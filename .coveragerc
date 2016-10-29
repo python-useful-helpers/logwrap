@@ -1,0 +1,5 @@
+[run]
+source =
+    logwrap
+omit =
+    logwrap/_tests/*
