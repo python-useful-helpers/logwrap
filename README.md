@@ -60,3 +60,15 @@ Note: get_call_args reqires strictly consistent set of arguments for function.
 
 Testing
 =======
+The main test mechanism for the package `logwrap` is using `tox`.
+Test environments available:
+
+    pep8
+    py27
+    py34
+    py35
+    pylint
+    docs
+
+Also possible to run `python setup.py test` for unti tests and `python setup.py flake8` for code style tests,
+but it requires all package dependencies to be installed.
