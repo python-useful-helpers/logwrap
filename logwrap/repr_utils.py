@@ -114,7 +114,7 @@ def pretty_repr(
     else:
         prefix, suffix = '{', '}'
     for elem in src:
-        if _simple(elem):
+        if _simple(elem) or len(elem) == 0:
             result += '\n'
         result += pretty_repr(
             elem,

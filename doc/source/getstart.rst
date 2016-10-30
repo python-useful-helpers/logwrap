@@ -1,0 +1,77 @@
+.. _getstart:
+
+Getting Started
+===============
+
+logwrap is a python package with several helpers, primary designed for easy
+logging of function calls by human-readable way.
+
+There are several functions are made public for usage in external code:
+
+* logwrap - decorator for logging of function calls
+* pretty_repr - helpers for making human-readable repr output for complex objects
+* get_arg_names - get argument names lis for the function
+* get_call_args - get bound OrderedDict of arguments for the function
+
+Every helper contains docstring with description for call arguments.
+There is no reason for importing any submodule: the all public API is exposed on the top level.
+
+Example of code (Python 3 related)
+**********************************
+
+.. code-block:: python
+   :caption: script.py
+   :name: script.py
+
+   import logwrap
+
+   @logwrap.logwrap
+   def example_function1(
+           arg1: str,
+           arg2: str='arg2',
+           *args,
+           kwarg1: str,
+           kwarg2: str='kwarg2',
+           **kwargs
+   ) -> tuple():
+       return (arg1, arg2, args, kwarg1, kwarg2, kwargs)
+
+   example_function1('arg1', kwarg1='kwarg1', kwarg3='kwarg3')
+
+This code during execution will produce log records:
+
+.. code-block:: text
+
+    Calling:
+    'example_function1'(
+        'arg1'=u'''arg1''',
+        'arg2'=u'''arg2''',
+        'args'=(),
+        'kwarg1'=u'''kwarg1''',
+        'kwarg2'=u'''kwarg2''',
+        'kwargs'=
+             dict({
+                'kwarg3': u'''kwarg3''',
+             }),
+    )
+    Done: 'example_function1' with result:
+
+     tuple((
+        u'''arg1''',
+        u'''arg2''',
+        (),
+        u'''kwarg1''',
+        u'''kwarg2''',
+         dict({
+            'kwarg3': u'''kwarg3''',
+         }),
+     ))
+
+During execution of function other helpers called as:
+
+.. code-block:: python
+
+    get_arg_names(example_function1)
+    get_call_args(*('arg1'), **dict(kwarg1='kwarg1', kwarg3='kwarg3'))
+
+Also `pretty_repr` is called for every argument and call result.
