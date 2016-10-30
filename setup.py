@@ -13,11 +13,10 @@
 #    under the License.
 
 import setuptools
-import sys
 
 setuptools.setup(
     name='logwrap',
-    version='0.5.1',
+    version='0.5.2',
     packages=['logwrap'],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -58,6 +57,6 @@ setuptools.setup(
         'tox>=2.0',
         'pytest>=3.0',
         'pytest-cov',
-        'mock' if sys.version_info.major == 2 else ''
+        'mock'
     ],
 )
