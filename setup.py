@@ -13,10 +13,11 @@
 #    under the License.
 
 import setuptools
+import sys
 
 setuptools.setup(
     name='logwrap',
-    version='0.5.2',
+    version='0.5.3',
     packages=['logwrap'],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -30,7 +31,6 @@ setuptools.setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
@@ -57,6 +57,5 @@ setuptools.setup(
         'tox>=2.0',
         'pytest>=3.0',
         'pytest-cov',
-        'mock'
-    ],
+    ] + ['mock'] if sys.version_info.major == 2 else [],
 )
