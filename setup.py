@@ -19,6 +19,28 @@ setuptools.setup(
     name='logwrap',
     version='0.5',
     packages=['logwrap'],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Developers',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+
+        'License :: OSI Approved :: Apache Software License',
+
+        # Specify the Python versions you support here. In particular, ensure
+        # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+    ],
+    keywords='logging debugging development',
+
     zip_safe=True,
     url='',
     license='Apache License, Version 2.0',
