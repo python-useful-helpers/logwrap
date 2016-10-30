@@ -15,9 +15,11 @@
 import setuptools
 import sys
 
+import logwrap
+
 setuptools.setup(
     name='logwrap',
-    version='0.5.3',
+    version=logwrap.__version__,
     packages=['logwrap'],
     classifiers=[
         'Development Status :: 4 - Beta',

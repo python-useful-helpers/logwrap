@@ -2,4 +2,4 @@
 source =
     logwrap
 omit =
-    logwrap/_tests/*
+    _tests/*
