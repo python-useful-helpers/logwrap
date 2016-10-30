@@ -17,7 +17,7 @@ import sys
 
 setuptools.setup(
     name='logwrap',
-    version='0.5',
+    version='0.5.1',
     packages=['logwrap'],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -42,7 +42,7 @@ setuptools.setup(
     keywords='logging debugging development',
 
     zip_safe=True,
-    url='',
+    url='https://github.com/penguinolog/logwrap',
     license='Apache License, Version 2.0',
     author='Alexey Stepanov',
     author_email='penguinolog@gmail.com',
