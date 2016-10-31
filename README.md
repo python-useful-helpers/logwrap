@@ -1,6 +1,10 @@
 logwrap
 =======
 
+[![Travis CI](https://travis-ci.org/penguinolog/logwrap.svg?branch=master)](https://travis-ci.org/penguinolog/logwrap)
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/72f332d53b924cd2b2c0dc6f9d1f8d0f)](https://www.codacy.com/app/penguinolog/logwrap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=penguinolog/logwrap&amp;utm_campaign=Badge_Grade)
+
 logwrap is a helper for logging in human-readable format function arguments and call result on function call.
 
 This package also includes helpers:

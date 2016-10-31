@@ -97,30 +97,21 @@ def pretty_repr(
                     max_indent=max_indent,
                 )
             )
-        return (
-            _formatters['iterable_item'](
-                spc='',
-                obj_type=src.__class__.__name__,
-                start=prefix,
-                indent=indent,
-                result=result,
-                end=suffix,
-            )
-        )
-    if isinstance(src, list):
-        prefix, suffix = '[', ']'
-    elif isinstance(src, tuple):
-        prefix, suffix = '(', ')'
     else:
-        prefix, suffix = '{', '}'
-    for elem in src:
-        if _simple(elem) or len(elem) == 0:
-            result += '\n'
-        result += pretty_repr(
-            elem,
-            indent + 4,
-            max_indent=max_indent,
-        ) + ','
+        if isinstance(src, list):
+            prefix, suffix = '[', ']'
+        elif isinstance(src, tuple):
+            prefix, suffix = '(', ')'
+        else:
+            prefix, suffix = '{', '}'
+        for elem in src:
+            if _simple(elem) or len(elem) == 0:
+                result += '\n'
+            result += pretty_repr(
+                elem,
+                indent + 4,
+                max_indent=max_indent,
+            ) + ','
     return (
         _formatters['iterable_item'](
             spc='',
