@@ -105,7 +105,7 @@ def pretty_repr(
         else:
             prefix, suffix = '{', '}'
         for elem in src:
-            if _simple(elem) or len(elem) == 0:
+            if _simple(elem) or len(elem) == 0 or indent + 4 >= max_indent:
                 result += '\n'
             result += pretty_repr(
                 elem,

@@ -27,6 +27,6 @@ from .func_helpers import get_call_args
 from .log_wrap import logwrap
 from .repr_utils import pretty_repr
 
-__version__ = '0.5.5'
+__version__ = '0.5.6'
 
 __all__ = ['get_arg_names', 'get_call_args', 'logwrap', 'pretty_repr']
