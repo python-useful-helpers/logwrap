@@ -17,6 +17,9 @@ import sys
 
 import logwrap
 
+with open('README.rst') as file:
+    long_description = file.read()
+
 setuptools.setup(
     name='logwrap',
     version=logwrap.__version__,
@@ -50,6 +53,7 @@ setuptools.setup(
     description=(
         'Decorator for logging function arguments by human-readable way'
     ),
+    long_description=long_description,
     install_requires=[
         'six>=1.9.0'
         'pytest-runner>=2.0',
