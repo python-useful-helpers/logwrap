@@ -1,7 +1,10 @@
 logwrap
 =======
 
-[![Travis CI](https://travis-ci.org/penguinolog/logwrap.svg?branch=master)](https://travis-ci.org/penguinolog/logwrap) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/72f332d53b924cd2b2c0dc6f9d1f8d0f)](https://www.codacy.com/app/penguinolog/logwrap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=penguinolog/logwrap&amp;utm_campaign=Badge_Grade)
+.. image:: https://travis-ci.org/penguinolog/logwrap.svg?branch=master
+    :target: https://travis-ci.org/penguinolog/logwrap
+.. image:: https://api.codacy.com/project/badge/Grade/72f332d53b924cd2b2c0dc6f9d1f8d0f
+    :target: https://www.codacy.com/app/penguinolog/logwrap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=penguinolog/logwrap&amp;utm_campaign=Badge_Grade
 
 logwrap is a helper for logging in human-readable format function arguments and call result on function call.
 
@@ -10,7 +13,7 @@ This package also includes helpers:
     pretty_repr
     get_arg_names
     get_call_args
-    
+
 Usage
 =====
 
@@ -38,7 +41,7 @@ Signature is self-documenting:
         no_indent_start=False,  # do not indent the first level
         max_indent=20,  # maximum allowed indent level
     )
-    
+
 Limitation: Dict like objects is always marked inside `{}` for readability, even if it is `collections.OrderedDict` (standard repr as list of tuples).
 
 get_arg_names
@@ -56,7 +59,7 @@ Get call arguments bound to argument names for function. This is multiple python
 Usage:
 
     get_call_args(func, *positional, **named)
-    
+
 where `func` is target function, `*positional` and `**named` is arguments for the `func`.
 Note: get_call_args reqires strictly consistent set of arguments for function.
 
