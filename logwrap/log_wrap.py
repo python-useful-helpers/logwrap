@@ -34,6 +34,7 @@ def logwrap(
         log=_logger,
         log_level=logging.DEBUG,
         exc_level=logging.ERROR,
+        max_indent=20,
         spec=None,
 ):
     """Log function calls and return values
@@ -44,6 +45,8 @@ def logwrap(
     :type log_level: int
     :param exc_level: log level for exception cases
     :type exc_level: int
+    :param max_indent: maximal indent before classic repr() call.
+    :type max_indent: int
     :param spec: callable object used as spec for arguments bind.
                  This is designed for the special cases only,
                  when impossible to change signature of target object,
@@ -82,6 +85,7 @@ def logwrap(
                         val=core.pretty_repr(
                             val,
                             indent=8,
+                            max_indent=max_indent,
                             no_indent_start=True,
                         ),
                     )
@@ -100,7 +104,11 @@ def logwrap(
                     level=log_level,
                     msg="Done: {name!r} with result:\n{result}".format(
                         name=func.__name__,
-                        result=core.pretty_repr(result))
+                        result=core.pretty_repr(
+                            result,
+                            max_indent=max_indent,
+                        )
+                    )
                 )
             except BaseException:
                 log.log(

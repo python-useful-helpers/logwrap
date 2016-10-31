@@ -24,6 +24,7 @@ Argumented usage with arguments from signature:
         log=logging.getLogger(__name__),  # __name__ = 'logwrap'
         log_level=logging.DEBUG,
         exc_level=logging.ERROR,
+        max_indent=20,
         spec=None,  # use target callable function for spec
     )
 
