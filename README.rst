@@ -10,9 +10,9 @@ logwrap is a helper for logging in human-readable format function arguments and 
 
 This package also includes helpers:
 
-    pretty_repr
-    get_arg_names
-    get_call_args
+* pretty_repr
+* get_arg_names
+* get_call_args
 
 Usage
 =====
@@ -22,6 +22,8 @@ logwrap
 The main decorator. Could be used as not argumented (`@logwrap.logwrap`) and argumented (`@logwrap.logwrap()`).
 Not argumented usage simple calls with default values for all positions.
 Argumented usage with arguments from signature:
+
+.. code-block:: python
 
     @logwrap.logwrap(
         log=logging.getLogger(__name__),  # __name__ = 'logwrap'
@@ -34,6 +36,8 @@ pretty_repr
 -----------
 This is specified helper for making human-readable repr on complex objects.
 Signature is self-documenting:
+
+.. code-block:: python
 
     def pretty_repr(
         src,  # object for repr
@@ -49,6 +53,8 @@ get_arg_names
 Get argument names for function. This is multiple python versions supporting helper, due to differences between Python 2.7 and Python 3.3+
 Usage:
 
+.. code-block:: python
+
     get_arg_names(func)
 
 where `func` is target function.
@@ -57,6 +63,8 @@ get_call_args
 -------------
 Get call arguments bound to argument names for function. This is multiple python versions supporting helper, due to differences between Python 2.7 and Python 3.5+
 Usage:
+
+.. code-block:: python
 
     get_call_args(func, *positional, **named)
 
