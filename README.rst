@@ -8,9 +8,9 @@ logwrap
 .. image:: https://img.shields.io/pypi/v/logwrap.svg
     :target: https://pypi.python.org/pypi/logwrap
 .. image:: https://img.shields.io/pypi/pyversions/logwrap.svg
-    :target:
+    :target: https://pypi.python.org/pypi/logwrap
 .. image:: https://img.shields.io/github/license/penguinolog/logwrap.svg
-    :target:
+    :target: https://raw.githubusercontent.com/penguinolog/logwrap/master/LICENSE
 
 
 logwrap is a helper for logging in human-readable format function arguments and call result on function call.
