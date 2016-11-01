@@ -5,6 +5,13 @@ logwrap
     :target: https://travis-ci.org/penguinolog/logwrap
 .. image:: https://api.codacy.com/project/badge/Grade/72f332d53b924cd2b2c0dc6f9d1f8d0f
     :target: https://www.codacy.com/app/penguinolog/logwrap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=penguinolog/logwrap&amp;utm_campaign=Badge_Grade
+.. image:: https://img.shields.io/pypi/v/logwrap.svg
+    :target: https://pypi.python.org/pypi/logwrap
+.. image:: https://img.shields.io/pypi/pyversions/logwrap.svg
+    :target:
+.. image:: https://img.shields.io/github/license/penguinolog/logwrap.svg
+    :target:
+
 
 logwrap is a helper for logging in human-readable format function arguments and call result on function call.
 
