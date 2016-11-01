@@ -35,7 +35,7 @@ _formatters = {
     'iterable_item':
         "\n"
         "{spc:<{indent}}{obj_type:}({start}{result}\n"
-        "{end:>{indent}})".format
+        "{spc:<{indent}}{end})".format
 }
 
 
