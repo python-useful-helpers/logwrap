@@ -3,7 +3,7 @@ machine:
     version: 3.5.2
 
 dependencies:
-  post:
+  override:
     - sudo pip install -U virtualenv
     - sudo pip install -U setuptools
     - sudo pip install -U tox
