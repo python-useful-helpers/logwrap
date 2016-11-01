@@ -9,6 +9,8 @@ logwrap
     :target: https://pypi.python.org/pypi/logwrap
 .. image:: https://img.shields.io/pypi/pyversions/logwrap.svg
     :target: https://pypi.python.org/pypi/logwrap
+.. image:: https://img.shields.io/pypi/status/logwrap.svg
+    :target: https://pypi.python.org/pypi/logwrap
 .. image:: https://img.shields.io/github/license/penguinolog/logwrap.svg
     :target: https://raw.githubusercontent.com/penguinolog/logwrap/master/LICENSE
 
@@ -127,10 +129,13 @@ Testing
 The main test mechanism for the package `logwrap` is using `tox`.
 Test environments available:
 
+::
+
     pep8
     py27
     py34
     py35
+    pypy
     pylint
     docs
 

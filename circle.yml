@@ -1,0 +1,19 @@
+machine:
+  python:
+    version: 3.5
+
+dependencies:
+  post:
+    - sudo pip install -U virtualenv
+    - sudo pip install -U setuptools
+    - sudo pip install -U tox
+
+test:
+  override:
+    - tox -e pylint
+
+deployment:
+  coverage:
+    branch: master
+    commands:
+      - tox -e upload_coverage
