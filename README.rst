@@ -8,6 +8,21 @@ logwrap
 
 logwrap is a helper for logging in human-readable format function arguments and call result on function call.
 
+Pros:
+
+* Free software: Apache license
+* Open Source: https://github.com/penguinolog/logwrap
+* PyPI packaged: https://pypi.python.org/pypi/logwrap
+* Self-documented code: docstrings with types in comments
+* Tested: see bages on top
+* Support miltiple Python versions:
+
+    Python 2.7
+    Python 3.4
+    Python 3.5
+    Python 3.6
+    PyPy
+
 This package also includes helpers:
 
 * pretty_repr
@@ -32,6 +47,32 @@ Argumented usage with arguments from signature:
         max_indent=20,  # forwarded to the pretty_repr
         spec=None,  # use target callable function for spec
     )
+
+Usage examples:
+
+.. code-block:: python
+
+    @logwrap.logwrap()
+    def foo():
+        pass
+
+is equal to:
+
+.. code-block:: python
+
+    @logwrap.logwrap
+    def foo():
+        pass
+
+Get decorator for use without parameters:
+
+.. code-block:: python
+
+    get_logs = logwap.logwrap()  # set required parameters via arguments
+
+    @get_logs
+    def foo():
+        pass
 
 pretty_repr
 -----------
