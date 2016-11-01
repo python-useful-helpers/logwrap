@@ -8,7 +8,6 @@ dependencies:
     - sudo pip install -U setuptools
     - sudo pip install -U tox
     - sudo pip install -U six
-    - sudo pip install -U pylint
 
 test:
   override:
