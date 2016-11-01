@@ -32,7 +32,7 @@ sphinx_apidoc_main([
     # source dir
     '../../logwrap',
     # exclude dirs
-    '../../logwrap/_tests/',
+    '../../test/',
 ])
 
 # If extensions (or modules to document with autodoc) are in another directory,
