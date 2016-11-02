@@ -70,6 +70,12 @@ def get_call_args(func, *positional, **named):
     :type positional: iterable
     :type named: dict
     :rtype: collections.OrderedDict
+
+    >>> def tst(arg, darg=2, *args, **kwargs):
+    ...     pass
+
+    >>> get_call_args(tst, *(1, ))
+    OrderedDict([('arg', 1), ('darg', 2), ('args', ()), ('kwargs', {})])
     """
     # noinspection PyUnresolvedReferences
     if sys.version_info[0:2] < (3, 5):  # apply_defaults is py35 feature
