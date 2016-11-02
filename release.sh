@@ -4,4 +4,3 @@ tox
 python setup.py sdist bdist_wheel bdist_egg
 twine register dist/logwrap*.tar.gz
 twine upload ./dist/*
-tox -e upload_docs
