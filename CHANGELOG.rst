@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+Version 0.7.1
+-------------
+* Tests is included in package
+* Docstrings and misprints in documents fixed
+* CI CD
+
 Version 0.7
 -----------
 Functional changes:
