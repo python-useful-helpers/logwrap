@@ -30,6 +30,7 @@ def _simple(item):
 
 _formatters = {
     'simple': "{spc:<{indent}}{val!r}".format,
+    'manual': "{spc:<{indent}}{val}".format,
     'text': "{spc:<{indent}}{prefix}'''{string}'''".format,
     'dict': "\n{spc:<{indent}}{key!r:{size}}: {val},".format,
     'iterable_item':
@@ -37,6 +38,46 @@ _formatters = {
         "{spc:<{indent}}{obj_type:}({start}{result}\n"
         "{spc:<{indent}}{end})".format
 }
+
+
+def _repr_simple(src, indent=0, no_indent_start=False):
+    """repr object without iteration
+
+    :type src: union(six.binary_type, six.text_type, int, iterable, object)
+    :type indent: int
+    :type no_indent_start: bool
+    :rtype: str
+    """
+    indent = 0 if no_indent_start else indent
+    if isinstance(src, (six.binary_type, six.text_type)):
+        if isinstance(src, six.binary_type):
+            string = src.decode(
+                encoding='utf-8',
+                errors='backslashreplace'
+            )
+            prefix = 'b'
+        else:
+            string = src
+            prefix = 'u'
+        return _formatters['text'](
+            spc='',
+            indent=indent,
+            prefix=prefix,
+            string=string
+        )
+    # Parse set manually due to different repr() implementation
+    # in different python versions
+    if isinstance(src, set):
+        return _formatters['manual'](
+            spc='',
+            indent=indent,
+            val='set()',
+        )
+    return _formatters['simple'](
+        spc='',
+        indent=indent,
+        val=src,
+    )
 
 
 def pretty_repr(
@@ -58,27 +99,10 @@ def pretty_repr(
     :return: formatted string
     """
     if _simple(src) or indent >= max_indent or len(src) == 0:
-        indent = 0 if no_indent_start else indent
-        if isinstance(src, (six.binary_type, six.text_type)):
-            if isinstance(src, six.binary_type):
-                string = src.decode(
-                    encoding='utf-8',
-                    errors='backslashreplace'
-                )
-                prefix = 'b'
-            else:
-                string = src
-                prefix = 'u'
-            return _formatters['text'](
-                spc='',
-                indent=indent,
-                prefix=prefix,
-                string=string
-            )
-        return _formatters['simple'](
-            spc='',
+        return _repr_simple(
+            src=src,
             indent=indent,
-            val=src
+            no_indent_start=no_indent_start,
         )
     result = ''
     if isinstance(src, dict):

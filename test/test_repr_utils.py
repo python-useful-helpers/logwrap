@@ -65,7 +65,7 @@ class TestPrettyRepr(unittest.TestCase):
             '})'
         )
 
-    def test_nested_dict(self):
+    def test_nested_obj(self):
         test_obj = [
             {1: 2},
             {3: {4}},
@@ -101,7 +101,7 @@ class TestPrettyRepr(unittest.TestCase):
             '    {},\n'
             '    [],\n'
             '    (),\n'
-            '    %s,\n'
-            '])' % repr(set())
+            '    set(),\n'
+            '])'
         )
         self.assertEqual(logwrap.pretty_repr(test_obj), exp_repr)
