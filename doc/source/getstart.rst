@@ -20,8 +20,6 @@ Example of code (Python 3 related)
 **********************************
 
 .. code-block:: python
-   :caption: script.py
-   :name: script.py
 
    import logwrap
 
@@ -40,7 +38,7 @@ Example of code (Python 3 related)
 
 This code during execution will produce log records:
 
-.. code-block:: text
+::
 
     Calling:
     'example_function1'(
@@ -72,6 +70,11 @@ During execution of function other helpers called as:
 .. code-block:: python
 
     get_arg_names(example_function1)
-    get_call_args(*('arg1'), **dict(kwarg1='kwarg1', kwarg3='kwarg3'))
+    get_call_args(example_function1, *('arg1'), **dict(kwarg1='kwarg1', kwarg3='kwarg3'))
 
 Also `pretty_repr` is called for every argument and call result.
+
+.. code-block:: python
+
+    pretty_repr(('arg1', 'arg2', (), 'kwarg1', 'kwarg2', {'kwarg3': 'kwarg3'})
+
