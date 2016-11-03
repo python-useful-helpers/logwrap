@@ -11,8 +11,10 @@ dependencies:
 
 test:
   override:
-    - tox -e pylint
     - tox -e docs
+        parallel: true
+    - tox -e pylint
+        parallel: true
 
 deployment:
   coverage:
