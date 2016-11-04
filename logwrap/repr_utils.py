@@ -24,12 +24,12 @@ from __future__ import unicode_literals
 import sys
 
 
-if sys.version_info[0:2] < (3, 0):
-    binary_type = str
-    text_type = unicode
-else:
+if sys.version_info[0:2] > (3, 0):
     binary_type = bytes
     text_type = str
+else:
+    binary_type = str
+    text_type = unicode
 
 
 def _simple(item):
