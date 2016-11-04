@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 0.7.2
+-------------
+Internal bump for CI systems check
+
 Version 0.7.1
 -------------
 * Tests is included in package
