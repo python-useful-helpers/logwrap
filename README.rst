@@ -145,3 +145,10 @@ Test environments available:
 
 Also possible to run `python setup.py test` for unit tests and `python setup.py flake8` for code style tests,
 but it requires all package dependencies to be installed.
+
+CI systems
+==========
+For code checking several CI systems is used in parallel:
+1. `Travis CI: <https://travis-ci.org/penguinolog/logwrap>`_ is used for checking: PEP8, installation possibility and unit tests
+2. `Circle CI: <https://circleci.com/gh/penguinolog/logwrap>`_ is used for checking: pylint, docs. In addition this CI publishes coverage results.
+3. `Codacy: <https://www.codacy.com/app/penguinolog/logwrap/dashboard>`_ is used for statical analysis and coverage display.
