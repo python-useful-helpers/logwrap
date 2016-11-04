@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 0.7.3
+-------------
+* Documentation update only
+
 Version 0.7.2
 -------------
 Internal bump for CI systems check
