@@ -7,7 +7,6 @@ dependencies:
     - sudo pip install -U virtualenv
     - sudo pip install -U setuptools
     - sudo pip install -U tox
-    - sudo pip install -U six
 
 test:
   override:

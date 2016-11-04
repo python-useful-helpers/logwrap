@@ -55,7 +55,6 @@ setuptools.setup(
     ),
     long_description=long_description,
     install_requires=[
-        'six>=1.9.0'
         'pytest-runner>=2.0',
     ],
     tests_require=[

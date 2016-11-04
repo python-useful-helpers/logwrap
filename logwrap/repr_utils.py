@@ -21,7 +21,15 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import six
+import sys
+
+
+if sys.version_info[0:2] < (3, 0):
+    binary_type = str
+    text_type = unicode
+else:
+    binary_type = bytes
+    text_type = str
 
 
 def _simple(item):
@@ -49,8 +57,8 @@ def _repr_simple(src, indent=0, no_indent_start=False):
     :rtype: str
     """
     indent = 0 if no_indent_start else indent
-    if isinstance(src, (six.binary_type, six.text_type)):
-        if isinstance(src, six.binary_type):
+    if isinstance(src, (binary_type, text_type)):
+        if isinstance(src, binary_type):
             string = src.decode(
                 encoding='utf-8',
                 errors='backslashreplace'

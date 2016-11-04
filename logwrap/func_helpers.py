@@ -24,8 +24,6 @@ import collections
 import inspect
 import sys
 
-import six
-
 
 # pylint: disable=no-member
 def get_arg_names(func):
@@ -49,7 +47,7 @@ def get_arg_names(func):
     ['arg']
     """
     # noinspection PyUnresolvedReferences
-    if six.PY2:
+    if sys.version_info[0:2] < (3, 0):
         # pylint: disable=deprecated-method
         spec = inspect.getargspec(func=func)
         # pylint: enable=deprecated-method
