@@ -29,7 +29,10 @@ if sys.version_info[0:2] > (3, 0):
     text_type = str
 else:
     binary_type = str
-    text_type = unicode
+    # pylint: disable=unicode-builtin
+    # noinspection PyUnresolvedReferences
+    text_type = unicode  # NOQA
+    # pylint: enable=unicode-builtin
 
 
 def _simple(item):

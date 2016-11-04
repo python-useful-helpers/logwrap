@@ -49,6 +49,7 @@ def get_arg_names(func):
     # noinspection PyUnresolvedReferences
     if sys.version_info[0:2] < (3, 0):
         # pylint: disable=deprecated-method
+        # noinspection PyDeprecation
         spec = inspect.getargspec(func=func)
         # pylint: enable=deprecated-method
         args = spec.args[:]
