@@ -47,7 +47,7 @@ def get_arg_names(func):
     ['arg']
     """
     # noinspection PyUnresolvedReferences
-    if sys.version_info[0:2] < (3, 0):
+    if sys.version_info[0:2] < (3, 3):
         # pylint: disable=deprecated-method
         # noinspection PyDeprecation
         spec = inspect.getargspec(func=func)
@@ -89,6 +89,65 @@ def get_call_args(func, *positional, **named):
     sig = inspect.signature(func).bind(*positional, **named)
     sig.apply_defaults()  # after bind we doesn't have defaults
     return sig.arguments
+
+
+def get_default_args(func):
+    """Get function defaults from it's signature
+
+    :param func: target function
+    :type func: function
+    :rtype: collections.OrderedDict
+
+    >>> def tst0():pass
+
+    >>> get_default_args(tst0)
+    OrderedDict()
+
+    >>> def tst1(a): pass
+
+    >>> get_default_args(tst1)
+    OrderedDict()
+
+    >>> def tst2(a, b): pass
+
+    >>> get_default_args(tst2)
+    OrderedDict()
+
+    >>> def tst3(a=0): pass
+
+    >>> get_default_args(tst3)
+    OrderedDict([('a', 0)])
+
+    >>> def tst4(a, b=1): pass
+
+    >>> get_default_args(tst4)
+    OrderedDict([('b', 1)])
+
+    >>> def tst5(a=0, b=1): pass
+
+    >>> get_default_args(tst5)
+    OrderedDict([('a', 0), ('b', 1)])
+    """
+    if sys.version_info[0:2] < (3, 0):
+        # pylint: disable=deprecated-method
+        # noinspection PyDeprecation
+        spec = inspect.getargspec(func)
+        # pylint: enable=deprecated-method
+        if not spec.defaults:
+            return collections.OrderedDict()
+        collector = []
+        for val in range(1, len(spec.defaults)+1):
+            collector.append((spec.args[-val], spec.defaults[-val]))
+        return collections.OrderedDict(reversed(collector))
+    sig = inspect.signature(func)
+    result = collections.OrderedDict(
+        [
+            (arg.name, arg.default)
+            for arg in sig.parameters.values()
+            if arg.default != inspect.Parameter.empty
+        ]
+    )
+    return result
 # pylint: enable=no-member
 
 __all__ = ['get_arg_names', 'get_call_args']
