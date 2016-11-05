@@ -91,6 +91,62 @@ def get_call_args(func, *positional, **named):
     return sig.arguments
 
 
+def get_args_kwargs_names(func):
+    """Get names of *args and **kwargs in uniform manner
+
+    :param func: target function
+    :type func: function
+    :rtype: tuple(str, str)
+
+    This helper is useful for producing callable repr():
+    get_call_args() returns fully bound arguments
+    (as it designed in PY3 inspect.signature), but named and positional
+    arguments is impossible to provide by standard manner
+    (except modify code in runtime, which is bad practice).
+
+    >>> def tst0():pass
+
+    >>> get_args_kwargs_names(tst0)
+    (None, None)
+
+    >>> def tst1(a): pass
+
+    >>> get_args_kwargs_names(tst1)
+    (None, None)
+
+    >>> def tst2(a, *positional): pass
+
+    >>> get_args_kwargs_names(tst2)
+    ('positional', None)
+
+    >>> def tst3(a, **named): pass
+
+    >>> get_args_kwargs_names(tst3)
+    (None, 'named')
+
+    >>> def tst4(a, *positional, **named): pass
+
+    >>> get_args_kwargs_names(tst4)
+    ('positional', 'named')
+    """
+    if sys.version_info[0:2] < (3, 0):
+        # pylint: disable=deprecated-method
+        # noinspection PyDeprecation
+        spec = inspect.getargspec(func)
+        # pylint: enable=deprecated-method
+        return spec.varargs, spec.keywords
+    sig = inspect.signature(func)
+    args_name = None
+    kwargs_name = None
+    for arg in sig.parameters.values():
+        if arg.kind == inspect.Parameter.VAR_POSITIONAL:
+            args_name = arg.name
+        elif arg.kind == inspect.Parameter.VAR_KEYWORD:
+            kwargs_name = arg.name
+
+    return args_name, kwargs_name
+
+
 def get_default_args(func):
     """Get function defaults from it's signature
 
@@ -151,4 +207,9 @@ def get_default_args(func):
     return result
 # pylint: enable=no-member
 
-__all__ = ['get_arg_names', 'get_call_args', 'get_default_args']
+__all__ = [
+    'get_arg_names',
+    'get_call_args',
+    'get_args_kwargs_names',
+    'get_default_args',
+]

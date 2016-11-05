@@ -93,6 +93,47 @@ class TestFuncHelpers(unittest.TestCase):
             {'arg1': 'arg1', 'arg2': 2}
         )
 
+    def test_get_args_kwargs_names(self):
+        def tst0():
+            pass
+
+        self.assertEqual(
+            logwrap.get_args_kwargs_names(tst0),
+            (None, None)
+        )
+
+        def tst1(a):
+            pass
+
+        self.assertEqual(
+            logwrap.get_args_kwargs_names(tst1),
+            (None, None)
+        )
+
+        def tst2(a, *positional):
+            pass
+
+        self.assertEqual(
+            logwrap.get_args_kwargs_names(tst2),
+            ('positional', None)
+        )
+
+        def tst3(a, **named):
+            pass
+
+        self.assertEqual(
+            logwrap.get_args_kwargs_names(tst3),
+            (None, 'named')
+        )
+
+        def tst4(a, *positional, **named):
+            pass
+
+        self.assertEqual(
+            logwrap.get_args_kwargs_names(tst4),
+            ('positional', 'named')
+        )
+
     def test_get_default_args(self):
         def tst0():
             pass

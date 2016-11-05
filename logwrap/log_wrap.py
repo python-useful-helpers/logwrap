@@ -73,10 +73,12 @@ def logwrap(
 
              *args and **kwargs is bound in separate helpers
              """
-            if not spec:
-                call_args = core.get_call_args(func, *args, **kwargs)
-            else:
-                call_args = core.get_call_args(spec, *args, **kwargs)
+            call_args = core.get_call_args(
+                func if not spec else spec,
+                *args,
+                **kwargs
+            )
+
             args_repr = ""
             if len(call_args) > 0:
                 args_repr = "\n    " + "\n    ".join((
