@@ -30,6 +30,30 @@ import logwrap as core
 _logger = logging.getLogger(__name__)
 
 
+def _get_func_args_repr(call_args, max_indent):
+    """Internal helper for reducing complexity of decorator code
+
+    :type call_args: collections.OrderedDict
+    :type max_indent: int
+    :rtype: str
+    """
+    args_repr = ""
+    if len(call_args) > 0:
+        args_repr = "\n    " + "\n    ".join((
+            "{key!r}={val},".format(
+                key=key,
+                val=core.pretty_repr(
+                    val,
+                    indent=8,
+                    max_indent=max_indent,
+                    no_indent_start=True,
+                ),
+            )
+            for key, val in call_args.items())
+        ) + '\n'
+    return args_repr
+
+
 def logwrap(
         log=_logger,
         log_level=logging.DEBUG,
@@ -79,20 +103,8 @@ def logwrap(
                 **kwargs
             )
 
-            args_repr = ""
-            if len(call_args) > 0:
-                args_repr = "\n    " + "\n    ".join((
-                    "{key!r}={val},".format(
-                        key=key,
-                        val=core.pretty_repr(
-                            val,
-                            indent=8,
-                            max_indent=max_indent,
-                            no_indent_start=True,
-                        ),
-                    )
-                    for key, val in call_args.items())
-                ) + '\n'
+            args_repr = _get_func_args_repr(call_args, max_indent)
+
             log.log(
                 level=log_level,
                 msg="Calling: \n{name!r}({arguments})".format(
