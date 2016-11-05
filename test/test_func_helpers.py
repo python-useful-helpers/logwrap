@@ -94,48 +94,56 @@ class TestFuncHelpers(unittest.TestCase):
         )
 
     def test_get_default_args(self):
-        def tst0(): pass
+        def tst0():
+            pass
+
         self.assertEqual(
             logwrap.get_default_args(tst0),
             collections.OrderedDict()
         )
 
-        def tst1(a): pass
+        def tst1(a):
+            pass
 
         self.assertEqual(
             logwrap.get_default_args(tst1),
             collections.OrderedDict()
         )
 
-        def tst2(a, b): pass
+        def tst2(a, b):
+            pass
 
         self.assertEqual(
             logwrap.get_default_args(tst2),
             collections.OrderedDict()
         )
 
-        def tst3(a=0): pass
+        def tst3(a=0):
+            pass
 
         self.assertEqual(
             logwrap.get_default_args(tst3),
             collections.OrderedDict([('a', 0)])
         )
 
-        def tst4(a, b=1): pass
+        def tst4(a, b=1):
+            pass
 
         self.assertEqual(
             logwrap.get_default_args(tst4),
             collections.OrderedDict([('b', 1)])
         )
 
-        def tst5(a=0, b=1): pass
+        def tst5(a=0, b=1):
+            pass
 
         self.assertEqual(
             logwrap.get_default_args(tst5),
             collections.OrderedDict([('a', 0), ('b', 1)])
         )
 
-        def tst6(a=0, b=1, *args, **kwargs): pass
+        def tst6(a=0, b=1, *args, **kwargs):
+            pass
 
         self.assertEqual(
             logwrap.get_default_args(tst6),
