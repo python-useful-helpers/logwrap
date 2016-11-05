@@ -136,7 +136,7 @@ def get_default_args(func):
         if not spec.defaults:
             return collections.OrderedDict()
         collector = []
-        for val in range(1, len(spec.defaults)+1):
+        for val in range(1, len(spec.defaults) + 1):
             collector.append((spec.args[-val], spec.defaults[-val]))
         return collections.OrderedDict(reversed(collector))
     sig = inspect.signature(func)
