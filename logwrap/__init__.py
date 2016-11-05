@@ -24,9 +24,16 @@ from __future__ import absolute_import
 
 from .func_helpers import get_arg_names
 from .func_helpers import get_call_args
+from .func_helpers import get_default_args
 from .log_wrap import logwrap
 from .repr_utils import pretty_repr
 
 __version__ = '0.8.0'
 
-__all__ = ['get_arg_names', 'get_call_args', 'logwrap', 'pretty_repr']
+__all__ = [
+    'get_arg_names',
+    'get_call_args',
+    'logwrap',
+    'pretty_repr',
+    'get_default_args',
+]

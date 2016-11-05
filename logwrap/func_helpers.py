@@ -151,4 +151,4 @@ def get_default_args(func):
     return result
 # pylint: enable=no-member
 
-__all__ = ['get_arg_names', 'get_call_args']
+__all__ = ['get_arg_names', 'get_call_args', 'get_default_args']
