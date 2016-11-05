@@ -135,9 +135,10 @@ def get_default_args(func):
         # pylint: enable=deprecated-method
         if not spec.defaults:
             return collections.OrderedDict()
-        collector = []
-        for val in range(1, len(spec.defaults) + 1):
-            collector.append((spec.args[-val], spec.defaults[-val]))
+        collector = [
+            (spec.args[-val], spec.defaults[-val])
+            for val in range(1, len(spec.defaults) + 1)
+        ]
         return collections.OrderedDict(reversed(collector))
     sig = inspect.signature(func)
     result = collections.OrderedDict(
