@@ -109,6 +109,8 @@ class TestPrettyRepr(unittest.TestCase):
         self.assertEqual(logwrap.pretty_repr(test_obj), exp_repr)
 
     def test_callable(self):
+        fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args})>".format
+
         def empty_func():
             pass
 
@@ -127,32 +129,37 @@ class TestPrettyRepr(unittest.TestCase):
 
         self.assertEqual(
             logwrap.pretty_repr(empty_func),
-            '\n<{}() at 0x{:X}>'.format(empty_func.__name__, id(empty_func))
+            fmt(spc='', indent=0, obj=empty_func, args='')
         )
 
         self.assertEqual(
             logwrap.pretty_repr(full_func),
-            '\n<{}(\n'
-            '    arg,\n'
-            '    darg=1,\n'
-            '    *positional,\n'
-            '    **named,\n'
-            ') at 0x{:X}>'.format(full_func.__name__, id(full_func))
+            fmt(
+                spc='',
+                indent=0,
+                obj=full_func,
+                args='\n'
+                '    arg,\n'
+                '    darg=1,\n'
+                '    *positional,\n'
+                '    **named,\n'
+            )
         )
 
         obj = TstClass.tst_method
 
         self.assertEqual(
             logwrap.pretty_repr(obj),
-            '\n<{}(\n'
-            '    self,\n'
-            '    arg,\n'
-            '    darg=1,\n'
-            '    *positional,\n'
-            '    **named,\n'
-            ') at 0x{:X}>'.format(
-                obj.__name__,
-                id(obj)
+            fmt(
+                spc='',
+                indent=0,
+                obj=obj,
+                args='\n'
+                     '    self,\n'
+                     '    arg,\n'
+                     '    darg=1,\n'
+                     '    *positional,\n'
+                     '    **named,\n'
             )
         )
 
@@ -160,17 +167,16 @@ class TestPrettyRepr(unittest.TestCase):
 
         self.assertEqual(
             logwrap.pretty_repr(obj),
-            '\n<{cls_name}.{obj}(\n'
-            '    cls={cls!r},\n'
-            '    arg,\n'
-            '    darg=1,\n'
-            '    *positional,\n'
-            '    **named,\n'
-            ') at 0x{id:X}>'.format(
-                cls_name=TstClass.__name__,
-                obj=obj.__name__,
-                cls=TstClass,
-                id=id(obj)
+            fmt(
+                spc='',
+                indent=0,
+                obj=obj,
+                args='\n'
+                     '    cls={cls!r},\n'
+                     '    arg,\n'
+                     '    darg=1,\n'
+                     '    *positional,\n'
+                     '    **named,\n'.format(cls=TstClass)
             )
         )
 
@@ -178,17 +184,16 @@ class TestPrettyRepr(unittest.TestCase):
 
         self.assertEqual(
             logwrap.pretty_repr(obj),
-            '\n<{cls_name}.{obj}(\n'
-            '    self={cls!r},\n'
-            '    arg,\n'
-            '    darg=1,\n'
-            '    *positional,\n'
-            '    **named,\n'
-            ') at 0x{id:X}>'.format(
-                cls_name=tst_instance.__class__.__name__,
-                obj=obj.__name__,
-                cls=tst_instance,
-                id=id(obj)
+            fmt(
+                spc='',
+                indent=0,
+                obj=obj,
+                args='\n'
+                     '    self={self!r},\n'
+                     '    arg,\n'
+                     '    darg=1,\n'
+                     '    *positional,\n'
+                     '    **named,\n'.format(self=tst_instance)
             )
         )
 
@@ -196,16 +201,15 @@ class TestPrettyRepr(unittest.TestCase):
 
         self.assertEqual(
             logwrap.pretty_repr(obj),
-            '\n<{cls_name}.{obj}(\n'
-            '    cls={cls!r},\n'
-            '    arg,\n'
-            '    darg=1,\n'
-            '    *positional,\n'
-            '    **named,\n'
-            ') at 0x{id:X}>'.format(
-                cls_name=tst_instance.__class__.__name__,
-                obj=obj.__name__,
-                cls=tst_instance.__class__,
-                id=id(obj)
+            fmt(
+                spc='',
+                indent=0,
+                obj=obj,
+                args='\n'
+                     '    cls={cls!r},\n'
+                     '    arg,\n'
+                     '    darg=1,\n'
+                     '    *positional,\n'
+                     '    **named,\n'.format(cls=TstClass)
             )
         )

@@ -23,7 +23,6 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import inspect
 import sys
 import types
 
@@ -55,8 +54,7 @@ _formatters = {
         "\n"
         "{spc:<{indent}}{obj_type:}({start}{result}\n"
         "{spc:<{indent}}{end})".format,
-    'function': "\n{spc:<{indent}}<{name}({args}) at 0x{id:X}>".format,
-    'method': "\n{spc:<{indent}}<{cls}.{name}({args}) at 0x{id:X}>".format,
+    'callable': "\n{spc:<{indent}}<{obj!r} with interface ({args})>".format,
     'func_arg': "\n{spc:<{indent}}{key},".format,
     'func_def_arg': "\n{spc:<{indent}}{key}={val},".format,
 }
@@ -70,7 +68,6 @@ def _repr_callable(src, indent=0, max_indent=20):
     :type max_indent: int
     :rtype: str
     """
-    isfunction = inspect.isfunction(src) or src.__self__ is None
     param_str = ""
 
     for param in _func_helpers.prepare_repr(src):
@@ -95,27 +92,11 @@ def _repr_callable(src, indent=0, max_indent=20):
 
     if param_str:
         param_str += "\n" + " " * indent
-    if isfunction:
-        return _formatters['function'](
-            spc="",
-            indent=indent,
-            name=src.__name__,
-            args=param_str,
-            id=id(src)
-        )
-    # Bound method: get source class
-    self_obj = next(_func_helpers.prepare_repr(src))[1]
-    if inspect.isclass(self_obj):
-        self_name = self_obj.__name__
-    else:
-        self_name = self_obj.__class__.__name__
-    return _formatters['method'](
+    return _formatters['callable'](
         spc="",
         indent=indent,
-        cls=self_name,
-        name=src.__name__,
+        obj=src,
         args=param_str,
-        id=id(src)
     )
 
 
