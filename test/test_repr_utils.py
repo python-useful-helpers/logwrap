@@ -156,8 +156,10 @@ class TestPrettyRepr(unittest.TestCase):
             )
         )
 
+        obj = TstClass.tst_classmethod
+
         self.assertEqual(
-            logwrap.pretty_repr(TstClass.tst_classmethod),
+            logwrap.pretty_repr(obj),
             '\n<{cls_name}.{obj}(\n'
             '    cls={cls!r},\n'
             '    arg,\n'
@@ -166,14 +168,16 @@ class TestPrettyRepr(unittest.TestCase):
             '    **named,\n'
             ') at 0x{id:X}>'.format(
                 cls_name=TstClass.__name__,
-                obj=TstClass.tst_classmethod.__name__,
+                obj=obj.__name__,
                 cls=TstClass,
-                id=id(TstClass.tst_classmethod)
+                id=id(obj)
             )
         )
 
+        obj = tst_instance.tst_method
+
         self.assertEqual(
-            logwrap.pretty_repr(tst_instance.tst_method),
+            logwrap.pretty_repr(obj),
             '\n<{cls_name}.{obj}(\n'
             '    self={cls!r},\n'
             '    arg,\n'
@@ -182,14 +186,16 @@ class TestPrettyRepr(unittest.TestCase):
             '    **named,\n'
             ') at 0x{id:X}>'.format(
                 cls_name=tst_instance.__class__.__name__,
-                obj=tst_instance.tst_method.__name__,
+                obj=obj.__name__,
                 cls=tst_instance,
-                id=id(tst_instance.tst_method)
+                id=id(obj)
             )
         )
 
+        obj = tst_instance.tst_classmethod
+
         self.assertEqual(
-            logwrap.pretty_repr(tst_instance.tst_classmethod),
+            logwrap.pretty_repr(obj),
             '\n<{cls_name}.{obj}(\n'
             '    cls={cls!r},\n'
             '    arg,\n'
@@ -198,8 +204,8 @@ class TestPrettyRepr(unittest.TestCase):
             '    **named,\n'
             ') at 0x{id:X}>'.format(
                 cls_name=tst_instance.__class__.__name__,
-                obj=tst_instance.tst_classmethod.__name__,
+                obj=obj.__name__,
                 cls=tst_instance.__class__,
-                id=id(tst_instance.tst_classmethod)
+                id=id(obj)
             )
         )
