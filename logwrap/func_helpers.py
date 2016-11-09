@@ -26,15 +26,19 @@ import collections
 import inspect
 import sys
 
+# pylint: disable=no-member
+# pylint: disable=ungrouped-imports
 if sys.version_info[0:2] > (3, 0):
     from inspect import Parameter
     from inspect import signature
 else:
+    # noinspection PyUnresolvedReferences
     from funcsigs import Parameter
+    # noinspection PyUnresolvedReferences
     from funcsigs import signature
+# pylint: enable=ungrouped-imports
 
 
-# pylint: disable=no-member
 def get_arg_names(func):
     """get argument names for function
 

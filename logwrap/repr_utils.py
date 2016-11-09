@@ -25,6 +25,7 @@ from __future__ import unicode_literals
 
 import inspect
 import sys
+import types
 
 from logwrap import func_helpers
 
@@ -34,10 +35,10 @@ if sys.version_info[0:2] > (3, 0):
     text_type = str
 else:
     binary_type = str
-    # pylint: disable=unicode-builtin
+    # pylint: disable=unicode-builtin, undefined-variable
     # noinspection PyUnresolvedReferences
     text_type = unicode  # NOQA
-    # pylint: enable=unicode-builtin
+    # pylint: enable=unicode-builtin, undefined-variable
 
 
 def _simple(item):
@@ -58,16 +59,14 @@ _formatters = {
 }
 
 
-def _repr_callable(src, indent=0, no_indent_start=False, max_indent=20):
+def _repr_callable(src, indent=0, max_indent=20):
     """repr callable object (function or method)
 
     :type src: union(types.FunctionType, types.MethodType)
     :type indent: int
-    :type no_indent_start: bool
     :type max_indent: int
     :rtype: str
     """
-    indent = 0 if no_indent_start else indent
     isfunction = inspect.isfunction(src) or src.__self__ is None
     param_str = ""
 
@@ -94,19 +93,20 @@ def _repr_callable(src, indent=0, no_indent_start=False, max_indent=20):
     if param_str:
         param_str += "\n" + " " * indent
     if isfunction:
-        return "{spc:<{indent}}<{name}({args}) at 0x{id:X}>".format(
+        return "\n{spc:<{indent}}<{name}({args}) at 0x{id:X}>".format(
             spc="",
             indent=indent,
             name=src.__name__,
             args=param_str,
             id=id(src)
         )
+    # Bound method: get source class
     self_obj = next(func_helpers.prepare_repr(src))[1]
     if inspect.isclass(self_obj):
         self_name = self_obj.__name__
     else:
         self_name = self_obj.__class__.__name__
-    return "{spc:<{indent}}<{cls}.{name}({args}) at 0x{id:X}>".format(
+    return "\n{spc:<{indent}}<{cls}.{name}({args}) at 0x{id:X}>".format(
         spc="",
         indent=indent,
         cls=self_name,
@@ -125,6 +125,12 @@ def _repr_simple(src, indent=0, no_indent_start=False, max_indent=20):
     :type max_indent: int
     :rtype: str
     """
+    if isinstance(src, (types.FunctionType, types.MethodType)):
+        return _repr_callable(
+            src=src,
+            indent=indent,
+            max_indent=max_indent
+        )
     indent = 0 if no_indent_start else indent
     if isinstance(src, (binary_type, text_type)):
         if isinstance(src, binary_type):
