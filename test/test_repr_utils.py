@@ -140,8 +140,10 @@ class TestPrettyRepr(unittest.TestCase):
             ') at 0x{:X}>'.format(full_func.__name__, id(full_func))
         )
 
+        obj = TstClass.tst_method
+
         self.assertEqual(
-            logwrap.pretty_repr(TstClass.tst_method),
+            logwrap.pretty_repr(obj),
             '\n<{}(\n'
             '    self,\n'
             '    arg,\n'
@@ -149,8 +151,8 @@ class TestPrettyRepr(unittest.TestCase):
             '    *positional,\n'
             '    **named,\n'
             ') at 0x{:X}>'.format(
-                TstClass.tst_method.__name__,
-                id(TstClass.tst_method)
+                obj.__name__,
+                id(obj)
             )
         )
 
