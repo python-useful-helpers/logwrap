@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+Version 0.8.5
+-------------
+* Use funcsigs instead of manual reimplementation of inspect.signature & supplemental
+
+* Implement parsing of functions and methods (log interfaces in additional to standard repr)
+
+* internal modules was moved to protected scope
+
 Version 0.8.0
 -------------
 * Drop six requirement
