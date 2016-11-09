@@ -8,7 +8,7 @@ python:
 install: pip install tox-travis
 script: tox
 before_deploy:
-  - pip install funcsigs
+  - pip install -r CI_REQUIREMENTS.txt
 deploy:
   - provider: pypi
     server: https://testpypi.python.org/pypi
