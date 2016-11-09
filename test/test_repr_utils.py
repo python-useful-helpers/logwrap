@@ -107,3 +107,97 @@ class TestPrettyRepr(unittest.TestCase):
             '])'
         )
         self.assertEqual(logwrap.pretty_repr(test_obj), exp_repr)
+
+    def test_callable(self):
+        def empty_func():
+            pass
+
+        def full_func(arg, darg=1, *positional, **named):
+            pass
+
+        class TstClass(object):
+            def tst_method(self, arg, darg=1, *positional, **named):
+                pass
+
+            @classmethod
+            def tst_classmethod(cls, arg, darg=1, *positional, **named):
+                pass
+
+        tst_instance = TstClass()
+
+        self.assertEqual(
+            logwrap.pretty_repr(empty_func),
+            '\n<{}() at 0x{:X}>'.format(empty_func.__name__, id(empty_func))
+        )
+
+        self.assertEqual(
+            logwrap.pretty_repr(full_func),
+            '\n<{}(\n'
+            '    arg,\n'
+            '    darg=1,\n'
+            '    *positional,\n'
+            '    **named,\n'
+            ') at 0x{:X}>'.format(full_func.__name__, id(full_func))
+        )
+
+        self.assertEqual(
+            logwrap.pretty_repr(TstClass.tst_method),
+            '\n<{}(\n'
+            '    self,\n'
+            '    arg,\n'
+            '    darg=1,\n'
+            '    *positional,\n'
+            '    **named,\n'
+            ') at 0x{:X}>'.format(
+                TstClass.tst_method.__name__,
+                id(TstClass.tst_method)
+            )
+        )
+
+        self.assertEqual(
+            logwrap.pretty_repr(TstClass.tst_classmethod),
+            '\n<{cls_name}.{obj}(\n'
+            '    cls={cls!r},\n'
+            '    arg,\n'
+            '    darg=1,\n'
+            '    *positional,\n'
+            '    **named,\n'
+            ') at 0x{id:X}>'.format(
+                cls_name=TstClass.__name__,
+                obj=TstClass.tst_classmethod.__name__,
+                cls=TstClass,
+                id=id(TstClass.tst_classmethod)
+            )
+        )
+
+        self.assertEqual(
+            logwrap.pretty_repr(tst_instance.tst_method),
+            '\n<{cls_name}.{obj}(\n'
+            '    self={cls!r},\n'
+            '    arg,\n'
+            '    darg=1,\n'
+            '    *positional,\n'
+            '    **named,\n'
+            ') at 0x{id:X}>'.format(
+                cls_name=tst_instance.__class__.__name__,
+                obj=tst_instance.tst_method.__name__,
+                cls=tst_instance,
+                id=id(tst_instance.tst_method)
+            )
+        )
+
+        self.assertEqual(
+            logwrap.pretty_repr(tst_instance.tst_classmethod),
+            '\n<{cls_name}.{obj}(\n'
+            '    cls={cls!r},\n'
+            '    arg,\n'
+            '    darg=1,\n'
+            '    *positional,\n'
+            '    **named,\n'
+            ') at 0x{id:X}>'.format(
+                cls_name=tst_instance.__class__.__name__,
+                obj=tst_instance.tst_classmethod.__name__,
+                cls=tst_instance.__class__,
+                id=id(tst_instance.tst_classmethod)
+            )
+        )
