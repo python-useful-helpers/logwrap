@@ -24,11 +24,11 @@ later it has been reworked and extended for support of special cases.
 
 from __future__ import absolute_import
 
-from .func_helpers import get_arg_names
-from .func_helpers import get_call_args
-from .func_helpers import get_args_kwargs_names
-from .log_wrap import logwrap
-from .repr_utils import pretty_repr
+from ._func_helpers import get_arg_names
+from ._func_helpers import get_call_args
+from ._func_helpers import get_args_kwargs_names
+from ._log_wrap import logwrap
+from ._repr_utils import pretty_repr
 
 __version__ = '0.8.0'
 

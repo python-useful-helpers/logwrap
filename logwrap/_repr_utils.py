@@ -27,7 +27,8 @@ import inspect
 import sys
 import types
 
-from logwrap import func_helpers
+# noinspection PyProtectedMember
+from logwrap import _func_helpers
 
 
 if sys.version_info[0:2] > (3, 0):
@@ -70,7 +71,7 @@ def _repr_callable(src, indent=0, max_indent=20):
     isfunction = inspect.isfunction(src) or src.__self__ is None
     param_str = ""
 
-    for param in func_helpers.prepare_repr(src):
+    for param in _func_helpers.prepare_repr(src):
         if isinstance(param, tuple):
             param_str += _formatters['func_def_arg'](
                 spc='',
@@ -101,7 +102,7 @@ def _repr_callable(src, indent=0, max_indent=20):
             id=id(src)
         )
     # Bound method: get source class
-    self_obj = next(func_helpers.prepare_repr(src))[1]
+    self_obj = next(_func_helpers.prepare_repr(src))[1]
     if inspect.isclass(self_obj):
         self_name = self_obj.__name__
     else:
