@@ -1,5 +1,7 @@
-#    Copyright 2016 Mirantis, Inc.
 #    Copyright 2016 Alexey Stepanov aka penguinolog
+
+#    Copyright 2016 Mirantis, Inc.
+
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -24,6 +26,13 @@ import collections
 import inspect
 import sys
 
+if sys.version_info[0:2] > (3, 0):
+    from inspect import Parameter
+    from inspect import signature
+else:
+    from funcsigs import Parameter
+    from funcsigs import signature
+
 
 # pylint: disable=no-member
 def get_arg_names(func):
@@ -46,19 +55,7 @@ def get_arg_names(func):
     >>> get_arg_names(tst_2)
     ['arg']
     """
-    # noinspection PyUnresolvedReferences
-    if sys.version_info[0:2] < (3, 3):
-        # pylint: disable=deprecated-method
-        # noinspection PyDeprecation
-        spec = inspect.getargspec(func=func)
-        # pylint: enable=deprecated-method
-        args = spec.args[:]
-        if spec.varargs:
-            args.append(spec.varargs)
-        if spec.keywords:
-            args.append(spec.keywords)
-        return args
-    return list(inspect.signature(obj=func).parameters.keys())
+    return list(signature(obj=func).parameters.keys())
 
 
 def get_call_args(func, *positional, **named):
@@ -147,69 +144,34 @@ def get_args_kwargs_names(func):
     return args_name, kwargs_name
 
 
-def get_default_args(func):
-    """Get function defaults from it's signature
+def prepare_repr(func):
+    """Get arguments lists with defaults
 
-    :param func: target function
-    :type func: function
-    :rtype: collections.OrderedDict
-
-    >>> def tst0():pass
-
-    >>> get_default_args(tst0)
-    OrderedDict()
-
-    >>> def tst1(a): pass
-
-    >>> get_default_args(tst1)
-    OrderedDict()
-
-    >>> def tst2(a, b): pass
-
-    >>> get_default_args(tst2)
-    OrderedDict()
-
-    >>> def tst3(a=0): pass
-
-    >>> get_default_args(tst3)
-    OrderedDict([('a', 0)])
-
-    >>> def tst4(a, b=1): pass
-
-    >>> get_default_args(tst4)
-    OrderedDict([('b', 1)])
-
-    >>> def tst5(a=0, b=1): pass
-
-    >>> get_default_args(tst5)
-    OrderedDict([('a', 0), ('b', 1)])
+    :type func: union(types.FunctionType, types.MethodType)
+    :rtype: generator
     """
-    if sys.version_info[0:2] < (3, 0):
-        # pylint: disable=deprecated-method
-        # noinspection PyDeprecation
-        spec = inspect.getargspec(func)
-        # pylint: enable=deprecated-method
-        if not spec.defaults:
-            return collections.OrderedDict()
-        collector = [
-            (spec.args[-val], spec.defaults[-val])
-            for val in range(1, len(spec.defaults) + 1)
-        ]
-        return collections.OrderedDict(reversed(collector))
-    sig = inspect.signature(func)
-    result = collections.OrderedDict(
-        [
-            (arg.name, arg.default)
-            for arg in sig.parameters.values()
-            if arg.default != inspect.Parameter.empty
-        ]
-    )
-    return result
+    isfunction = inspect.isfunction(func)
+    real_func = func if isfunction else func.__func__
+
+    parameters = list(signature(real_func).parameters.values())
+
+    params = iter(parameters)
+    if not isfunction and func.__self__ is not None:
+        yield next(params).name, func.__self__
+    for arg in params:
+        if arg.default != Parameter.empty:
+            yield arg.name, arg.default
+        elif arg.kind == Parameter.VAR_POSITIONAL:
+            yield '*' + arg.name
+        elif arg.kind == Parameter.VAR_KEYWORD:
+            yield '**' + arg.name
+        else:
+            yield arg.name
+
 # pylint: enable=no-member
 
 __all__ = [
     'get_arg_names',
     'get_call_args',
     'get_args_kwargs_names',
-    'get_default_args',
 ]

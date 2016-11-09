@@ -1,5 +1,7 @@
-#    Copyright 2016 Mirantis, Inc.
 #    Copyright 2016 Alexey Stepanov aka penguinolog
+
+#    Copyright 2016 Mirantis, Inc.
+
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -25,7 +27,6 @@ from __future__ import absolute_import
 from .func_helpers import get_arg_names
 from .func_helpers import get_call_args
 from .func_helpers import get_args_kwargs_names
-from .func_helpers import get_default_args
 from .log_wrap import logwrap
 from .repr_utils import pretty_repr
 
@@ -36,5 +37,4 @@ __all__ = [
     'get_call_args',
     'logwrap',
     'pretty_repr',
-    'get_default_args',
 ]

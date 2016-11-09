@@ -1,5 +1,7 @@
-#    Copyright 2016 Mirantis, Inc.
 #    Copyright 2016 Alexey Stepanov aka penguinolog
+
+#    Copyright 2016 Mirantis, Inc.
+
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -17,7 +19,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import collections
 import unittest
 
 import logwrap
@@ -132,61 +133,4 @@ class TestFuncHelpers(unittest.TestCase):
         self.assertEqual(
             logwrap.get_args_kwargs_names(tst4),
             ('positional', 'named')
-        )
-
-    def test_get_default_args(self):
-        def tst0():
-            pass
-
-        self.assertEqual(
-            logwrap.get_default_args(tst0),
-            collections.OrderedDict()
-        )
-
-        def tst1(a):
-            pass
-
-        self.assertEqual(
-            logwrap.get_default_args(tst1),
-            collections.OrderedDict()
-        )
-
-        def tst2(a, b):
-            pass
-
-        self.assertEqual(
-            logwrap.get_default_args(tst2),
-            collections.OrderedDict()
-        )
-
-        def tst3(a=0):
-            pass
-
-        self.assertEqual(
-            logwrap.get_default_args(tst3),
-            collections.OrderedDict([('a', 0)])
-        )
-
-        def tst4(a, b=1):
-            pass
-
-        self.assertEqual(
-            logwrap.get_default_args(tst4),
-            collections.OrderedDict([('b', 1)])
-        )
-
-        def tst5(a=0, b=1):
-            pass
-
-        self.assertEqual(
-            logwrap.get_default_args(tst5),
-            collections.OrderedDict([('a', 0), ('b', 1)])
-        )
-
-        def tst6(a=0, b=1, *args, **kwargs):
-            pass
-
-        self.assertEqual(
-            logwrap.get_default_args(tst6),
-            collections.OrderedDict([('a', 0), ('b', 1)])
         )
