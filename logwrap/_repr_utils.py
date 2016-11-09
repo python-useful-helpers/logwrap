@@ -55,6 +55,8 @@ _formatters = {
         "\n"
         "{spc:<{indent}}{obj_type:}({start}{result}\n"
         "{spc:<{indent}}{end})".format,
+    'function': "\n{spc:<{indent}}<{name}({args}) at 0x{id:X}>".format,
+    'method': "\n{spc:<{indent}}<{cls}.{name}({args}) at 0x{id:X}>".format,
     'func_arg': "\n{spc:<{indent}}{key},".format,
     'func_def_arg': "\n{spc:<{indent}}{key}={val},".format,
 }
@@ -94,7 +96,7 @@ def _repr_callable(src, indent=0, max_indent=20):
     if param_str:
         param_str += "\n" + " " * indent
     if isfunction:
-        return "\n{spc:<{indent}}<{name}({args}) at 0x{id:X}>".format(
+        return _formatters['function'](
             spc="",
             indent=indent,
             name=src.__name__,
@@ -107,7 +109,7 @@ def _repr_callable(src, indent=0, max_indent=20):
         self_name = self_obj.__name__
     else:
         self_name = self_obj.__class__.__name__
-    return "\n{spc:<{indent}}<{cls}.{name}({args}) at 0x{id:X}>".format(
+    return _formatters['method'](
         spc="",
         indent=indent,
         cls=self_name,
