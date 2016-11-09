@@ -32,7 +32,7 @@ else:
     from unittest import mock
 
 
-@mock.patch('logwrap.log_wrap._logger', autospec=True)
+@mock.patch('logwrap._log_wrap._logger', autospec=True)
 class TestLogWrap(unittest.TestCase):
     def test_no_args(self, logger):
         @logwrap.logwrap

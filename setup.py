@@ -14,6 +14,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+"""logwrap decorator for human-readable logging of command arguments"""
+
 import setuptools
 import sys
 
