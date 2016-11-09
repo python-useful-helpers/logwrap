@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import unittest
 
 import logwrap
+from logwrap import func_helpers
 
 
 class TestFuncHelpers(unittest.TestCase):
@@ -133,4 +134,71 @@ class TestFuncHelpers(unittest.TestCase):
         self.assertEqual(
             logwrap.get_args_kwargs_names(tst4),
             ('positional', 'named')
+        )
+
+    def test_prepare_repr(self):
+        def empty_func():
+            pass
+
+        def full_func(arg, darg=1, *positional, **named):
+            pass
+
+        class TstClass(object):
+            def tst_method(self, arg, darg=1, *positional, **named):
+                pass
+
+            @classmethod
+            def tst_classmethod(cls, arg, darg=1, *positional, **named):
+                pass
+
+            @staticmethod
+            def tst_staticmethod(arg, darg=1, *positional, **named):
+                pass
+
+        tst_instance = TstClass()
+
+        self.assertEqual(
+            list(func_helpers.prepare_repr(empty_func)),
+            []
+        )
+
+        self.assertEqual(
+            list(func_helpers.prepare_repr(full_func)),
+            ['arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(func_helpers.prepare_repr(TstClass.tst_method)),
+            ['self', 'arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(func_helpers.prepare_repr(TstClass.tst_classmethod)),
+            [('cls', TstClass), 'arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(func_helpers.prepare_repr(TstClass.tst_staticmethod)),
+            ['arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(func_helpers.prepare_repr(tst_instance.tst_method)),
+            [
+                ('self', tst_instance),
+                'arg',
+                ('darg', 1),
+                '*positional',
+                '**named',
+            ]
+        )
+
+        self.assertEqual(
+            list(func_helpers.prepare_repr(tst_instance.tst_classmethod)),
+            [('cls', TstClass), 'arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(func_helpers.prepare_repr(tst_instance.tst_staticmethod)),
+            ['arg', ('darg', 1), '*positional', '**named']
         )

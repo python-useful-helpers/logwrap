@@ -27,7 +27,7 @@ import inspect
 import sys
 
 # pylint: disable=no-member
-# pylint: disable=ungrouped-imports
+# pylint: disable=ungrouped-imports, no-name-in-module
 if sys.version_info[0:2] > (3, 0):
     from inspect import Parameter
     from inspect import signature
@@ -36,7 +36,7 @@ else:
     from funcsigs import Parameter
     # noinspection PyUnresolvedReferences
     from funcsigs import signature
-# pylint: enable=ungrouped-imports
+# pylint: enable=ungrouped-imports, no-name-in-module
 
 
 def get_arg_names(func):
