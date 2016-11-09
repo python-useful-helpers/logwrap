@@ -101,7 +101,7 @@ class TestFuncHelpers(unittest.TestCase):
             pass
 
         self.assertEqual(
-            logwrap.get_args_kwargs_names(tst0),
+            _func_helpers.get_args_kwargs_names(tst0),
             (None, None)
         )
 
@@ -109,7 +109,7 @@ class TestFuncHelpers(unittest.TestCase):
             pass
 
         self.assertEqual(
-            logwrap.get_args_kwargs_names(tst1),
+            _func_helpers.get_args_kwargs_names(tst1),
             (None, None)
         )
 
@@ -117,7 +117,7 @@ class TestFuncHelpers(unittest.TestCase):
             pass
 
         self.assertEqual(
-            logwrap.get_args_kwargs_names(tst2),
+            _func_helpers.get_args_kwargs_names(tst2),
             ('positional', None)
         )
 
@@ -125,7 +125,7 @@ class TestFuncHelpers(unittest.TestCase):
             pass
 
         self.assertEqual(
-            logwrap.get_args_kwargs_names(tst3),
+            _func_helpers.get_args_kwargs_names(tst3),
             (None, 'named')
         )
 
@@ -133,7 +133,7 @@ class TestFuncHelpers(unittest.TestCase):
             pass
 
         self.assertEqual(
-            logwrap.get_args_kwargs_names(tst4),
+            _func_helpers.get_args_kwargs_names(tst4),
             ('positional', 'named')
         )
 

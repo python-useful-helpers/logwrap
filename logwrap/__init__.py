@@ -26,7 +26,6 @@ from __future__ import absolute_import
 
 from ._func_helpers import get_arg_names
 from ._func_helpers import get_call_args
-from ._func_helpers import get_args_kwargs_names
 from ._log_wrap import logwrap
 from ._repr_utils import pretty_repr
 
