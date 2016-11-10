@@ -121,5 +121,4 @@ def prepare_repr(func):
 __all__ = [
     'get_arg_names',
     'get_call_args',
-    'get_args_kwargs_names',
-]
+    ]
