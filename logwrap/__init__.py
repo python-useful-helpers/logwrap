@@ -29,7 +29,7 @@ from ._func_helpers import get_call_args
 from ._log_wrap import logwrap
 from ._repr_utils import pretty_repr
 
-__version__ = '0.8.5'
+__version__ = '0.9.0'
 
 __all__ = [
     'get_arg_names',

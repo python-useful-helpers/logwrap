@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+Version 0.9.0
+-------------
+* get_arg_names and get_call_args now presents only for historical reasons
+
+* logwrap now logs argument types as commentaries
+(POSITIONAL_ONLY(builtins only) | POSITIONAL_OR_KEYWORD (standard) | VAR_POSITIONAL (e.g. *args) | KEYWORD_ONLY (Python 3+ only) | VAR_KEYWORD (e.g. **kwargs))
+
 Version 0.8.5
 -------------
 * Use funcsigs instead of manual reimplementation of inspect.signature & supplemental
