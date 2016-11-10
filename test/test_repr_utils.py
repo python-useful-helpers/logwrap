@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import unittest
 
 import logwrap
+from logwrap import _repr_utils
 
 
 class TestPrettyRepr(unittest.TestCase):
@@ -107,6 +108,73 @@ class TestPrettyRepr(unittest.TestCase):
             '])'
         )
         self.assertEqual(logwrap.pretty_repr(test_obj), exp_repr)
+
+    def test_prepare_repr(self):
+        def empty_func():
+            pass
+
+        def full_func(arg, darg=1, *positional, **named):
+            pass
+
+        class TstClass(object):
+            def tst_method(self, arg, darg=1, *positional, **named):
+                pass
+
+            @classmethod
+            def tst_classmethod(cls, arg, darg=1, *positional, **named):
+                pass
+
+            @staticmethod
+            def tst_staticmethod(arg, darg=1, *positional, **named):
+                pass
+
+        tst_instance = TstClass()
+
+        self.assertEqual(
+            list(_repr_utils.prepare_repr(empty_func)),
+            []
+        )
+
+        self.assertEqual(
+            list(_repr_utils.prepare_repr(full_func)),
+            ['arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(_repr_utils.prepare_repr(TstClass.tst_method)),
+            ['self', 'arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(_repr_utils.prepare_repr(TstClass.tst_classmethod)),
+            [('cls', TstClass), 'arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(_repr_utils.prepare_repr(TstClass.tst_staticmethod)),
+            ['arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(_repr_utils.prepare_repr(tst_instance.tst_method)),
+            [
+                ('self', tst_instance),
+                'arg',
+                ('darg', 1),
+                '*positional',
+                '**named',
+            ]
+        )
+
+        self.assertEqual(
+            list(_repr_utils.prepare_repr(tst_instance.tst_classmethod)),
+            [('cls', TstClass), 'arg', ('darg', 1), '*positional', '**named']
+        )
+
+        self.assertEqual(
+            list(_repr_utils.prepare_repr(tst_instance.tst_staticmethod)),
+            ['arg', ('darg', 1), '*positional', '**named']
+        )
 
     def test_callable(self):
         fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args})>".format

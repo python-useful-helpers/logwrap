@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 1.0.0
+-------------
+* Drop historical code and update documentation
+
 Version 0.9.0
 -------------
 * get_arg_names and get_call_args now presents only for historical reasons

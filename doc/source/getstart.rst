@@ -9,9 +9,8 @@ logging of function calls by human-readable way.
 There are several functions are made public for usage in external code:
 
 * logwrap - decorator for logging of function calls
+
 * pretty_repr - helpers for making human-readable repr output for complex objects
-* get_arg_names - get argument names lis for the function
-* get_call_args - get bound OrderedDict of arguments for the function
 
 Every helper contains docstring with description for call arguments.
 There is no reason for importing any submodule: the all public API is exposed on the top level.
@@ -42,11 +41,15 @@ This code during execution will produce log records:
 
     Calling:
     'example_function1'(
+        # POSITIONAL_OR_KEYWORD:
         'arg1'=u'''arg1''',
         'arg2'=u'''arg2''',
+        # VAR_POSITIONAL:
         'args'=(),
+        # KEYWORD_ONLY:
         'kwarg1'=u'''kwarg1''',
         'kwarg2'=u'''kwarg2''',
+        # VAR_KEYWORD:
         'kwargs'=
              dict({
                 'kwarg3': u'''kwarg3''',
@@ -65,14 +68,7 @@ This code during execution will produce log records:
          }),
      ))
 
-During execution of function other helpers called as:
-
-.. code-block:: python
-
-    get_arg_names(example_function1)
-    get_call_args(example_function1, *('arg1'), **dict(kwarg1='kwarg1', kwarg3='kwarg3'))
-
-Also `pretty_repr` is called for every argument and call result.
+During execution of function `pretty_repr` is called for every argument and call result.
 
 .. code-block:: python
 

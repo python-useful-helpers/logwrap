@@ -41,8 +41,6 @@ Pros:
 This package also includes helpers:
 
 * pretty_repr
-* get_arg_names
-* get_call_args
 
 Usage
 =====
@@ -104,29 +102,6 @@ Signature is self-documenting:
     )
 
 Limitation: Dict like objects is always marked inside `{}` for readability, even if it is `collections.OrderedDict` (standard repr as list of tuples).
-
-get_arg_names
--------------
-Get argument names for function. This is multiple python versions supporting helper, due to differences between Python 2.7 and Python 3.3+
-Usage:
-
-.. code-block:: python
-
-    get_arg_names(func)
-
-where `func` is target function.
-
-get_call_args
--------------
-Get call arguments bound to argument names for function. This is multiple python versions supporting helper, due to differences between Python 2.7 and Python 3.5+
-Usage:
-
-.. code-block:: python
-
-    get_call_args(func, *positional, **named)
-
-where `func` is target function, `*positional` and `**named` is arguments for the `func`.
-Note: get_call_args reqires strictly consistent set of arguments for function.
 
 Testing
 =======

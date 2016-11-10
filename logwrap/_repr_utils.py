@@ -26,8 +26,16 @@ from __future__ import unicode_literals
 import sys
 import types
 
-# noinspection PyProtectedMember
-from logwrap import _func_helpers
+# pylint: disable=ungrouped-imports, no-name-in-module
+if sys.version_info[0:2] > (3, 0):
+    from inspect import Parameter
+    from inspect import signature
+else:
+    # noinspection PyUnresolvedReferences
+    from funcsigs import Parameter
+    # noinspection PyUnresolvedReferences
+    from funcsigs import signature
+# pylint: enable=ungrouped-imports, no-name-in-module
 
 
 if sys.version_info[0:2] > (3, 0):
@@ -60,6 +68,33 @@ _formatters = {
 }
 
 
+# pylint: disable=no-member
+def prepare_repr(func):
+    """Get arguments lists with defaults
+
+    :type func: union(types.FunctionType, types.MethodType)
+    :rtype: generator
+    """
+    isfunction = isinstance(func, types.FunctionType)
+    real_func = func if isfunction else func.__func__
+
+    parameters = list(signature(real_func).parameters.values())
+
+    params = iter(parameters)
+    if not isfunction and func.__self__ is not None:
+        yield next(params).name, func.__self__
+    for arg in params:
+        if arg.default != Parameter.empty:
+            yield arg.name, arg.default
+        elif arg.kind == Parameter.VAR_POSITIONAL:
+            yield '*' + arg.name
+        elif arg.kind == Parameter.VAR_KEYWORD:
+            yield '**' + arg.name
+        else:
+            yield arg.name
+# pylint: enable=no-member
+
+
 def _repr_callable(src, indent=0, max_indent=20):
     """repr callable object (function or method)
 
@@ -70,7 +105,7 @@ def _repr_callable(src, indent=0, max_indent=20):
     """
     param_str = ""
 
-    for param in _func_helpers.prepare_repr(src):
+    for param in prepare_repr(src):
         if isinstance(param, tuple):
             param_str += _formatters['func_def_arg'](
                 spc='',

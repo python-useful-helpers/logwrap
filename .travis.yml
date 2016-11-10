@@ -11,18 +11,18 @@ before_deploy:
   - pip install -r CI_REQUIREMENTS.txt
 deploy:
   - provider: pypi
+    distributions: sdist bdist_wheel
     server: https://testpypi.python.org/pypi
     user: penguinolog
     password:
       secure: "ND25WysM1Qe5IhZcywUH9W4mpzmQK+N7eNSyiU/tg7O+77cgZ5mNTjn3HBTlD45nwMxCInWeLpZYSn611pR5c6yelbZAnHig/yjb6Xgbbr4703kRzcJNWQ6dOR638IjWPeWBbs21Z8w0N57FjcG+gy5CW/9rKmyaOx/hneavqvlAvoHOVy30sm6RrQQPrQEb1D9wpjR4u5nR/zo436RhihMb6jmG+QwOG20fXKVsOg+w8npRCh6dTTh9itarVLlMveB1pd1W8FXFFolCorsrNJJXr0ZAG7YnF+pEzItKWZexHle5bf1jF2dJrG4bn3EuB04nqCcWrGp3hhjL5ZQqI69Im1BK5ffpNPkoQRdQlD60YwG067iO8myKtGlgx7ZmkOibIcAALQB6EhMf5QglT/CCgZ6dGXcqRk9T7/nGPmGyqKZKAjO6ZATrhUY0OBFdreuLYGkYRxvqTxbv4UXHORTg16QlV0UWBjEW+Mxwvl9m/efIeUAsmfFwN/19ue9S4ObIkcAoznvpcZj+b+hQ5t2KWyQZ0JqamSXrMRFEC1cs8HDk4tfIYGrnbebij0g5lAeN9/+CpimLi+QBowKZo5iOJAlo8y8kV37LFtZCC/Jn8Nl/ihzp2dtyWf8+OTyQ0fI3VIUYunIafi1FdRMqkifVXElOeY6eq4QOei6IHqo="
     on:
-      distributions: sdist bdist_wheel
       tags: false
     # PyPI
   - provider: pypi
+    distributions: sdist bdist_wheel
     user: penguinolog
     password:
       secure: QNBIAaqj682K95G2jVBFLgKmzscDz8sYLrJOmRVa+TmwV/n19Nar1fTdt86V2FRgl5SBbuGwAz6s9RD+X1j+OAEUKQ/wUmkP8hLriKcTaP5dH5+WWvwH9TD5A3SSvYOI9G9Qq+0rG71F/OMEBtTI5lrIaiPt39YUwhejLsUYy2vcvT/yxEnrMFc3gGFEvIRA6pnZWY+t3cK/uDdhDXutNSvLKTEuPILswqiGQZ/79Aio5HzQasCjvmWKr2c9nwZB1SoSfbhvNWitOzJZ5+7wc0ewFcRHBMeiLmGjI/z6FRVp/QTHtwhAwzRQQ955MiqcX2fLnVlfE68qT47RpX9ueqhFXMgIDqJ/3O/ln5619xZ1ykuUT8i/gUm2/lXGV9Wz0IwDxz4RpL8ul24qLdECXhVlBBDA3VjJT8YbErvY3EB+YKHiJCywAcOa8boHTMDxmP/BLUh24PrsKs4eYW5MVRR3V6Un8ajCCk2ZhDlyQXSxPsRA7/dHQS5a6d1neCCapdwR+VKHjjBmW0MppxQmsxjg6poOtWR/d1bT9XuHdu6/vAmTAosZN56MnR0KD4ZVJxM5OoMqE3Fgw6jusJnyWyxJ5XRkG/NuDITTC7aS5MQuPOGUSw3GzzAwZOgSRCDmgLMxRaZcv8a8r8GqpzVHpB9D+zfOhvh8+1BOhNFXMMc=
     on:
       tags: true
-      distributions: sdist bdist_wheel

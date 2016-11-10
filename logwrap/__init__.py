@@ -24,16 +24,12 @@ later it has been reworked and extended for support of special cases.
 
 from __future__ import absolute_import
 
-from ._func_helpers import get_arg_names
-from ._func_helpers import get_call_args
 from ._log_wrap import logwrap
 from ._repr_utils import pretty_repr
 
 __version__ = '0.9.0'
 
 __all__ = [
-    'get_arg_names',
-    'get_call_args',
     'logwrap',
     'pretty_repr',
 ]
