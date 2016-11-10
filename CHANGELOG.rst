@@ -9,6 +9,8 @@ but now it's clean package with minimal requirements
 (funcsigs looks like copy-paste from inspect.signature + adoption to use on python 2.7
 (Enum is not available, not using enum34 package)).
 
+* Mark package as stable (tested by unit tests and external run).
+
 Version 0.9.0
 -------------
 * get_arg_names and get_call_args now presents only for historical reasons
