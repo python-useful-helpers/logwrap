@@ -65,9 +65,17 @@ class TestLogWrap(unittest.TestCase):
         logger.assert_has_calls((
             mock.call.log(
                 level=logging.DEBUG,
-                msg="Calling: \n'func'(\n    'tst'={},\n)".format(
-                    logwrap.pretty_repr(arg, indent=8, no_indent_start=True)
-                )
+                msg="Calling: \n"
+                    "'func'(\n"
+                    "    # POSITIONAL_OR_KEYWORD:\n"
+                    "    'tst'={},\n"
+                    ")".format(
+                        logwrap.pretty_repr(
+                            arg,
+                            indent=8,
+                            no_indent_start=True
+                        )
+                    )
             ),
             mock.call.log(
                 level=logging.DEBUG,
@@ -88,9 +96,16 @@ class TestLogWrap(unittest.TestCase):
         logger.assert_has_calls((
             mock.call.log(
                 level=logging.DEBUG,
-                msg="Calling: \n'func'(\n    'tst'={},\n)".format(
-                    logwrap.pretty_repr(arg, indent=8,
-                                        no_indent_start=True))
+                msg="Calling: \n"
+                    "'func'(\n"
+                    "    # POSITIONAL_OR_KEYWORD:\n"
+                    "    'tst'={},\n"
+                    ")".format(
+                        logwrap.pretty_repr(
+                            arg,
+                            indent=8,
+                            no_indent_start=True)
+                    )
             ),
             mock.call.log(
                 level=logging.DEBUG,
@@ -113,9 +128,12 @@ class TestLogWrap(unittest.TestCase):
         logger.assert_has_calls((
             mock.call.log(
                 level=logging.DEBUG,
-                msg="Calling: \n'func'("
-                    "\n    'param_string'={string},"
-                    "\n    'param_dictionary'={dictionary},\n)".format(
+                msg="Calling: \n"
+                    "'func'(\n"
+                    "    # POSITIONAL_OR_KEYWORD:\n"
+                    "    'param_string'={string},\n"
+                    "    'param_dictionary'={dictionary},\n"
+                    ")".format(
                         string=logwrap.pretty_repr(
                             string,
                             indent=8, no_indent_start=True),
@@ -145,9 +163,12 @@ class TestLogWrap(unittest.TestCase):
         logger.assert_has_calls((
             mock.call.log(
                 level=logging.DEBUG,
-                msg="Calling: \n'func'("
-                    "\n    'args'={args},"
-                    "\n    'kwargs'={kwargs},\n)".format(
+                msg="Calling: \n"
+                    "'func'(\n"
+                    "    # VAR_POSITIONAL:\n"
+                    "    'args'={args},\n"
+                    "    # VAR_KEYWORD:\n"
+                    "    'kwargs'={kwargs},\n)".format(
                         args=logwrap.pretty_repr(
                             tuple(targs),
                             indent=8, no_indent_start=True),
@@ -178,10 +199,14 @@ class TestLogWrap(unittest.TestCase):
         logger.assert_has_calls((
             mock.call.log(
                 level=logging.DEBUG,
-                msg="Calling: \n'func'("
-                    "\n    'arg'={arg},"
-                    "\n    'positional'={args},"
-                    "\n    'named'={kwargs},\n)".format(
+                msg="Calling: \n"
+                    "'func'(\n"
+                    "    # POSITIONAL_OR_KEYWORD:\n"
+                    "    'arg'={arg},\n"
+                    "    # VAR_POSITIONAL:\n"
+                    "    'positional'={args},\n"
+                    "    # VAR_KEYWORD:\n"
+                    "    'named'={kwargs},\n)".format(
                         arg=logwrap.pretty_repr(
                             arg,
                             indent=8, no_indent_start=True),
@@ -273,6 +298,7 @@ class TestLogWrap(unittest.TestCase):
                 level=logging.DEBUG,
                 msg="Calling: \n"
                     "'func'(\n"
+                    "    # POSITIONAL_OR_KEYWORD:\n"
                     "    'arg'=u'''test arg''',\n"
                     ")"),
             mock.call(

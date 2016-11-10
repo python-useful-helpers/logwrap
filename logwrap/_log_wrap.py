@@ -25,35 +25,59 @@ from __future__ import unicode_literals
 
 import functools
 import logging
+import sys
 
 import logwrap as core
+
+# pylint: disable=ungrouped-imports, no-name-in-module
+if sys.version_info[0:2] > (3, 0):
+    from inspect import signature
+else:
+    # noinspection PyUnresolvedReferences
+    from funcsigs import signature
+# pylint: enable=ungrouped-imports, no-name-in-module
 
 
 _logger = logging.getLogger(__name__)
 
 
-def _get_func_args_repr(call_args, max_indent):
+indent = 4
+fmt = "\n{spc:<{indent}}{{key!r}}={{val}},".format(
+    spc='',
+    indent=indent,
+).format
+comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
+
+
+def _get_func_args_repr(sig, args, kwargs, max_indent):
     """Internal helper for reducing complexity of decorator code
 
-    :type call_args: collections.OrderedDict
+    :type sig: inspect.Signature
     :type max_indent: int
     :rtype: str
     """
-    args_repr = ""
-    if len(call_args) > 0:
-        args_repr = "\n    " + "\n    ".join((
-            "{key!r}={val},".format(
-                key=key,
-                val=core.pretty_repr(
-                    val,
-                    indent=8,
-                    max_indent=max_indent,
-                    no_indent_start=True,
-                ),
-            )
-            for key, val in call_args.items())
-        ) + '\n'
-    return args_repr
+
+    bound = sig.bind(*args, **kwargs).arguments
+
+    param_str = ""
+
+    last_kind = None
+    for param in sig.parameters.values():
+        if last_kind != param.kind:
+            param_str += comment(kind=param.kind)
+            last_kind = param.kind
+        param_str += fmt(
+            key=param.name,
+            val=core.pretty_repr(
+                src=bound.get(param.name, param.default),
+                indent=indent + 4,
+                no_indent_start=True,
+                max_indent=max_indent,
+            ),
+        )
+    if param_str:
+        param_str += "\n"
+    return param_str
 
 
 def logwrap(
@@ -93,19 +117,21 @@ def logwrap(
         :return: wrapped function
         :rtype: callable
         """
+        # Get signature _before_ call
+        sig = signature(obj=func if not spec else spec)
+
         @functools.wraps(func)
         def wrapped(*args, **kwargs):
             """Real wrapper.
 
              *args and **kwargs is bound in separate helpers
              """
-            call_args = core.get_call_args(
-                func if not spec else spec,
-                *args,
-                **kwargs
+            args_repr = _get_func_args_repr(
+                sig=sig,
+                args=args,
+                kwargs=kwargs,
+                max_indent=max_indent,
             )
-
-            args_repr = _get_func_args_repr(call_args, max_indent)
 
             log.log(
                 level=log_level,
