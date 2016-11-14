@@ -335,3 +335,77 @@ class TestLogWrap(unittest.TestCase):
                     "    ]),\n"
                     "])"),
         ))
+
+    @unittest.skipUnless(
+        sys.version_info[0:2] > (3, 0),
+        'Strict python 3 syntax'
+    )
+    def test_py3_args(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        log_call = logwrap.logwrap(log=new_logger)
+
+        namespace = {}
+
+        exec(
+            "def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs): pass\n",
+            namespace
+        )
+        wrapped = log_call(namespace['tst'])
+        wrapped(0, 1, 2, kwarg=3, somekwarg=5)
+
+        log.assert_has_calls((
+            mock.call(
+                level=logging.DEBUG,
+                msg="Calling: \n"
+                    "'tst'(\n"
+                    "    # POSITIONAL_OR_KEYWORD:\n"
+                    "    'arg'=0,\n"
+                    "    'darg'=1,\n"
+                    "    # VAR_POSITIONAL:\n"
+                    "    'args'=\n"
+                    "        tuple((\n"
+                    "            2,\n"
+                    "        )),\n"
+                    "    # KEYWORD_ONLY:\n"
+                    "    'kwarg'=3,\n"
+                    "    'dkwarg'=4,\n"
+                    "    # VAR_KEYWORD:\n"
+                    "    'kwargs'=\n"
+                    "        dict({\n"
+                    "            'somekwarg': 5,\n"
+                    "        }),\n"
+                    ")"),
+            mock.call(
+                level=logging.DEBUG,
+                msg="Done: 'tst' with result:\n"
+                    "None"),
+        ))
+
+    @unittest.skipUnless(
+        sys.version_info[0:2] > (3, 4),
+        'Strict python 3.5+ API'
+    )
+    def test_coroutine(self, logger):
+
+        namespace = {'logwrap': logwrap}
+
+        exec(
+            "import asyncio\n"
+            "@logwrap.logwrap\n"
+            "async def func(): pass\n"
+            "loop = asyncio.get_event_loop()\n"
+            "loop.run_until_complete(func())\n"
+            "loop.close()\n",
+            namespace
+        )
+        # While we're not expanding result coroutine object from namespace,
+        # do not check execution result
+        logger.assert_has_calls((
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Calling: \n'func'()"
+            ),
+        ))
