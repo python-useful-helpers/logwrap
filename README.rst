@@ -3,8 +3,6 @@ logwrap
 
 .. image:: https://travis-ci.org/penguinolog/logwrap.svg?branch=master
     :target: https://travis-ci.org/penguinolog/logwrap
-.. image:: https://img.shields.io/circleci/project/github/penguinolog/logwrap.svg
-    :target: https://circleci.com/gh/penguinolog/logwrap
 .. image:: https://api.codacy.com/project/badge/Grade/72f332d53b924cd2b2c0dc6f9d1f8d0f
     :target: https://www.codacy.com/app/penguinolog/logwrap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=penguinolog/logwrap&amp;utm_campaign=Badge_Grade
 .. image:: https://api.codacy.com/project/badge/Coverage/72f332d53b924cd2b2c0dc6f9d1f8d0f
@@ -133,11 +131,9 @@ CI systems
 ==========
 For code checking several CI systems is used in parallel:
 
-1. `Travis CI: <https://travis-ci.org/penguinolog/logwrap>`_ is used for checking: PEP8, installation possibility and unit tests
+1. `Travis CI: <https://travis-ci.org/penguinolog/logwrap>`_ is used for checking: PEP8, pylint, installation possibility and unit tests. Also it's publishes coverage on Codacy.
 
-2. `Circle CI: <https://circleci.com/gh/penguinolog/logwrap>`_ is used for checking: pylint, docs. In addition this CI publishes coverage results.
-
-3. `Codacy: <https://www.codacy.com/app/penguinolog/logwrap/dashboard>`_ is used for statical analysis and coverage display.
+2. `Codacy: <https://www.codacy.com/app/penguinolog/logwrap/dashboard>`_ is used for statical analysis and coverage display.
 
 CD system
 =========
