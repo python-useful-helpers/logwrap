@@ -11,9 +11,3 @@ dependencies:
 test:
   override:
     - tox -e docs
-
-deployment:
-  coverage:
-    branch: master
-    commands:
-      - tox -e upload_coverage
