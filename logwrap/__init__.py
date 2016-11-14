@@ -16,7 +16,7 @@
 
 """logwrap module
 
-Contents: 'get_arg_names', 'get_call_args', 'logwrap', 'pretty_repr'
+Contents: 'logwrap', 'pretty_repr'
 
 Original code was made for Mirantis Inc by Alexey Stepanov,
 later it has been reworked and extended for support of special cases.
