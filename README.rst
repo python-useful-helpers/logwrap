@@ -90,6 +90,11 @@ Get decorator for use without parameters:
     def foo():
         pass
 
+Limitations:
+* return value from awaitable objects (`async def(...`) is not accessible - on call asyncio object is returned.
+
+* nested wrapping (`@logwrap @deco2 ...`) is not parsed under python 2.7: `funcsigs` limitation. Please set `logwrap` as the first level decorator.
+
 pretty_repr
 -----------
 This is specified helper for making human-readable repr on complex objects.
