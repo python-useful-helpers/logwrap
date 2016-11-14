@@ -1,5 +1,15 @@
 CHANGELOG
 =========
+Version 1.0.1
+-------------
+* Circle CI was disabled: all has been moved to the Travis
+
+* Covered several special cases by unit tests
+
+* ReadTheDocs now working correctly
+
+* Fixed legacy commentaries at docstring
+
 Version 1.0.0
 -------------
 * Drop historical code and update documentation
