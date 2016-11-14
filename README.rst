@@ -9,6 +9,9 @@ logwrap
     :target: https://www.codacy.com/app/penguinolog/logwrap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=penguinolog/logwrap&amp;utm_campaign=Badge_Grade
 .. image:: https://api.codacy.com/project/badge/Coverage/72f332d53b924cd2b2c0dc6f9d1f8d0f
     :target: https://www.codacy.com/app/penguinolog/logwrap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=penguinolog/logwrap&amp;utm_campaign=Badge_Coverage
+.. image:: https://readthedocs.org/projects/logwrap/badge/?version=latest
+    :target: http://logwrap.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 .. image:: https://img.shields.io/pypi/v/logwrap.svg
     :target: https://pypi.python.org/pypi/logwrap
 .. image:: https://img.shields.io/pypi/pyversions/logwrap.svg
