@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import functools
 import logging
 import sys
 import unittest
@@ -408,4 +409,60 @@ class TestLogWrap(unittest.TestCase):
                 level=logging.DEBUG,
                 msg="Calling: \n'func'()"
             ),
+        ))
+
+    @unittest.skipUnless(
+        sys.version_info[0:2] > (3, 0),
+        'Wrap expanding is not supported under python 2.7: funcsigs limitation'
+    )
+    def test_wrapped(self, logger):
+        def simpledeco(func):
+            @functools.wraps(func)
+            def wrapped(*args, **kwargs):
+                return func(*args, **kwargs)
+            return wrapped
+
+        @logwrap.logwrap
+        @simpledeco
+        def func(arg, darg=1, *args, **kwargs):
+            return arg, darg, args, kwargs
+
+        result = func(0, 1, 2, arg3=3)
+        self.assertEqual(
+            result,
+            (0, 1, (2, ), {'arg3': 3})
+        )
+        logger.assert_has_calls((
+            mock.call.log(
+                level=10,
+                msg="Calling: \n"
+                    "'func'(\n"
+                    "    # POSITIONAL_OR_KEYWORD:\n"
+                    "    'arg'=0,\n"
+                    "    'darg'=1,\n"
+                    "    # VAR_POSITIONAL:\n"
+                    "    'args'=\n"
+                    "        tuple((\n"
+                    "            2,\n"
+                    "        )),\n"
+                    "    # VAR_KEYWORD:\n"
+                    "    'kwargs'=\n"
+                    "        dict({\n"
+                    "            'arg3': 3,\n"
+                    "        }),\n"
+                    ")"),
+            mock.call.log(
+                level=10,
+                msg="Done: 'func' with result:\n"
+                    "\n"
+                    "tuple((\n"
+                    "    0,\n"
+                    "    1,\n"
+                    "    tuple((\n"
+                    "        2,\n"
+                    "    )),\n"
+                    "    dict({\n"
+                    "        'arg3': 3,\n"
+                    "    }),\n"
+                    "))")
         ))
