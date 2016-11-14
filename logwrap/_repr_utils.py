@@ -53,6 +53,7 @@ def _simple(item):
     """Check for nested iterations: True, if not"""
     return not isinstance(item, (list, set, tuple, dict))
 
+
 _formatters = {
     'simple': "{spc:<{indent}}{val!r}".format,
     'manual': "{spc:<{indent}}{val}".format,
@@ -249,5 +250,6 @@ def pretty_repr(
             end=suffix,
         )
     )
+
 
 __all__ = ['pretty_repr']
