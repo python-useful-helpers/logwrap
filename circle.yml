@@ -10,7 +10,6 @@ dependencies:
 
 test:
   override:
-    - tox -e pylint
     - tox -e docs
 
 deployment:
