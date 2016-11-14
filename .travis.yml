@@ -7,12 +7,13 @@ python:
   - "pypy"
 install: pip install tox-travis
 script: tox
-after_success:
-  - pip install -r CI_REQUIREMENTS.txt
-  - tox -e upload_coverage
 before_deploy:
   - pip install -r CI_REQUIREMENTS.txt
 deploy:
+  - provider: script
+    script: tox -e upload_coverage
+    on:
+      python: 2.7
   - provider: pypi
     distributions: sdist bdist_wheel
     server: https://testpypi.python.org/pypi
