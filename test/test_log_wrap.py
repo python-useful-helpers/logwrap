@@ -306,3 +306,32 @@ class TestLogWrap(unittest.TestCase):
                 msg="Done: 'func' with result:\n"
                     "u'''test arg'''"),
         ))
+
+    def test_indent(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        @logwrap.logwrap(log=new_logger, max_indent=10)
+        def func():
+            return [[[[[[[[[[123]]]]]]]]]]
+
+        func()
+
+        log.assert_has_calls((
+            mock.call(
+                level=logging.DEBUG,
+                msg="Calling: \n"
+                    "'func'()"),
+            mock.call(
+                level=logging.DEBUG,
+                msg="Done: 'func' with result:\n"
+                    "\n"
+                    "list([\n"
+                    "    list([\n"
+                    "        list([\n"
+                    "            [[[[[[[123]]]]]]],\n"
+                    "        ]),\n"
+                    "    ]),\n"
+                    "])"),
+        ))

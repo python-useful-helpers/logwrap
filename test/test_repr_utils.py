@@ -281,3 +281,42 @@ class TestPrettyRepr(unittest.TestCase):
                      '    **named,\n'.format(cls=TstClass)
             )
         )
+
+    def test_indent(self):
+        obj = [[[[[[[[[[123]]]]]]]]]]
+        self.assertEqual(
+            logwrap.pretty_repr(obj, max_indent=40),
+            "\n"
+            "list([\n"
+            "    list([\n"
+            "        list([\n"
+            "            list([\n"
+            "                list([\n"
+            "                    list([\n"
+            "                        list([\n"
+            "                            list([\n"
+            "                                list([\n"
+            "                                    list([\n"
+            "                                        123,\n"
+            "                                    ]),\n"
+            "                                ]),\n"
+            "                            ]),\n"
+            "                        ]),\n"
+            "                    ]),\n"
+            "                ]),\n"
+            "            ]),\n"
+            "        ]),\n"
+            "    ]),\n"
+            "])"
+        )
+        self.assertEqual(
+            logwrap.pretty_repr(obj, max_indent=10),
+            "\n"
+            "list([\n"
+            "    list([\n"
+            "        list([\n"
+            "            [[[[[[[123]]]]]]],\n"
+            "        ]),\n"
+            "    ]),\n"
+            "])"
+        )
