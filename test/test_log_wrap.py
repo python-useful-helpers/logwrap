@@ -350,10 +350,12 @@ class TestLogWrap(unittest.TestCase):
 
         namespace = {}
 
-        exec(
-            "def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs): pass\n",
-            namespace
-        )
+        exec("""
+def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
+    pass
+        """,
+             namespace
+             )
         wrapped = log_call(namespace['tst'])
         wrapped(0, 1, 2, kwarg=3, somekwarg=5)
 
@@ -393,15 +395,19 @@ class TestLogWrap(unittest.TestCase):
 
         namespace = {'logwrap': logwrap}
 
-        exec(
-            "import asyncio\n"
-            "@logwrap.logwrap\n"
-            "async def func(): pass\n"
-            "loop = asyncio.get_event_loop()\n"
-            "loop.run_until_complete(func())\n"
-            "loop.close()\n",
-            namespace
-        )
+        exec("""
+import asyncio
+
+@logwrap.logwrap
+async def func():
+    pass
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(func())
+loop.close()
+        """,
+             namespace
+             )
         # While we're not expanding result coroutine object from namespace,
         # do not check execution result
         logger.assert_has_calls((
