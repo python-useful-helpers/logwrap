@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 1.0.3
+-------------
+* Technical bump: was a false-negative ci results
+
 Version 1.0.2
 -------------
 * Rework requirements: remove magic

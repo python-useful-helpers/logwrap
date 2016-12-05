@@ -27,7 +27,7 @@ from __future__ import absolute_import
 from ._log_wrap import logwrap
 from ._repr_utils import pretty_repr
 
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 
 __all__ = [
     'logwrap',
