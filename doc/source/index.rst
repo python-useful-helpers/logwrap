@@ -6,8 +6,6 @@
 Welcome to logwrap documentation!
 =================================
 
-.. include:: ../../README
-
 Contents:
 
 .. toctree::
