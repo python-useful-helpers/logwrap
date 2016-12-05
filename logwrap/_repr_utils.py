@@ -54,10 +54,45 @@ def _simple(item):
     return not isinstance(item, (list, set, tuple, dict))
 
 
+def _strings_repr(indent, val):
+    """Custom repr for strings and binary strings"""
+    if isinstance(val, binary_type):
+        val = val.decode(
+            encoding='utf-8',
+            errors='backslashreplace'
+        )
+        prefix = 'b'
+    else:
+        prefix = 'u'
+    return "{spc:<{indent}}{prefix}'''{string}'''".format(
+        spc='',
+        indent=indent,
+        prefix=prefix,
+        string=val
+    )
+
+
+def _set_repr(indent, val):
+    """Custom repr formatter for sets"""
+    return "{spc:<{indent}}{val}".format(
+        spc='',
+        indent=indent,
+        val="set({})".format(
+            ' ,'.join(
+                map(
+                    '{!r}'.format,  # unicode -> !repr
+                    val
+                )
+            )
+        )
+    )
+
+
 repr_formatters = {
     'simple': "{spc:<{indent}}{val!r}".format,
     'manual': "{spc:<{indent}}{val}".format,
-    'text': "{spc:<{indent}}{prefix}'''{string}'''".format,
+    'simple_set': _set_repr,
+    'text': _strings_repr,
     'dict': "\n{spc:<{indent}}{key!r:{size}}: {val},".format,
     'iterable_item':
         "\n"
@@ -203,28 +238,16 @@ class PrettyFormat(object):
             )
         indent = 0 if no_indent_start else indent
         if isinstance(src, (binary_type, text_type)):
-            if isinstance(src, binary_type):
-                string = src.decode(
-                    encoding='utf-8',
-                    errors='backslashreplace'
-                )
-                prefix = 'b'
-            else:
-                string = src
-                prefix = 'u'
             return self.__formatters['text'](
-                spc='',
                 indent=indent,
-                prefix=prefix,
-                string=string
+                val=src
             )
         # Parse set manually due to different repr() implementation
         # in different python versions
         if isinstance(src, set):
-            return self.__formatters['manual'](
-                spc='',
+            return self.__formatters['simple_set'](
                 indent=indent,
-                val='set()',
+                val=src,
             )
         return self.__formatters['simple'](
             spc='',
