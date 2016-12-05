@@ -148,7 +148,7 @@ pretty_repr behavior could be overridden for your classes by implementing specif
 
     def __pretty_repr__(
         self,
-        parser  # pretty repr class instance,
+        parser  # PrettyFormat class instance,
         indent  # start indent,
         no_indent_start  # do not indent the first level
     ):

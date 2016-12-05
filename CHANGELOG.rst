@@ -1,5 +1,16 @@
 CHANGELOG
 =========
+Version 1.0.4
+-------------
+* divide process and final result call
+
+* allow override behavior per type by magic __pretty_{}__ method
+
+* PrettyFormat class is public
+
+Note: No major bump until ready:
+    pretty_str implementation for usage in __str__ and print calls
+
 Version 1.0.3
 -------------
 * Technical bump: was a false-negative ci results
