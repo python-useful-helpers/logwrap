@@ -21,8 +21,8 @@ import sys
 
 import logwrap
 
-with open('README.rst') as file:
-    long_description = file.read()
+with open('README.rst') as f:
+    long_description = f.read()
 
 setuptools.setup(
     name='logwrap',

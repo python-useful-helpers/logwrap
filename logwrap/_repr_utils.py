@@ -26,8 +26,10 @@ from __future__ import unicode_literals
 import sys
 import types
 
+_PY3 = sys.version_info[0:2] > (3, 0)
+
 # pylint: disable=ungrouped-imports, no-name-in-module
-if sys.version_info[0:2] > (3, 0):
+if _PY3:
     from inspect import Parameter
     from inspect import signature
 else:
@@ -38,7 +40,7 @@ else:
 # pylint: enable=ungrouped-imports, no-name-in-module
 
 
-if sys.version_info[0:2] > (3, 0):
+if _PY3:
     binary_type = bytes
     text_type = str
 else:
@@ -255,12 +257,54 @@ class PrettyFormat(object):
             val=src,
         )
 
+    def _repr_dict_items(self, src, indent=0):
+        """repr dict items
+
+        :param src: object to process
+        :type src: dict
+        :param indent: start indentation
+        :type indent: int
+        :yields: str
+        """
+        max_len = len(max([repr(key) for key in src])) if src else 0
+        for key, val in src.items():
+            yield self.__formatters['dict'](
+                spc='',
+                indent=self.next_indent(indent),
+                size=max_len,
+                key=key,
+                val=self.process(
+                    val,
+                    self.next_indent(indent, doubled=True),
+                    no_indent_start=True,
+                )
+            )
+
+    def _repr_iterable_items(self, src, indent=0):
+        """repr iterable items (not designed for dicts)
+
+        :param src: object to process
+        :type src: dict
+        :param indent: start indentation
+        :type indent: int
+        :yields: str
+        """
+        for elem in src:
+            res = ''
+            indent_overflow = self.next_indent(indent) >= self.max_indent
+            if _simple(elem) or len(elem) == 0 or indent_overflow:
+                res += '\n'
+            yield res + self.process(
+                elem,
+                self.next_indent(indent),
+            ) + ','
+
     def process(self, src, indent=0, no_indent_start=False):
         """Make human readable representation of object
 
         :param src: object to process
         :type src: union(six.binary_type, six.text_type, int, iterable, object)
-        :param indent: start indentation, all next levels is +4
+        :param indent: start indentation
         :type indent: int
         :param no_indent_start:
             do not indent open bracket and simple parameters
@@ -273,22 +317,10 @@ class PrettyFormat(object):
                 indent=indent,
                 no_indent_start=no_indent_start,
             )
-        result = ''
+
         if isinstance(src, dict):
             prefix, suffix = '{', '}'
-            max_len = len(max([repr(key) for key in src])) if src else 0
-            for key, val in src.items():
-                result += self.__formatters['dict'](
-                    spc='',
-                    indent=self.next_indent(indent),
-                    size=max_len,
-                    key=key,
-                    val=self.process(
-                        val,
-                        self.next_indent(indent, doubled=True),
-                        no_indent_start=True,
-                    )
-                )
+            result = ''.join(self._repr_dict_items(src=src, indent=indent))
         else:
             if isinstance(src, list):
                 prefix, suffix = '[', ']'
@@ -296,15 +328,7 @@ class PrettyFormat(object):
                 prefix, suffix = '(', ')'
             else:
                 prefix, suffix = '{', '}'
-            for elem in src:
-                if _simple(elem) or\
-                        len(elem) == 0 or \
-                        self.next_indent(indent) >= self.max_indent:
-                    result += '\n'
-                result += self.process(
-                    elem,
-                    self.next_indent(indent),
-                ) + ','
+            result = ''.join(self._repr_iterable_items(src=src, indent=indent))
         return (
             self.__formatters['iterable_item'](
                 spc='',
@@ -323,6 +347,7 @@ def pretty_repr(
     no_indent_start=False,
     max_indent=20,
     indent_step=4,
+    py2_str=False,
 ):
     """Make human readable repr of object
 
@@ -336,9 +361,11 @@ def pretty_repr(
     :type max_indent: int
     :param indent_step: step for the next indentation level
     :type indent_step: int
+    :param py2_str: use Python 2.x compatible strings instead of unicode
+    :type py2_str: bool
     :return: formatted string
     """
-    return PrettyFormat(
+    result = PrettyFormat(
         formatters=repr_formatters,
         max_indent=max_indent,
         indent_step=indent_step
@@ -347,6 +374,12 @@ def pretty_repr(
         indent=indent,
         no_indent_start=no_indent_start,
     )
+    if py2_str:
+        return result.encode(
+            encoding='utf-8',
+            errors='backslashreplace',
+        )
+    return result
 
 
 __all__ = ['pretty_repr']
