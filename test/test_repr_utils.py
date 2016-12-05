@@ -131,32 +131,32 @@ class TestPrettyRepr(unittest.TestCase):
         tst_instance = TstClass()
 
         self.assertEqual(
-            list(_repr_utils.prepare_repr(empty_func)),
+            list(_repr_utils._prepare_repr(empty_func)),
             []
         )
 
         self.assertEqual(
-            list(_repr_utils.prepare_repr(full_func)),
+            list(_repr_utils._prepare_repr(full_func)),
             ['arg', ('darg', 1), '*positional', '**named']
         )
 
         self.assertEqual(
-            list(_repr_utils.prepare_repr(TstClass.tst_method)),
+            list(_repr_utils._prepare_repr(TstClass.tst_method)),
             ['self', 'arg', ('darg', 1), '*positional', '**named']
         )
 
         self.assertEqual(
-            list(_repr_utils.prepare_repr(TstClass.tst_classmethod)),
+            list(_repr_utils._prepare_repr(TstClass.tst_classmethod)),
             [('cls', TstClass), 'arg', ('darg', 1), '*positional', '**named']
         )
 
         self.assertEqual(
-            list(_repr_utils.prepare_repr(TstClass.tst_staticmethod)),
+            list(_repr_utils._prepare_repr(TstClass.tst_staticmethod)),
             ['arg', ('darg', 1), '*positional', '**named']
         )
 
         self.assertEqual(
-            list(_repr_utils.prepare_repr(tst_instance.tst_method)),
+            list(_repr_utils._prepare_repr(tst_instance.tst_method)),
             [
                 ('self', tst_instance),
                 'arg',
@@ -167,12 +167,12 @@ class TestPrettyRepr(unittest.TestCase):
         )
 
         self.assertEqual(
-            list(_repr_utils.prepare_repr(tst_instance.tst_classmethod)),
+            list(_repr_utils._prepare_repr(tst_instance.tst_classmethod)),
             [('cls', TstClass), 'arg', ('darg', 1), '*positional', '**named']
         )
 
         self.assertEqual(
-            list(_repr_utils.prepare_repr(tst_instance.tst_staticmethod)),
+            list(_repr_utils._prepare_repr(tst_instance.tst_staticmethod)),
             ['arg', ('darg', 1), '*positional', '**named']
         )
 
@@ -319,4 +319,31 @@ class TestPrettyRepr(unittest.TestCase):
             "        ]),\n"
             "    ]),\n"
             "])"
+        )
+
+    def test_magic_override(self):
+        class Tst(object):
+            def __repr__(self):
+                return 'Test'
+
+            def __pretty_repr__(
+                self,
+                parser,
+                indent=0,
+                no_indent_start=False
+            ):
+                return parser.process_element(
+                    "<Test Class at 0x{:X}>".format(id(self.__class__)),
+                    indent=indent,
+                    no_indent_start=no_indent_start
+                )
+
+        result = logwrap.pretty_repr(Tst())
+        self.assertNotEqual(
+            result,
+            'Test'
+        )
+        self.assertEqual(
+            result,
+            "u'''<Test Class at 0x{:X}>'''".format(id(Tst))
         )

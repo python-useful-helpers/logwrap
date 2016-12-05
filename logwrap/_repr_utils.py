@@ -51,6 +51,11 @@ else:
     # pylint: enable=unicode-builtin, undefined-variable
 
 
+def _known_callble(item):
+    """Check for possibility to parse callable"""
+    return isinstance(item, (types.FunctionType, types.MethodType))
+
+
 def _simple(item):
     """Check for nested iterations: True, if not"""
     return not isinstance(item, (list, set, tuple, dict))
@@ -93,8 +98,9 @@ def _set_repr(indent, val):
 repr_formatters = {
     'simple': "{spc:<{indent}}{val!r}".format,
     'manual': "{spc:<{indent}}{val}".format,
-    'simple_set': _set_repr,
-    'text': _strings_repr,
+    set: _set_repr,
+    binary_type: _strings_repr,
+    text_type: _strings_repr,
     'dict': "\n{spc:<{indent}}{key!r:{size}}: {val},".format,
     'iterable_item':
         "\n"
@@ -107,7 +113,7 @@ repr_formatters = {
 
 
 # pylint: disable=no-member
-def prepare_repr(func):
+def _prepare_repr(func):
     """Get arguments lists with defaults
 
     :type func: union(types.FunctionType, types.MethodType)
@@ -142,23 +148,31 @@ class PrettyFormat(object):
     def __init__(
         self,
         formatters=None,
+        keyword='repr',
         max_indent=20,
         indent_step=4,
+        py2_str=False,
     ):
         """Pretty Formatter
 
         :param formatters: object formatters (prepared str.format functions)
         :type formatters: {str: callable}
+        :param keyword: operation keyword (__pretty_{keyword}__)
+        :type keyword: str
         :param max_indent: maximal indent before classic repr() call
         :type max_indent: int
         :param indent_step: step for the next indentation level
         :type indent_step: int
+        :param py2_str: use Python 2.x compatible strings instead of unicode
+        :type py2_str: bool
         """
         if formatters is None:
             formatters = repr_formatters
         self.__formatters = formatters
+        self.__keyword = keyword
         self.__max_indent = max_indent
         self.__indent_step = indent_step
+        self.__py2_str = py2_str
 
     @property
     def max_indent(self):
@@ -197,13 +211,13 @@ class PrettyFormat(object):
         """
         param_str = ""
 
-        for param in prepare_repr(src):
+        for param in _prepare_repr(src):
             if isinstance(param, tuple):
                 param_str += self.__formatters['func_def_arg'](
                     spc='',
                     indent=self.next_indent(indent),
                     key=param[0],
-                    val=self.process(
+                    val=self.process_element(
                         src=param[1],
                         indent=indent,
                         no_indent_start=True,
@@ -233,24 +247,15 @@ class PrettyFormat(object):
         :type no_indent_start: bool
         :rtype: str
         """
-        if isinstance(src, (types.FunctionType, types.MethodType)):
-            return self._repr_callable(
-                src=src,
-                indent=indent,
-            )
         indent = 0 if no_indent_start else indent
-        if isinstance(src, (binary_type, text_type)):
-            return self.__formatters['text'](
+        # pylint: disable=unidiomatic-typecheck
+        # We use type(obj) as dict key
+        if type(src) in self.__formatters:
+            return self.__formatters[type(src)](
                 indent=indent,
                 val=src
             )
-        # Parse set manually due to different repr() implementation
-        # in different python versions
-        if isinstance(src, set):
-            return self.__formatters['simple_set'](
-                indent=indent,
-                val=src,
-            )
+        # pylint: enable=unidiomatic-typecheck
         return self.__formatters['simple'](
             spc='',
             indent=indent,
@@ -264,7 +269,7 @@ class PrettyFormat(object):
         :type src: dict
         :param indent: start indentation
         :type indent: int
-        :yields: str
+        :rtype: generator
         """
         max_len = len(max([repr(key) for key in src])) if src else 0
         for key, val in src.items():
@@ -273,7 +278,7 @@ class PrettyFormat(object):
                 indent=self.next_indent(indent),
                 size=max_len,
                 key=key,
-                val=self.process(
+                val=self.process_element(
                     val,
                     self.next_indent(indent, doubled=True),
                     no_indent_start=True,
@@ -287,19 +292,22 @@ class PrettyFormat(object):
         :type src: dict
         :param indent: start indentation
         :type indent: int
-        :yields: str
+        :rtype: generator
         """
+        indent_overflow = self.next_indent(indent) >= self.max_indent
         for elem in src:
             res = ''
-            indent_overflow = self.next_indent(indent) >= self.max_indent
-            if _simple(elem) or len(elem) == 0 or indent_overflow:
-                res += '\n'
-            yield res + self.process(
+            if _simple(elem) or\
+                    _known_callble(elem) or\
+                    len(elem) == 0\
+                    or indent_overflow:
+                res = '\n'
+            yield res + self.process_element(
                 elem,
                 self.next_indent(indent),
             ) + ','
 
-    def process(self, src, indent=0, no_indent_start=False):
+    def process_element(self, src, indent=0, no_indent_start=False):
         """Make human readable representation of object
 
         :param src: object to process
@@ -310,7 +318,24 @@ class PrettyFormat(object):
             do not indent open bracket and simple parameters
         :type no_indent_start: bool
         :return: formatted string
+        :rtype: str
         """
+        if hasattr(src, '__pretty_{}__'.format(self.__keyword)):
+            return getattr(
+                src,
+                '__pretty_{}__'.format(self.__keyword)
+            )(
+                self,
+                indent=indent,
+                no_indent_start=no_indent_start
+            )
+
+        if _known_callble(src):
+            return self._repr_callable(
+                src=src,
+                indent=indent,
+            )
+
         if _simple(src) or indent >= self.max_indent or len(src) == 0:
             return self._repr_simple(
                 src=src,
@@ -340,6 +365,30 @@ class PrettyFormat(object):
             )
         )
 
+    def parse(self, src, indent=0, no_indent_start=False):
+        """Make human readable representation of object
+
+        :param src: object to process
+        :type src: union(six.binary_type, six.text_type, int, iterable, object)
+        :param indent: start indentation
+        :type indent: int
+        :param no_indent_start:
+            do not indent open bracket and simple parameters
+        :type no_indent_start: bool
+        :return: formatted string
+        """
+        result = self.process_element(
+            src,
+            indent=indent,
+            no_indent_start=no_indent_start
+        )
+        if self.__py2_str:
+            return result.encode(
+                encoding='utf-8',
+                errors='backslashreplace',
+            )
+        return result
+
 
 def pretty_repr(
     src,
@@ -365,21 +414,17 @@ def pretty_repr(
     :type py2_str: bool
     :return: formatted string
     """
-    result = PrettyFormat(
+    return PrettyFormat(
         formatters=repr_formatters,
+        keyword='repr',
         max_indent=max_indent,
-        indent_step=indent_step
-    ).process(
+        indent_step=indent_step,
+        py2_str=py2_str
+    ).parse(
         src=src,
         indent=indent,
         no_indent_start=no_indent_start,
     )
-    if py2_str:
-        return result.encode(
-            encoding='utf-8',
-            errors='backslashreplace',
-        )
-    return result
 
 
-__all__ = ['pretty_repr']
+__all__ = ['pretty_repr', 'PrettyFormat']
