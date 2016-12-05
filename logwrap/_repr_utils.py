@@ -96,98 +96,175 @@ def prepare_repr(func):
 # pylint: enable=no-member
 
 
-def _repr_callable(src, indent=0, max_indent=20):
-    """repr callable object (function or method)
+class PrettyFormat(object):
+    """Pretty Formatter
 
-    :type src: union(types.FunctionType, types.MethodType)
-    :type indent: int
-    :type max_indent: int
-    :rtype: str
+    Designed for usage as __repr__ and __str__ replacement on complex objects
     """
-    param_str = ""
 
-    for param in prepare_repr(src):
-        if isinstance(param, tuple):
-            param_str += _formatters['func_def_arg'](
-                spc='',
-                indent=indent + 4,
-                key=param[0],
-                val=pretty_repr(
-                    src=param[1],
-                    indent=indent,
-                    no_indent_start=True,
-                    max_indent=max_indent
+    def __init__(self, max_indent=20):
+        """Pretty Formatter
+
+        :param max_indent: maximal indent before classic repr() call
+        :type max_indent: int
+        """
+        self.__max_indent = max_indent
+
+    @property
+    def max_indent(self):
+        """Max indent getter
+
+        :rtype: int
+        """
+        return self.__max_indent
+
+    def _repr_callable(self, src, indent=0):
+        """repr callable object (function or method)
+
+        :type src: union(types.FunctionType, types.MethodType)
+        :type indent: int
+        :rtype: str
+        """
+        param_str = ""
+
+        for param in prepare_repr(src):
+            if isinstance(param, tuple):
+                param_str += _formatters['func_def_arg'](
+                    spc='',
+                    indent=indent + 4,
+                    key=param[0],
+                    val=self.process(
+                        src=param[1],
+                        indent=indent,
+                        no_indent_start=True,
+                    )
                 )
+            else:
+                param_str += _formatters['func_arg'](
+                    spc='',
+                    indent=indent + 4,
+                    key=param
+                )
+
+        if param_str:
+            param_str += "\n" + " " * indent
+        return _formatters['callable'](
+            spc="",
+            indent=indent,
+            obj=src,
+            args=param_str,
+        )
+
+    def _repr_simple(self, src, indent=0, no_indent_start=False):
+        """repr object without iteration
+
+        :type src: union(six.binary_type, six.text_type, int, iterable, object)
+        :type indent: int
+        :type no_indent_start: bool
+        :rtype: str
+        """
+        if isinstance(src, (types.FunctionType, types.MethodType)):
+            return self._repr_callable(
+                src=src,
+                indent=indent,
             )
-        else:
-            param_str += _formatters['func_arg'](
+        indent = 0 if no_indent_start else indent
+        if isinstance(src, (binary_type, text_type)):
+            if isinstance(src, binary_type):
+                string = src.decode(
+                    encoding='utf-8',
+                    errors='backslashreplace'
+                )
+                prefix = 'b'
+            else:
+                string = src
+                prefix = 'u'
+            return _formatters['text'](
                 spc='',
-                indent=indent + 4,
-                key=param
+                indent=indent,
+                prefix=prefix,
+                string=string
             )
-
-    if param_str:
-        param_str += "\n" + " " * indent
-    return _formatters['callable'](
-        spc="",
-        indent=indent,
-        obj=src,
-        args=param_str,
-    )
-
-
-def _repr_simple(src, indent=0, no_indent_start=False, max_indent=20):
-    """repr object without iteration
-
-    :type src: union(six.binary_type, six.text_type, int, iterable, object)
-    :type indent: int
-    :type no_indent_start: bool
-    :type max_indent: int
-    :rtype: str
-    """
-    if isinstance(src, (types.FunctionType, types.MethodType)):
-        return _repr_callable(
-            src=src,
+        # Parse set manually due to different repr() implementation
+        # in different python versions
+        if isinstance(src, set):
+            return _formatters['manual'](
+                spc='',
+                indent=indent,
+                val='set()',
+            )
+        return _formatters['simple'](
+            spc='',
             indent=indent,
-            max_indent=max_indent
+            val=src,
         )
-    indent = 0 if no_indent_start else indent
-    if isinstance(src, (binary_type, text_type)):
-        if isinstance(src, binary_type):
-            string = src.decode(
-                encoding='utf-8',
-                errors='backslashreplace'
+
+    def process(self, src, indent=0, no_indent_start=False):
+        """Make human readable representation of object
+
+        :param src: object to process
+        :type src: union(six.binary_type, six.text_type, int, iterable, object)
+        :param indent: start indentation, all next levels is +4
+        :type indent: int
+        :param no_indent_start:
+            do not indent open bracket and simple parameters
+        :type no_indent_start: bool
+        :return: formatted string
+        """
+        if _simple(src) or indent >= self.max_indent or len(src) == 0:
+            return self._repr_simple(
+                src=src,
+                indent=indent,
+                no_indent_start=no_indent_start,
             )
-            prefix = 'b'
+        result = ''
+        if isinstance(src, dict):
+            prefix, suffix = '{', '}'
+            max_len = len(max([repr(key) for key in src])) if src else 0
+            for key, val in src.items():
+                result += _formatters['dict'](
+                    spc='',
+                    indent=indent + 4,
+                    size=max_len,
+                    key=key,
+                    val=self.process(
+                        val,
+                        indent + 8,
+                        no_indent_start=True,
+                    )
+                )
         else:
-            string = src
-            prefix = 'u'
-        return _formatters['text'](
-            spc='',
-            indent=indent,
-            prefix=prefix,
-            string=string
+            if isinstance(src, list):
+                prefix, suffix = '[', ']'
+            elif isinstance(src, tuple):
+                prefix, suffix = '(', ')'
+            else:
+                prefix, suffix = '{', '}'
+            for elem in src:
+                if _simple(elem) or\
+                        len(elem) == 0 or indent + 4 >= self.max_indent:
+                    result += '\n'
+                result += self.process(
+                    elem,
+                    indent + 4,
+                ) + ','
+        return (
+            _formatters['iterable_item'](
+                spc='',
+                obj_type=src.__class__.__name__,
+                start=prefix,
+                indent=indent,
+                result=result,
+                end=suffix,
+            )
         )
-    # Parse set manually due to different repr() implementation
-    # in different python versions
-    if isinstance(src, set):
-        return _formatters['manual'](
-            spc='',
-            indent=indent,
-            val='set()',
-        )
-    return _formatters['simple'](
-        spc='',
-        indent=indent,
-        val=src,
-    )
 
 
 def pretty_repr(
-        src,
-        indent=0,
-        no_indent_start=False,
-        max_indent=20,
+    src,
+    indent=0,
+    no_indent_start=False,
+    max_indent=20,
 ):
     """Make human readable repr of object
 
@@ -201,54 +278,12 @@ def pretty_repr(
     :type max_indent: int
     :return: formatted string
     """
-    if _simple(src) or indent >= max_indent or len(src) == 0:
-        return _repr_simple(
-            src=src,
-            indent=indent,
-            no_indent_start=no_indent_start,
-            max_indent=max_indent
-        )
-    result = ''
-    if isinstance(src, dict):
-        prefix, suffix = '{', '}'
-        max_len = len(max([repr(key) for key in src])) if src else 0
-        for key, val in src.items():
-            result += _formatters['dict'](
-                spc='',
-                indent=indent + 4,
-                size=max_len,
-                key=key,
-                val=pretty_repr(
-                    val,
-                    indent + 8,
-                    no_indent_start=True,
-                    max_indent=max_indent,
-                )
-            )
-    else:
-        if isinstance(src, list):
-            prefix, suffix = '[', ']'
-        elif isinstance(src, tuple):
-            prefix, suffix = '(', ')'
-        else:
-            prefix, suffix = '{', '}'
-        for elem in src:
-            if _simple(elem) or len(elem) == 0 or indent + 4 >= max_indent:
-                result += '\n'
-            result += pretty_repr(
-                elem,
-                indent + 4,
-                max_indent=max_indent,
-            ) + ','
-    return (
-        _formatters['iterable_item'](
-            spc='',
-            obj_type=src.__class__.__name__,
-            start=prefix,
-            indent=indent,
-            result=result,
-            end=suffix,
-        )
+    return PrettyFormat(
+        max_indent=max_indent,
+    ).process(
+        src=src,
+        indent=indent,
+        no_indent_start=no_indent_start,
     )
 
 
