@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+Version 1.0.2
+-------------
+* Rework requirements: remove magic
+
+* Start extending pretty_repr: object model
+
 Version 1.0.1
 -------------
 * Circle CI was disabled: all has been moved to the Travis

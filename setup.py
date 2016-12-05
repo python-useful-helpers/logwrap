@@ -62,8 +62,13 @@ setuptools.setup(
     ),
     long_description=long_description,
     install_requires=[
-        'pytest-runner>=2.0',
-    ] + ['funcsigs>=1.0'] if sys.version_info.major == 2 else [],
+        'pytest-runner>=2.0',  # python setup.py test
+    ],
+    extras_require={
+        ':python_version == "2.7"': [
+            'funcsigs>=1.0',
+        ],
+    },
     tests_require=[
         'flake8',
         'tox>=2.0',
