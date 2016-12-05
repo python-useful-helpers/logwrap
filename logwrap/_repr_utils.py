@@ -280,7 +280,7 @@ class PrettyFormat(object):
                 key=key,
                 val=self.process_element(
                     val,
-                    self.next_indent(indent, doubled=True),
+                    indent=self.next_indent(indent, doubled=True),
                     no_indent_start=True,
                 )
             )
@@ -296,15 +296,15 @@ class PrettyFormat(object):
         """
         indent_overflow = self.next_indent(indent) >= self.max_indent
         for elem in src:
-            res = ''
+            prefix = ''
             if _simple(elem) or\
                     _known_callble(elem) or\
                     len(elem) == 0\
                     or indent_overflow:
-                res = '\n'
-            yield res + self.process_element(
-                elem,
-                self.next_indent(indent),
+                prefix = '\n'
+            yield prefix + self.process_element(
+                src=elem,
+                indent=self.next_indent(indent),
             ) + ','
 
     def process_element(self, src, indent=0, no_indent_start=False):
@@ -365,7 +365,12 @@ class PrettyFormat(object):
             )
         )
 
-    def parse(self, src, indent=0, no_indent_start=False):
+    def __call__(
+        self,
+        src,
+        indent=0,
+        no_indent_start=False
+    ):
         """Make human readable representation of object
 
         :param src: object to process
@@ -420,7 +425,7 @@ def pretty_repr(
         max_indent=max_indent,
         indent_step=indent_step,
         py2_str=py2_str
-    ).parse(
+    )(
         src=src,
         indent=indent,
         no_indent_start=no_indent_start,

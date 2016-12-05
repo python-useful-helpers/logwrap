@@ -329,8 +329,8 @@ class TestPrettyRepr(unittest.TestCase):
             def __pretty_repr__(
                 self,
                 parser,
-                indent=0,
-                no_indent_start=False
+                indent,
+                no_indent_start
             ):
                 return parser.process_element(
                     "<Test Class at 0x{:X}>".format(id(self.__class__)),

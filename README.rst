@@ -43,6 +43,8 @@ This package also includes helpers:
 
 * pretty_repr
 
+* PrettyFormat
+
 Usage
 =====
 
@@ -105,9 +107,54 @@ Signature is self-documenting:
         indent=0,  # start indent
         no_indent_start=False,  # do not indent the first level
         max_indent=20,  # maximum allowed indent level
+        indent_step=4,  # step between indents
+        py2_str=False,  # use bytes for python 2 __repr__ and __str__
     )
 
 Limitation: Dict like objects is always marked inside `{}` for readability, even if it is `collections.OrderedDict` (standard repr as list of tuples).
+
+PrettyFormat
+------------
+PrettyFormat is the main formatting implementation class. on `pretty_repr` instance of this class is created and executed.
+Object signature:
+
+.. code-block:: python
+
+    def __init__(
+        self,
+        formatters=None,  # Currently only legacy pretty_repr formatters is supported, will be extended in the future
+        keyword='repr',  # Currently 'repr' is supported, will be extended in the future
+        max_indent=20,  # maximum allowed indent level
+        indent_step=4,  # step between indents
+        py2_str=False,  # use bytes for python 2 __repr__ and __str__
+    )
+
+Callable object (`PrettyFormat` instance) signature:
+
+.. code-block:: python
+
+    def __call__(
+        self,
+        src,  # object for repr
+        indent=0,  # start indent
+        no_indent_start=False  # do not indent the first level
+    )
+
+Adopting your code
+------------------
+pretty_repr behavior could be overridden for your classes by implementing specific magic method:
+
+.. code-block:: python
+
+    def __pretty_repr__(
+        self,
+        parser  # pretty repr class instance,
+        indent  # start indent,
+        no_indent_start  # do not indent the first level
+    ):
+        return ...
+
+This method will be executed instead of __repr__ on your object.
 
 Testing
 =======
