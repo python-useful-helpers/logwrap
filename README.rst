@@ -176,9 +176,9 @@ CI systems
 ==========
 For code checking several CI systems is used in parallel:
 
-1. `Travis CI: <https://travis-ci.org/penguinolog/logwrap>`_ is used for checking: PEP8, pylint, installation possibility and unit tests. Also it's publishes coverage on Codacy.
+1. `Travis CI: <https://travis-ci.org/penguinolog/logwrap>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests. Also it's publishes coverage on coveralls.
 
-2. `coveralls: <https://coveralls.io/github/penguinolog/logwrap>`_ is used forcoverage display.
+2. `coveralls: <https://coveralls.io/github/penguinolog/logwrap>`_ is used for coverage display.
 
 CD system
 =========
