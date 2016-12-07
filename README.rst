@@ -169,9 +169,6 @@ Test environments available:
     pylint
     docs
 
-Also possible to run `python setup.py test` for unit tests and `python setup.py flake8` for code style tests,
-but it requires all package dependencies to be installed.
-
 CI systems
 ==========
 For code checking several CI systems is used in parallel:

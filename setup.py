@@ -17,7 +17,6 @@
 """logwrap decorator for human-readable logging of command arguments"""
 
 import setuptools
-import sys
 
 import logwrap
 
@@ -61,18 +60,9 @@ setuptools.setup(
         'Decorator for logging function arguments by human-readable way'
     ),
     long_description=long_description,
-    install_requires=[
-        'pytest-runner>=2.0',  # python setup.py test
-    ],
     extras_require={
         ':python_version == "2.7"': [
             'funcsigs>=1.0',
         ],
     },
-    tests_require=[
-        'flake8',
-        'tox>=2.0',
-        'pytest>=3.0',
-        'pytest-cov',
-    ] + ['mock'] if sys.version_info.major == 2 else [],
 )
