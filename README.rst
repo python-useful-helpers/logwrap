@@ -3,10 +3,8 @@ logwrap
 
 .. image:: https://travis-ci.org/penguinolog/logwrap.svg?branch=master
     :target: https://travis-ci.org/penguinolog/logwrap
-.. image:: https://api.codacy.com/project/badge/Grade/72f332d53b924cd2b2c0dc6f9d1f8d0f
-    :target: https://www.codacy.com/app/penguinolog/logwrap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=penguinolog/logwrap&amp;utm_campaign=Badge_Grade
-.. image:: https://api.codacy.com/project/badge/Coverage/72f332d53b924cd2b2c0dc6f9d1f8d0f
-    :target: https://www.codacy.com/app/penguinolog/logwrap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=penguinolog/logwrap&amp;utm_campaign=Badge_Coverage
+.. image:: https://coveralls.io/repos/github/penguinolog/logwrap/badge.svg?branch=master
+    :target: https://coveralls.io/github/penguinolog/logwrap?branch=master
 .. image:: https://readthedocs.org/projects/logwrap/badge/?version=latest
     :target: http://logwrap.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
@@ -180,7 +178,7 @@ For code checking several CI systems is used in parallel:
 
 1. `Travis CI: <https://travis-ci.org/penguinolog/logwrap>`_ is used for checking: PEP8, pylint, installation possibility and unit tests. Also it's publishes coverage on Codacy.
 
-2. `Codacy: <https://www.codacy.com/app/penguinolog/logwrap/dashboard>`_ is used for statical analysis and coverage display.
+2. `coveralls: <https://coveralls.io/github/penguinolog/logwrap>`_ is used forcoverage display.
 
 CD system
 =========
