@@ -5,15 +5,15 @@ python:
   - "3.4"
   - "3.5"
   - "pypy"
-install: pip install tox-travis
+install:
+  - pip install tox-travis
+  - pip install coveralls
 script: tox
+after_success:
+  - coveralls
 before_deploy:
   - pip install -r CI_REQUIREMENTS.txt
 deploy:
-  - provider: script
-    script: tox -e upload_coverage
-    on:
-      python: 2.7
   - provider: pypi
     distributions: sdist bdist_wheel
     server: https://testpypi.python.org/pypi
