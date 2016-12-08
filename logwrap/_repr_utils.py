@@ -172,7 +172,7 @@ class PrettyFormat(object):
         self.__keyword = keyword
         self.__max_indent = max_indent
         self.__indent_step = indent_step
-        self.__py2_str = py2_str
+        self.__py2_str = py2_str and not _PY3  # Python 2 only behavior
 
     @property
     def max_indent(self):

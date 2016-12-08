@@ -347,3 +347,6 @@ class TestPrettyRepr(unittest.TestCase):
             result,
             "u'''<Test Class at 0x{:X}>'''".format(id(Tst))
         )
+
+    def test_py2_compatibility_flag(self):
+        self.assertIsInstance(logwrap.pretty_repr(u'Text', py2_str=True), str)
