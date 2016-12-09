@@ -2,6 +2,10 @@ CHANGELOG
 =========
 Version 1.0.5
 -------------
+* Technical bump
+
+Version 1.0.5
+-------------
 * Drop test-related code from package and setup.py
 
 Version 1.0.4

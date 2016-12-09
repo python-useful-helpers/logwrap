@@ -28,7 +28,7 @@ from ._log_wrap import logwrap
 from ._repr_utils import pretty_repr
 from ._repr_utils import PrettyFormat
 
-__version__ = '1.0.4'
+__version__ = '1.0.6'
 
 __all__ = [
     'logwrap',
