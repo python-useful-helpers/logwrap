@@ -1,6 +1,10 @@
 CHANGELOG
 =========
-Version 1.0.5
+Version 1.1.0
+-------------
+* pretty_str has been implemented
+
+Version 1.0.6
 -------------
 * Technical bump
 
