@@ -25,13 +25,15 @@ later it has been reworked and extended for support of special cases.
 from __future__ import absolute_import
 
 from ._log_wrap import logwrap
-from ._repr_utils import pretty_repr
 from ._repr_utils import PrettyFormat
+from ._repr_utils import pretty_repr
+from ._repr_utils import pretty_str
 
 __version__ = '1.0.6'
 
 __all__ = [
     'logwrap',
+    'PrettyFormat',
     'pretty_repr',
-    'PrettyFormat'
+    'pretty_str'
 ]

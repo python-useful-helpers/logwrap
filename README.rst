@@ -39,9 +39,11 @@ Pros:
 
 This package also includes helpers:
 
-* pretty_repr
+* `pretty_repr`
 
-* PrettyFormat
+* `pretty_str`
+
+* `PrettyFormat`
 
 Usage
 =====
@@ -111,6 +113,27 @@ Signature is self-documenting:
 
 Limitation: Dict like objects is always marked inside `{}` for readability, even if it is `collections.OrderedDict` (standard repr as list of tuples).
 
+pretty_str
+----------
+This is specified helper for making human-readable repr on complex objects.
+Signature is self-documenting:
+
+.. code-block:: python
+
+    def pretty_str(
+        src,  # object for __str__
+        indent=0,  # start indent
+        no_indent_start=False,  # do not indent the first level
+        max_indent=20,  # maximum allowed indent level
+        indent_step=4,  # step between indents
+        py2_str=False,  # use bytes for python 2 __repr__ and __str__
+    )
+
+Limitations:
+    Dict like objects is always marked inside `{}` for readability, even if it is `collections.OrderedDict` (standard repr as list of tuples).
+    Iterable types is not declared, only brackets is used.
+    String and bytes looks the same (its __str__, not __repr__).
+
 PrettyFormat
 ------------
 PrettyFormat is the main formatting implementation class. on `pretty_repr` instance of this class is created and executed.
@@ -120,7 +143,8 @@ Object signature:
 
     def __init__(
         self,
-        formatters=None,  # Currently only legacy pretty_repr formatters is supported, will be extended in the future
+        simple_formatters=None,  # Will be used to repr not complex. Keys is data types and 'default'.
+        complex_formatters=None,  # Currently only legacy pretty_repr formatters is supported, will be extended in the future
         keyword='repr',  # Currently 'repr' is supported, will be extended in the future
         max_indent=20,  # maximum allowed indent level
         indent_step=4,  # step between indents
