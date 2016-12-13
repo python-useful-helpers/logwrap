@@ -115,7 +115,7 @@ Limitation: Dict like objects is always marked inside `{}` for readability, even
 
 pretty_str
 ----------
-This is specified helper for making human-readable repr on complex objects.
+This is specified helper for making human-readable str on complex objects.
 Signature is self-documenting:
 
 .. code-block:: python
@@ -131,7 +131,9 @@ Signature is self-documenting:
 
 Limitations:
     Dict like objects is always marked inside `{}` for readability, even if it is `collections.OrderedDict` (standard repr as list of tuples).
+
     Iterable types is not declared, only brackets is used.
+
     String and bytes looks the same (its __str__, not __repr__).
 
 PrettyFormat
