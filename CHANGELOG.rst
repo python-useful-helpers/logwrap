@@ -2,6 +2,10 @@ CHANGELOG
 =========
 Version 1.1.0
 -------------
+* documentation fix
+
+Version 1.1.0
+-------------
 * pretty_str has been implemented
 
 Version 1.0.6
