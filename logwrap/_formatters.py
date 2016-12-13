@@ -101,14 +101,14 @@ def _set_str(indent, val):
     return "{spc:<{indent}}{val}".format(
         spc='',
         indent=indent,
-        val='{' + "{}".format(
+        val="set({})".format(
             ' ,'.join(
                 map(
-                    '{!s}'.format,  # unicode -> !repr
+                    '{!s}'.format,
                     val
                 )
             )
-        ) + '}'
+        )
     )
 
 

@@ -104,8 +104,8 @@ class PrettyFormat(object):
 
     def __init__(
         self,
-        simple_formatters=None,
-        complex_formatters=None,
+        simple_formatters,
+        complex_formatters,
         keyword='repr',
         max_indent=20,
         indent_step=4,
@@ -125,11 +125,6 @@ class PrettyFormat(object):
         :param py2_str: use Python 2.x compatible strings instead of unicode
         :type py2_str: bool
         """
-        if simple_formatters is None:
-            simple_formatters = s_repr_formatters
-        if complex_formatters is None:
-            complex_formatters = c_repr_formatters
-
         self.__s_formatters = simple_formatters
         self.__c_formatters = complex_formatters
         self.__keyword = keyword

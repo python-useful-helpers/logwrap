@@ -143,8 +143,8 @@ Object signature:
 
     def __init__(
         self,
-        simple_formatters=None,  # Will be used to repr not complex. Keys is data types and 'default'.
-        complex_formatters=None,  # Currently only legacy pretty_repr formatters is supported, will be extended in the future
+        simple_formatters,  # Will be used to repr not complex. Keys is data types and 'default'.
+        complex_formatters,  # Currently only legacy pretty_repr formatters is supported, will be extended in the future
         keyword='repr',  # Currently 'repr' is supported, will be extended in the future
         max_indent=20,  # maximum allowed indent level
         indent_step=4,  # step between indents

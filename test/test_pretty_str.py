@@ -56,6 +56,12 @@ class TestPrettyStr(unittest.TestCase):
             res.startswith('\n{') and res.endswith('\n}')
         )
 
+    def test_simple_set(self):
+        self.assertEqual(
+            logwrap.pretty_str(set()),
+            'set()'
+        )
+
     def test_dict(self):
         self.assertEqual(
             logwrap.pretty_str({1: 1, 2: 2, 33: 33}),
