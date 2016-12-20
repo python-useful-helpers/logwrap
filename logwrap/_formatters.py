@@ -73,7 +73,7 @@ s_repr_formatters = {
 c_repr_formatters = {
     'dict': "\n{spc:<{indent}}{key!r:{size}}: {val},".format,
     'iterable_item':
-        "\n"
+        "{nl}"
         "{spc:<{indent}}{obj_type:}({start}{result}\n"
         "{spc:<{indent}}{end})".format,
     'callable': "\n{spc:<{indent}}<{obj!r} with interface ({args})>".format,
@@ -123,7 +123,7 @@ s_str_formatters = {
 c_str_formatters = {
     'dict': "\n{spc:<{indent}}{key!s:{size}}: {val},".format,
     'iterable_item':
-        "\n"
+        "{nl}"
         "{spc:<{indent}}{start}{result}\n"
         "{spc:<{indent}}{end}".format,
     'callable': "\n{spc:<{indent}}<{obj!s} with interface ({args})>".format,

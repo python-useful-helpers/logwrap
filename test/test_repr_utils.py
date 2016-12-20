@@ -41,31 +41,28 @@ class TestPrettyRepr(unittest.TestCase):
 
     def test_iterable(self):
         self.assertEqual(
-            logwrap.pretty_repr([1, 2, 3]),
-            '\n'
             'list([{nl:<5}1,{nl:<5}2,{nl:<5}3,\n'
-            '])'.format(nl='\n')
+            '])'.format(nl='\n'),
+            logwrap.pretty_repr([1, 2, 3]),
         )
         self.assertEqual(
-            logwrap.pretty_repr((1, 2, 3)),
-            '\n'
             'tuple(({nl:<5}1,{nl:<5}2,{nl:<5}3,\n'
-            '))'.format(nl='\n')
+            '))'.format(nl='\n'),
+            logwrap.pretty_repr((1, 2, 3)),
         )
         res = logwrap.pretty_repr({1, 2, 3})
         self.assertTrue(
-            res.startswith('\nset({') and res.endswith('\n})')
+            res.startswith('set({') and res.endswith('\n})')
         )
 
     def test_dict(self):
         self.assertEqual(
-            logwrap.pretty_repr({1: 1, 2: 2, 33: 33}),
-            '\n'
             'dict({\n'
             '    1 : 1,\n'
             '    2 : 2,\n'
             '    33: 33,\n'
-            '})'
+            '})',
+            logwrap.pretty_repr({1: 1, 2: 2, 33: 33}),
         )
 
     def test_nested_obj(self):
@@ -80,7 +77,6 @@ class TestPrettyRepr(unittest.TestCase):
             set(),
         ]
         exp_repr = (
-            '\n'
             'list([\n'
             '    dict({\n'
             '        1: 2,\n'
@@ -107,7 +103,7 @@ class TestPrettyRepr(unittest.TestCase):
             '    set(),\n'
             '])'
         )
-        self.assertEqual(logwrap.pretty_repr(test_obj), exp_repr)
+        self.assertEqual(exp_repr, logwrap.pretty_repr(test_obj))
 
     def test_prepare_repr(self):
         def empty_func():
@@ -285,8 +281,6 @@ class TestPrettyRepr(unittest.TestCase):
     def test_indent(self):
         obj = [[[[[[[[[[123]]]]]]]]]]
         self.assertEqual(
-            logwrap.pretty_repr(obj, max_indent=40),
-            "\n"
             "list([\n"
             "    list([\n"
             "        list([\n"
@@ -307,18 +301,18 @@ class TestPrettyRepr(unittest.TestCase):
             "            ]),\n"
             "        ]),\n"
             "    ]),\n"
-            "])"
+            "])",
+            logwrap.pretty_repr(obj, max_indent=40),
         )
         self.assertEqual(
-            logwrap.pretty_repr(obj, max_indent=10),
-            "\n"
             "list([\n"
             "    list([\n"
             "        list([\n"
             "            [[[[[[[123]]]]]]],\n"
             "        ]),\n"
             "    ]),\n"
-            "])"
+            "])",
+            logwrap.pretty_repr(obj, max_indent=10),
         )
 
     def test_magic_override(self):

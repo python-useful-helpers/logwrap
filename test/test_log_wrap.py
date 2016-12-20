@@ -327,7 +327,6 @@ class TestLogWrap(unittest.TestCase):
             mock.call(
                 level=logging.DEBUG,
                 msg="Done: 'func' with result:\n"
-                    "\n"
                     "list([\n"
                     "    list([\n"
                     "        list([\n"
@@ -460,7 +459,6 @@ loop.close()
             mock.call.log(
                 level=10,
                 msg="Done: 'func' with result:\n"
-                    "\n"
                     "tuple((\n"
                     "    0,\n"
                     "    1,\n"

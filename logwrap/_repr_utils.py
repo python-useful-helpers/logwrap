@@ -252,15 +252,8 @@ class PrettyFormat(object):
         :type indent: int
         :rtype: generator
         """
-        indent_overflow = self.next_indent(indent) >= self.max_indent
         for elem in src:
-            prefix = ''
-            if _simple(elem) or\
-                    _known_callble(elem) or\
-                    len(elem) == 0\
-                    or indent_overflow:
-                prefix = '\n'
-            yield prefix + self.process_element(
+            yield '\n' + self.process_element(
                 src=elem,
                 indent=self.next_indent(indent),
             ) + ','
@@ -314,6 +307,7 @@ class PrettyFormat(object):
             result = ''.join(self._repr_iterable_items(src=src, indent=indent))
         return (
             self.__c_formatters['iterable_item'](
+                nl='\n' if no_indent_start else '',
                 spc='',
                 obj_type=src.__class__.__name__,
                 start=prefix,
