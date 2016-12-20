@@ -229,7 +229,7 @@ class PrettyFormat(object):
         :type indent: int
         :rtype: generator
         """
-        max_len = len(max([repr(key) for key in src])) if src else 0
+        max_len = max([len(repr(key)) for key in src]) if src else 0
         for key, val in src.items():
             yield self.__c_formatters['dict'](
                 spc='',
