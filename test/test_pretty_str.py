@@ -181,7 +181,7 @@ class TestPrettyStr(unittest.TestCase):
 
     def test_magic_override(self):
         class Tst(object):
-            def __repr__(self):
+            def __str__(self):
                 return 'Test'
 
             def __pretty_str__(
