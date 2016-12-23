@@ -1,2 +1,3 @@
-* [ ] Document pretty_ste and pretty_repr
+* [ ] Document pretty_str and pretty_repr
 * [ ] Document overriding with detailed examples
+* [ ] Update docs with package
