@@ -148,17 +148,16 @@ class PrettyFormat(object):
         """
         return self.__indent_step
 
-    def next_indent(self, indent, doubled=False):
+    def next_indent(self, indent, multiplier=1):
         """Next indentation value
 
         :param indent: current indentation value
         :type indent: int
-        :param doubled: use double step instead of single
-        :type doubled: bool
+        :param multiplier: step multiplier
+        :type multiplier: int
         :rtype: int
         """
-        mult = 1 if not doubled else 2
-        return indent + mult * self.indent_step
+        return indent + multiplier * self.indent_step
 
     def _repr_callable(self, src, indent=0):
         """repr callable object (function or method)
@@ -238,7 +237,7 @@ class PrettyFormat(object):
                 key=key,
                 val=self.process_element(
                     val,
-                    indent=self.next_indent(indent, doubled=True),
+                    indent=self.next_indent(indent, multiplier=2),
                     no_indent_start=True,
                 )
             )
