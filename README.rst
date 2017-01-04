@@ -90,6 +90,58 @@ Get decorator for use without parameters:
     def foo():
         pass
 
+Call example:
+
+.. code-block:: python
+
+   import logwrap
+
+   @logwrap.logwrap
+   def example_function1(
+           arg1: str,
+           arg2: str='arg2',
+           *args,
+           kwarg1: str,
+           kwarg2: str='kwarg2',
+           **kwargs
+   ) -> tuple():
+       return (arg1, arg2, args, kwarg1, kwarg2, kwargs)
+
+   example_function1('arg1', kwarg1='kwarg1', kwarg3='kwarg3')
+
+This code during execution will produce log records:
+
+::
+
+    Calling:
+    'example_function1'(
+        # POSITIONAL_OR_KEYWORD:
+        'arg1'=u'''arg1''',
+        'arg2'=u'''arg2''',
+        # VAR_POSITIONAL:
+        'args'=(),
+        # KEYWORD_ONLY:
+        'kwarg1'=u'''kwarg1''',
+        'kwarg2'=u'''kwarg2''',
+        # VAR_KEYWORD:
+        'kwargs'=
+             dict({
+                'kwarg3': u'''kwarg3''',
+             }),
+    )
+    Done: 'example_function1' with result:
+
+     tuple((
+        u'''arg1''',
+        u'''arg2''',
+        (),
+        u'''kwarg1''',
+        u'''kwarg2''',
+         dict({
+            'kwarg3': u'''kwarg3''',
+         }),
+     ))
+
 Limitations:
 * return value from awaitable objects (`async def(...`) is not accessible - on call asyncio object is returned.
 
@@ -139,6 +191,7 @@ Limitations:
 PrettyFormat
 ------------
 PrettyFormat is the main formatting implementation class. on `pretty_repr` instance of this class is created and executed.
+This class is mostly exposed for typing reasons.
 Object signature:
 
 .. code-block:: python
