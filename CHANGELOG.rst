@@ -1,6 +1,14 @@
 CHANGELOG
 =========
-Version 1.1.0
+Version 1.2.0
+-------------
+* Fix dict keys length calculation
+
+* Simplify API
+
+* Expand documentation
+
+Version 1.1.1
 -------------
 * documentation fix
 
