@@ -26,7 +26,7 @@ with open('README.rst') as f:
 setuptools.setup(
     name='logwrap',
     version=logwrap.__version__,
-    packages=['logwrap'],
+    packages=setuptools.find_packages(),
     classifiers=[
         'Development Status :: 5 - Production/Stable',
 

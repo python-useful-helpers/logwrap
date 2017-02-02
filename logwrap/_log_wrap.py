@@ -49,11 +49,12 @@ fmt = "\n{spc:<{indent}}{{key!r}}={{val}},".format(
 comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
 
 
-def _get_func_args_repr(sig, args, kwargs, max_indent):
+def _get_func_args_repr(sig, args, kwargs, max_indent, blacklisted_names):
     """Internal helper for reducing complexity of decorator code
 
     :type sig: inspect.Signature
     :type max_indent: int
+    :type blacklisted_names: list
     :rtype: str
     """
 
@@ -63,6 +64,9 @@ def _get_func_args_repr(sig, args, kwargs, max_indent):
 
     last_kind = None
     for param in sig.parameters.values():
+        if param.name in blacklisted_names:
+            continue
+
         if last_kind != param.kind:
             param_str += comment(kind=param.kind)
             last_kind = param.kind
@@ -81,11 +85,12 @@ def _get_func_args_repr(sig, args, kwargs, max_indent):
 
 
 def logwrap(
-        log=_logger,
-        log_level=logging.DEBUG,
-        exc_level=logging.ERROR,
-        max_indent=20,
-        spec=None,
+    log=_logger,
+    log_level=logging.DEBUG,
+    exc_level=logging.ERROR,
+    max_indent=20,
+    spec=None,
+    blacklisted_names=None,
 ):
     """Log function calls and return values
 
@@ -104,9 +109,15 @@ def logwrap(
                  Note: this object should provide fully compatible signature
                  with decorated function, or arguments bind will be failed!
     :type spec: callable
+    :param blacklisted_names: Blacklisted argument names.
+                              Arguments with this names will be skipped in log.
+    :type blacklisted_names: list
     :return: built real decorator
     :rtype: callable
     """
+    if blacklisted_names is None:
+        blacklisted_names = []
+
     def real_decorator(func):
         """Log function calls and return values
 
@@ -131,6 +142,7 @@ def logwrap(
                 args=args,
                 kwargs=kwargs,
                 max_indent=max_indent,
+                blacklisted_names=blacklisted_names
             )
 
             log.log(

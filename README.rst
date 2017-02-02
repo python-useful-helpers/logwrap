@@ -62,6 +62,7 @@ Argumented usage with arguments from signature:
         exc_level=logging.ERROR,
         max_indent=20,  # forwarded to the pretty_repr
         spec=None,  # use target callable function for spec
+        blacklisted_names=None,  # list argument names, which should be dropped from log
     )
 
 Usage examples:

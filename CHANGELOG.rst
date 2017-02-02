@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 1.3.0
+-------------
+* Allowed to blacklist call arguments
+
 Version 1.2.0
 -------------
 * Fix dict keys length calculation

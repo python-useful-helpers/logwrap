@@ -470,3 +470,39 @@ loop.close()
                     "    }),\n"
                     "))")
         ))
+
+    def test_args_blacklist(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        arg1 = 'test arg 1'
+        arg2 = 'test arg 2'
+
+        @logwrap.logwrap(log=new_logger, blacklisted_names=['test_arg2'])
+        def func(test_arg1, test_arg2):
+            return test_arg1, test_arg2
+
+        result = func(arg1, arg2)
+        self.assertEqual(result, (arg1, arg2))
+        log.assert_has_calls((
+            mock.call(
+                level=logging.DEBUG,
+                msg="Calling: \n"
+                    "'func'(\n"
+                    "    # POSITIONAL_OR_KEYWORD:\n"
+                    "    'test_arg1'={},\n"
+                    ")".format(
+                        logwrap.pretty_repr(
+                            arg1,
+                            indent=8,
+                            no_indent_start=True
+                        )
+                    )
+            ),
+            mock.call(
+                level=logging.DEBUG,
+                msg="Done: 'func' with result:\n{}".format(
+                    logwrap.pretty_repr(result))
+            ),
+        ))
