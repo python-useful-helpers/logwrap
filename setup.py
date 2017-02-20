@@ -48,6 +48,7 @@ setuptools.setup(
 
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
+        'Programming Language :: Python :: Implementation :: Jython',
     ],
     keywords='logging debugging development',
 

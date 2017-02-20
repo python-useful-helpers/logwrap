@@ -36,6 +36,7 @@ Pros:
     Python 3.5
     Python 3.6
     PyPy
+    Jyton 2.7
 
 This package also includes helpers:
 
@@ -247,6 +248,7 @@ Test environments available:
     py35
     py36
     pypy
+    jyton
     pylint
     docs
 
