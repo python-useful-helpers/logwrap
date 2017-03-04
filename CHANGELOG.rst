@@ -1,7 +1,10 @@
 CHANGELOG
 =========
 Version 2.0.0
+-------------
 * Async version is added
+
+* pep8 tests is moved to Python 3.6 due to `async_logwrap` syntax incompatibility with python < 3.5
 
 Version 1.3.0
 -------------
