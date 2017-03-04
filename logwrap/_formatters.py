@@ -6,9 +6,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""formatters module
+"""formatters module.
 
-This is no reason to import this submodule directly, it's strictly internal"""
+This is no reason to import this submodule directly, it's strictly internal
+"""
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
@@ -29,7 +30,7 @@ else:
 
 
 def _strings_repr(indent, val):
-    """Custom repr for strings and binary strings"""
+    """Custom repr for strings and binary strings."""
     if isinstance(val, binary_type):
         val = val.decode(
             encoding='utf-8',
@@ -47,7 +48,7 @@ def _strings_repr(indent, val):
 
 
 def _set_repr(indent, val):
-    """Custom repr formatter for sets"""
+    """Custom repr formatter for sets."""
     return "{spc:<{indent}}{val}".format(
         spc='',
         indent=indent,
@@ -83,7 +84,7 @@ c_repr_formatters = {
 
 
 def _strings_str(indent, val):
-    """Custom repr for strings and binary strings"""
+    """Custom repr for strings and binary strings."""
     if isinstance(val, binary_type):
         val = val.decode(
             encoding='utf-8',
@@ -97,7 +98,7 @@ def _strings_str(indent, val):
 
 
 def _set_str(indent, val):
-    """Custom repr formatter for sets"""
+    """Custom repr formatter for sets."""
     return "{spc:<{indent}}{val}".format(
         spc='',
         indent=indent,
@@ -132,7 +133,7 @@ c_str_formatters = {
 }
 
 
-__all__ = [
+__all__ = (
     'c_repr_formatters', 's_repr_formatters',
     'c_str_formatters', 's_str_formatters',
-]
+)

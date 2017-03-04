@@ -14,7 +14,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""log_wrap module
+"""log_wrap module.
 
 This is no reason to import this submodule directly, all required methods is
 available from the main module.
@@ -50,14 +50,13 @@ comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
 
 
 def _get_func_args_repr(sig, args, kwargs, max_indent, blacklisted_names):
-    """Internal helper for reducing complexity of decorator code
+    """Internal helper for reducing complexity of decorator code.
 
     :type sig: inspect.Signature
     :type max_indent: int
     :type blacklisted_names: list
     :rtype: str
     """
-
     bound = sig.bind(*args, **kwargs).arguments
 
     param_str = ""
@@ -92,7 +91,7 @@ def logwrap(
     spec=None,
     blacklisted_names=None,
 ):
-    """Log function calls and return values
+    """Log function calls and return values.
 
     :param log: logger object for decorator, by default used 'logwrap'
     :type log: logging.Logger
@@ -119,7 +118,7 @@ def logwrap(
         blacklisted_names = []
 
     def real_decorator(func):
-        """Log function calls and return values
+        """Log function calls and return values.
 
         This decorator could be extracted as configured from outer function.
 
@@ -133,10 +132,6 @@ def logwrap(
 
         @functools.wraps(func)
         def wrapped(*args, **kwargs):
-            """Real wrapper.
-
-             *args and **kwargs is bound in separate helpers
-             """
             args_repr = _get_func_args_repr(
                 sig=sig,
                 args=args,
@@ -184,4 +179,4 @@ def logwrap(
     return real_decorator
 
 
-__all__ = ['logwrap']
+__all__ = ('logwrap', )

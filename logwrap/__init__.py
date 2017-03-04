@@ -14,9 +14,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""logwrap module
+"""logwrap module.
 
-Contents: 'logwrap', 'pretty_repr'
+Contents: 'logwrap', 'pretty_repr', 'pretty_str'
 
 Original code was made for Mirantis Inc by Alexey Stepanov,
 later it has been reworked and extended for support of special cases.
@@ -31,9 +31,9 @@ from ._repr_utils import pretty_str
 
 __version__ = '1.3.0'
 
-__all__ = [
+__all__ = (
     'logwrap',
     'PrettyFormat',
     'pretty_repr',
     'pretty_str'
-]
+)

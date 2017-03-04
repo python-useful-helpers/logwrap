@@ -14,7 +14,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""repr_utils module
+"""repr_utils module.
 
 This is no reason to import this submodule directly, all required methods is
 available from the main module.
@@ -60,18 +60,18 @@ else:
 
 
 def _known_callble(item):
-    """Check for possibility to parse callable"""
+    """Check for possibility to parse callable."""
     return isinstance(item, (types.FunctionType, types.MethodType))
 
 
 def _simple(item):
-    """Check for nested iterations: True, if not"""
+    """Check for nested iterations: True, if not."""
     return not isinstance(item, (list, set, tuple, dict))
 
 
 # pylint: disable=no-member
 def _prepare_repr(func):
-    """Get arguments lists with defaults
+    """Get arguments lists with defaults.
 
     :type func: union(types.FunctionType, types.MethodType)
     :rtype: generator
@@ -97,7 +97,7 @@ def _prepare_repr(func):
 
 
 class PrettyFormat(object):
-    """Pretty Formatter
+    """Pretty Formatter.
 
     Designed for usage as __repr__ and __str__ replacement on complex objects
     """
@@ -111,7 +111,8 @@ class PrettyFormat(object):
         indent_step=4,
         py2_str=False,
     ):
-        """Pretty Formatter
+        """Pretty Formatter.
+
         :param simple_formatters: object formatters by type
         :type simple_formatters: {str: callable}
         :param complex_formatters: object formatters for complex objects
@@ -134,7 +135,7 @@ class PrettyFormat(object):
 
     @property
     def max_indent(self):
-        """Max indent getter
+        """Max indent getter.
 
         :rtype: int
         """
@@ -142,14 +143,14 @@ class PrettyFormat(object):
 
     @property
     def indent_step(self):
-        """Indent step getter
+        """Indent step getter.
 
         :rtype: int
         """
         return self.__indent_step
 
     def next_indent(self, indent, multiplier=1):
-        """Next indentation value
+        """Next indentation value.
 
         :param indent: current indentation value
         :type indent: int
@@ -160,7 +161,7 @@ class PrettyFormat(object):
         return indent + multiplier * self.indent_step
 
     def _repr_callable(self, src, indent=0):
-        """repr callable object (function or method)
+        """Repr callable object (function or method).
 
         :type src: union(types.FunctionType, types.MethodType)
         :type indent: int
@@ -197,7 +198,7 @@ class PrettyFormat(object):
         )
 
     def _repr_simple(self, src, indent=0, no_indent_start=False):
-        """repr object without iteration
+        """Repr object without iteration.
 
         :type src: union(six.binary_type, six.text_type, int, iterable, object)
         :type indent: int
@@ -220,7 +221,7 @@ class PrettyFormat(object):
         )
 
     def _repr_dict_items(self, src, indent=0):
-        """repr dict items
+        """Repr dict items.
 
         :param src: object to process
         :type src: dict
@@ -243,7 +244,7 @@ class PrettyFormat(object):
             )
 
     def _repr_iterable_items(self, src, indent=0):
-        """repr iterable items (not designed for dicts)
+        """Repr iterable items (not designed for dicts).
 
         :param src: object to process
         :type src: dict
@@ -258,7 +259,7 @@ class PrettyFormat(object):
             ) + ','
 
     def process_element(self, src, indent=0, no_indent_start=False):
-        """Make human readable representation of object
+        """Make human readable representation of object.
 
         :param src: object to process
         :type src: union(six.binary_type, six.text_type, int, iterable, object)
@@ -322,7 +323,7 @@ class PrettyFormat(object):
         indent=0,
         no_indent_start=False
     ):
-        """Make human readable representation of object
+        """Make human readable representation of object.
 
         :param src: object to process
         :type src: union(six.binary_type, six.text_type, int, iterable, object)
@@ -354,7 +355,7 @@ def pretty_repr(
     indent_step=4,
     py2_str=False,
 ):
-    """Make human readable repr of object
+    """Make human readable repr of object.
 
     :param src: object to process
     :type src: union(six.binary_type, six.text_type, int, iterable, object)
@@ -392,7 +393,7 @@ def pretty_str(
     indent_step=4,
     py2_str=False,
 ):
-    """Make human readable str of object
+    """Make human readable str of object.
 
     :param src: object to process
     :type src: union(six.binary_type, six.text_type, int, iterable, object)
@@ -422,4 +423,4 @@ def pretty_str(
     )
 
 
-__all__ = ['PrettyFormat', 'pretty_repr', 'pretty_str']
+__all__ = ('PrettyFormat', 'pretty_repr', 'pretty_str')
