@@ -46,6 +46,8 @@ This package also includes helpers:
 
 * `PrettyFormat`
 
+* `async_logwrap` *on python 3.5+ only*
+
 Usage
 =====
 
@@ -145,9 +147,14 @@ This code during execution will produce log records:
      ))
 
 Limitations:
-* return value from awaitable objects (`async def(...`) is not accessible - on call asyncio object is returned.
+* return value from awaitable objects (`async def(...`) is not accessible - on call asyncio object is returned. Please use `async_logwrap` instead.
 
 * nested wrapping (`@logwrap @deco2 ...`) is not parsed under python 2.7: `funcsigs` limitation. Please set `logwrap` as the first level decorator.
+
+async_logwrap
+-------------
+Async version of `logwrap` decorator. Usage is the same as `logwrap`, but result object type is coroutine.
+**This method is available only on python 3.5+ installations.**
 
 pretty_repr
 -----------

@@ -31,7 +31,7 @@ from ._repr_utils import PrettyFormat
 from ._repr_utils import pretty_repr
 from ._repr_utils import pretty_str
 
-__version__ = '1.3.0'
+__version__ = '2.0.0'
 
 __all__ = (
     'logwrap',
