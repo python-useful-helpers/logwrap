@@ -1,4 +1,4 @@
-#    Copyright 2016 Alexey Stepanov aka penguinolog
+#    Copyright 2016 - 2017 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -33,7 +33,7 @@ else:
     from unittest import mock
 
 
-@mock.patch('logwrap._log_wrap._logger', autospec=True)
+@mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 class TestLogWrap(unittest.TestCase):
     def test_no_args(self, logger):
         @logwrap.logwrap
@@ -387,36 +387,6 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
         ))
 
     @unittest.skipUnless(
-        sys.version_info[0:2] > (3, 4),
-        'Strict python 3.5+ API'
-    )
-    def test_coroutine(self, logger):
-
-        namespace = {'logwrap': logwrap}
-
-        exec("""
-import asyncio
-
-@logwrap.logwrap
-async def func():
-    pass
-
-loop = asyncio.get_event_loop()
-loop.run_until_complete(func())
-loop.close()
-        """,
-             namespace
-             )
-        # While we're not expanding result coroutine object from namespace,
-        # do not check execution result
-        logger.assert_has_calls((
-            mock.call.log(
-                level=logging.DEBUG,
-                msg="Calling: \n'func'()"
-            ),
-        ))
-
-    @unittest.skipUnless(
         sys.version_info[0:2] > (3, 0),
         'Wrap expanding is not supported under python 2.7: funcsigs limitation'
     )
@@ -505,4 +475,134 @@ loop.close()
                 msg="Done: 'func' with result:\n{}".format(
                     logwrap.pretty_repr(result))
             ),
+        ))
+
+
+@mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
+@unittest.skipUnless(
+    sys.version_info[0:2] > (3, 4),
+    'Strict python 3.5+ API'
+)
+class TestLogWrapAsync(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        namespace = {}
+
+        exec("""
+import asyncio
+
+loop = asyncio.get_event_loop()
+        """,
+             namespace
+             )
+        cls.loop = namespace['loop']
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.loop.close()
+
+    def test_coroutine_sync(self, logger):
+            namespace = {'logwrap': logwrap, 'loop': self.loop}
+
+            exec("""
+@logwrap.logwrap
+async def func():
+    pass
+
+loop.run_until_complete(func())
+            """,
+                 namespace
+                 )
+            # While we're not expanding result coroutine object from namespace,
+            # do not check execution result
+            logger.assert_has_calls((
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Calling: \n'func'()"
+                ),
+            ))
+
+    def test_coroutine_async(self, logger):
+        namespace = {'logwrap': logwrap, 'loop': self.loop}
+
+        exec("""
+@logwrap.async_logwrap
+async def func():
+    pass
+
+loop.run_until_complete(func())
+        """,
+             namespace
+             )
+        # While we're not expanding result coroutine object from namespace,
+        # do not check execution result
+        logger.assert_has_calls((
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Calling: \n'func'()"
+            ),
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Done: 'func' with result:\nNone"
+            )
+        ))
+
+    def test_coroutine_async_as_argumented(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        namespace = {
+            'logwrap': logwrap,
+            'loop': self.loop,
+            'new_logger': new_logger
+        }
+
+        exec("""
+@logwrap.async_logwrap(log=new_logger)
+async def func():
+    pass
+
+loop.run_until_complete(func())
+        """,
+             namespace
+             )
+        # While we're not expanding result coroutine object from namespace,
+        # do not check execution result
+        log.assert_has_calls((
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Calling: \n'func'()"
+            ),
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Done: 'func' with result:\nNone"
+            )
+        ))
+
+    def test_coroutine_fail(self, logger):
+        namespace = {'logwrap': logwrap, 'self': self}
+
+        exec("""
+@logwrap.async_logwrap
+async def func():
+    raise Exception('Expected')
+
+with self.assertRaises(Exception):
+    self.loop.run_until_complete(func())
+        """,
+             namespace
+             )
+        # While we're not expanding result coroutine object from namespace,
+        # do not check execution result
+        logger.assert_has_calls((
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Calling: \n'func'()"
+            ),
+            mock.call.log(
+                level=logging.ERROR,
+                msg="Failed: \n'func'()",
+                exc_info=True
+            )
         ))

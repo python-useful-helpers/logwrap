@@ -24,6 +24,8 @@ later it has been reworked and extended for support of special cases.
 
 from __future__ import absolute_import
 
+import sys
+
 from ._log_wrap import logwrap
 from ._repr_utils import PrettyFormat
 from ._repr_utils import pretty_repr
@@ -37,3 +39,10 @@ __all__ = (
     'pretty_repr',
     'pretty_str'
 )
+
+# pylint: disable=ungrouped-imports, no-name-in-module
+if sys.version_info[0:2] >= (3, 5):
+    from ._alogwrap import async_logwrap
+
+    __all__ += ('async_logwrap', )
+# pylint: enable=ungrouped-imports, no-name-in-module

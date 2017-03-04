@@ -14,7 +14,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""log_wrap module.
+"""log_wrap: async part (python 3.5+).
 
 This is no reason to import this submodule directly, all required methods is
 available from the main module.
@@ -24,72 +24,58 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import functools
+import inspect
 import logging
-import sys
+import types
+import typing
 
 import logwrap as core
 
 from . import _log_wrap_shared
 
-# pylint: disable=ungrouped-imports, no-name-in-module
-if sys.version_info[0:2] > (3, 0):
-    from inspect import signature
-else:
-    # noinspection PyUnresolvedReferences
-    from funcsigs import signature
-# pylint: enable=ungrouped-imports, no-name-in-module
 
-
-def logwrap(
-    log=_log_wrap_shared.logger,
-    log_level=logging.DEBUG,
-    exc_level=logging.ERROR,
-    max_indent=20,
-    spec=None,
-    blacklisted_names=None,
-):
-    """Log function calls and return values.
+def async_logwrap(
+    log: logging.Logger=_log_wrap_shared.logger,
+    log_level: int=logging.DEBUG,
+    exc_level: int=logging.ERROR,
+    max_indent: int=20,
+    spec: types.FunctionType=None,
+    blacklisted_names: typing.Iterable[str]=None,
+) -> types.FunctionType:
+    """Log function calls and return values. Async version.
 
     :param log: logger object for decorator, by default used 'logwrap'
-    :type log: logging.Logger
     :param log_level: log level for successful calls
-    :type log_level: int
     :param exc_level: log level for exception cases
-    :type exc_level: int
     :param max_indent: maximal indent before classic repr() call.
-    :type max_indent: int
     :param spec: callable object used as spec for arguments bind.
                  This is designed for the special cases only,
                  when impossible to change signature of target object,
                  but processed/redirected signature is accessible.
                  Note: this object should provide fully compatible signature
                  with decorated function, or arguments bind will be failed!
-    :type spec: callable
     :param blacklisted_names: Blacklisted argument names.
                               Arguments with this names will be skipped in log.
-    :type blacklisted_names: list
     :return: built real decorator
-    :rtype: callable
     """
     if blacklisted_names is None:
         blacklisted_names = []
 
-    def real_decorator(func):
+    def real_decorator(func: types.FunctionType) -> types.CoroutineType:
         """Log function calls and return values.
 
         This decorator could be extracted as configured from outer function.
 
         :param func: function to log calls from
-        :type func: callable
         :return: wrapped function
-        :rtype: callable
         """
         # Get signature _before_ call
-        sig = signature(obj=func if not spec else spec)
+        sig = inspect.signature(obj=func if not spec else spec)
 
         # pylint: disable=missing-docstring
+        # noinspection PyCompatibility
         @functools.wraps(func)
-        def wrapped(*args, **kwargs):
+        async def wrapped(*args, **kwargs):
             args_repr = _log_wrap_shared.get_func_args_repr(
                 sig=sig,
                 args=args,
@@ -106,7 +92,7 @@ def logwrap(
                 )
             )
             try:
-                result = func(*args, **kwargs)
+                result = await func(*args, **kwargs)
                 log.log(
                     level=log_level,
                     msg="Done: {name!r} with result:\n{result}".format(
@@ -140,4 +126,4 @@ def logwrap(
     return real_decorator
 
 
-__all__ = ('logwrap', )
+__all__ = ('async_logwrap',)

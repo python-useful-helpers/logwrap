@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+Version 2.0.0
+* Async version is added
+
 Version 1.3.0
 -------------
 * Allowed to blacklist call arguments
