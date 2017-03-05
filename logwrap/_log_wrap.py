@@ -26,6 +26,7 @@ from __future__ import unicode_literals
 import functools
 import logging
 import sys
+import warnings
 
 import logwrap as core
 
@@ -84,6 +85,20 @@ def logwrap(
         :return: wrapped function
         :rtype: callable
         """
+        if sys.version_info[0:2] >= (3, 5):
+            ns = {'func': func}
+            exec("""
+from inspect import iscoroutinefunction
+coro = iscoroutinefunction(func)
+            """,
+                 ns
+                 )
+            if ns['coro']:
+                warnings.warn(
+                    'Calling @logwrap over coroutine function. '
+                    'Required to use @async_logwrap instead.',
+                    SyntaxWarning,
+                )
         # Get signature _before_ call
         sig = signature(obj=func if not spec else spec)
 

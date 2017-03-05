@@ -96,7 +96,7 @@ Get decorator for use without parameters:
 
 Call example:
 
-.. code-block:: python
+.. code-block:: python3
 
    import logwrap
 
@@ -155,6 +155,35 @@ async_logwrap
 -------------
 Async version of `logwrap` decorator. Usage is the same as `logwrap`, but result object type is coroutine.
 **This method is available only on python 3.5+ installations.**
+
+Example:
+
+.. code-block:: python3
+
+    import asyncio
+
+    import logwrap
+
+    @logwrap.async_logwrap
+    async def foo():
+        pass
+
+    asyncio.get_event_loop().run_until_complete(foo())
+
+Remember: `async_logwrap` can be applied over classic functions, but anyway it will return coroutine:
+
+.. code-block:: python3
+
+    import asyncio
+
+    import logwrap
+
+    @logwrap.async_logwrap
+    def foo():
+        pass
+
+    asyncio.get_event_loop().run_until_complete(foo())
+
 
 pretty_repr
 -----------

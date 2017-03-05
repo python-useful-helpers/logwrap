@@ -45,18 +45,25 @@ def async_logwrap(
     """Log function calls and return values. Async version.
 
     :param log: logger object for decorator, by default used 'logwrap'
+    :type log: logging.Logger
     :param log_level: log level for successful calls
+    :type log_level: int
     :param exc_level: log level for exception cases
+    :type exc_level: int
     :param max_indent: maximal indent before classic repr() call.
+    :type  max_indent: int
     :param spec: callable object used as spec for arguments bind.
                  This is designed for the special cases only,
                  when impossible to change signature of target object,
                  but processed/redirected signature is accessible.
                  Note: this object should provide fully compatible signature
                  with decorated function, or arguments bind will be failed!
+    :type spec: types.FunctionType
     :param blacklisted_names: Blacklisted argument names.
                               Arguments with this names will be skipped in log.
+    :type blacklisted_names: typing.Iterable[str]
     :return: built real decorator
+    :rtype: types.FunctionType
     """
     if blacklisted_names is None:
         blacklisted_names = []
@@ -67,7 +74,9 @@ def async_logwrap(
         This decorator could be extracted as configured from outer function.
 
         :param func: function to log calls from
-        :return: wrapped function
+        :type func: types.FunctionType
+        :return: wrapped coroutine function
+        :rtype: types.CoroutineType
         """
         # Get signature _before_ call
         sig = inspect.signature(obj=func if not spec else spec)
@@ -92,7 +101,10 @@ def async_logwrap(
                 )
             )
             try:
-                result = await func(*args, **kwargs)
+                if inspect.iscoroutinefunction(func):
+                    result = await func(*args, **kwargs)
+                else:
+                    result = func(*args, **kwargs)
                 log.log(
                     level=log_level,
                     msg="Done: {name!r} with result:\n{result}".format(

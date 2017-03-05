@@ -501,7 +501,8 @@ loop = asyncio.get_event_loop()
     def tearDownClass(cls):
         cls.loop.close()
 
-    def test_coroutine_sync(self, logger):
+    @mock.patch('warnings.warn', autospec=True)
+    def test_coroutine_sync(self, warn, logger):
             namespace = {'logwrap': logwrap, 'loop': self.loop}
 
             exec("""
@@ -513,6 +514,11 @@ loop.run_until_complete(func())
             """,
                  namespace
                  )
+            warn.assert_called_once_with(
+                'Calling @logwrap over coroutine function. '
+                'Required to use @async_logwrap instead.',
+                SyntaxWarning
+            )
             # While we're not expanding result coroutine object from namespace,
             # do not check execution result
             logger.assert_has_calls((
@@ -604,5 +610,30 @@ with self.assertRaises(Exception):
                 level=logging.ERROR,
                 msg="Failed: \n'func'()",
                 exc_info=True
+            )
+        ))
+
+    def test_coroutine_sync(self, logger):
+        namespace = {'logwrap': logwrap, 'loop': self.loop}
+
+        exec("""
+@logwrap.async_logwrap
+def func():
+    pass
+
+loop.run_until_complete(func())
+        """,
+             namespace
+             )
+        # While we're not expanding result coroutine object from namespace,
+        # do not check execution result
+        logger.assert_has_calls((
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Calling: \n'func'()"
+            ),
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Done: 'func' with result:\nNone"
             )
         ))

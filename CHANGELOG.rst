@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+Version 2.1.0
+-------------
+* Async version can run sync code (but anyway, decorator returns coroutine)
+
+* Sync version produces warning on async code
+
 Version 2.0.0
 -------------
 * Async version is added
