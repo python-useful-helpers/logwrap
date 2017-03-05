@@ -613,7 +613,7 @@ with self.assertRaises(Exception):
             )
         ))
 
-    def test_coroutine_sync(self, logger):
+    def test_func_async(self, logger):
         namespace = {'logwrap': logwrap, 'loop': self.loop}
 
         exec("""

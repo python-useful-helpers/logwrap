@@ -86,13 +86,18 @@ def logwrap(
         :rtype: callable
         """
         if sys.version_info[0:2] >= (3, 5):
+            # pylint: disable=exec-used
+            # Exec is required due to python<3.5 hasn't this methods
             ns = {'func': func}
-            exec("""
+            exec(  # nosec
+                """
 from inspect import iscoroutinefunction
 coro = iscoroutinefunction(func)
             """,
-                 ns
-                 )
+                ns
+            ) in ns
+            # pylint: enable=exec-used
+
             if ns['coro']:
                 warnings.warn(
                     'Calling @logwrap over coroutine function. '
