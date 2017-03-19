@@ -104,7 +104,7 @@ coro = iscoroutinefunction(func)
         return wrapper
 
 
-# pylint: disable=unexpected-keyword-arg
+# pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 def logwrap(
     log=_log_wrap_shared.logger,
     log_level=logging.DEBUG,
@@ -159,4 +159,4 @@ def logwrap(
         log_call_args_on_exc=log_call_args_on_exc,
         log_result_obj=log_result_obj
     )
-# pylint: enable=unexpected-keyword-arg
+# pylint: enable=unexpected-keyword-arg, no-value-for-parameter

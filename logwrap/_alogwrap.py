@@ -97,7 +97,7 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
         return wrapper
 
 
-# pylint: disable=unexpected-keyword-arg
+# pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 def async_logwrap(
     log: logging.Logger=_log_wrap_shared.logger,
     log_level: int=logging.DEBUG,
@@ -152,4 +152,4 @@ def async_logwrap(
         log_call_args_on_exc=log_call_args_on_exc,
         log_result_obj=log_result_obj
     )
-# pylint: enable=unexpected-keyword-arg
+# pylint: enable=unexpected-keyword-arg, no-value-for-parameter

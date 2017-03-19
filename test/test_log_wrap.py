@@ -477,6 +477,29 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
             ),
         ))
 
+    def test_exceptions_blacklist(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        @logwrap.logwrap(log=new_logger, blacklisted_exceptions=[TypeError])
+        def func():
+            raise TypeError('Blacklisted')
+
+        with self.assertRaises(TypeError):
+            func()
+
+        self.assertEqual(len(logger.mock_calls), 0)
+        self.assertEqual(
+            log.mock_calls,
+            [
+                mock.call(
+                    level=logging.DEBUG,
+                    msg="Calling: \n'func'()"
+                ),
+            ]
+        )
+
 
 @mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 @unittest.skipUnless(
@@ -647,3 +670,42 @@ loop.run_until_complete(func())
                 msg="Done: 'func' with result:\nNone"
             )
         ))
+
+    def test_exceptions_blacklist(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        namespace = {
+            'logwrap': logwrap,
+            'loop': self.loop,
+            'new_logger': new_logger,
+            'assertRaises': self.assertRaises
+        }
+
+        exec("""
+import asyncio
+
+@logwrap.async_logwrap(log=new_logger, blacklisted_exceptions=[TypeError])
+@asyncio.coroutine
+def func():
+    raise TypeError('Blacklisted')
+
+with assertRaises(TypeError):
+    loop.run_until_complete(func())
+        """,
+             namespace
+             )
+        # While we're not expanding result coroutine object from namespace,
+        # do not check execution result
+
+        self.assertEqual(len(logger.mock_calls), 0)
+        self.assertEqual(
+            log.mock_calls,
+            [
+                mock.call(
+                    level=logging.DEBUG,
+                    msg="Awaiting: \n'func'()"
+                ),
+            ]
+        )
