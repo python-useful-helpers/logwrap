@@ -480,8 +480,8 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
 
 @mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 @unittest.skipUnless(
-    sys.version_info[0:2] > (3, 4),
-    'Strict python 3.5+ API'
+    sys.version_info[0:2] >= (3, 4),
+    'Strict python 3.4+ API'
 )
 class TestLogWrapAsync(unittest.TestCase):
     @classmethod
@@ -497,17 +497,16 @@ loop = asyncio.get_event_loop()
              )
         cls.loop = namespace['loop']
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.loop.close()
-
     @mock.patch('warnings.warn', autospec=True)
     def test_coroutine_sync(self, warn, logger):
             namespace = {'logwrap': logwrap, 'loop': self.loop}
 
             exec("""
+import asyncio
+
 @logwrap.logwrap
-async def func():
+@asyncio.coroutine
+def func():
     pass
 
 loop.run_until_complete(func())
@@ -532,8 +531,11 @@ loop.run_until_complete(func())
         namespace = {'logwrap': logwrap, 'loop': self.loop}
 
         exec("""
+import asyncio
+
 @logwrap.async_logwrap
-async def func():
+@asyncio.coroutine
+def func():
     pass
 
 loop.run_until_complete(func())
@@ -565,8 +567,11 @@ loop.run_until_complete(func())
         }
 
         exec("""
+import asyncio
+
 @logwrap.async_logwrap(log=new_logger)
-async def func():
+@asyncio.coroutine
+def func():
     pass
 
 loop.run_until_complete(func())
@@ -590,8 +595,11 @@ loop.run_until_complete(func())
         namespace = {'logwrap': logwrap, 'self': self}
 
         exec("""
+import asyncio
+
 @logwrap.async_logwrap
-async def func():
+@asyncio.coroutine
+def func():
     raise Exception('Expected')
 
 with self.assertRaises(Exception):
@@ -617,6 +625,8 @@ with self.assertRaises(Exception):
         namespace = {'logwrap': logwrap, 'loop': self.loop}
 
         exec("""
+import asyncio
+
 @logwrap.async_logwrap
 def func():
     pass

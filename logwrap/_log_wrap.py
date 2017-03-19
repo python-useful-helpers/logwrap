@@ -24,8 +24,18 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
+import sys
+import warnings
 
 from . import _log_wrap_shared
+
+# pylint: disable=ungrouped-imports, no-name-in-module
+if sys.version_info[0:2] > (3, 0):
+    from inspect import signature
+else:
+    # noinspection PyUnresolvedReferences
+    from funcsigs import signature
+# pylint: enable=ungrouped-imports, no-name-in-module
 
 
 def logwrap(
@@ -86,6 +96,71 @@ def logwrap(
 
 class LogWrap(_log_wrap_shared.BaseLogWrap):
     """LogWrap."""
+
+    def _get_function_wrapper(self, func):
+        """Here should be constructed and returned real decorator.
+
+        :param func: Wrapped function
+        :type func: types.FunctionType
+        :rtype: types.FunctionType
+        """
+        if sys.version_info[0:2] >= (3, 4):
+            # pylint: disable=exec-used, expression-not-assigned
+            # Exec is required due to python<3.5 hasn't this methods
+            ns = {'func': func}
+            exec(  # nosec
+                """
+from asyncio import iscoroutinefunction
+coro = iscoroutinefunction(func)
+            """,
+                ns
+            ) in ns
+            # pylint: enable=exec-used, expression-not-assigned
+
+            if ns['coro']:
+                warnings.warn(
+                    'Calling @logwrap over coroutine function. '
+                    'Required to use @async_logwrap instead.',
+                    SyntaxWarning,
+                )
+
+        sig = signature(obj=self._spec or func)
+
+        # pylint: disable=missing-docstring
+        @_log_wrap_shared.wraps(func)
+        def wrapper(*args, **kwargs):
+            args_repr = self._get_func_args_repr(
+                sig=sig,
+                args=args,
+                kwargs=kwargs,
+            )
+
+            self._logger.log(
+                level=self.log_level,
+                msg="Calling: \n{name!r}({arguments})".format(
+                    name=func.__name__,
+                    arguments=args_repr
+                )
+            )
+            try:
+                result = func(*args, **kwargs)
+                self._make_done_record(func.__name__, result)
+            except BaseException as e:
+                if isinstance(e, tuple(self.blacklisted_exceptions)):
+                    raise
+                self._logger.log(
+                    level=self.exc_level,
+                    msg="Failed: \n{name!r}({arguments})".format(
+                        name=func.__name__,
+                        arguments=args_repr,
+                    ),
+                    exc_info=True
+                )
+                raise
+            return result
+
+        # pylint: enable=missing-docstring
+        return wrapper
 
 
 __all__ = ('logwrap', )

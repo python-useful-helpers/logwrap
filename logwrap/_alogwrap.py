@@ -23,6 +23,7 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import asyncio
 import functools
 import inspect
 import logging
@@ -108,7 +109,8 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
         # pylint: disable=missing-docstring
         # noinspection PyCompatibility
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        @asyncio.coroutine
+        def wrapper(*args, **kwargs):
             args_repr = self._get_func_args_repr(
                 sig=sig,
                 args=args,
@@ -116,7 +118,7 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
             )
 
             try:
-                if inspect.iscoroutinefunction(func):
+                if asyncio.iscoroutinefunction(func):
                     self._logger.log(
                         level=self.log_level,
                         msg="Awaiting: \n{name!r}({arguments})".format(
@@ -124,7 +126,7 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
                             arguments=args_repr
                         )
                     )
-                    result = await func(*args, **kwargs)
+                    result = yield from func(*args, **kwargs)
                 else:
                     self._logger.log(
                         level=self.log_level,
