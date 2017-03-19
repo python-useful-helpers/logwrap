@@ -39,7 +39,7 @@ __all__ = (
 )
 
 # pylint: disable=ungrouped-imports, no-name-in-module
-if sys.version_info[0:2] >= (3, 5):
+if sys.version_info[0:2] >= (3, 4):
     from ._alogwrap import async_logwrap, AsyncLogWrap
 
     __all__ += ('async_logwrap', 'AsyncLogWrap')
