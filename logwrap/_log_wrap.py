@@ -88,15 +88,7 @@ coro = iscoroutinefunction(func)
             except BaseException as e:
                 if isinstance(e, tuple(self.blacklisted_exceptions)):
                     raise
-                arguments = args_repr if self.log_call_args_on_exc else ''
-                self._logger.log(
-                    level=self.exc_level,
-                    msg="Failed: \n{name!r}({arguments})".format(
-                        name=func.__name__,
-                        arguments=arguments,
-                    ),
-                    exc_info=True
-                )
+                self._make_exc_record(name=func.__name__, arguments=args_repr)
                 raise
             return result
 

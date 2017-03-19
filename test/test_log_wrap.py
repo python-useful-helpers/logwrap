@@ -500,6 +500,190 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
             ]
         )
 
+    def test_disable_args(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        arg1 = 'test arg 1'
+        arg2 = 'test arg 2'
+
+        @logwrap.logwrap(log=new_logger, log_call_args=False)
+        def func(test_arg1, test_arg2):
+            return test_arg1, test_arg2
+
+        result = func(arg1, arg2)
+        self.assertEqual(result, (arg1, arg2))
+        log.assert_has_calls((
+            mock.call(
+                level=logging.DEBUG,
+                msg="Calling: \n"
+                    "'func'()"
+            ),
+            mock.call(
+                level=logging.DEBUG,
+                msg="Done: 'func' with result:\n{}".format(
+                    logwrap.pretty_repr(result))
+            ),
+        ))
+
+    def test_disable_args_exc(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        arg1 = 'test arg 1'
+        arg2 = 'test arg 2'
+
+        @logwrap.logwrap(log=new_logger, log_call_args_on_exc=False)
+        def func(test_arg1, test_arg2):
+            raise TypeError('Blacklisted')
+
+        with self.assertRaises(TypeError):
+            func(arg1, arg2)
+
+        self.assertEqual(len(logger.mock_calls), 0)
+        log.assert_has_calls((
+            mock.call(
+                level=logging.DEBUG,
+                msg="Calling: \n"
+                    "'func'(\n"
+                    "    # POSITIONAL_OR_KEYWORD:\n"
+                    "    'test_arg1'={},\n"
+                    "    'test_arg2'={},\n"
+                    ")".format(
+                        logwrap.pretty_repr(
+                            arg1,
+                            indent=8,
+                            no_indent_start=True
+                        ),
+                        logwrap.pretty_repr(
+                            arg2,
+                            indent=8,
+                            no_indent_start=True
+                        ),
+                    )
+            ),
+            mock.call(
+                level=logging.ERROR,
+                msg="Failed: \n'func'()",
+                exc_info=True
+            ),
+        ))
+
+    def test_disable_all_args(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        arg1 = 'test arg 1'
+        arg2 = 'test arg 2'
+
+        @logwrap.logwrap(
+            log=new_logger,
+            log_call_args=False,
+            log_call_args_on_exc=False
+        )
+        def func(test_arg1, test_arg2):
+            raise TypeError('Blacklisted')
+
+        with self.assertRaises(TypeError):
+            func(arg1, arg2)
+
+        self.assertEqual(len(logger.mock_calls), 0)
+        log.assert_has_calls((
+            mock.call(
+                level=logging.DEBUG,
+                msg="Calling: \n"
+                    "'func'()"
+            ),
+            mock.call(
+                level=logging.ERROR,
+                msg="Failed: \n'func'()",
+                exc_info=True
+            ),
+        ))
+
+    def test_disable_result(self, logger):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        @logwrap.logwrap(log=new_logger, log_result_obj=False)
+        def func():
+            return 'not logged'
+
+        func()
+
+        self.assertEqual(len(logger.mock_calls), 0)
+        self.assertEqual(
+            log.mock_calls,
+            [
+                mock.call(
+                    level=logging.DEBUG,
+                    msg="Calling: \n'func'()"
+                ),
+                mock.call(
+                    level=logging.DEBUG,
+                    msg="Done: 'func'"
+                ),
+            ]
+        )
+
+
+class TestObject(unittest.TestCase):
+    def test_basic(self):
+        log_call = logwrap.LogWrap()
+        self.assertEqual(log_call.log_level, logging.DEBUG)
+        self.assertEqual(log_call.exc_level, logging.ERROR)
+        self.assertEqual(log_call.max_indent, 20)
+        self.assertEqual(log_call.blacklisted_names, [])
+        self.assertEqual(log_call.blacklisted_exceptions, [])
+        self.assertTrue(log_call.log_call_args)
+        self.assertTrue(log_call.log_call_args_on_exc)
+        self.assertTrue(log_call.log_result_obj)
+
+        log_call.log_level = logging.INFO
+        log_call.exc_level = logging.CRITICAL
+        log_call.max_indent = 40
+        log_call.blacklisted_names.append('password')
+        log_call.blacklisted_exceptions.append(IOError)
+        log_call.log_call_args = False
+        log_call.log_call_args_on_exc = False
+        log_call.log_result_obj = False
+
+        self.assertEqual(log_call.log_level, logging.INFO)
+        self.assertEqual(log_call.exc_level, logging.CRITICAL)
+        self.assertEqual(log_call.max_indent, 40)
+        self.assertEqual(log_call.blacklisted_names, ['password'])
+        self.assertEqual(log_call.blacklisted_exceptions, [IOError])
+        self.assertFalse(log_call.log_call_args)
+        self.assertFalse(log_call.log_call_args_on_exc)
+        self.assertFalse(log_call.log_result_obj)
+
+        with self.assertRaises(TypeError):
+            log_call.log_level = 'WARNING'
+
+        self.assertEqual(
+            '{cls}('
+            'log={logger}, '
+            'log_level={obj.log_level}, '
+            'exc_level={obj.exc_level}, '
+            'max_indent={obj.max_indent}, '
+            'spec=None, '
+            'blacklisted_names={obj.blacklisted_names}, '
+            'blacklisted_exceptions={obj.blacklisted_exceptions}, '
+            'log_call_args={obj.log_call_args}, '
+            'log_call_args_on_exc={obj.log_call_args_on_exc}, '
+            'log_result_obj={obj.log_result_obj}, '
+            ')'.format(
+                cls=log_call.__class__.__name__,
+                logger=log_call._logger,
+                obj=log_call
+            ),
+            repr(log_call),
+        )
+
 
 @mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 @unittest.skipUnless(

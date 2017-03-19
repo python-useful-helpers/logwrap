@@ -200,7 +200,7 @@ class BaseLogWrap(
     @_check_type(int)
     def max_indent(self, val):
         """Maximum indentation."""
-        self.__exc_level = val
+        self.__max_indent = val
 
     @property
     def blacklisted_names(self):
@@ -240,7 +240,7 @@ class BaseLogWrap(
         return self.__log_result_obj
 
     @log_result_obj.setter
-    @_check_type
+    @_check_type(bool)
     def log_result_obj(self, val):
         """Flag: log result object."""
         self.__log_result_obj = val
@@ -336,6 +336,16 @@ class BaseLogWrap(
                 name=name,
                 arguments=arguments if self.log_call_args else ''
             )
+        )
+
+    def _make_exc_record(self, name, arguments):
+        self._logger.log(
+            level=self.exc_level,
+            msg="Failed: \n{name!r}({arguments})".format(
+                name=name,
+                arguments=arguments if self.log_call_args_on_exc else '',
+            ),
+            exc_info=True
         )
 
     @abc.abstractmethod
