@@ -81,24 +81,19 @@ coro = iscoroutinefunction(func)
                 kwargs=kwargs,
             )
 
-            self._logger.log(
-                level=self.log_level,
-                msg="Calling: \n{name!r}({arguments})".format(
-                    name=func.__name__,
-                    arguments=args_repr
-                )
-            )
+            self._make_calling_record(name=func.__name__, arguments=args_repr)
             try:
                 result = func(*args, **kwargs)
                 self._make_done_record(func.__name__, result)
             except BaseException as e:
                 if isinstance(e, tuple(self.blacklisted_exceptions)):
                     raise
+                arguments = args_repr if self.log_call_args_on_exc else ''
                 self._logger.log(
                     level=self.exc_level,
                     msg="Failed: \n{name!r}({arguments})".format(
                         name=func.__name__,
-                        arguments=args_repr,
+                        arguments=arguments,
                     ),
                     exc_info=True
                 )
@@ -109,6 +104,7 @@ coro = iscoroutinefunction(func)
         return wrapper
 
 
+# pylint: disable=unexpected-keyword-arg
 def logwrap(
     log=_log_wrap_shared.logger,
     log_level=logging.DEBUG,
@@ -163,3 +159,4 @@ def logwrap(
         log_call_args_on_exc=log_call_args_on_exc,
         log_result_obj=log_result_obj
     )
+# pylint: enable=unexpected-keyword-arg

@@ -42,6 +42,7 @@ comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
 def _check_type(expected):
     def deco(func):
         """Check type before asign."""
+        # pylint: disable=missing-docstring
         @functools.wraps(func)
         def wrapper(self, val):
             if not isinstance(val, expected):
@@ -52,6 +53,8 @@ def _check_type(expected):
                     )
                 )
             return func(self, val)
+
+        # pylint: enable=missing-docstring
         return wrapper
     return deco
 
@@ -63,10 +66,13 @@ if sys.version_info[0:2] < (3, 4):
         updated=functools.WRAPPER_UPDATES
     ):
         """Backport of functools.wraps to older python versions."""
+        # pylint: disable=missing-docstring
         def wrapper(f):
             f = functools.wraps(wrapped, assigned, updated)(f)
             f.__wrapped__ = wrapped
             return f
+
+        # pylint: enable=missing-docstring
         return wrapper
 else:
     wraps = functools.wraps
@@ -153,6 +159,8 @@ class BaseLogWrap(
         self.__log_result_obj = log_result_obj
 
         self.__wrap_func_self()
+
+        super(BaseLogWrap, self).__init__()
 
     def __wrap_func_self(self):
         """Mark self as function wrapper. Usd only without arguments."""
@@ -317,6 +325,17 @@ class BaseLogWrap(
         self._logger.log(
             level=self.log_level,
             msg=msg
+        )
+
+    def _make_calling_record(self, name, arguments, method='Calling'):
+        """Make log record before execution."""
+        self._logger.log(
+            level=self.log_level,
+            msg="{method}: \n{name!r}({arguments})".format(
+                method=method,
+                name=name,
+                arguments=arguments if self.log_call_args else ''
+            )
         )
 
     @abc.abstractmethod

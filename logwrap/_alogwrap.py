@@ -64,32 +64,29 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
 
             try:
                 if asyncio.iscoroutinefunction(func):
-                    self._logger.log(
-                        level=self.log_level,
-                        msg="Awaiting: \n{name!r}({arguments})".format(
-                            name=func.__name__,
-                            arguments=args_repr
-                        )
+                    self._make_calling_record(
+                        name=func.__name__,
+                        arguments=args_repr,
+                        method='Awaiting'
                     )
                     result = yield from func(*args, **kwargs)
                 else:
-                    self._logger.log(
-                        level=self.log_level,
-                        msg="Calling: \n{name!r}({arguments})".format(
-                            name=func.__name__,
-                            arguments=args_repr
-                        )
+
+                    self._make_calling_record(
+                        name=func.__name__,
+                        arguments=args_repr
                     )
                     result = func(*args, **kwargs)
                 self._make_done_record(func.__name__, result)
             except BaseException as e:
                 if isinstance(e, tuple(self.blacklisted_exceptions)):
                     raise
+                arguments = args_repr if self.log_call_args_on_exc else ''
                 self._logger.log(
                     level=self.exc_level,
                     msg="Failed: \n{name!r}({arguments})".format(
                         name=func.__name__,
-                        arguments=args_repr,
+                        arguments=arguments,
                     ),
                     exc_info=True
                 )
@@ -100,6 +97,7 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
         return wrapper
 
 
+# pylint: disable=unexpected-keyword-arg
 def async_logwrap(
     log: logging.Logger=_log_wrap_shared.logger,
     log_level: int=logging.DEBUG,
@@ -154,3 +152,4 @@ def async_logwrap(
         log_call_args_on_exc=log_call_args_on_exc,
         log_result_obj=log_result_obj
     )
+# pylint: enable=unexpected-keyword-arg
