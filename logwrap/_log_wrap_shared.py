@@ -26,6 +26,8 @@ import sys
 
 import logwrap as core
 
+__all__ = ('wraps', 'BaseLogWrap')
+
 logger = logging.getLogger(__name__)
 
 

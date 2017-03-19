@@ -32,61 +32,7 @@ import types
 
 from . import _log_wrap_shared
 
-
-def async_logwrap(
-    log: logging.Logger=_log_wrap_shared.logger,
-    log_level: int=logging.DEBUG,
-    exc_level: int=logging.ERROR,
-    max_indent: int=20,
-    spec: types.FunctionType=None,
-    blacklisted_names: [str]=None,
-    blacklisted_exceptions: [BaseException]=None,
-    log_call_args: bool=True,
-    log_call_args_on_exc: bool=True,
-    log_result_obj: bool=True,
-) -> types.FunctionType:
-    """Log function calls and return values. Async version.
-
-    :param log: logger object for decorator, by default used 'logwrap'
-    :type log: logging.Logger
-    :param log_level: log level for successful calls
-    :type log_level: int
-    :param exc_level: log level for exception cases
-    :type exc_level: int
-    :param max_indent: maximal indent before classic repr() call.
-    :type  max_indent: int
-    :param spec: callable object used as spec for arguments bind.
-                 This is designed for the special cases only,
-                 when impossible to change signature of target object,
-                 but processed/redirected signature is accessible.
-                 Note: this object should provide fully compatible signature
-                 with decorated function, or arguments bind will be failed!
-    :type spec: types.FunctionType
-    :param blacklisted_names: Blacklisted argument names.
-                              Arguments with this names will be skipped in log.
-    :type blacklisted_names: typing.Iterable[str]
-    :type blacklisted_exceptions: list
-    :param log_call_args: log call arguments before executing wrapped function.
-    :type log_call_args: bool
-    :param log_call_args_on_exc: log call arguments if exception raised
-    :type log_call_args_on_exc: bool
-    :param log_result_obj: log result of function call
-    :type log_result_obj: bool
-    :return: built real decorator
-    :rtype: AsyncLogWrap
-    """
-    return AsyncLogWrap(
-        log=log,
-        log_level=log_level,
-        exc_level=exc_level,
-        max_indent=max_indent,
-        spec=spec,
-        blacklisted_names=blacklisted_names,
-        blacklisted_exceptions=blacklisted_exceptions,
-        log_call_args=log_call_args,
-        log_call_args_on_exc=log_call_args_on_exc,
-        log_result_obj=log_result_obj
-    )
+__all__ = ('async_logwrap', 'AsyncLogWrap')
 
 
 class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
@@ -95,7 +41,7 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
     def _get_function_wrapper(
         self,
         func: types.FunctionType
-    ) -> types.CoroutineType:
+    ):
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -154,4 +100,57 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
         return wrapper
 
 
-__all__ = ('async_logwrap', 'AsyncLogWrap')
+def async_logwrap(
+    log: logging.Logger=_log_wrap_shared.logger,
+    log_level: int=logging.DEBUG,
+    exc_level: int=logging.ERROR,
+    max_indent: int=20,
+    spec: types.FunctionType=None,
+    blacklisted_names: list=None,
+    blacklisted_exceptions: list=None,
+    log_call_args: bool=True,
+    log_call_args_on_exc: bool=True,
+    log_result_obj: bool=True,
+) -> AsyncLogWrap:
+    """Log function calls and return values. Async version.
+
+    :param log: logger object for decorator, by default used 'logwrap'
+    :type log: logging.Logger
+    :param log_level: log level for successful calls
+    :type log_level: int
+    :param exc_level: log level for exception cases
+    :type exc_level: int
+    :param max_indent: maximal indent before classic repr() call.
+    :type  max_indent: int
+    :param spec: callable object used as spec for arguments bind.
+                 This is designed for the special cases only,
+                 when impossible to change signature of target object,
+                 but processed/redirected signature is accessible.
+                 Note: this object should provide fully compatible signature
+                 with decorated function, or arguments bind will be failed!
+    :type spec: types.FunctionType
+    :param blacklisted_names: Blacklisted argument names.
+                              Arguments with this names will be skipped in log.
+    :type blacklisted_names: typing.Iterable[str]
+    :type blacklisted_exceptions: list
+    :param log_call_args: log call arguments before executing wrapped function.
+    :type log_call_args: bool
+    :param log_call_args_on_exc: log call arguments if exception raised
+    :type log_call_args_on_exc: bool
+    :param log_result_obj: log result of function call
+    :type log_result_obj: bool
+    :return: built real decorator
+    :rtype: AsyncLogWrap
+    """
+    return AsyncLogWrap(
+        log=log,
+        log_level=log_level,
+        exc_level=exc_level,
+        max_indent=max_indent,
+        spec=spec,
+        blacklisted_names=blacklisted_names,
+        blacklisted_exceptions=blacklisted_exceptions,
+        log_call_args=log_call_args,
+        log_call_args_on_exc=log_call_args_on_exc,
+        log_result_obj=log_result_obj
+    )
