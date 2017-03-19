@@ -19,15 +19,23 @@ logwrap
 
 
 logwrap is a helper for logging in human-readable format function arguments and call result on function call.
+Why? Because logging of `*args, **kwargs` become useless with project grow and you need more details in call log.
+
+Cons:
+
+* Log records are not single line.
 
 Pros:
 
+* Log records are not single 100500 symbols length line.
+  (Especially actual for testing/development environments and for Kibana users).
+* Service free: job is done by this library and it's dependencies. It works at virtualenv
 * Free software: Apache license
 * Open Source: https://github.com/penguinolog/logwrap
 * PyPI packaged: https://pypi.python.org/pypi/logwrap
 * Self-documented code: docstrings with types in comments
 * Tested: see bages on top
-* Support miltiple Python versions:
+* Support multiple Python versions:
 
 ::
 
@@ -38,7 +46,11 @@ Pros:
     PyPy
     Jyton 2.7
 
-This package also includes helpers:
+This package includes helpers:
+
+* `logwrap` - main helper
+
+* `LogWrap` - class with `logwrap` implementation. May be used directly.
 
 * `pretty_repr`
 
@@ -46,7 +58,9 @@ This package also includes helpers:
 
 * `PrettyFormat`
 
-* `async_logwrap` *on python 3.5+ only*
+* `async_logwrap` (*on python 3.4+ only*)
+
+* `AsyncLogWrap` - class with `async_logwrap` implementation. May be used directly. (*on python 3.4+ only*)
 
 Usage
 =====
@@ -66,6 +80,10 @@ Argumented usage with arguments from signature:
         max_indent=20,  # forwarded to the pretty_repr
         spec=None,  # use target callable function for spec
         blacklisted_names=None,  # list argument names, which should be dropped from log
+        blacklisted_exceptions=None,  # Exceptions to skip in log
+        log_call_args=True,  # Log call arguments before call
+        log_call_args_on_exc=True,  # Log call arguments if exception happens
+        log_result_obj=True,  # Log result object
     )
 
 Usage examples:
@@ -88,7 +106,9 @@ Get decorator for use without parameters:
 
 .. code-block:: python
 
-    get_logs = logwap.logwrap()  # set required parameters via arguments
+    get_logs = logwrap.logwrap()  # set required parameters via arguments
+
+    type(get_logs) == LogWrap  # All logic is implemented in LogWrap class starting from version 2.2.0
 
     @get_logs
     def foo():
@@ -151,10 +171,30 @@ Limitations:
 
 * nested wrapping (`@logwrap @deco2 ...`) is not parsed under python 2.7: `funcsigs` limitation. Please set `logwrap` as the first level decorator.
 
+LogWrap
+-------
+May be used as `logwrap` with possibility to read and change several parameters later.
+
+Example construction and read from test:
+
+.. code-block:: python
+
+    log_call = logwrap.LogWrap()
+    log_call.log_level == logging.DEBUG
+    log_call.exc_level == logging.ERROR
+    log_call.max_indent == 20
+    log_call.blacklisted_names == []
+    log_call.blacklisted_exceptions == []
+    log_call.log_call_args == True
+    log_call.log_call_args_on_exc == True
+    log_call.log_result_obj == True
+
+On object change, variable types is validated.
+
 async_logwrap
 -------------
 Async version of `logwrap` decorator. Usage is the same as `logwrap`, but result object type is coroutine.
-**This method is available only on python 3.5+ installations.**
+**This method is available only on python 3.4+ installations.**
 
 Example:
 
@@ -165,7 +205,7 @@ Example:
     import logwrap
 
     @logwrap.async_logwrap
-    async def foo():
+    async def foo():  # asynio.coroutine is supported without any adoptions.
         pass
 
     asyncio.get_event_loop().run_until_complete(foo())
@@ -183,6 +223,10 @@ Remember: `async_logwrap` can be applied over classic functions, but anyway it w
         pass
 
     asyncio.get_event_loop().run_until_complete(foo())
+
+AsyncLogWrap
+------------
+The same as `LogWrap`, but for async_logwrap.
 
 
 pretty_repr

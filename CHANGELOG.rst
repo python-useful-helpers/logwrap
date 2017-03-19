@@ -1,5 +1,17 @@
 CHANGELOG
 =========
+Version 2.2.0
+-------------
+* Async for python 3.4
+
+* Object model
+
+* Ignore list for exceptions
+
+* Possibility to omit arguments log (call/exception/both)
+
+* Possibility to omit result object log
+
 Version 2.1.0
 -------------
 * Async version can run sync code (but anyway, decorator returns coroutine)
