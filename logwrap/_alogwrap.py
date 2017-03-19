@@ -28,7 +28,6 @@ import functools
 import inspect
 import logging
 import types
-import typing
 
 
 from . import _log_wrap_shared
@@ -40,8 +39,8 @@ def async_logwrap(
     exc_level: int=logging.ERROR,
     max_indent: int=20,
     spec: types.FunctionType=None,
-    blacklisted_names: typing.Iterable[str]=None,
-    blacklisted_exceptions: typing.Iterable[BaseException]=None,
+    blacklisted_names: [str]=None,
+    blacklisted_exceptions: [BaseException]=None,
     log_call_args: bool=True,
     log_call_args_on_exc: bool=True,
     log_result_obj: bool=True,
