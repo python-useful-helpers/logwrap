@@ -545,7 +545,7 @@ loop.run_until_complete(func())
         logger.assert_has_calls((
             mock.call.log(
                 level=logging.DEBUG,
-                msg="Calling: \n'func'()"
+                msg="Awaiting: \n'func'()"
             ),
             mock.call.log(
                 level=logging.DEBUG,
@@ -578,7 +578,7 @@ loop.run_until_complete(func())
         log.assert_has_calls((
             mock.call.log(
                 level=logging.DEBUG,
-                msg="Calling: \n'func'()"
+                msg="Awaiting: \n'func'()"
             ),
             mock.call.log(
                 level=logging.DEBUG,
@@ -604,7 +604,7 @@ with self.assertRaises(Exception):
         logger.assert_has_calls((
             mock.call.log(
                 level=logging.DEBUG,
-                msg="Calling: \n'func'()"
+                msg="Awaiting: \n'func'()"
             ),
             mock.call.log(
                 level=logging.ERROR,

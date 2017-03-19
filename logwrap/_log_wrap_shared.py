@@ -16,9 +16,20 @@
 
 """log_wrap shared code module."""
 
+import functools
 import logging
+import sys
+import warnings
 
 import logwrap as core
+
+# pylint: disable=ungrouped-imports, no-name-in-module
+if sys.version_info[0:2] > (3, 0):
+    from inspect import signature
+else:
+    # noinspection PyUnresolvedReferences
+    from funcsigs import signature
+# pylint: enable=ungrouped-imports, no-name-in-module
 
 logger = logging.getLogger(__name__)
 
@@ -31,37 +42,349 @@ fmt = "\n{spc:<{indent}}{{key!r}}={{val}},".format(
 comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
 
 
-def get_func_args_repr(sig, args, kwargs, max_indent, blacklisted_names):
-    """Internal helper for reducing complexity of decorator code.
+def _check_type(expected):
+    def deco(func):
+        """Check type before asign."""
+        @functools.wraps(func)
+        def wrapper(self, val):
+            if not isinstance(val, expected):
+                raise TypeError(
+                    'Unexpected type: {}. Should be {}.'.format(
+                        val.__class__.__name__,
+                        expected.__name__,
+                    )
+                )
+            return func(self, val)
+        return wrapper
+    return deco
 
-    :type sig: inspect.Signature
-    :type args: tuple
-    :type kwargs: dict
-    :type max_indent: int
-    :type blacklisted_names: list
-    :rtype: str
-    """
-    bound = sig.bind(*args, **kwargs).arguments
 
-    param_str = ""
+if sys.version_info[0:2] < (3, 4):
+    def wraps(
+        wrapped,
+        assigned=functools.WRAPPER_ASSIGNMENTS,
+        updated=functools.WRAPPER_UPDATES
+    ):
+        """Backport of functools.wraps to older python versions."""
+        def wrapper(f):
+            f = functools.wraps(wrapped, assigned, updated)(f)
+            f.__wrapped__ = wrapped
+            return f
+        return wrapper
+else:
+    wraps = functools.wraps
 
-    last_kind = None
-    for param in sig.parameters.values():
-        if param.name in blacklisted_names:
-            continue
 
-        if last_kind != param.kind:
-            param_str += comment(kind=param.kind)
-            last_kind = param.kind
-        param_str += fmt(
-            key=param.name,
-            val=core.pretty_repr(
-                src=bound.get(param.name, param.default),
-                indent=indent + 4,
-                no_indent_start=True,
-                max_indent=max_indent,
-            ),
+class BaseLogWrap(object):
+    """Base class for LogWrap implementation."""
+
+    def __init__(
+        self,
+        log=logger,
+        log_level=logging.DEBUG,
+        exc_level=logging.ERROR,
+        max_indent=20,
+        spec=None,
+        blacklisted_names=None,
+        blacklisted_exceptions=None,
+        log_call_args=True,
+        log_call_args_on_exc=True,
+        log_result_obj=True,
+
+    ):
+        """Log function calls and return values.
+
+        :param log: logger object for decorator, by default used 'logwrap'
+        :type log: logging.Logger
+        :param log_level: log level for successful calls
+        :type log_level: int
+        :param exc_level: log level for exception cases
+        :type exc_level: int
+        :param max_indent: maximal indent before classic repr() call.
+        :type max_indent: int
+        :param spec: callable object used as spec for arguments bind.
+                     This is designed for the special cases only,
+                     when impossible to change signature of target object,
+                     but processed/redirected signature is accessible.
+                     Note: this object should provide fully compatible
+                     signature with decorated function, or arguments bind
+                     will be failed!
+        :type spec: callable
+        :param blacklisted_names: Blacklisted argument names.
+                                  Arguments with this names will be skipped
+                                  in log.
+        :type blacklisted_names: typing.Iterable[str]
+        :param blacklisted_exceptions: Blacklisted exceptions,
+                                       which should not be logged.
+        :type blacklisted_exceptions: typing.Iterable[BaseException]
+        :param log_call_args: log call arguments before executing
+                              wrapped function.
+        :type log_call_args: bool
+        :param log_call_args_on_exc: log call arguments if exception raised
+        :type log_call_args_on_exc: bool
+        :param log_result_obj: log result of function call
+        :type log_result_obj: bool
+        """
+        # Typing fix:
+        if blacklisted_names is None:
+            self.__blacklisted_names = []
+        else:
+            self.__blacklisted_names = list(blacklisted_names)
+        if blacklisted_exceptions is None:
+            self.__blacklisted_exceptions = []
+        else:
+            self.__blacklisted_exceptions = list(blacklisted_exceptions)
+
+        if not isinstance(log, logging.Logger):
+            self.__func, self.__logger = log, logger
+        else:
+            self.__func, self.__logger = None, log
+
+        self.__log_level = log_level
+        self.__exc_level = exc_level
+        self.__max_indent = max_indent
+        self.__spec = spec or self.__func
+        self.__log_call_args = log_call_args
+        self.__log_call_args_on_exc = log_call_args_on_exc
+        self.__log_result_obj = log_result_obj
+
+        self.__wrap_func_self()
+
+    def __wrap_func_self(self):
+        """Mark self as function wrapper. Usd only without arguments."""
+        if self.__func is not None:
+            functools.update_wrapper(self, self.__func)
+            if sys.version_info[0:2] < (3, 4):
+                self.__wrapped__ = self.__func
+
+    @property
+    def log_level(self):
+        """Log level for normal behavior."""
+        return self.__log_level
+
+    @log_level.setter
+    @_check_type(int)
+    def log_level(self, val):
+        """Log level for normal behavior."""
+        self.__log_level = val
+
+    @property
+    def exc_level(self):
+        """Log level for exceptions."""
+        return self.__exc_level
+
+    @exc_level.setter
+    @_check_type(int)
+    def exc_level(self, val):
+        """Log level for exceptions."""
+        self.__exc_level = val
+
+    @property
+    def max_indent(self):
+        """Maximum indentation."""
+        return self.__max_indent
+
+    @max_indent.setter
+    @_check_type(int)
+    def max_indent(self, val):
+        """Maximum indentation."""
+        self.__exc_level = val
+
+    @property
+    def blacklisted_names(self):
+        """List of arguments names to ignore in log."""
+        return self.__blacklisted_names
+
+    @property
+    def blacklisted_exceptions(self):
+        """List of exceptions to re-raise without log."""
+        return self.__blacklisted_exceptions
+
+    @property
+    def log_call_args(self):
+        """Flag: log call arguments before call."""
+        return self.__log_call_args
+
+    @log_call_args.setter
+    @_check_type(bool)
+    def log_call_args(self, val):
+        """Flag: log call arguments before call."""
+        self.__log_call_args = val
+
+    @property
+    def log_call_args_on_exc(self):
+        """Flag: log call arguments on exception."""
+        return self.__log_call_args_on_exc
+
+    @log_call_args_on_exc.setter
+    @_check_type(bool)
+    def log_call_args_on_exc(self, val):
+        """Flag: log call arguments on exception."""
+        self.__log_call_args_on_exc = val
+
+    @property
+    def log_result_obj(self):
+        """Flag: log result object."""
+        return self.__log_result_obj
+
+    @log_result_obj.setter
+    @_check_type
+    def log_result_obj(self, val):
+        """Flag: log result object."""
+        self.__log_result_obj = val
+
+    @property
+    def _logger(self):
+        """logger instance."""
+        return self.__logger
+
+    @property
+    def _spec(self):
+        """Spec for function arguments."""
+        return self.__spec
+
+    def __repr__(self):
+        """Repr for debug purposes."""
+        return (
+            "{cls}("
+            "log={self._logger}, "
+            "log_level={self.log_level}, "
+            "exc_level={self.exc_level}, "
+            "max_indent={self.max_indent}, "
+            "spec={spec}, "
+            "blacklisted_names={self.blacklisted_names}, "
+            "blacklisted_exceptions={self.blacklisted_exceptions}, "
+            "log_call_args={self.log_call_args}, "
+            "log_call_args_on_exc={self.log_call_args_on_exc}, "
+            "log_result_obj={self.log_result_obj}, )".format(
+                cls=self.__class__.__name__,
+                self=self,
+                spec=self._spec
+            )
         )
-    if param_str:
-        param_str += "\n"
-    return param_str
+
+    def _get_func_args_repr(self, sig, args, kwargs):
+        """Internal helper for reducing complexity of decorator code.
+
+        :type sig: inspect.Signature
+        :type args: tuple
+        :type kwargs: dict
+        :rtype: str
+        """
+        if not (self.log_call_args or self.log_call_args_on_exc):
+            return ''
+
+        bound = sig.bind(*args, **kwargs).arguments
+
+        param_str = ""
+
+        last_kind = None
+        for param in sig.parameters.values():
+            if param.name in self.blacklisted_names:
+                continue
+
+            if last_kind != param.kind:
+                param_str += comment(kind=param.kind)
+                last_kind = param.kind
+            param_str += fmt(
+                key=param.name,
+                val=core.pretty_repr(
+                    src=bound.get(param.name, param.default),
+                    indent=indent + 4,
+                    no_indent_start=True,
+                    max_indent=self.max_indent,
+                ),
+            )
+        if param_str:
+            param_str += "\n"
+        return param_str
+
+    def _make_done_record(self, func_name, result):
+        """Construct success record."""
+        msg = "Done: {name!r}".format(name=func_name)
+
+        if self.log_result_obj:
+            msg += " with result:\n{result}".format(
+                result=core.pretty_repr(
+                    result,
+                    max_indent=self.max_indent,
+                )
+            )
+        self._logger.log(
+            level=self.log_level,
+            msg=msg
+        )
+
+    def _get_function_wrapper(self, func):
+        """Here should be constructed and returned real decorator.
+
+        :param func: Wrapped function
+        :type func: types.FunctionType
+        :rtype: types.FunctionType
+        """
+        if sys.version_info[0:2] >= (3, 5):
+            # pylint: disable=exec-used, expression-not-assigned
+            # Exec is required due to python<3.5 hasn't this methods
+            ns = {'func': func}
+            exec(  # nosec
+                """
+from inspect import iscoroutinefunction
+coro = iscoroutinefunction(func)
+            """,
+                ns
+            ) in ns
+            # pylint: enable=exec-used, expression-not-assigned
+
+            if ns['coro']:
+                warnings.warn(
+                    'Calling @logwrap over coroutine function. '
+                    'Required to use @async_logwrap instead.',
+                    SyntaxWarning,
+                )
+
+        sig = signature(obj=self._spec or func)
+
+        # pylint: disable=missing-docstring
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            args_repr = self._get_func_args_repr(
+                sig=sig,
+                args=args,
+                kwargs=kwargs,
+            )
+
+            self._logger.log(
+                level=self.log_level,
+                msg="Calling: \n{name!r}({arguments})".format(
+                    name=func.__name__,
+                    arguments=args_repr
+                )
+            )
+            try:
+                result = func(*args, **kwargs)
+                self._make_done_record(func.__name__, result)
+            except BaseException as e:
+                if isinstance(e, tuple(self.blacklisted_exceptions)):
+                    raise
+                self._logger.log(
+                    level=self.exc_level,
+                    msg="Failed: \n{name!r}({arguments})".format(
+                        name=func.__name__,
+                        arguments=args_repr,
+                    ),
+                    exc_info=True
+                )
+                raise
+            return result
+
+        # pylint: enable=missing-docstring
+        return wrapper
+
+    def __call__(self, *args, **kwargs):
+        """Main decorator getter."""
+        args = list(args)
+        wrapped = self.__func or args.pop(0)
+        wrapper = self._get_function_wrapper(wrapped)
+        if self.__func:
+            return wrapper(*args, **kwargs)
+        return wrapper

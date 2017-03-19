@@ -23,22 +23,9 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import functools
 import logging
-import sys
-import warnings
-
-import logwrap as core
 
 from . import _log_wrap_shared
-
-# pylint: disable=ungrouped-imports, no-name-in-module
-if sys.version_info[0:2] > (3, 0):
-    from inspect import signature
-else:
-    # noinspection PyUnresolvedReferences
-    from funcsigs import signature
-# pylint: enable=ungrouped-imports, no-name-in-module
 
 
 def logwrap(
@@ -48,6 +35,10 @@ def logwrap(
     max_indent=20,
     spec=None,
     blacklisted_names=None,
+    blacklisted_exceptions=None,
+    log_call_args=True,
+    log_call_args_on_exc=True,
+    log_result_obj=True,
 ):
     """Log function calls and return values.
 
@@ -69,95 +60,32 @@ def logwrap(
     :param blacklisted_names: Blacklisted argument names.
                               Arguments with this names will be skipped in log.
     :type blacklisted_names: list
+    :type blacklisted_exceptions: list
+    :param log_call_args: log call arguments before executing wrapped function.
+    :type log_call_args: bool
+    :param log_call_args_on_exc: log call arguments if exception raised
+    :type log_call_args_on_exc: bool
+    :param log_result_obj: log result of function call
+    :type log_result_obj: bool
     :return: built real decorator
-    :rtype: callable
+    :rtype: _log_wrap_shared.BaseLogWrap
     """
-    if blacklisted_names is None:
-        blacklisted_names = []
+    return LogWrap(
+        log=log,
+        log_level=log_level,
+        exc_level=exc_level,
+        max_indent=max_indent,
+        spec=spec,
+        blacklisted_names=blacklisted_names,
+        blacklisted_exceptions=blacklisted_exceptions,
+        log_call_args=log_call_args,
+        log_call_args_on_exc=log_call_args_on_exc,
+        log_result_obj=log_result_obj
+    )
 
-    def real_decorator(func):
-        """Log function calls and return values.
 
-        This decorator could be extracted as configured from outer function.
-
-        :param func: function to log calls from
-        :type func: callable
-        :return: wrapped function
-        :rtype: callable
-        """
-        if sys.version_info[0:2] >= (3, 5):
-            # pylint: disable=exec-used, expression-not-assigned
-            # Exec is required due to python<3.5 hasn't this methods
-            ns = {'func': func}
-            exec(  # nosec
-                """
-from inspect import iscoroutinefunction
-coro = iscoroutinefunction(func)
-            """,
-                ns
-            ) in ns
-            # pylint: enable=exec-used, expression-not-assigned
-
-            if ns['coro']:
-                warnings.warn(
-                    'Calling @logwrap over coroutine function. '
-                    'Required to use @async_logwrap instead.',
-                    SyntaxWarning,
-                )
-        # Get signature _before_ call
-        sig = signature(obj=func if not spec else spec)
-
-        # pylint: disable=missing-docstring
-        @functools.wraps(func)
-        def wrapped(*args, **kwargs):
-            args_repr = _log_wrap_shared.get_func_args_repr(
-                sig=sig,
-                args=args,
-                kwargs=kwargs,
-                max_indent=max_indent,
-                blacklisted_names=blacklisted_names
-            )
-
-            log.log(
-                level=log_level,
-                msg="Calling: \n{name!r}({arguments})".format(
-                    name=func.__name__,
-                    arguments=args_repr
-                )
-            )
-            try:
-                result = func(*args, **kwargs)
-                log.log(
-                    level=log_level,
-                    msg="Done: {name!r} with result:\n{result}".format(
-                        name=func.__name__,
-                        result=core.pretty_repr(
-                            result,
-                            max_indent=max_indent,
-                        )
-                    )
-                )
-            except BaseException:
-                log.log(
-                    level=exc_level,
-                    msg="Failed: \n{name!r}({arguments})".format(
-                        name=func.__name__,
-                        arguments=args_repr,
-                    ),
-                    exc_info=True
-                )
-                raise
-            return result
-
-        # pylint: enable=missing-docstring
-        return wrapped
-
-    if not isinstance(log, logging.Logger):
-        func, log = log, _log_wrap_shared.logger
-
-        return real_decorator(func)
-
-    return real_decorator
+class LogWrap(_log_wrap_shared.BaseLogWrap):
+    """LogWrap."""
 
 
 __all__ = ('logwrap', )

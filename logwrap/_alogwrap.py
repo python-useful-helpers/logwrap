@@ -29,7 +29,6 @@ import logging
 import types
 import typing
 
-import logwrap as core
 
 from . import _log_wrap_shared
 
@@ -41,6 +40,10 @@ def async_logwrap(
     max_indent: int=20,
     spec: types.FunctionType=None,
     blacklisted_names: typing.Iterable[str]=None,
+    blacklisted_exceptions: typing.Iterable[BaseException]=None,
+    log_call_args: bool=True,
+    log_call_args_on_exc: bool=True,
+    log_result_obj: bool=True,
 ) -> types.FunctionType:
     """Log function calls and return values. Async version.
 
@@ -62,62 +65,81 @@ def async_logwrap(
     :param blacklisted_names: Blacklisted argument names.
                               Arguments with this names will be skipped in log.
     :type blacklisted_names: typing.Iterable[str]
+    :type blacklisted_exceptions: list
+    :param log_call_args: log call arguments before executing wrapped function.
+    :type log_call_args: bool
+    :param log_call_args_on_exc: log call arguments if exception raised
+    :type log_call_args_on_exc: bool
+    :param log_result_obj: log result of function call
+    :type log_result_obj: bool
     :return: built real decorator
-    :rtype: types.FunctionType
+    :rtype: AsyncLogWrap
     """
-    if blacklisted_names is None:
-        blacklisted_names = []
+    return AsyncLogWrap(
+        log=log,
+        log_level=log_level,
+        exc_level=exc_level,
+        max_indent=max_indent,
+        spec=spec,
+        blacklisted_names=blacklisted_names,
+        blacklisted_exceptions=blacklisted_exceptions,
+        log_call_args=log_call_args,
+        log_call_args_on_exc=log_call_args_on_exc,
+        log_result_obj=log_result_obj
+    )
 
-    def real_decorator(func: types.FunctionType) -> types.CoroutineType:
-        """Log function calls and return values.
 
-        This decorator could be extracted as configured from outer function.
+class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
+    """Async version of LogWrap."""
 
-        :param func: function to log calls from
+    def _get_function_wrapper(
+        self,
+        func: types.FunctionType
+    ) -> types.CoroutineType:
+        """Here should be constructed and returned real decorator.
+
+        :param func: Wrapped function
         :type func: types.FunctionType
         :return: wrapped coroutine function
         :rtype: types.CoroutineType
         """
-        # Get signature _before_ call
-        sig = inspect.signature(obj=func if not spec else spec)
+        sig = inspect.signature(obj=self._spec or func)
 
         # pylint: disable=missing-docstring
         # noinspection PyCompatibility
         @functools.wraps(func)
-        async def wrapped(*args, **kwargs):
-            args_repr = _log_wrap_shared.get_func_args_repr(
+        async def wrapper(*args, **kwargs):
+            args_repr = self._get_func_args_repr(
                 sig=sig,
                 args=args,
                 kwargs=kwargs,
-                max_indent=max_indent,
-                blacklisted_names=blacklisted_names
             )
 
-            log.log(
-                level=log_level,
-                msg="Calling: \n{name!r}({arguments})".format(
-                    name=func.__name__,
-                    arguments=args_repr
-                )
-            )
             try:
                 if inspect.iscoroutinefunction(func):
-                    result = await func(*args, **kwargs)
-                else:
-                    result = func(*args, **kwargs)
-                log.log(
-                    level=log_level,
-                    msg="Done: {name!r} with result:\n{result}".format(
-                        name=func.__name__,
-                        result=core.pretty_repr(
-                            result,
-                            max_indent=max_indent,
+                    self._logger.log(
+                        level=self.log_level,
+                        msg="Awaiting: \n{name!r}({arguments})".format(
+                            name=func.__name__,
+                            arguments=args_repr
                         )
                     )
-                )
-            except BaseException:
-                log.log(
-                    level=exc_level,
+                    result = await func(*args, **kwargs)
+                else:
+                    self._logger.log(
+                        level=self.log_level,
+                        msg="Calling: \n{name!r}({arguments})".format(
+                            name=func.__name__,
+                            arguments=args_repr
+                        )
+                    )
+                    result = func(*args, **kwargs)
+                self._make_done_record(func.__name__, result)
+            except BaseException as e:
+                if isinstance(e, tuple(self.blacklisted_exceptions)):
+                    raise
+                self._logger.log(
+                    level=self.exc_level,
                     msg="Failed: \n{name!r}({arguments})".format(
                         name=func.__name__,
                         arguments=args_repr,
@@ -128,14 +150,7 @@ def async_logwrap(
             return result
 
         # pylint: enable=missing-docstring
-        return wrapped
-
-    if not isinstance(log, logging.Logger):
-        func, log = log, _log_wrap_shared.logger
-
-        return real_decorator(func)
-
-    return real_decorator
+        return wrapper
 
 
-__all__ = ('async_logwrap',)
+__all__ = ('async_logwrap', 'AsyncLogWrap')
