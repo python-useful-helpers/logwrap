@@ -14,24 +14,12 @@ This is no reason to import this submodule directly, it's strictly internal
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import sys
-
-_PY3 = sys.version_info[0:2] > (3, 0)
-
-if _PY3:
-    binary_type = bytes
-    text_type = str
-else:
-    binary_type = str
-    # pylint: disable=unicode-builtin, undefined-variable
-    # noinspection PyUnresolvedReferences
-    text_type = unicode  # NOQA
-    # pylint: enable=unicode-builtin, undefined-variable
+import six
 
 
 def _strings_repr(indent, val):
     """Custom repr for strings and binary strings."""
-    if isinstance(val, binary_type):
+    if isinstance(val, six.binary_type):
         val = val.decode(
             encoding='utf-8',
             errors='backslashreplace'
@@ -66,8 +54,8 @@ def _set_repr(indent, val):
 s_repr_formatters = {
     'default': "{spc:<{indent}}{val!r}".format,
     set: _set_repr,
-    binary_type: _strings_repr,
-    text_type: _strings_repr,
+    six.binary_type: _strings_repr,
+    six.text_type: _strings_repr,
 }
 
 
@@ -85,7 +73,7 @@ c_repr_formatters = {
 
 def _strings_str(indent, val):
     """Custom repr for strings and binary strings."""
-    if isinstance(val, binary_type):
+    if isinstance(val, six.binary_type):
         val = val.decode(
             encoding='utf-8',
             errors='backslashreplace'
@@ -116,8 +104,8 @@ def _set_str(indent, val):
 s_str_formatters = {
     'default': "{spc:<{indent}}{val!s}".format,
     set: _set_str,
-    binary_type: _strings_str,
-    text_type: _strings_str,
+    six.binary_type: _strings_str,
+    six.text_type: _strings_str,
 }
 
 

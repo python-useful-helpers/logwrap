@@ -23,6 +23,7 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+# noinspection PyCompatibility
 import asyncio
 import functools
 import inspect
@@ -52,7 +53,7 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
         sig = inspect.signature(obj=self._spec or func)
 
         # pylint: disable=missing-docstring
-        # noinspection PyCompatibility
+        # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         @asyncio.coroutine
         def wrapper(*args, **kwargs):

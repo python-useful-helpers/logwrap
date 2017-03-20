@@ -23,13 +23,12 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import sys
 import types
 
-_PY3 = sys.version_info[0:2] > (3, 0)
+import six
 
 # pylint: disable=ungrouped-imports, no-name-in-module
-if _PY3:
+if six.PY3:
     from inspect import Parameter
     from inspect import signature
 else:
@@ -46,17 +45,6 @@ from logwrap._formatters import (  # noqa
     c_str_formatters, s_str_formatters
 )
 # pylint: enable=wrong-import-position
-
-
-if _PY3:
-    binary_type = bytes
-    text_type = str
-else:
-    binary_type = str
-    # pylint: disable=unicode-builtin, undefined-variable
-    # noinspection PyUnresolvedReferences
-    text_type = unicode  # NOQA
-    # pylint: enable=unicode-builtin, undefined-variable
 
 
 def _known_callble(item):
@@ -131,7 +119,7 @@ class PrettyFormat(object):
         self.__keyword = keyword
         self.__max_indent = max_indent
         self.__indent_step = indent_step
-        self.__py2_str = py2_str and not _PY3  # Python 2 only behavior
+        self.__py2_str = py2_str and not six.PY3  # Python 2 only behavior
 
     @property
     def max_indent(self):

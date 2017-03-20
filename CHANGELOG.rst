@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 2.2.1
+-------------
+* Use six library for compatibility options (anyway, it's required by modern setuptools).
+
 Version 2.2.0
 -------------
 * Async for python 3.4

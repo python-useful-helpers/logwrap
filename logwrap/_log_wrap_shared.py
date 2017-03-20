@@ -22,11 +22,12 @@ from __future__ import unicode_literals
 import abc
 import functools
 import logging
-import sys
+
+import six
 
 import logwrap as core
 
-__all__ = ('wraps', 'BaseLogWrap')
+__all__ = ('BaseLogWrap', )
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ def _check_type(expected):
     def deco(func):
         """Check type before asign."""
         # pylint: disable=missing-docstring
+        # noinspection PyMissingOrEmptyDocstring
         @functools.wraps(func)
         def wrapper(self, val):
             if not isinstance(val, expected):
@@ -59,29 +61,10 @@ def _check_type(expected):
     return deco
 
 
-if sys.version_info[0:2] < (3, 4):
-    def wraps(
-        wrapped,
-        assigned=functools.WRAPPER_ASSIGNMENTS,
-        updated=functools.WRAPPER_UPDATES
-    ):
-        """Backport of functools.wraps to older python versions."""
-        # pylint: disable=missing-docstring
-        def wrapper(f):
-            f = functools.wraps(wrapped, assigned, updated)(f)
-            f.__wrapped__ = wrapped
-            return f
-
-        # pylint: enable=missing-docstring
-        return wrapper
-else:
-    wraps = functools.wraps
-
-
 class BaseLogWrap(
     type.__new__(
         abc.ABCMeta,
-        'BaseMeta' if sys.version_info[0:2] > (3, 0) else b'BaseMeta',
+        'BaseMeta' if six.PY3 else b'BaseMeta',
         (object, ),
         {}
     )
@@ -160,13 +143,15 @@ class BaseLogWrap(
 
         self.__wrap_func_self()
 
+        # We are not interested to pass any arguments to object
+        # noinspection PyArgumentList
         super(BaseLogWrap, self).__init__()
 
     def __wrap_func_self(self):
         """Mark self as function wrapper. Usd only without arguments."""
         if self.__func is not None:
             functools.update_wrapper(self, self.__func)
-            if sys.version_info[0:2] < (3, 4):
+            if not six.PY34:
                 self.__wrapped__ = self.__func
 
     @property

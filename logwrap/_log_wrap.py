@@ -24,13 +24,14 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
-import sys
 import warnings
+
+import six
 
 from . import _log_wrap_shared
 
 # pylint: disable=ungrouped-imports, no-name-in-module
-if sys.version_info[0:2] > (3, 0):
+if six.PY34:
     from inspect import signature
 else:
     # noinspection PyUnresolvedReferences
@@ -50,10 +51,11 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
         :type func: types.FunctionType
         :rtype: types.FunctionType
         """
-        if sys.version_info[0:2] >= (3, 4):
+        if six.PY34:
             # pylint: disable=exec-used, expression-not-assigned
-            # Exec is required due to python<3.5 hasn't this methods
+            # Exec is required due to python<3.4 hasn't this methods
             ns = {'func': func}
+            # noinspection PyStatementEffect
             exec(  # nosec
                 """
 from asyncio import iscoroutinefunction
@@ -73,7 +75,8 @@ coro = iscoroutinefunction(func)
         sig = signature(obj=self._spec or func)
 
         # pylint: disable=missing-docstring
-        @_log_wrap_shared.wraps(func)
+        # noinspection PyMissingOrEmptyDocstring
+        @six.wraps(func)
         def wrapper(*args, **kwargs):
             args_repr = self._get_func_args_repr(
                 sig=sig,

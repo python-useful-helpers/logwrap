@@ -24,12 +24,12 @@ later it has been reworked and extended for support of special cases.
 
 from __future__ import absolute_import
 
-import sys
+import six
 
 from ._log_wrap import logwrap, LogWrap
 from ._repr_utils import PrettyFormat, pretty_repr, pretty_str
 
-__version__ = '2.2.0'
+__version__ = '2.2.1'
 
 __all__ = (
     'logwrap',
@@ -39,7 +39,7 @@ __all__ = (
 )
 
 # pylint: disable=ungrouped-imports, no-name-in-module
-if sys.version_info[0:2] >= (3, 4):
+if six.PY34:
     from ._alogwrap import async_logwrap, AsyncLogWrap
 
     __all__ += ('async_logwrap', 'AsyncLogWrap')
