@@ -13,7 +13,7 @@ script: tox
 after_success:
   - coveralls
 before_deploy:
-  - pip install -U .
+  - pip install -r CI_REQUIREMENTS.txt
 deploy:
   - provider: pypi
     distributions: sdist bdist_wheel
