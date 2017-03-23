@@ -26,10 +26,7 @@ from __future__ import absolute_import
 
 import six
 
-from ._log_wrap import logwrap, LogWrap
 from ._repr_utils import PrettyFormat, pretty_repr, pretty_str
-
-__version__ = '2.2.1'
 
 __all__ = (
     'logwrap',
@@ -40,7 +37,11 @@ __all__ = (
 
 # pylint: disable=ungrouped-imports, no-name-in-module
 if six.PY34:
-    from ._alogwrap import async_logwrap, AsyncLogWrap
+    from ._logwrap3 import logwrap, LogWrap, async_logwrap, AsyncLogWrap
 
     __all__ += ('async_logwrap', 'AsyncLogWrap')
+else:
+    from ._log_wrap2 import logwrap, LogWrap
 # pylint: enable=ungrouped-imports, no-name-in-module
+
+__version__ = '2.3.0'

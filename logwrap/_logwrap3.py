@@ -14,7 +14,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""log_wrap: async part (python 3.5+).
+"""log_wrap: async part (python 3.4+).
 
 This is no reason to import this submodule directly, all required methods is
 available from the main module.
@@ -29,15 +29,17 @@ import functools
 import inspect
 import logging
 import types
+import typing
+import warnings
 
 
 from . import _log_wrap_shared
 
-__all__ = ('async_logwrap', 'AsyncLogWrap')
+__all__ = ('logwrap', 'LogWrap')
 
 
-class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
-    """Async version of LogWrap."""
+class LogWrap(_log_wrap_shared.BaseLogWrap):
+    """Python 3.4+ version of LogWrap."""
 
     def _get_function_wrapper(
         self,
@@ -56,6 +58,30 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         @asyncio.coroutine
+        def async_wrapper(*args, **kwargs):
+            args_repr = self._get_func_args_repr(
+                sig=sig,
+                args=args,
+                kwargs=kwargs,
+            )
+
+            try:
+                self._make_calling_record(
+                    name=func.__name__,
+                    arguments=args_repr,
+                    method='Awaiting'
+                )
+                result = yield from func(*args, **kwargs)
+                self._make_done_record(func.__name__, result)
+            except BaseException as e:
+                if isinstance(e, tuple(self.blacklisted_exceptions)):
+                    raise
+                self._make_exc_record(name=func.__name__, arguments=args_repr)
+                raise
+            return result
+
+        # noinspection PyCompatibility,PyMissingOrEmptyDocstring
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
             args_repr = self._get_func_args_repr(
                 sig=sig,
@@ -64,20 +90,11 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
             )
 
             try:
-                if asyncio.iscoroutinefunction(func):
-                    self._make_calling_record(
-                        name=func.__name__,
-                        arguments=args_repr,
-                        method='Awaiting'
-                    )
-                    result = yield from func(*args, **kwargs)
-                else:
-
-                    self._make_calling_record(
-                        name=func.__name__,
-                        arguments=args_repr
-                    )
-                    result = func(*args, **kwargs)
+                self._make_calling_record(
+                    name=func.__name__,
+                    arguments=args_repr
+                )
+                result = func(*args, **kwargs)
                 self._make_done_record(func.__name__, result)
             except BaseException as e:
                 if isinstance(e, tuple(self.blacklisted_exceptions)):
@@ -87,23 +104,23 @@ class AsyncLogWrap(_log_wrap_shared.BaseLogWrap):
             return result
 
         # pylint: enable=missing-docstring
-        return wrapper
+        return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper
 
 
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
-def async_logwrap(
+def logwrap(
     log: logging.Logger=_log_wrap_shared.logger,
     log_level: int=logging.DEBUG,
     exc_level: int=logging.ERROR,
     max_indent: int=20,
     spec: types.FunctionType=None,
-    blacklisted_names: list=None,
-    blacklisted_exceptions: list=None,
+    blacklisted_names: typing.List[str]=None,
+    blacklisted_exceptions: typing.List[Exception]=None,
     log_call_args: bool=True,
     log_call_args_on_exc: bool=True,
     log_result_obj: bool=True,
-) -> AsyncLogWrap:
-    """Log function calls and return values. Async version.
+) -> LogWrap:
+    """Log function calls and return values. Python 3.4+ version.
 
     :param log: logger object for decorator, by default used 'logwrap'
     :type log: logging.Logger
@@ -131,9 +148,9 @@ def async_logwrap(
     :param log_result_obj: log result of function call
     :type log_result_obj: bool
     :return: built real decorator
-    :rtype: AsyncLogWrap
+    :rtype: LogWrap
     """
-    return AsyncLogWrap(
+    return LogWrap(
         log=log,
         log_level=log_level,
         exc_level=exc_level,
@@ -146,3 +163,24 @@ def async_logwrap(
         log_result_obj=log_result_obj
     )
 # pylint: enable=unexpected-keyword-arg, no-value-for-parameter
+
+
+class AsyncLogWrap(LogWrap):
+    """Deprecated."""
+
+    def __init__(self, *args, **kwargs):
+        """Deprecated version."""
+        warnings.warn(
+            "AsyncLogWrap is deprecated. Functionality is merged into LogWrap",
+            DeprecationWarning
+        )
+        super(AsyncLogWrap, self).__init__(*args, **kwargs)
+
+
+def async_logwrap(*args, **kwargs):
+    """Deprecated."""
+    warnings.warn(
+        "async_logwrap is deprectaed. Functionality is merged into logwrap",
+        DeprecationWarning
+    )
+    return logwrap(*args, **kwargs)

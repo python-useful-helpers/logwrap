@@ -48,19 +48,15 @@ Pros:
 
 This package includes helpers:
 
-* `logwrap` - main helper
+* :func:`logwrap` - main helper
 
-* `LogWrap` - class with `logwrap` implementation. May be used directly.
+* :class:`LogWrap` - class with `logwrap` implementation. May be used directly.
 
-* `pretty_repr`
+* :func:`pretty_repr`
 
-* `pretty_str`
+* :func:`pretty_str`
 
-* `PrettyFormat`
-
-* `async_logwrap` (*on python 3.4+ only*)
-
-* `AsyncLogWrap` - class with `async_logwrap` implementation. May be used directly. (*on python 3.4+ only*)
+* :class:`PrettyFormat`
 
 Usage
 =====
@@ -190,43 +186,6 @@ Example construction and read from test:
     log_call.log_result_obj == True
 
 On object change, variable types is validated.
-
-async_logwrap
--------------
-Async version of `logwrap` decorator. Usage is the same as `logwrap`, but result object type is coroutine.
-**This method is available only on python 3.4+ installations.**
-
-Example:
-
-.. code-block:: python3
-
-    import asyncio
-
-    import logwrap
-
-    @logwrap.async_logwrap
-    async def foo():  # asynio.coroutine is supported without any adoptions.
-        pass
-
-    asyncio.get_event_loop().run_until_complete(foo())
-
-Remember: `async_logwrap` can be applied over classic functions, but anyway it will return coroutine:
-
-.. code-block:: python3
-
-    import asyncio
-
-    import logwrap
-
-    @logwrap.async_logwrap
-    def foo():
-        pass
-
-    asyncio.get_event_loop().run_until_complete(foo())
-
-AsyncLogWrap
-------------
-The same as `LogWrap`, but for async_logwrap.
 
 
 pretty_repr

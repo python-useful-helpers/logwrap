@@ -66,5 +66,8 @@ setuptools.setup(
         ':python_version == "2.7"': [
             'funcsigs>=1.0',
         ],
+        ':python_version == "3.4"': [
+            'typing>=3.5',
+        ],
     },
 )

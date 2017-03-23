@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 2.3.0
+-------------
+* logwrap/LogWrap transparently supports coroutines on py3.4+. AsyncLogWrap/async_logwrap is deprecated and will be deleted in version 2.3.2.
+
 Version 2.2.1
 -------------
 * Use six library for compatibility options (anyway, it's required by modern setuptools).

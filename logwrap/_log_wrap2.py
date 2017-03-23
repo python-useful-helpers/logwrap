@@ -24,19 +24,12 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
-import warnings
 
 import six
+# noinspection PyUnresolvedReferences
+import funcsigs
 
 from . import _log_wrap_shared
-
-# pylint: disable=ungrouped-imports, no-name-in-module
-if six.PY34:
-    from inspect import signature
-else:
-    # noinspection PyUnresolvedReferences
-    from funcsigs import signature
-# pylint: enable=ungrouped-imports, no-name-in-module
 
 __all__ = ('logwrap', 'LogWrap')
 
@@ -51,28 +44,7 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
         :type func: types.FunctionType
         :rtype: types.FunctionType
         """
-        if six.PY34:
-            # pylint: disable=exec-used, expression-not-assigned
-            # Exec is required due to python<3.4 hasn't this methods
-            ns = {'func': func}
-            # noinspection PyStatementEffect
-            exec(  # nosec
-                """
-from asyncio import iscoroutinefunction
-coro = iscoroutinefunction(func)
-            """,
-                ns
-            ) in ns
-            # pylint: enable=exec-used, expression-not-assigned
-
-            if ns['coro']:
-                warnings.warn(
-                    'Calling @logwrap over coroutine function. '
-                    'Required to use @async_logwrap instead.',
-                    SyntaxWarning,
-                )
-
-        sig = signature(obj=self._spec or func)
+        sig = funcsigs.signature(obj=self._spec or func)
 
         # pylint: disable=missing-docstring
         # noinspection PyMissingOrEmptyDocstring

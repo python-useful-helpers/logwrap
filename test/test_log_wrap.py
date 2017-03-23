@@ -24,10 +24,12 @@ import logging
 import sys
 import unittest
 
+import six
+
 import logwrap
 
 # pylint: disable=import-error
-if sys.version_info.major == 2:
+if six.PY2:
     import mock
 else:
     from unittest import mock
@@ -704,36 +706,6 @@ loop = asyncio.get_event_loop()
              )
         cls.loop = namespace['loop']
 
-    @mock.patch('warnings.warn', autospec=True)
-    def test_coroutine_sync(self, warn, logger):
-            namespace = {'logwrap': logwrap, 'loop': self.loop}
-
-            exec("""
-import asyncio
-
-@logwrap.logwrap
-@asyncio.coroutine
-def func():
-    pass
-
-loop.run_until_complete(func())
-            """,
-                 namespace
-                 )
-            warn.assert_called_once_with(
-                'Calling @logwrap over coroutine function. '
-                'Required to use @async_logwrap instead.',
-                SyntaxWarning
-            )
-            # While we're not expanding result coroutine object from namespace,
-            # do not check execution result
-            logger.assert_has_calls((
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Calling: \n'func'()"
-                ),
-            ))
-
     def test_coroutine_async(self, logger):
         namespace = {'logwrap': logwrap, 'loop': self.loop}
 
@@ -825,33 +797,6 @@ with self.assertRaises(Exception):
                 level=logging.ERROR,
                 msg="Failed: \n'func'()",
                 exc_info=True
-            )
-        ))
-
-    def test_func_async(self, logger):
-        namespace = {'logwrap': logwrap, 'loop': self.loop}
-
-        exec("""
-import asyncio
-
-@logwrap.async_logwrap
-def func():
-    pass
-
-loop.run_until_complete(func())
-        """,
-             namespace
-             )
-        # While we're not expanding result coroutine object from namespace,
-        # do not check execution result
-        logger.assert_has_calls((
-            mock.call.log(
-                level=logging.DEBUG,
-                msg="Calling: \n'func'()"
-            ),
-            mock.call.log(
-                level=logging.DEBUG,
-                msg="Done: 'func' with result:\nNone"
             )
         ))
 
