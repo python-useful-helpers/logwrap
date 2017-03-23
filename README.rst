@@ -48,15 +48,15 @@ Pros:
 
 This package includes helpers:
 
-* :func:`logwrap` - main helper
+* `logwrap` - main helper
 
-* :class:`LogWrap` - class with `logwrap` implementation. May be used directly.
+* `LogWrap` - class with `logwrap` implementation. May be used directly.
 
-* :func:`pretty_repr`
+* `pretty_repr`
 
-* :func:`pretty_str`
+* `pretty_str`
 
-* :class:`PrettyFormat`
+* `PrettyFormat`
 
 Usage
 =====
