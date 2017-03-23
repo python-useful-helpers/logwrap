@@ -706,13 +706,82 @@ loop = asyncio.get_event_loop()
              )
         cls.loop = namespace['loop']
 
-    def test_coroutine_async(self, logger):
+    @mock.patch('warnings.warn', autospec=True)
+    def test_class_deprecation(self, warn, logger):
+        namespace = {'logwrap': logwrap, 'loop': self.loop}
+
+        exec("""
+import asyncio
+
+@logwrap.AsyncLogWrap
+@asyncio.coroutine
+def func():
+    pass
+
+loop.run_until_complete(func())
+        """,
+             namespace
+             )
+        # While we're not expanding result coroutine object from namespace,
+        # do not check execution result
+        logger.assert_has_calls((
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Awaiting: \n'func'()"
+            ),
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Done: 'func' with result:\nNone"
+            )
+        ))
+
+        warn.assert_called_once_with(
+            'AsyncLogWrap is deprecated. Functionality is merged into LogWrap',
+            DeprecationWarning
+        )
+
+    @mock.patch('warnings.warn', autospec=True)
+    def test_func_deprecation(self, warn, logger):
         namespace = {'logwrap': logwrap, 'loop': self.loop}
 
         exec("""
 import asyncio
 
 @logwrap.async_logwrap
+@asyncio.coroutine
+def func():
+    pass
+
+loop.run_until_complete(func())
+        """,
+             namespace
+             )
+        # While we're not expanding result coroutine object from namespace,
+        # do not check execution result
+        logger.assert_has_calls((
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Awaiting: \n'func'()"
+            ),
+            mock.call.log(
+                level=logging.DEBUG,
+                msg="Done: 'func' with result:\nNone"
+            )
+        ))
+
+        warn.assert_called_once_with(
+            'async_logwrap is deprectaed. '
+            'Functionality is merged into logwrap',
+            DeprecationWarning
+        )
+
+    def test_coroutine_async(self, logger):
+        namespace = {'logwrap': logwrap, 'loop': self.loop}
+
+        exec("""
+import asyncio
+
+@logwrap.logwrap
 @asyncio.coroutine
 def func():
     pass
@@ -748,7 +817,7 @@ loop.run_until_complete(func())
         exec("""
 import asyncio
 
-@logwrap.async_logwrap(log=new_logger)
+@logwrap.logwrap(log=new_logger)
 @asyncio.coroutine
 def func():
     pass
@@ -776,7 +845,7 @@ loop.run_until_complete(func())
         exec("""
 import asyncio
 
-@logwrap.async_logwrap
+@logwrap.logwrap
 @asyncio.coroutine
 def func():
     raise Exception('Expected')
@@ -815,7 +884,7 @@ with self.assertRaises(Exception):
         exec("""
 import asyncio
 
-@logwrap.async_logwrap(log=new_logger, blacklisted_exceptions=[TypeError])
+@logwrap.logwrap(log=new_logger, blacklisted_exceptions=[TypeError])
 @asyncio.coroutine
 def func():
     raise TypeError('Blacklisted')

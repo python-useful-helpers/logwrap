@@ -37,7 +37,7 @@ __all__ = (
 
 # pylint: disable=ungrouped-imports, no-name-in-module
 if six.PY34:
-    from ._logwrap3 import logwrap, LogWrap, async_logwrap, AsyncLogWrap
+    from ._log_wrap3 import logwrap, LogWrap, async_logwrap, AsyncLogWrap
 
     __all__ += ('async_logwrap', 'AsyncLogWrap')
 else:
