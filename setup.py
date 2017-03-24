@@ -61,13 +61,10 @@ setuptools.setup(
         'Decorator for logging function arguments by human-readable way'
     ),
     long_description=long_description,
-    install_requires=['six'],
-    extras_require={
-        ':python_version == "2.7"': [
-            'funcsigs>=1.0',
-        ],
-        ':python_version == "3.4"': [
-            'typing>=3.5',
-        ],
-    },
+    setup_requires=['setuptools > 20.2'],
+    install_requires=[
+        'six',
+        'funcsigs>=1.0; python_version == "2.7"',
+        'typing>=3.5; python_version == "3.4"'
+    ],
 )
