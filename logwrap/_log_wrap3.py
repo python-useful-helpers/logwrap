@@ -128,27 +128,28 @@ def logwrap(
     :type log_level: int
     :param exc_level: log level for exception cases
     :type exc_level: int
-    :param max_indent: maximal indent before classic repr() call.
-    :type  max_indent: int
+    :param max_indent: maximum indent before classic `repr()` call.
+    :type max_indent: int
     :param spec: callable object used as spec for arguments bind.
                  This is designed for the special cases only,
                  when impossible to change signature of target object,
                  but processed/redirected signature is accessible.
                  Note: this object should provide fully compatible signature
                  with decorated function, or arguments bind will be failed!
-    :type spec: types.FunctionType
-    :param blacklisted_names: Blacklisted argument names.
-                              Arguments with this names will be skipped in log.
-    :type blacklisted_names: typing.Iterable[str]
+    :type spec: callable
+    :param blacklisted_names: list of exception,
+                              which should be re-raised without
+                              producing log record.
+    :type blacklisted_names: list
     :type blacklisted_exceptions: list
     :param log_call_args: log call arguments before executing wrapped function.
     :type log_call_args: bool
-    :param log_call_args_on_exc: log call arguments if exception raised
+    :param log_call_args_on_exc: log call arguments if exception raised.
     :type log_call_args_on_exc: bool
-    :param log_result_obj: log result of function call
+    :param log_result_obj: log result of function call.
     :type log_result_obj: bool
-    :return: built real decorator
-    :rtype: LogWrap
+    :return: built real decorator.
+    :rtype: _log_wrap_shared.BaseLogWrap
     """
     return LogWrap(
         log=log,

@@ -93,7 +93,7 @@ class BaseLogWrap(
         :type log_level: int
         :param exc_level: log level for exception cases
         :type exc_level: int
-        :param max_indent: maximal indent before classic repr() call.
+        :param max_indent: maximum indent before classic `repr()` call.
         :type max_indent: int
         :param spec: callable object used as spec for arguments bind.
                      This is designed for the special cases only,
@@ -107,15 +107,16 @@ class BaseLogWrap(
                                   Arguments with this names will be skipped
                                   in log.
         :type blacklisted_names: typing.Iterable[str]
-        :param blacklisted_exceptions: Blacklisted exceptions,
-                                       which should not be logged.
+        :param blacklisted_exceptions: list of exception,
+                                       which should be re-raised without
+                                       producing log record.
         :type blacklisted_exceptions: typing.Iterable[BaseException]
         :param log_call_args: log call arguments before executing
                               wrapped function.
         :type log_call_args: bool
-        :param log_call_args_on_exc: log call arguments if exception raised
+        :param log_call_args_on_exc: log call arguments if exception raised.
         :type log_call_args_on_exc: bool
-        :param log_result_obj: log result of function call
+        :param log_result_obj: log result of function call.
         :type log_result_obj: bool
         """
         # Typing fix:

@@ -44,4 +44,4 @@ else:
     from ._log_wrap2 import logwrap, LogWrap
 # pylint: enable=ungrouped-imports, no-name-in-module
 
-__version__ = '2.3.1'
+__version__ = '2.3.2'

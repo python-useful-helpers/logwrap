@@ -1,4 +1,4 @@
-#    Copyright 2016 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2017 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -14,7 +14,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-"""logwrap decorator for human-readable logging of command arguments"""
+"""logwrap decorator for human-readable logging of command arguments."""
 
 import setuptools
 
@@ -64,7 +64,7 @@ setuptools.setup(
     setup_requires=['setuptools > 20.2'],
     install_requires=[
         'six',
-        'funcsigs>=1.0; python_version == "2.7"',
-        'typing>=3.5; python_version == "3.4"'
+        'funcsigs >= 1.0; python_version == "2.7"',
+        'typing >= 3.5; python_version == "3.4"'
     ],
 )

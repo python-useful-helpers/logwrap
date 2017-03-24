@@ -1,5 +1,14 @@
 CHANGELOG
 =========
+
+Version 2.3.2
+-------------
+* Setup wa updated in conform to PEP0508
+
+* AsyncLogWrap/async_logwrap deletion moved on v 2.4 as destructive action.
+
+* Mark, that setup requires not pre-historic setuptools.
+
 Version 2.3.0
 -------------
 * logwrap/LogWrap transparently supports coroutines on py3.4+. AsyncLogWrap/async_logwrap is deprecated and will be deleted in version 2.3.2.

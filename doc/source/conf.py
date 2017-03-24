@@ -77,7 +77,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'logwrap'
-copyright = '2016, Alexey Stepanov'
+copyright = '2016-2017, Alexey Stepanov'
 author = 'Alexey Stepanov'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -153,7 +153,9 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'page_width': 'auto',
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []

@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import functools
 import logging
-import sys
 import unittest
 
 import six
@@ -339,7 +338,7 @@ class TestLogWrap(unittest.TestCase):
         ))
 
     @unittest.skipUnless(
-        sys.version_info[0:2] > (3, 0),
+        six.PY3,
         'Strict python 3 syntax'
     )
     def test_py3_args(self, logger):
@@ -389,8 +388,9 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
         ))
 
     @unittest.skipUnless(
-        sys.version_info[0:2] > (3, 0),
-        'Wrap expanding is not supported under python 2.7: funcsigs limitation'
+        six.PY34,
+        'Wrap expanding is not supported under python 2.7: @functools.wraps '
+        'implementation limitation.'
     )
     def test_wrapped(self, logger):
         def simpledeco(func):
@@ -689,7 +689,7 @@ class TestObject(unittest.TestCase):
 
 @mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 @unittest.skipUnless(
-    sys.version_info[0:2] >= (3, 4),
+    six.PY34,
     'Strict python 3.4+ API'
 )
 class TestLogWrapAsync(unittest.TestCase):
