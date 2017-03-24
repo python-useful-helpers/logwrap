@@ -3,7 +3,7 @@ CHANGELOG
 
 Version 2.3.2
 -------------
-* Setup wa updated in conform to PEP0508
+* Setup was updated in conform to PEP0508
 
 * AsyncLogWrap/async_logwrap deletion moved on v 2.4 as destructive action.
 
