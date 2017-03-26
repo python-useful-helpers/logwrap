@@ -163,9 +163,8 @@ This code during execution will produce log records:
      ))
 
 Limitations:
-* return value from awaitable objects (`async def(...`) is not accessible - on call asyncio object is returned. Please use `async_logwrap` instead.
 
-* nested wrapping (`@logwrap @deco2 ...`) is not parsed under python 2.7: `funcsigs` limitation. Please set `logwrap` as the first level decorator.
+* nested wrapping (`@logwrap @deco2 ...`) is not parsed under python 2.7: `functools.wraps` limitation. Please set `logwrap` as the first level decorator.
 
 LogWrap
 -------

@@ -24,6 +24,7 @@ deploy:
     on:
       python: 3.5
       tags: false
+    skip_upload_docs: true
     # PyPI
   - provider: pypi
     distributions: sdist bdist_wheel
@@ -33,3 +34,4 @@ deploy:
     on:
       python: 3.5
       tags: true
+    skip_upload_docs: true

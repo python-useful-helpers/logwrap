@@ -102,9 +102,9 @@ class PrettyFormat(object):
         """Pretty Formatter.
 
         :param simple_formatters: object formatters by type
-        :type simple_formatters: {str: callable}
+        :type simple_formatters: typing.Dict[str, types.FunctionType]
         :param complex_formatters: object formatters for complex objects
-        :type complex_formatters: {str: callable}
+        :type complex_formatters: typing.Dict[str, types.FunctionType]
         :param keyword: operation keyword (__pretty_{keyword}__)
         :type keyword: str
         :param max_indent: maximal indent before classic repr() call
@@ -151,7 +151,7 @@ class PrettyFormat(object):
     def _repr_callable(self, src, indent=0):
         """Repr callable object (function or method).
 
-        :type src: union(types.FunctionType, types.MethodType)
+        :type src: typing.Union[types.FunctionType, types.MethodType]
         :type indent: int
         :rtype: str
         """
@@ -188,7 +188,10 @@ class PrettyFormat(object):
     def _repr_simple(self, src, indent=0, no_indent_start=False):
         """Repr object without iteration.
 
-        :type src: union(six.binary_type, six.text_type, int, iterable, object)
+        :type src: typing.Union[
+                   six.binary_type, six.text_type, int, typing.Iterable,
+                   object,
+                   ]
         :type indent: int
         :type no_indent_start: bool
         :rtype: str
@@ -235,7 +238,7 @@ class PrettyFormat(object):
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
-        :type src: dict
+        :type src: typing.Iterable
         :param indent: start indentation
         :type indent: int
         :rtype: generator
@@ -250,14 +253,16 @@ class PrettyFormat(object):
         """Make human readable representation of object.
 
         :param src: object to process
-        :type src: union(six.binary_type, six.text_type, int, iterable, object)
+        :type src: typing.Union[
+                   six.binary_type, six.text_type, int, typing.Iterable, object
+                   ]
         :param indent: start indentation
         :type indent: int
         :param no_indent_start:
             do not indent open bracket and simple parameters
         :type no_indent_start: bool
         :return: formatted string
-        :rtype: str
+        :rtype: six.text_type
         """
         if hasattr(src, '__pretty_{}__'.format(self.__keyword)):
             return getattr(
@@ -311,16 +316,19 @@ class PrettyFormat(object):
         indent=0,
         no_indent_start=False
     ):
-        """Make human readable representation of object.
+        """Make human readable representation of object. The main entry point.
 
         :param src: object to process
-        :type src: union(six.binary_type, six.text_type, int, iterable, object)
+        :type src: typing.Union[
+                   six.binary_type, six.text_type, int, typing.Iterable, object
+                   ]
         :param indent: start indentation
         :type indent: int
         :param no_indent_start:
             do not indent open bracket and simple parameters
         :type no_indent_start: bool
         :return: formatted string
+        :rtype: str
         """
         result = self.process_element(
             src,
@@ -346,8 +354,10 @@ def pretty_repr(
     """Make human readable repr of object.
 
     :param src: object to process
-    :type src: union(six.binary_type, six.text_type, int, iterable, object)
-    :param indent: start indentation, all next levels is +4
+    :type src: typing.Union[
+               six.binary_type, six.text_type, int, typing.Iterable, object
+               ]
+    :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
     :type no_indent_start: bool
@@ -358,6 +368,7 @@ def pretty_repr(
     :param py2_str: use Python 2.x compatible strings instead of unicode
     :type py2_str: bool
     :return: formatted string
+    :rtype: str
     """
     return PrettyFormat(
         simple_formatters=s_repr_formatters,
@@ -384,8 +395,10 @@ def pretty_str(
     """Make human readable str of object.
 
     :param src: object to process
-    :type src: union(six.binary_type, six.text_type, int, iterable, object)
-    :param indent: start indentation, all next levels is +4
+    :type src: typing.Union[
+               six.binary_type, six.text_type, int, typing.Iterable, object
+               ]
+    :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
     :type no_indent_start: bool

@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+Version 2.3.3
+-------------
+* API docs rewritten by hand due to automatic generation limitations.
+
 Version 2.3.2
 -------------
 * Setup was updated in conform to PEP0508
