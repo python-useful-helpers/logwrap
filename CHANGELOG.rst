@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+Version 2.3.5
+-------------
+* Simplify code
+
 Version 2.3.4
 -------------
 * Revert setup from PEP0508 to PEP0426 due to external tools support limitation

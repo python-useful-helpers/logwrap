@@ -131,6 +131,9 @@ class BaseLogWrap(
 
         if not isinstance(log, logging.Logger):
             self.__func, self.__logger = log, logger
+            functools.update_wrapper(self, self.__func)
+            if not six.PY34:
+                self.__wrapped__ = self.__func
         else:
             self.__func, self.__logger = None, log
 
@@ -142,18 +145,9 @@ class BaseLogWrap(
         self.__log_call_args_on_exc = log_call_args_on_exc
         self.__log_result_obj = log_result_obj
 
-        self.__wrap_func_self()
-
         # We are not interested to pass any arguments to object
         # noinspection PyArgumentList
         super(BaseLogWrap, self).__init__()
-
-    def __wrap_func_self(self):
-        """Mark self as function wrapper. Usd only without arguments."""
-        if self.__func is not None:
-            functools.update_wrapper(self, self.__func)
-            if not six.PY34:
-                self.__wrapped__ = self.__func
 
     @property
     def log_level(self):
