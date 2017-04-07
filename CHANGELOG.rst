@@ -1,8 +1,8 @@
 CHANGELOG
 =========
-
 Version 2.3.5
 -------------
+* Allow to run setup.py on not installed package (`__init__.py` imports fix).
 * Simplify code
 
 Version 2.3.4
