@@ -44,6 +44,7 @@ Pros:
     Python 3.5
     Python 3.6
     PyPy
+    PyPy3 3.5+
     Jyton 2.7
 
 This package includes helpers:
@@ -286,7 +287,7 @@ Test environments available:
     py35
     py36
     pypy
-    jyton
+    pypy3
     pylint
     docs
 
