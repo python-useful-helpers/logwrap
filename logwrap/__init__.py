@@ -30,9 +30,9 @@ try:
     from ._repr_utils import PrettyFormat, pretty_repr, pretty_str
 
     # pylint: disable=no-name-in-module
-    if six.PY3:
+    if six.PY3:  # pragma: no cover
         from ._log_wrap3 import logwrap, LogWrap
-    else:
+    else:  # pragma: no cover
         from ._log_wrap2 import logwrap, LogWrap
     # pylint: enable=no-name-in-module
 
@@ -44,7 +44,7 @@ try:
         'pretty_str'
     )
 
-except ImportError:
+except ImportError:  # pragma: no cover
     # Package is not installed
     six = PrettyFormat = pretty_repr = pretty_str = logwrap = LogWrap = None
 

@@ -28,12 +28,12 @@ import types
 import six
 
 # pylint: disable=ungrouped-imports, no-name-in-module
-if six.PY3:
+if six.PY3:  # pragma: no cover
     from inspect import (
         Parameter,
         signature,
     )
-else:
+else:  # pragma: no cover
     # noinspection PyUnresolvedReferences
     from funcsigs import (
         Parameter,
