@@ -42,7 +42,7 @@ comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
 
 def _check_type(expected):
     def deco(func):
-        """Check type before asign."""
+        """Check type before assign."""
         # pylint: disable=missing-docstring
         # noinspection PyMissingOrEmptyDocstring
         @functools.wraps(func)

@@ -29,13 +29,16 @@ import six
 
 # pylint: disable=ungrouped-imports, no-name-in-module
 if six.PY3:
-    from inspect import Parameter
-    from inspect import signature
+    from inspect import (
+        Parameter,
+        signature,
+    )
 else:
     # noinspection PyUnresolvedReferences
-    from funcsigs import Parameter
-    # noinspection PyUnresolvedReferences
-    from funcsigs import signature
+    from funcsigs import (
+        Parameter,
+        signature,
+    )
 # pylint: enable=ungrouped-imports, no-name-in-module
 
 # pylint: disable=wrong-import-position
@@ -47,7 +50,7 @@ from logwrap._formatters import (  # noqa
 # pylint: enable=wrong-import-position
 
 
-def _known_callble(item):
+def _known_callable(item):
     """Check for possibility to parse callable."""
     return isinstance(item, (types.FunctionType, types.MethodType))
 
@@ -274,7 +277,7 @@ class PrettyFormat(object):
                 no_indent_start=no_indent_start
             )
 
-        if _known_callble(src):
+        if _known_callable(src):
             return self._repr_callable(
                 src=src,
                 indent=indent,

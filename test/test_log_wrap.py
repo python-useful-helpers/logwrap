@@ -28,11 +28,13 @@ import logwrap
 
 # pylint: disable=import-error
 if six.PY2:
+    # noinspection PyUnresolvedReferences
     import mock
 else:
     from unittest import mock
 
 
+# noinspection PyUnusedLocal
 @mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 class TestLogWrap(unittest.TestCase):
     def test_no_args(self, logger):
@@ -743,6 +745,7 @@ class TestObject(unittest.TestCase):
         )
 
 
+# noinspection PyUnusedLocal
 @mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 @unittest.skipUnless(
     six.PY3,

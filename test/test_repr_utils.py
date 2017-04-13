@@ -25,6 +25,7 @@ import logwrap
 from logwrap import _repr_utils
 
 
+# noinspection PyUnusedLocal
 class TestPrettyRepr(unittest.TestCase):
     def test_simple(self):
         self.assertEqual(

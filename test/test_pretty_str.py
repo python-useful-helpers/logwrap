@@ -24,6 +24,7 @@ import unittest
 import logwrap
 
 
+# noinspection PyUnusedLocal
 class TestPrettyStr(unittest.TestCase):
     def test_simple(self):
         self.assertEqual(
@@ -181,6 +182,7 @@ class TestPrettyStr(unittest.TestCase):
             def __str__(self):
                 return 'Test'
 
+            # noinspection PyMethodMayBeStatic
             def __pretty_str__(
                 self,
                 parser,

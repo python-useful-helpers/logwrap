@@ -38,7 +38,7 @@ __all__ = ('logwrap', 'LogWrap')
 
 
 class LogWrap(_log_wrap_shared.BaseLogWrap):
-    """Python 3.4+ version of LogWrap."""
+    """Python 3.3+ version of LogWrap."""
 
     def _get_function_wrapper(
         self,

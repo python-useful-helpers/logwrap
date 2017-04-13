@@ -46,7 +46,7 @@ try:
 
 except ImportError:
     # Package is not installed
-    pass
+    six = PrettyFormat = pretty_repr = pretty_str = logwrap = LogWrap = None
 
 __version__ = '2.4.0'
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
