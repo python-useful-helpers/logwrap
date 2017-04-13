@@ -48,5 +48,5 @@ except ImportError:
     # Package is not installed
     pass
 
-__version__ = '2.3.5'
+__version__ = '2.4.0'
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
