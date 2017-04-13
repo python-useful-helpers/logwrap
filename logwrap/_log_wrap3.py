@@ -30,7 +30,6 @@ import inspect
 import logging
 import types
 import typing
-import warnings
 
 
 from . import _log_wrap_shared
@@ -164,24 +163,3 @@ def logwrap(
         log_result_obj=log_result_obj
     )
 # pylint: enable=unexpected-keyword-arg, no-value-for-parameter
-
-
-class AsyncLogWrap(LogWrap):
-    """Deprecated."""
-
-    def __init__(self, *args, **kwargs):
-        """Deprecated version."""
-        warnings.warn(
-            "AsyncLogWrap is deprecated. Functionality is merged into LogWrap",
-            DeprecationWarning
-        )
-        super(AsyncLogWrap, self).__init__(*args, **kwargs)
-
-
-def async_logwrap(*args, **kwargs):
-    """Deprecated."""
-    warnings.warn(
-        "async_logwrap is deprectaed. Functionality is merged into logwrap",
-        DeprecationWarning
-    )
-    return logwrap(*args, **kwargs)

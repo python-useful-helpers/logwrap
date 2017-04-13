@@ -29,21 +29,20 @@ try:
 
     from ._repr_utils import PrettyFormat, pretty_repr, pretty_str
 
+    # pylint: disable=no-name-in-module
+    if six.PY3:
+        from ._log_wrap3 import logwrap, LogWrap
+    else:
+        from ._log_wrap2 import logwrap, LogWrap
+    # pylint: enable=no-name-in-module
+
     __all__ = (
+        'LogWrap',
         'logwrap',
         'PrettyFormat',
         'pretty_repr',
         'pretty_str'
     )
-
-    # pylint: disable=ungrouped-imports, no-name-in-module
-    if six.PY34:
-        from ._log_wrap3 import logwrap, LogWrap, async_logwrap, AsyncLogWrap
-
-        __all__ += ('async_logwrap', 'AsyncLogWrap')
-    else:
-        from ._log_wrap2 import logwrap, LogWrap
-    # pylint: enable=ungrouped-imports, no-name-in-module
 
 except ImportError:
     # Package is not installed

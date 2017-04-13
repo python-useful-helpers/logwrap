@@ -18,59 +18,17 @@
 
 import setuptools
 
-import logwrap
-
-with open('README.rst') as f:
-    long_description = f.read()
-
 setuptools.setup(
     name='logwrap',
-    version=logwrap.__version__,
-    packages=setuptools.find_packages(),
-    classifiers=[
-        'Development Status :: 5 - Production/Stable',
-
-        # Indicate who your project is intended for
-        'Intended Audience :: Developers',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-
-        'License :: OSI Approved :: Apache Software License',
-
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Programming Language :: Python :: Implementation :: Jython',
-    ],
-    keywords='logging debugging development',
-
-    zip_safe=True,
-    url='https://github.com/penguinolog/logwrap',
-    license='Apache License, Version 2.0',
-    author='Alexey Stepanov',
-    author_email='penguinolog@gmail.com',
-    description=(
-        'Decorator for logging function arguments by human-readable way'
-    ),
-    long_description=long_description,
-    setup_requires=['setuptools > 20.2'],
-    install_requires=[
-        'six',
-    ],
     extras_require={
         ':python_version == "2.7"': [
             'funcsigs>=1.0',
         ],
-        ':python_version == "3.4"': [
+        ':python_version <= "3.4"': [
             'typing>=3.5',
+        ],
+        ':python_version == "3.3"': [
+            'asyncio>=3.4',
         ],
     },
 )

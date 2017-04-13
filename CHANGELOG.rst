@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+Version 2.4.0
+-------------
+* PyPy3 correct support and python 3.3 external asyncio.
+* Move the most metadata from `setup.py` to `setup.cfg`.
+* Drop deprecated code.
+
 Version 2.3.5
 -------------
 * Allow to run setup.py on not installed package (`__init__.py` imports fix).
