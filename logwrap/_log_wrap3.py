@@ -107,6 +107,7 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
 
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
+# pylint: disable=bad-whitespace
 def logwrap(
     log: logging.Logger=_log_wrap_shared.logger,
     log_level: int=logging.DEBUG,
@@ -162,4 +163,5 @@ def logwrap(
         log_call_args_on_exc=log_call_args_on_exc,
         log_result_obj=log_result_obj
     )
+# pylint: enable=bad-whitespace
 # pylint: enable=unexpected-keyword-arg, no-value-for-parameter

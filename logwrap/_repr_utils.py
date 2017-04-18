@@ -283,7 +283,7 @@ class PrettyFormat(object):
                 indent=indent,
             )
 
-        if _simple(src) or indent >= self.max_indent or len(src) == 0:
+        if _simple(src) or indent >= self.max_indent or not src:
             return self._repr_simple(
                 src=src,
                 indent=indent,
