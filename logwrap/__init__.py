@@ -24,29 +24,24 @@ later it has been reworked and extended for support of special cases.
 
 from __future__ import absolute_import
 
-try:
-    import six
+import six
 
-    from ._repr_utils import PrettyFormat, pretty_repr, pretty_str
+from ._repr_utils import PrettyFormat, pretty_repr, pretty_str
 
-    # pylint: disable=no-name-in-module
-    if six.PY3:  # pragma: no cover
-        from ._log_wrap3 import logwrap, LogWrap
-    else:  # pragma: no cover
-        from ._log_wrap2 import logwrap, LogWrap
-    # pylint: enable=no-name-in-module
+# pylint: disable=no-name-in-module
+if six.PY3:  # pragma: no cover
+    from ._log_wrap3 import logwrap, LogWrap
+else:  # pragma: no cover
+    from ._log_wrap2 import logwrap, LogWrap
+# pylint: enable=no-name-in-module
 
-    __all__ = (
-        'LogWrap',
-        'logwrap',
-        'PrettyFormat',
-        'pretty_repr',
-        'pretty_str'
-    )
+__all__ = (
+    'LogWrap',
+    'logwrap',
+    'PrettyFormat',
+    'pretty_repr',
+    'pretty_str'
+)
 
-except ImportError:  # pragma: no cover
-    # Package is not installed
-    six = PrettyFormat = pretty_repr = pretty_str = logwrap = LogWrap = None
-
-__version__ = '2.4.0'
+__version__ = '2.4.1'
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
