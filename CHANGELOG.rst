@@ -2,6 +2,7 @@ CHANGELOG
 =========
 Version 2.4.1
 -------------
+* Support `frozenset` expansion.
 * Use ast for version extraction and do not use danger of if's in `__init__.py` - installed without dependencies package should crash on import.
 
 Version 2.4.0

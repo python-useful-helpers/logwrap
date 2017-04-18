@@ -54,6 +54,10 @@ class TestPrettyStr(unittest.TestCase):
         self.assertTrue(
             res.startswith('{') and res.endswith('\n}')
         )
+        res = logwrap.pretty_str(frozenset({1, 2, 3}))
+        self.assertTrue(
+            res.startswith('{') and res.endswith('\n}')
+        )
 
     def test_simple_set(self):
         self.assertEqual(

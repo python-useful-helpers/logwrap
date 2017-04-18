@@ -57,7 +57,7 @@ def _known_callable(item):
 
 def _simple(item):
     """Check for nested iterations: True, if not."""
-    return not isinstance(item, (list, set, tuple, dict))
+    return not isinstance(item, (list, set, tuple, dict, frozenset))
 
 
 # pylint: disable=no-member

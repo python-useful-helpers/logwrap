@@ -55,6 +55,10 @@ class TestPrettyRepr(unittest.TestCase):
         self.assertTrue(
             res.startswith('set({') and res.endswith('\n})')
         )
+        res = logwrap.pretty_repr(frozenset({1, 2, 3}))
+        self.assertTrue(
+            res.startswith('frozenset({') and res.endswith('\n})')
+        )
 
     def test_dict(self):
         self.assertEqual(
