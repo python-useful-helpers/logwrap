@@ -403,7 +403,7 @@ class BaseLogWrap(
 
     def __call__(self, *args, **kwargs):
         """Main decorator getter.
-        
+
         :returns: Decorated function. On python 3.3+ awaitable is supported.
         :rtype: typing.Union[typing.Callable, typing.Awaitable]
         """
