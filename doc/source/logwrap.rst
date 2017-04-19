@@ -114,21 +114,3 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :rtype: LogWrap
 
         .. versionchanged:: 2.2.0
-
-
-.. py:class:: AsyncLogWrap
-
-    .. versionadded:: 2.2.0
-
-    .. deprecated:: 2.3.0
-
-    .. attention:: Will be deleted on 2.4.0.
-
-
-.. py:function:: async_logwrap
-
-    .. versionadded:: 2.0.0
-
-    .. deprecated:: 2.3.0
-
-    .. attention:: Will be deleted on 2.4.0.
