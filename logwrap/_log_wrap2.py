@@ -41,8 +41,9 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
-        :type func: types.FunctionType
-        :rtype: types.FunctionType
+        :type func: typing.Callable
+        :return: wrapped function
+        :rtype: typing.Callable
         """
         sig = funcsigs.signature(obj=self._spec or func)
 
@@ -87,7 +88,7 @@ def logwrap(
     """Log function calls and return values.
 
     :param log: logger object for decorator, by default used 'logwrap'
-    :type log: logging.Logger
+    :type log: typing.Union[logging.Logger, typing.Callable]
     :param log_level: log level for successful calls
     :type log_level: int
     :param exc_level: log level for exception cases
@@ -100,12 +101,15 @@ def logwrap(
                  but processed/redirected signature is accessible.
                  Note: this object should provide fully compatible signature
                  with decorated function, or arguments bind will be failed!
-    :type spec: callable
+    :type spec: typing.Optional[typing.Callable]
     :param blacklisted_names: list of exception,
                               which should be re-raised without
                               producing log record.
-    :type blacklisted_names: list
-    :type blacklisted_exceptions: list
+    :type blacklisted_names: typing.Optional[typing.Iterable[str]]
+    :param blacklisted_exceptions: list of exception,
+                                   which should be re-raised without
+                                   producing log record.
+    :type blacklisted_exceptions: typing.Optional[typing.Iterable[Exception]]
     :param log_call_args: log call arguments before executing wrapped function.
     :type log_call_args: bool
     :param log_call_args_on_exc: log call arguments if exception raised.

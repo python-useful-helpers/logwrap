@@ -28,7 +28,6 @@ import asyncio
 import functools
 import inspect
 import logging
-import types
 import typing
 
 
@@ -42,14 +41,14 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
     def _get_function_wrapper(
         self,
-        func: types.FunctionType
-    ):
+        func: typing.Callable
+    ) -> typing.Callable:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
-        :type func: types.FunctionType
-        :return: wrapped coroutine function
-        :rtype: types.CoroutineType
+        :type func: typing.Callable
+        :return: wrapped coroutine or function
+        :rtype: typing.Callable
         """
         sig = inspect.signature(obj=self._spec or func)
 
@@ -107,23 +106,22 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
 
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
-# pylint: disable=bad-whitespace
 def logwrap(
-    log: logging.Logger=_log_wrap_shared.logger,
-    log_level: int=logging.DEBUG,
-    exc_level: int=logging.ERROR,
-    max_indent: int=20,
-    spec: types.FunctionType=None,
-    blacklisted_names: typing.List[str]=None,
-    blacklisted_exceptions: typing.List[Exception]=None,
-    log_call_args: bool=True,
-    log_call_args_on_exc: bool=True,
-    log_result_obj: bool=True,
+    log: typing.Union[logging.Logger, typing.Callable]=_log_wrap_shared.logger,
+    log_level: int = logging.DEBUG,
+    exc_level: int = logging.ERROR,
+    max_indent: int = 20,
+    spec: typing.Optional[typing.Callable]=None,
+    blacklisted_names: typing.Optional[typing.List[str]]=None,
+    blacklisted_exceptions: typing.Optional[typing.List[Exception]]=None,
+    log_call_args: bool = True,
+    log_call_args_on_exc: bool = True,
+    log_result_obj: bool = True,
 ) -> LogWrap:
     """Log function calls and return values. Python 3.4+ version.
 
     :param log: logger object for decorator, by default used 'logwrap'
-    :type log: logging.Logger
+    :type log: typing.Union[logging.Logger, typing.Callable]
     :param log_level: log level for successful calls
     :type log_level: int
     :param exc_level: log level for exception cases
@@ -136,12 +134,15 @@ def logwrap(
                  but processed/redirected signature is accessible.
                  Note: this object should provide fully compatible signature
                  with decorated function, or arguments bind will be failed!
-    :type spec: callable
+    :type spec: typing.Optional[typing.Callable]
     :param blacklisted_names: list of exception,
                               which should be re-raised without
                               producing log record.
-    :type blacklisted_names: list
-    :type blacklisted_exceptions: list
+    :type blacklisted_names: typing.Optional[typing.Iterable[str]]
+    :param blacklisted_exceptions: list of exception,
+                                   which should be re-raised without
+                                   producing log record.
+    :type blacklisted_exceptions: typing.Optional[typing.Iterable[Exception]]
     :param log_call_args: log call arguments before executing wrapped function.
     :type log_call_args: bool
     :param log_call_args_on_exc: log call arguments if exception raised.
@@ -163,5 +164,4 @@ def logwrap(
         log_call_args_on_exc=log_call_args_on_exc,
         log_result_obj=log_result_obj
     )
-# pylint: enable=bad-whitespace
 # pylint: enable=unexpected-keyword-arg, no-value-for-parameter

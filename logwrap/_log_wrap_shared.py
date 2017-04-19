@@ -88,7 +88,7 @@ class BaseLogWrap(
         """Log function calls and return values.
 
         :param log: logger object for decorator, by default used 'logwrap'
-        :type log: logging.Logger
+        :type log: typing.Union[logging.Logger, typing.Callable]
         :param log_level: log level for successful calls
         :type log_level: int
         :param exc_level: log level for exception cases
@@ -106,11 +106,13 @@ class BaseLogWrap(
         :param blacklisted_names: Blacklisted argument names.
                                   Arguments with this names will be skipped
                                   in log.
-        :type blacklisted_names: typing.Iterable[str]
+        :type blacklisted_names: typing.Optional[typing.Iterable[str]]
         :param blacklisted_exceptions: list of exception,
                                        which should be re-raised without
                                        producing log record.
-        :type blacklisted_exceptions: typing.Iterable[BaseException]
+        :type blacklisted_exceptions: typing.Optional[
+                                          typing.Iterable[Exception]
+                                      ]
         :param log_call_args: log call arguments before executing
                               wrapped function.
         :type log_call_args: bool
@@ -151,88 +153,136 @@ class BaseLogWrap(
 
     @property
     def log_level(self):
-        """Log level for normal behavior."""
+        """Log level for normal behavior.
+
+        :rtype: int
+        """
         return self.__log_level
 
     @log_level.setter
     @_check_type(int)
     def log_level(self, val):
-        """Log level for normal behavior."""
+        """Log level for normal behavior.
+
+        :type val: int
+        """
         self.__log_level = val
 
     @property
     def exc_level(self):
-        """Log level for exceptions."""
+        """Log level for exceptions.
+
+        :rtype: int
+        """
         return self.__exc_level
 
     @exc_level.setter
     @_check_type(int)
     def exc_level(self, val):
-        """Log level for exceptions."""
+        """Log level for exceptions.
+
+        :type val: int
+        """
         self.__exc_level = val
 
     @property
     def max_indent(self):
-        """Maximum indentation."""
+        """Maximum indentation.
+
+        :rtype: int
+        """
         return self.__max_indent
 
     @max_indent.setter
     @_check_type(int)
     def max_indent(self, val):
-        """Maximum indentation."""
+        """Maximum indentation.
+
+        :type val: int
+        """
         self.__max_indent = val
 
     @property
     def blacklisted_names(self):
-        """List of arguments names to ignore in log."""
+        """List of arguments names to ignore in log.
+
+        :rtype: typing.List[str]
+        """
         return self.__blacklisted_names
 
     @property
     def blacklisted_exceptions(self):
-        """List of exceptions to re-raise without log."""
+        """List of exceptions to re-raise without log.
+
+        :rtype: typing.List[Exception]
+        """
         return self.__blacklisted_exceptions
 
     @property
     def log_call_args(self):
-        """Flag: log call arguments before call."""
+        """Flag: log call arguments before call.
+
+        :rtype: bool
+        """
         return self.__log_call_args
 
     @log_call_args.setter
     @_check_type(bool)
     def log_call_args(self, val):
-        """Flag: log call arguments before call."""
+        """Flag: log call arguments before call.
+
+        :type val: bool
+        """
         self.__log_call_args = val
 
     @property
     def log_call_args_on_exc(self):
-        """Flag: log call arguments on exception."""
+        """Flag: log call arguments on exception.
+
+        :rtype: bool
+        """
         return self.__log_call_args_on_exc
 
     @log_call_args_on_exc.setter
     @_check_type(bool)
     def log_call_args_on_exc(self, val):
-        """Flag: log call arguments on exception."""
+        """Flag: log call arguments on exception.
+
+        :type val: bool
+        """
         self.__log_call_args_on_exc = val
 
     @property
     def log_result_obj(self):
-        """Flag: log result object."""
+        """Flag: log result object.
+
+        :rtype: bool
+        """
         return self.__log_result_obj
 
     @log_result_obj.setter
     @_check_type(bool)
     def log_result_obj(self, val):
-        """Flag: log result object."""
+        """Flag: log result object.
+
+        :type val: bool
+        """
         self.__log_result_obj = val
 
     @property
     def _logger(self):
-        """logger instance."""
+        """logger instance.
+
+        :rtype: logging.Logger
+        """
         return self.__logger
 
     @property
     def _spec(self):
-        """Spec for function arguments."""
+        """Spec for function arguments.
+
+        :rtype: typing.Callable
+        """
         return self.__spec
 
     def __repr__(self):
@@ -292,7 +342,11 @@ class BaseLogWrap(
         return param_str
 
     def _make_done_record(self, func_name, result):
-        """Construct success record."""
+        """Construct success record.
+
+        :type func_name: str
+        :type result: typing.Any
+        """
         msg = "Done: {name!r}".format(name=func_name)
 
         if self.log_result_obj:
@@ -308,7 +362,12 @@ class BaseLogWrap(
         )
 
     def _make_calling_record(self, name, arguments, method='Calling'):
-        """Make log record before execution."""
+        """Make log record before execution.
+
+        :type name: str
+        :type arguments: str
+        :type method: str
+        """
         self._logger.log(
             level=self.log_level,
             msg="{method}: \n{name!r}({arguments})".format(
@@ -319,6 +378,11 @@ class BaseLogWrap(
         )
 
     def _make_exc_record(self, name, arguments):
+        """Make log record if exception raised.
+
+        :type name: str
+        :type arguments: str
+        """
         self._logger.log(
             level=self.exc_level,
             msg="Failed: \n{name!r}({arguments})".format(
@@ -333,8 +397,8 @@ class BaseLogWrap(
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
-        :type func: types.FunctionType
-        :rtype: types.FunctionType
+        :type func: typing.Callable
+        :rtype: typing.Callable
         """
 
     def __call__(self, *args, **kwargs):
