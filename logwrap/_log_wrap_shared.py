@@ -402,7 +402,11 @@ class BaseLogWrap(
         """
 
     def __call__(self, *args, **kwargs):
-        """Main decorator getter."""
+        """Main decorator getter.
+        
+        :returns: Decorated function. On python 3.3+ awaitable is supported.
+        :rtype: typing.Union[typing.Callable, typing.Awaitable]
+        """
         args = list(args)
         wrapped = self.__func or args.pop(0)
         wrapper = self._get_function_wrapper(wrapped)

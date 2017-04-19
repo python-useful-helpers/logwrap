@@ -60,11 +60,10 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
     .. py:method:: __call__(*args, **kwargs)
 
-        :returns: Python 2.x: function
-
-                  Python 3.4+: function or coroutine function (depends on decorated object)
-
         Decorator entry-point. Logic is stored separately and load depends on python version.
+
+        :returns: Decorated function. On python 3.3+ awaitable is supported.
+        :rtype: typing.Union[typing.Callable, typing.Awaitable]
 
 
 .. py:function:: logwrap(log=logging.getLogger('logwrap'), log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, spec=None, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_result_obj=True, )
