@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+Version 2.4.2
+-------------
+* Use `ast.literal_eval` instead of `eval` in isolated env for `__init__.py` parsing.
+* Do not rely on `six` in `setup.py`.
+
 Version 2.4.1
 -------------
 * Support `frozenset` expansion.

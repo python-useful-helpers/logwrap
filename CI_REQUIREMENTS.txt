@@ -1,3 +1,4 @@
+six
 funcsigs >= 1.0
 typing >= 3.5; python_version <= "3.4"
 asyncio>=3.4; python_version == "3.3"
