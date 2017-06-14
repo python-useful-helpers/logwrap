@@ -43,9 +43,14 @@ def get_simple_vars_from_src(src):
     :type src: str
     :rtype: collections.OrderedDict
     """
-    ast_data = (ast.Str, ast.Num, )
+    ast_data = (
+        ast.Str, ast.Num,
+        ast.List, ast.Set, ast.Dict, ast.Tuple
+    )
     if PY3:
         ast_data += (ast.Bytes,)
+    if PY34:
+        ast_data += (ast.NameConstant,)
 
     tree = ast.parse(src)
 
@@ -54,22 +59,26 @@ def get_simple_vars_from_src(src):
     for node in ast.iter_child_nodes(tree):
         if not isinstance(node, ast.Assign):  # We parse assigns only
             continue
+        try:
+            if isinstance(node.value, ast_data):
+                value = ast.literal_eval(node.value)
+            elif isinstance(  # NameConstant in python < 3.4
+                node.value, ast.Name
+            ) and isinstance(
+                node.value.ctx, ast.Load  # Read constant
+            ):
+                value = ast.literal_eval(node.value)
+            else:
+                continue
+        except ValueError:
+            continue
         for tgt in node.targets:
             if isinstance(
                 tgt, ast.Name
             ) and isinstance(
                 tgt.ctx, ast.Store
             ):
-                if isinstance(node.value, ast_data):
-                    result[tgt.id] = ast.literal_eval(node.value)
-                elif isinstance(  # NameConstant in python < 3.4
-                    node.value, ast.Name
-                ) and isinstance(
-                    node.value.ctx, ast.Load  # Read constant
-                ):
-                    result[tgt.id] = ast.literal_eval(node.value)
-                elif PY34 and isinstance(node.value, ast.NameConstant):
-                    result[tgt.id] = ast.literal_eval(node.value)
+                result[tgt.id] = value
     return result
 
 
