@@ -4,6 +4,7 @@ Version 2.5.0
 -------------
 * Typing is required for all python versions due to:
   June 15, 2018: Python 3.7.0 final release, the typing module is no longer provisional
+* Use slots due to usage of multiple instances per project
 
 
 Version 2.4.2

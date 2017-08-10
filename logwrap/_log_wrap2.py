@@ -37,6 +37,8 @@ __all__ = ('logwrap', 'LogWrap')
 class LogWrap(_log_wrap_shared.BaseLogWrap):
     """LogWrap."""
 
+    __slots__ = ()
+
     def _get_function_wrapper(self, func):
         """Here should be constructed and returned real decorator.
 

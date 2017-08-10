@@ -64,6 +64,8 @@ def _check_type(expected):
         return wrapper
     return deco
 
+# pylint: disable=assigning-non-slot
+
 
 class BaseLogWrap(
     type.__new__(
@@ -74,6 +76,20 @@ class BaseLogWrap(
     )
 ):
     """Base class for LogWrap implementation."""
+
+    __slots__ = (
+        '__blacklisted_names',
+        '__blacklisted_exceptions',
+        '__func',
+        '__wrapped__',
+        '__log_level',
+        '__exc_level',
+        '__max_indent',
+        '__spec',
+        '__log_call_args',
+        '__log_call_args_on_exc',
+        '__log_result_obj',
+    )
 
     def __init__(
         self,
@@ -404,6 +420,7 @@ class BaseLogWrap(
         :type func: typing.Callable
         :rtype: typing.Callable
         """
+        raise NotImplementedError()
 
     def __call__(self, *args, **kwargs):
         """Main decorator getter.
@@ -417,3 +434,6 @@ class BaseLogWrap(
         if self.__func:
             return wrapper(*args, **kwargs)
         return wrapper
+
+
+# pylint: enable=assigning-non-slot
