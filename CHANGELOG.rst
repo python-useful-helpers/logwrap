@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+Version 2.5.0
+-------------
+* Typing is required for all python versions due to:
+  June 15, 2018: Python 3.7.0 final release, the typing module is no longer provisional
+
+
 Version 2.4.2
 -------------
 * Use `ast.literal_eval` instead of `eval` in isolated env for `__init__.py` parsing.
