@@ -6,7 +6,7 @@ logwrap
 .. image:: https://coveralls.io/repos/github/penguinolog/logwrap/badge.svg?branch=master
     :target: https://coveralls.io/github/penguinolog/logwrap?branch=master
 .. image:: https://readthedocs.org/projects/logwrap/badge/?version=latest
-    :target: http://logwrap.readthedocs.io/en/latest/?badge=latest
+    :target: http://logwrap.readthedocs.io/
     :alt: Documentation Status
 .. image:: https://img.shields.io/pypi/v/logwrap.svg
     :target: https://pypi.python.org/pypi/logwrap
