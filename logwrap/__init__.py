@@ -43,5 +43,5 @@ __all__ = (
     'pretty_str'
 )
 
-__version__ = '2.4.2'
+__version__ = '2.5.0'
 __author__ = "Alexey Stepanov <penguinolog@gmail.com>"
