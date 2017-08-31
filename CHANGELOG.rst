@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 2.5.1
+-------------
+Base class for decorator has been extracted.
+
 Version 2.5.0
 -------------
 * Typing is required for all python versions due to:

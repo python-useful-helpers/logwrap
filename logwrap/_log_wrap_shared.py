@@ -19,13 +19,11 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import abc
 import functools
 import logging
 
-import six
-
 import logwrap as core
+from . import _class_decorator
 
 __all__ = ('BaseLogWrap', )
 
@@ -67,21 +65,13 @@ def _check_type(expected):
 # pylint: disable=assigning-non-slot
 
 
-class BaseLogWrap(
-    type.__new__(
-        abc.ABCMeta,
-        'BaseMeta' if six.PY3 else b'BaseMeta',
-        (object, ),
-        {}
-    )
-):
+class BaseLogWrap(_class_decorator.BaseDecorator):
     """Base class for LogWrap implementation."""
 
     __slots__ = (
         '__blacklisted_names',
         '__blacklisted_exceptions',
-        '__func',
-        '__wrapped__',
+        '__logger',
         '__log_level',
         '__exc_level',
         '__max_indent',
@@ -152,24 +142,20 @@ class BaseLogWrap(
             self.__blacklisted_exceptions = list(blacklisted_exceptions)
 
         if not isinstance(log, logging.Logger):
-            self.__func, self.__logger = log, logger
-            functools.update_wrapper(self, self.__func)
-            if not six.PY34:
-                self.__wrapped__ = self.__func
+            func, self.__logger = log, logger
         else:
-            self.__func, self.__logger = None, log
+            func, self.__logger = None, log
+        super(BaseLogWrap, self).__init__(func=func)
 
         self.__log_level = log_level
         self.__exc_level = exc_level
         self.__max_indent = max_indent
-        self.__spec = spec or self.__func
+        self.__spec = spec or self._func
         self.__log_call_args = log_call_args
         self.__log_call_args_on_exc = log_call_args_on_exc
         self.__log_result_obj = log_result_obj
 
         # We are not interested to pass any arguments to object
-        # noinspection PyArgumentList
-        super(BaseLogWrap, self).__init__()
 
     @property
     def log_level(self):
@@ -411,29 +397,6 @@ class BaseLogWrap(
             ),
             exc_info=True
         )
-
-    @abc.abstractmethod
-    def _get_function_wrapper(self, func):
-        """Here should be constructed and returned real decorator.
-
-        :param func: Wrapped function
-        :type func: typing.Callable
-        :rtype: typing.Callable
-        """
-        raise NotImplementedError()
-
-    def __call__(self, *args, **kwargs):
-        """Main decorator getter.
-
-        :returns: Decorated function. On python 3.3+ awaitable is supported.
-        :rtype: typing.Union[typing.Callable, typing.Awaitable]
-        """
-        args = list(args)
-        wrapped = self.__func or args.pop(0)
-        wrapper = self._get_function_wrapper(wrapped)
-        if self.__func:
-            return wrapper(*args, **kwargs)
-        return wrapper
 
 
 # pylint: enable=assigning-non-slot
