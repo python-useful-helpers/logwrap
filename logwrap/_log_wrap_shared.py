@@ -62,9 +62,10 @@ def _check_type(expected):
         return wrapper
     return deco
 
-# pylint: disable=assigning-non-slot
+# pylint: disable=assigning-non-slot,abstract-method
 
 
+# noinspection PyAbstractClass
 class BaseLogWrap(_class_decorator.BaseDecorator):
     """Base class for LogWrap implementation."""
 
@@ -399,4 +400,4 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         )
 
 
-# pylint: enable=assigning-non-slot
+# pylint: enable=assigning-non-slot, abstract-method
