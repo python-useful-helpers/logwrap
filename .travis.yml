@@ -6,7 +6,7 @@ python:
   - "3.5"
   - "3.6"
   - "pypy2.7-5.8.0"
-  - "pypy3-5.8.0"
+  - "pypy3.5-5.8.0"
 install:
   - pip install tox-travis
   - pip install coveralls
