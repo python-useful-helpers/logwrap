@@ -58,6 +58,11 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     .. py:attribute:: log_call_args_on_exc
     .. py:attribute:: log_result_obj
 
+    .. py:attribute:: _func
+
+        ``typing.Optional[typing.Callable[..., typing.Awaitable]]``
+        Wrapped function. Used for inheritance only.
+
     .. py:method:: __call__(*args, **kwargs)
 
         Decorator entry-point. Logic is stored separately and load depends on python version.

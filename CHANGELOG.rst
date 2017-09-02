@@ -3,6 +3,8 @@ CHANGELOG
 Version 2.5.1
 -------------
 Base class for decorator has been extracted.
+Requirements is extracted to requirements.txt
+Update setup.py from doctedsted get_simple_vars_from_src.
 
 Version 2.5.0
 -------------
