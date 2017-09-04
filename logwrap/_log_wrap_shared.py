@@ -14,6 +14,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+# cython: binding=True, embedsignature=True
+
 """log_wrap shared code module."""
 
 from __future__ import absolute_import

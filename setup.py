@@ -21,6 +21,11 @@ import collections
 import os.path
 import sys
 
+try:
+    from Cython.Build import cythonize
+except ImportError:
+    cythonize = None
+
 import setuptools
 
 PY3 = sys.version_info[:2] > (2, 7)
@@ -36,6 +41,28 @@ with open(
 
 with open('requirements.txt') as f:
     required = f.read().splitlines()
+
+
+def _extension(modpath):
+    """Make setuptools.Extension."""
+    return setuptools.Extension(modpath, [modpath.replace('.', '/') + '.py'])
+
+
+requires_optimization = [
+    _extension('logwrap._class_decorator'),
+    _extension('logwrap._log_wrap_shared'),
+    _extension(
+        'logwrap._log_wrap3'
+    ) if PY3 else _extension(
+        'logwrap._log_wrap2'
+    ),
+    _extension('logwrap._repr_utils'),
+    _extension('logwrap._formatters'),
+]
+
+ext_modules = cythonize(
+    requires_optimization
+) if cythonize is not None else ()
 
 
 # noinspection PyUnresolvedReferences
@@ -138,4 +165,5 @@ setuptools.setup(
         ],
     },
     install_requires=required,
+    ext_modules=ext_modules,
 )

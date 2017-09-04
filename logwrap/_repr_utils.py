@@ -14,6 +14,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+# cython: binding=True, embedsignature=True
+
 """repr_utils module.
 
 This is no reason to import this submodule directly, all required methods is

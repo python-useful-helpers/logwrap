@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 2.6.0
+-------------
+* Cytonize, if possible.
+
 Version 2.5.1
 -------------
 Base class for decorator has been extracted.
