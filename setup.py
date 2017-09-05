@@ -63,7 +63,12 @@ requires_optimization = [
 ]
 
 ext_modules = cythonize(
-    requires_optimization
+    requires_optimization,
+    compiler_directives=dict(
+        always_allow_keywords=True,
+        binding=True,
+        embedsignature=True,
+    )
 ) if cythonize is not None and PY3 else []
 
 
