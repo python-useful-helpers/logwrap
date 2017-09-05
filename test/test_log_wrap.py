@@ -16,6 +16,8 @@
 
 # pylint: disable=missing-docstring, unused-argument
 
+"""Python independent logwrap tests."""
+
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -34,7 +36,7 @@ else:
     from unittest import mock
 
 
-# noinspection PyUnusedLocal
+# noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 @mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 class TestLogWrap(unittest.TestCase):
     def test_no_args(self, logger):
@@ -216,6 +218,7 @@ class TestLogWrap(unittest.TestCase):
         targs = ['string1', 'string2']
         tkwargs = {'key': 'tkwargs'}
 
+        # noinspection PyShadowingNames
         @logwrap.logwrap
         def func(arg, *positional, **named):
             return arg, tuple(positional), named
@@ -318,6 +321,7 @@ class TestLogWrap(unittest.TestCase):
 
         arg = 'test arg'
 
+        # noinspection PyShadowingNames
         def spec_func(arg=arg):
             pass
 
@@ -432,6 +436,7 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
         )
 
     def test_wrapped(self, logger):
+        # noinspection PyShadowingNames
         def simpledeco(func):
             @six.wraps(func)
             def wrapped(*args, **kwargs):
@@ -742,161 +747,4 @@ class TestObject(unittest.TestCase):
                 obj=log_call
             ),
             repr(log_call),
-        )
-
-
-# noinspection PyUnusedLocal
-@mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
-@unittest.skipUnless(
-    six.PY3,
-    'Strict python 3.3+ API'
-)
-class TestLogWrapAsync(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        namespace = {}
-
-        exec("""
-import asyncio
-
-loop = asyncio.get_event_loop()
-        """,
-             namespace
-             )
-        cls.loop = namespace['loop']
-
-    def test_coroutine_async(self, logger):
-        namespace = {'logwrap': logwrap, 'loop': self.loop}
-
-        exec("""
-import asyncio
-
-@logwrap.logwrap
-@asyncio.coroutine
-def func():
-    pass
-
-loop.run_until_complete(func())
-        """,
-             namespace
-             )
-        self.assertEqual(
-            logger.mock_calls,
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\nNone"
-                )
-            ]
-        )
-
-    def test_coroutine_async_as_argumented(self, logger):
-        new_logger = mock.Mock(spec=logging.Logger, name='logger')
-        log = mock.Mock(name='log')
-        new_logger.attach_mock(log, 'log')
-
-        namespace = {
-            'logwrap': logwrap,
-            'loop': self.loop,
-            'new_logger': new_logger
-        }
-
-        exec("""
-import asyncio
-
-@logwrap.logwrap(log=new_logger)
-@asyncio.coroutine
-def func():
-    pass
-
-loop.run_until_complete(func())
-        """,
-             namespace
-             )
-        self.assertEqual(
-            log.mock_calls,
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\nNone"
-                )
-            ]
-        )
-
-    def test_coroutine_fail(self, logger):
-        namespace = {'logwrap': logwrap, 'self': self}
-
-        exec("""
-import asyncio
-
-@logwrap.logwrap
-@asyncio.coroutine
-def func():
-    raise Exception('Expected')
-
-with self.assertRaises(Exception):
-    self.loop.run_until_complete(func())
-        """,
-             namespace
-             )
-        self.assertEqual(
-            logger.mock_calls,
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.ERROR,
-                    msg="Failed: \n'func'()",
-                    exc_info=True
-                )
-            ]
-        )
-
-    def test_exceptions_blacklist(self, logger):
-        new_logger = mock.Mock(spec=logging.Logger, name='logger')
-        log = mock.Mock(name='log')
-        new_logger.attach_mock(log, 'log')
-
-        namespace = {
-            'logwrap': logwrap,
-            'loop': self.loop,
-            'new_logger': new_logger,
-            'assertRaises': self.assertRaises
-        }
-
-        exec("""
-import asyncio
-
-@logwrap.logwrap(log=new_logger, blacklisted_exceptions=[TypeError])
-@asyncio.coroutine
-def func():
-    raise TypeError('Blacklisted')
-
-with assertRaises(TypeError):
-    loop.run_until_complete(func())
-        """,
-             namespace
-             )
-        # While we're not expanding result coroutine object from namespace,
-        # do not check execution result
-
-        self.assertEqual(len(logger.mock_calls), 0)
-        self.assertEqual(
-            log.mock_calls,
-            [
-                mock.call(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
-                ),
-            ]
         )

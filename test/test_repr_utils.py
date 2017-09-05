@@ -16,16 +16,19 @@
 
 # pylint: disable=missing-docstring
 
+"""_repr_utils (internal helpers) specific tests."""
+
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import unittest
 
 import logwrap
+# noinspection PyProtectedMember
 from logwrap import _repr_utils
 
 
-# noinspection PyUnusedLocal
+# noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestPrettyRepr(unittest.TestCase):
     def test_simple(self):
         self.assertEqual(
@@ -117,6 +120,7 @@ class TestPrettyRepr(unittest.TestCase):
         def full_func(arg, darg=1, *positional, **named):
             pass
 
+        # noinspection PyMissingOrEmptyDocstring
         class TstClass(object):
             def tst_method(self, arg, darg=1, *positional, **named):
                 pass
@@ -186,6 +190,7 @@ class TestPrettyRepr(unittest.TestCase):
         def full_func(arg, darg=1, *positional, **named):
             pass
 
+        # noinspection PyMissingOrEmptyDocstring
         class TstClass(object):
             def tst_method(self, arg, darg=1, *positional, **named):
                 pass
@@ -321,6 +326,7 @@ class TestPrettyRepr(unittest.TestCase):
         )
 
     def test_magic_override(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Tst(object):
             def __repr__(self):
                 return 'Test'

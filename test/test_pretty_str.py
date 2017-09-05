@@ -16,6 +16,8 @@
 
 # pylint: disable=missing-docstring
 
+"""pretty_str specific tests"""
+
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
@@ -24,7 +26,7 @@ import unittest
 import logwrap
 
 
-# noinspection PyUnusedLocal
+# noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestPrettyStr(unittest.TestCase):
     def test_simple(self):
         self.assertEqual(
@@ -84,6 +86,7 @@ class TestPrettyStr(unittest.TestCase):
         def full_func(arg, darg=1, *positional, **named):
             pass
 
+        # noinspection PyMissingOrEmptyDocstring
         class TstClass(object):
             def tst_method(self, arg, darg=1, *positional, **named):
                 pass
@@ -182,6 +185,7 @@ class TestPrettyStr(unittest.TestCase):
         )
 
     def test_magic_override(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Tst(object):
             def __str__(self):
                 return 'Test'
