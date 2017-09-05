@@ -26,11 +26,12 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import types
+import sys
 
-import six
+PY3 = sys.version_info[:2] > (2, 0)
 
 # pylint: disable=ungrouped-imports, no-name-in-module
-if six.PY3:  # pragma: no cover
+if PY3:  # pragma: no cover
     from inspect import (
         Parameter,
         signature,
@@ -124,7 +125,7 @@ class PrettyFormat(object):
         self.__keyword = keyword
         self.__max_indent = max_indent
         self.__indent_step = indent_step
-        self.__py2_str = py2_str and not six.PY3  # Python 2 only behavior
+        self.__py2_str = py2_str and not PY3  # Python 2 only behavior
 
     @property
     def max_indent(self):

@@ -24,12 +24,14 @@ later it has been reworked and extended for support of special cases.
 
 from __future__ import absolute_import
 
-import six
+import sys
 
 from ._repr_utils import PrettyFormat, pretty_repr, pretty_str
 
+PY3 = sys.version_info[:2] > (2, 0)
+
 # pylint: disable=no-name-in-module
-if six.PY3:  # pragma: no cover
+if PY3:  # pragma: no cover
     from ._log_wrap3 import logwrap, LogWrap
 else:  # pragma: no cover
     from ._log_wrap2 import logwrap, LogWrap
