@@ -28,7 +28,7 @@ import sys
 
 from ._repr_utils import PrettyFormat, pretty_repr, pretty_str
 
-PY3 = sys.version_info[:2] > (2, 0)
+PY3 = sys.version_info[:2] > (3, 0)
 
 # pylint: disable=no-name-in-module
 if PY3:  # pragma: no cover

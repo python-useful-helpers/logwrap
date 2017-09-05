@@ -28,7 +28,7 @@ from __future__ import unicode_literals
 import types
 import sys
 
-PY3 = sys.version_info[:2] > (2, 0)
+PY3 = sys.version_info[:2] > (3, 0)
 
 # pylint: disable=ungrouped-imports, no-name-in-module
 if PY3:  # pragma: no cover
