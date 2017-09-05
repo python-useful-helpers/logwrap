@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 2.6.2
+-------------
+Fix no __init__ in wheel.
+
 Version 2.6.1
 -------------
 Python 2.7 compile failed -> exclude compile.

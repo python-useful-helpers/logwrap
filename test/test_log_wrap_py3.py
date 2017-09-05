@@ -24,7 +24,11 @@ except ImportError:
     asyncio = None
 import logging
 import unittest
-from unittest import mock
+try:
+    from unittest import mock
+except ImportError:
+    # noinspection PyUnresolvedReferences
+    import mock
 
 import logwrap
 
