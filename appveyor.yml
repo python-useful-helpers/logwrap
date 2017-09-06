@@ -27,10 +27,7 @@ cache:
   - '%LOCALAPPDATA%\pip\Cache'
 
 test_script:
-  - "tools/build.cmd %PYTHON%\\python.exe -m pytest --junitxml=unit_result_nocov.xml --cov-config .coveragerc --cov=logwrap test"
-
-after_test:
-  - "tools/build.cmd %PYTHON%\\python.exe setup.py bdist_wheel"
+  - "tools/build.cmd %PYTHON%\\python.exe -m pytest --junitxml=unit_result.xml --cov-config .coveragerc --cov=logwrap test"
 
 artifacts:
   - path: dist\*
