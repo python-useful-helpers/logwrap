@@ -8,6 +8,7 @@ python:
   - "3.6"
   - "pypy2.7-5.8.0"
   - "pypy3.5-5.8.0"
+script: skip
 
 jobs:
   fast_finish: true
