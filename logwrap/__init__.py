@@ -48,7 +48,7 @@ __all__ = (
 __version__ = '2.7.0'
 __author__ = "Alexey Stepanov"
 __author_email__ = 'penguinolog@gmail.com'
-__url__ = 'https://github.com/penguinolog/threaded'
+__url__ = 'https://github.com/penguinolog/logwrap'
 __description__ = (
     "Decorator for logging function arguments and "
     "return value by human-readable way"
