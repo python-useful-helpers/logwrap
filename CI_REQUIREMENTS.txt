@@ -1,4 +1,2 @@
-six
 funcsigs >= 1.0
-typing >= 3.6
-asyncio>=3.4; python_version == "3.3"
+-r requirements.txt

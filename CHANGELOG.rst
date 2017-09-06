@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+Version 2.7.0
+-------------
+* Python 3.3 support is ended. EOL is coming, test was run rarely.
+* Move data from setup.cfg to __init__.py and setup.py
+
 Version 2.6.2
 -------------
 Fix no __init__ in wheel.

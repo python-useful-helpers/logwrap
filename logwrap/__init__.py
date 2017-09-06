@@ -45,5 +45,12 @@ __all__ = (
     'pretty_str'
 )
 
-__version__ = '2.6.2'
-__author__ = "Alexey Stepanov <penguinolog@gmail.com>"
+__version__ = '2.7.0'
+__author__ = "Alexey Stepanov"
+__author_email__ = 'penguinolog@gmail.com'
+__url__ = 'https://github.com/penguinolog/threaded'
+__description__ = (
+    "Decorator for logging function arguments and "
+    "return value by human-readable way"
+)
+__license__ = "Apache License, Version 2.0"

@@ -170,5 +170,8 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# Test results
-/*_result.xml
+### Test results
+/*_result_*.xml
+
+### Generated code
+/logwrap/*.c
