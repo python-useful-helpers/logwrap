@@ -7,15 +7,15 @@ jobs:
   include:
   - stage: test
     python:
-    - "2.7"
-    - "3.4"
-    - "3.5"
-    - "3.6"
-    - "pypy2.7-5.8.0"
-    - "pypy3.5-5.8.0"
+      - "2.7"
+      - "3.4"
+      - "3.5"
+      - "3.6"
+      - "pypy2.7-5.8.0"
+      - "pypy3.5-5.8.0"
     install:
-    - pip install tox-travis
-    - pip install coveralls
+      - pip install tox-travis
+      - pip install coveralls
     script: tox
     after_success:
     - coveralls
