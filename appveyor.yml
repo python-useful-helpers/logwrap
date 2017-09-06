@@ -19,7 +19,7 @@ environment:
 
 install:
   - "tools/build.cmd %PYTHON%\\python.exe -m pip install wheel"
-  - "tools/build.cmd %PYTHON%\\python.exe -m pip install pytest pytest-cov"
+  - "tools/build.cmd %PYTHON%\\python.exe -m pip install pytest pytest-sugar pytest-cov"
   - "tools/build.cmd %PYTHON%\\python.exe -m pip install -r build_requirements.txt"
 
 build: false
