@@ -96,6 +96,15 @@ class PrettyFormat(object):
     Designed for usage as __repr__ and __str__ replacement on complex objects
     """
 
+    __slots__ = (
+        '__s_formatters',
+        '__c_formatters',
+        '__keyword',
+        '__max_indent',
+        '__indent_step',
+        '__py2_str',
+    )
+
     def __init__(
         self,
         simple_formatters,
