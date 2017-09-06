@@ -249,9 +249,9 @@ setup_args = dict(
     },
     install_requires=required,
 )
-if PY3 and cythonize is not None:
-    setup_args['ext_modules'] = ext_modules
-    setup_args['cmdclass'] = dict(build_ext=AllowFailRepair)
+# if PY3 and cythonize is not None:
+#     setup_args['ext_modules'] = ext_modules
+#     setup_args['cmdclass'] = dict(build_ext=AllowFailRepair)
 
 try:
     setuptools.setup(**setup_args)

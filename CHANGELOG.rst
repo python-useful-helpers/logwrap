@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 2.7.2
+-------------
+Urgent fix: cythonized code crashes on processing async code.
+
 Version 2.7.0
 -------------
 * Python 3.3 support is ended. EOL is coming, test was run rarely.
