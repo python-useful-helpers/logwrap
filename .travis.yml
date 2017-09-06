@@ -8,18 +8,15 @@ python:
   - "3.6"
   - "pypy2.7-5.8.0"
   - "pypy3.5-5.8.0"
-script: skip
-
+install:
+- pip install tox-travis
+- pip install coveralls
+script: tox
+after_success:
+- coveralls
 jobs:
   fast_finish: true
   include:
-  - stage: test
-    install:
-    - pip install tox-travis
-    - pip install coveralls
-    script: tox
-    after_success:
-    - coveralls
   - stage: deploy
     python: 3.6
     before_install:
@@ -30,6 +27,8 @@ jobs:
         echo Not building wheels
         exit 0
       fi
+    install: skip
+    script: skip
     before_deploy:
     - pip install -r build_requirements.txt
     deploy:
