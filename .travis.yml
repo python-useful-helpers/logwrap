@@ -18,8 +18,7 @@ jobs:
   fast_finish: true
   include:
   - stage: Test packaged
-    python:
-    - "3.6"
+    python: 3.6
     install:
     - pip install pytest pytest-sugar
     - pip install -r build_requirements
