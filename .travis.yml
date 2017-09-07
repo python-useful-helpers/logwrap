@@ -33,9 +33,6 @@ jobs:
     python: *mainstream_python
     services:
     - docker
-    branches:
-      only:
-      - /^\d+\.\d+\.\d+$/
     install: skip
     script:
     - ./tools/run_docker.sh "logwrap"
