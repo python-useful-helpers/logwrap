@@ -21,7 +21,7 @@ jobs:
     python: 3.6
     install:
     - pip install pytest pytest-sugar
-    - pip install -r build_requirements
+    - pip install -r build_requirements.txt
     script:
     - python setup.py bdist_wheel
     - pip install logwrap --no-index -f dist
