@@ -58,7 +58,6 @@ def _extension(modpath):
 requires_optimization = [
     _extension('logwrap._class_decorator'),
     _extension('logwrap._log_wrap_shared'),
-    _extension('logwrap._log_wrap3'),
     _extension('logwrap._repr_utils'),
     _extension('logwrap._formatters'),
     _extension('logwrap.__init__'),
@@ -94,13 +93,19 @@ class AllowFailRepair(build_ext.build_ext):
             root_dir = os.path.abspath(os.path.join(__file__, '..'))
             target_dir = build_dir if not self.inplace else root_dir
 
-            src_file = os.path.join('logwrap', '__init__.py')
+            src_files = (
+                os.path.join('logwrap', '__init__.py'),
+                # _log_wrap3 should not be compiled due to specific bug:
+                # Exception inside `async def` crashes python.
+                os.path.join('logwrap', '_log_wrap3.py'),
+            )
 
-            src = os.path.join(root_dir, src_file)
-            dst = os.path.join(target_dir, src_file)
+            for src_file in src_files:
+                src = os.path.join(root_dir, src_file)
+                dst = os.path.join(target_dir, src_file)
 
-            if src != dst:
-                shutil.copyfile(src, dst)
+                if src != dst:
+                    shutil.copyfile(src, dst)
         except (
             distutils.errors.DistutilsPlatformError,
             FileNotFoundError
@@ -249,9 +254,9 @@ setup_args = dict(
     },
     install_requires=required,
 )
-# if PY3 and cythonize is not None:
-#     setup_args['ext_modules'] = ext_modules
-#     setup_args['cmdclass'] = dict(build_ext=AllowFailRepair)
+if PY3 and cythonize is not None:
+    setup_args['ext_modules'] = ext_modules
+    setup_args['cmdclass'] = dict(build_ext=AllowFailRepair)
 
 try:
     setuptools.setup(**setup_args)

@@ -17,6 +17,20 @@ after_success:
 jobs:
   fast_finish: true
   include:
+  - stage: Test packaged
+    python:
+    - "2.7"
+    - "3.4"
+    - "3.5"
+    - "3.6"
+    install:
+    - pip install pytest pytest-sugar
+    - pip install -r build_requirements
+    script:
+    - python setup.py bdist_wheel
+    - pip install logwrap --no-index -f dist
+    - py.test -vv test
+    after_success: skip
   - stage: deploy
     python: 3.6
     before_install:
@@ -29,6 +43,7 @@ jobs:
       fi
     install: skip
     script: skip
+    after_success: skip
     before_deploy:
     - pip install -r build_requirements.txt
     deploy:
