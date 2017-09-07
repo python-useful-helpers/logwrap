@@ -2,13 +2,14 @@ sudo: false
 language: python
 os: linux
 python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "pypy2.7-5.8.0"
-  - "pypy3.5-5.8.0"
+- 2.7
+- 3.4
+- 3.5
+- &mainstream_python 3.6
+- pypy2.7-5.8.0
+- pypy3.5-5.8.0
 install:
+- &upgrade_python_toolset pip install --upgrade pip setuptools wheel
 - pip install tox-travis
 - pip install coveralls
 script: tox
@@ -18,8 +19,9 @@ jobs:
   fast_finish: true
   include:
   - stage: Test packaged
-    python: 3.6
+    python: *mainstream_python
     install:
+    - *upgrade_python_toolset
     - pip install pytest pytest-sugar
     - pip install -r build_requirements.txt
     script:
@@ -28,7 +30,7 @@ jobs:
     - py.test -vv test
     after_success: skip
   - stage: deploy
-    python: 3.6
+    python: *mainstream_python
     before_install:
     # This must prevent further job progress
     - |
@@ -49,7 +51,6 @@ jobs:
       password:
         secure: QNBIAaqj682K95G2jVBFLgKmzscDz8sYLrJOmRVa+TmwV/n19Nar1fTdt86V2FRgl5SBbuGwAz6s9RD+X1j+OAEUKQ/wUmkP8hLriKcTaP5dH5+WWvwH9TD5A3SSvYOI9G9Qq+0rG71F/OMEBtTI5lrIaiPt39YUwhejLsUYy2vcvT/yxEnrMFc3gGFEvIRA6pnZWY+t3cK/uDdhDXutNSvLKTEuPILswqiGQZ/79Aio5HzQasCjvmWKr2c9nwZB1SoSfbhvNWitOzJZ5+7wc0ewFcRHBMeiLmGjI/z6FRVp/QTHtwhAwzRQQ955MiqcX2fLnVlfE68qT47RpX9ueqhFXMgIDqJ/3O/ln5619xZ1ykuUT8i/gUm2/lXGV9Wz0IwDxz4RpL8ul24qLdECXhVlBBDA3VjJT8YbErvY3EB+YKHiJCywAcOa8boHTMDxmP/BLUh24PrsKs4eYW5MVRR3V6Un8ajCCk2ZhDlyQXSxPsRA7/dHQS5a6d1neCCapdwR+VKHjjBmW0MppxQmsxjg6poOtWR/d1bT9XuHdu6/vAmTAosZN56MnR0KD4ZVJxM5OoMqE3Fgw6jusJnyWyxJ5XRkG/NuDITTC7aS5MQuPOGUSw3GzzAwZOgSRCDmgLMxRaZcv8a8r8GqpzVHpB9D+zfOhvh8+1BOhNFXMMc=
       on:
-        python: 3.6
         tags: true
       skip_upload_docs: true
       skip_cleanup: true

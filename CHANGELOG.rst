@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 2.7.3
+-------------
+Return cythonize. Error reason failed, crashing code will not be compiled.
+
 Version 2.7.2
 -------------
 Urgent fix: cythonized code crashes on processing async code.
