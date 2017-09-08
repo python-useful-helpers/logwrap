@@ -50,14 +50,7 @@ def _set_repr(indent, val):
     return "{spc:<{indent}}{val}".format(
         spc='',
         indent=indent,
-        val="set({})".format(
-            ' ,'.join(
-                map(
-                    '{!r}'.format,  # unicode -> !repr
-                    val
-                )
-            )
-        )
+        val="set(" + ' ,'.join(map(repr, val)) + ")"
     )
 
 
@@ -100,14 +93,7 @@ def _set_str(indent, val):
     return "{spc:<{indent}}{val}".format(
         spc='',
         indent=indent,
-        val="set({})".format(
-            ' ,'.join(
-                map(
-                    '{!s}'.format,
-                    val
-                )
-            )
-        )
+        val="set(" + ' ,'.join(map(str, val)) + ")"
     )
 
 

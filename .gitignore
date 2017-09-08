@@ -171,7 +171,7 @@ ENV/
 .ropeproject
 
 ### Test results
-/*_result_*.xml
+/*_result*.xml
 
 ### Generated code
 /logwrap/*.c

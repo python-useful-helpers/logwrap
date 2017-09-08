@@ -67,8 +67,8 @@ def _simple(item):
 def _prepare_repr(func):
     """Get arguments lists with defaults.
 
-    :type func: union(types.FunctionType, types.MethodType)
-    :rtype: generator
+    :type func: typing.Union[types.FunctionType, types.MethodType]
+    :rtype: typing.Generator[str]
     """
     isfunction = isinstance(func, types.FunctionType)
     real_func = func if isfunction else func.__func__
@@ -233,7 +233,7 @@ class PrettyFormat(object):
         :type src: dict
         :param indent: start indentation
         :type indent: int
-        :rtype: generator
+        :rtype: typing.Generator[str]
         """
         max_len = max([len(repr(key)) for key in src]) if src else 0
         for key, val in src.items():
@@ -256,7 +256,7 @@ class PrettyFormat(object):
         :type src: typing.Iterable
         :param indent: start indentation
         :type indent: int
-        :rtype: generator
+        :rtype: typing.Generator[str]
         """
         for elem in src:
             yield '\n' + self.process_element(
@@ -350,7 +350,7 @@ class PrettyFormat(object):
             indent=indent,
             no_indent_start=no_indent_start
         )
-        if self.__py2_str:
+        if self.__py2_str:  # pragma: no cover
             return result.encode(
                 encoding='utf-8',
                 errors='backslashreplace',
