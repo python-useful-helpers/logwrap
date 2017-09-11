@@ -52,16 +52,13 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
     :rtype: str
 
 
-.. py:class:: PrettyFormat(simple_formatters, complex_formatters, keyword='repr', max_indent=20, indent_step=4, py2_str=False, )
+.. py:class:: PrettyFormat(keyword='repr', max_indent=20, indent_step=4, py2_str=False, )
 
     Designed for usage as __repr__ and __str__ replacement on complex objects
 
     .. versionadded:: 1.0.2
+    .. versionchanged:: 3.0.0
 
-    :param simple_formatters: object formatters by type
-    :type simple_formatters: typing.Dict[str, types.FunctionType]
-    :param complex_formatters: object formatters for complex objects
-    :type complex_formatters: typing.Dict[str, types.FunctionType]
     :param keyword: operation keyword (__pretty_{keyword}__)
     :type keyword: str
     :param max_indent: maximal indent before classic repr() call

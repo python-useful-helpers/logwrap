@@ -14,8 +14,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-# cython: binding=True, embedsignature=True
-
 """repr_utils module.
 
 This is no reason to import this submodule directly, all required methods is
@@ -26,12 +24,11 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import types
-import sys
 
-PY3 = sys.version_info[:2] > (3, 0)
+import six
 
 # pylint: disable=ungrouped-imports, no-name-in-module
-if PY3:  # pragma: no cover
+if six.PY3:  # pragma: no cover
     from inspect import (
         Parameter,
         signature,
@@ -43,14 +40,6 @@ else:  # pragma: no cover
         signature,
     )
 # pylint: enable=ungrouped-imports, no-name-in-module
-
-# pylint: disable=wrong-import-position
-# noinspection PyProtectedMember
-from logwrap._formatters import (  # noqa
-    c_repr_formatters, s_repr_formatters,
-    c_str_formatters, s_str_formatters
-)
-# pylint: enable=wrong-import-position
 
 
 def _known_callable(item):
@@ -97,8 +86,6 @@ class PrettyFormat(object):
     """
 
     __slots__ = (
-        '__s_formatters',
-        '__c_formatters',
         '__keyword',
         '__max_indent',
         '__indent_step',
@@ -107,8 +94,6 @@ class PrettyFormat(object):
 
     def __init__(
         self,
-        simple_formatters,
-        complex_formatters,
         keyword='repr',
         max_indent=20,
         indent_step=4,
@@ -116,10 +101,6 @@ class PrettyFormat(object):
     ):
         """Pretty Formatter.
 
-        :param simple_formatters: object formatters by type
-        :type simple_formatters: typing.Dict[str, types.FunctionType]
-        :param complex_formatters: object formatters for complex objects
-        :type complex_formatters: typing.Dict[str, types.FunctionType]
         :param keyword: operation keyword (__pretty_{keyword}__)
         :type keyword: str
         :param max_indent: maximal indent before classic repr() call
@@ -129,12 +110,10 @@ class PrettyFormat(object):
         :param py2_str: use Python 2.x compatible strings instead of unicode
         :type py2_str: bool
         """
-        self.__s_formatters = simple_formatters
-        self.__c_formatters = complex_formatters
         self.__keyword = keyword
         self.__max_indent = max_indent
         self.__indent_step = indent_step
-        self.__py2_str = py2_str and not PY3  # Python 2 only behavior
+        self.__py2_str = py2_str and not six.PY3  # Python 2 only behavior
 
     @property
     def max_indent(self):
@@ -170,35 +149,7 @@ class PrettyFormat(object):
         :type indent: int
         :rtype: str
         """
-        param_str = ""
-
-        for param in _prepare_repr(src):
-            if isinstance(param, tuple):
-                param_str += self.__c_formatters['func_def_arg'](
-                    spc='',
-                    indent=self.next_indent(indent),
-                    key=param[0],
-                    val=self.process_element(
-                        src=param[1],
-                        indent=indent,
-                        no_indent_start=True,
-                    )
-                )
-            else:
-                param_str += self.__c_formatters['func_arg'](
-                    spc='',
-                    indent=self.next_indent(indent),
-                    key=param
-                )
-
-        if param_str:
-            param_str += "\n" + " " * indent
-        return self.__c_formatters['callable'](
-            spc="",
-            indent=indent,
-            obj=src,
-            args=param_str,
-        )
+        raise NotImplementedError  # pragma: no cover
 
     def _repr_simple(self, src, indent=0, no_indent_start=False):
         """Repr object without iteration.
@@ -211,20 +162,7 @@ class PrettyFormat(object):
         :type no_indent_start: bool
         :rtype: str
         """
-        indent = 0 if no_indent_start else indent
-        # pylint: disable=unidiomatic-typecheck
-        # We use type(obj) as dict key
-        if type(src) in self.__s_formatters:
-            return self.__s_formatters[type(src)](
-                indent=indent,
-                val=src
-            )
-        # pylint: enable=unidiomatic-typecheck
-        return self.__s_formatters['default'](
-            spc='',
-            indent=indent,
-            val=src,
-        )
+        raise NotImplementedError()  # pragma: no cover
 
     def _repr_dict_items(self, src, indent=0):
         """Repr dict items.
@@ -235,19 +173,34 @@ class PrettyFormat(object):
         :type indent: int
         :rtype: typing.Generator[str]
         """
-        max_len = max([len(repr(key)) for key in src]) if src else 0
-        for key, val in src.items():
-            yield self.__c_formatters['dict'](
-                spc='',
-                indent=self.next_indent(indent),
-                size=max_len,
-                key=key,
-                val=self.process_element(
-                    val,
-                    indent=self.next_indent(indent, multiplier=2),
-                    no_indent_start=True,
-                )
-            )
+        raise NotImplementedError()  # pragma: no cover
+
+    @staticmethod
+    def _repr_iterable_item(
+        nl,
+        obj_type,
+        prefix,
+        indent,
+        result,
+        suffix,
+    ):
+        """Repr iterable item.
+
+        :param nl: newline before item
+        :type nl: bool
+        :param obj_type: Object type
+        :type obj_type: str
+        :param prefix: prefix
+        :type prefix: str
+        :param indent: start indentation
+        :type indent: int
+        :param result: result of pre-formatting
+        :type result: str
+        :param suffix: suffix
+        :type suffix: str
+        :rtype: str
+        """
+        raise NotImplementedError()  # pragma: no cover
 
     def _repr_iterable_items(self, src, indent=0):
         """Repr iterable items (not designed for dicts).
@@ -314,14 +267,13 @@ class PrettyFormat(object):
                 prefix, suffix = '{', '}'
             result = ''.join(self._repr_iterable_items(src=src, indent=indent))
         return (
-            self.__c_formatters['iterable_item'](
-                nl='\n' if no_indent_start else '',
-                spc='',
+            self._repr_iterable_item(
+                nl=no_indent_start,
                 obj_type=src.__class__.__name__,
-                start=prefix,
+                prefix=prefix,
                 indent=indent,
                 result=result,
-                end=suffix,
+                suffix=suffix,
             )
         )
 
@@ -358,6 +310,305 @@ class PrettyFormat(object):
         return result
 
 
+class PrettyRepr(PrettyFormat):
+    """Pretty repr.
+
+    Designed for usage as __repr__ replacement on complex objects
+    """
+
+    __slots__ = ()
+
+    @staticmethod
+    def _strings_repr(indent, val):
+        """Custom repr for strings and binary strings."""
+        if isinstance(val, six.binary_type):
+            val = val.decode(
+                encoding='utf-8',
+                errors='backslashreplace'
+            )
+            prefix = 'b'
+        else:
+            prefix = 'u'
+        return "{spc:<{indent}}{prefix}'''{string}'''".format(
+            spc='',
+            indent=indent,
+            prefix=prefix,
+            string=val
+        )
+
+    def _repr_simple(self, src, indent=0, no_indent_start=False):
+        """Repr object without iteration.
+
+        :type src: typing.Union[
+                   six.binary_type, six.text_type, int, typing.Iterable,
+                   object,
+                   ]
+        :type indent: int
+        :type no_indent_start: bool
+        :rtype: str
+        """
+        indent = 0 if no_indent_start else indent
+        if isinstance(src, set):
+            return "{spc:<{indent}}{val}".format(
+                spc='',
+                indent=indent,
+                val="set(" + ' ,'.join(map(repr, src)) + ")"
+            )
+        if isinstance(src, (six.binary_type, six.text_type)):
+            return self._strings_repr(indent=indent, val=src)
+        return "{spc:<{indent}}{val!r}".format(
+            spc='',
+            indent=indent,
+            val=src,
+        )
+
+    def _repr_dict_items(self, src, indent=0):
+        """Repr dict items.
+
+        :param src: object to process
+        :type src: dict
+        :param indent: start indentation
+        :type indent: int
+        :rtype: typing.Generator[str]
+        """
+        max_len = max((len(repr(key)) for key in src)) if src else 0
+        for key, val in src.items():
+            yield "\n{spc:<{indent}}{key!r:{size}}: {val},".format(
+                spc='',
+                indent=self.next_indent(indent),
+                size=max_len,
+                key=key,
+                val=self.process_element(
+                    val,
+                    indent=self.next_indent(indent, multiplier=2),
+                    no_indent_start=True,
+                )
+            )
+
+    def _repr_callable(self, src, indent=0):
+        """Repr callable object (function or method).
+
+        :type src: typing.Union[types.FunctionType, types.MethodType]
+        :type indent: int
+        :rtype: str
+        """
+        param_str = ""
+
+        for param in _prepare_repr(src):
+            if isinstance(param, tuple):
+                param_str += "\n{spc:<{indent}}{key}={val},".format(
+                    spc='',
+                    indent=self.next_indent(indent),
+                    key=param[0],
+                    val=self.process_element(
+                        src=param[1],
+                        indent=indent,
+                        no_indent_start=True,
+                    )
+                )
+            else:
+                param_str += "\n{spc:<{indent}}{key},".format(
+                    spc='',
+                    indent=self.next_indent(indent),
+                    key=param
+                )
+
+        if param_str:
+            param_str += "\n" + " " * indent
+        return "\n{spc:<{indent}}<{obj!r} with interface ({args})>".format(
+            spc="",
+            indent=indent,
+            obj=src,
+            args=param_str,
+        )
+
+    @staticmethod
+    def _repr_iterable_item(
+        nl,
+        obj_type,
+        prefix,
+        indent,
+        result,
+        suffix,
+    ):
+        """Repr iterable item.
+
+        :param nl: newline before item
+        :type nl: bool
+        :param obj_type: Object type
+        :type obj_type: str
+        :param prefix: prefix
+        :type prefix: str
+        :param indent: start indentation
+        :type indent: int
+        :param result: result of pre-formatting
+        :type result: str
+        :param suffix: suffix
+        :type suffix: str
+        :rtype: str
+        """
+        return (
+            "{nl}"
+            "{spc:<{indent}}{obj_type:}({prefix}{result}\n"
+            "{spc:<{indent}}{suffix})".format(
+                nl='\n' if nl else '',
+                spc='',
+                indent=indent,
+                obj_type=obj_type,
+                prefix=prefix,
+                result=result,
+                suffix=suffix
+            )
+        )
+
+
+class PrettyStr(PrettyFormat):
+    """Pretty str.
+
+    Designed for usage as __str__ replacement on complex objects
+    """
+
+    __slots__ = ()
+
+    @staticmethod
+    def _strings_str(indent, val):
+        """Custom repr for strings and binary strings."""
+        if isinstance(val, six.binary_type):
+            val = val.decode(
+                encoding='utf-8',
+                errors='backslashreplace'
+            )
+        return "{spc:<{indent}}{string}".format(
+            spc='',
+            indent=indent,
+            string=val
+        )
+
+    def _repr_simple(self, src, indent=0, no_indent_start=False):
+        """Repr object without iteration.
+
+        :type src: typing.Union[
+                   six.binary_type, six.text_type, int, typing.Iterable,
+                   object,
+                   ]
+        :type indent: int
+        :type no_indent_start: bool
+        :rtype: str
+        """
+        indent = 0 if no_indent_start else indent
+        if isinstance(src, set):
+            return "{spc:<{indent}}{val}".format(
+                spc='',
+                indent=indent,
+                val="set(" + ' ,'.join(map(str, src)) + ")"
+            )
+        if isinstance(src, (six.binary_type, six.text_type)):
+            return self._strings_str(indent=indent, val=src)
+        return "{spc:<{indent}}{val!s}".format(
+            spc='',
+            indent=indent,
+            val=src,
+        )
+
+    def _repr_dict_items(self, src, indent=0):
+        """Repr dict items.
+
+        :param src: object to process
+        :type src: dict
+        :param indent: start indentation
+        :type indent: int
+        :rtype: typing.Generator[str]
+        """
+        max_len = max((len(str(key)) for key in src)) if src else 0
+        for key, val in src.items():
+            yield "\n{spc:<{indent}}{key!s:{size}}: {val},".format(
+                spc='',
+                indent=self.next_indent(indent),
+                size=max_len,
+                key=key,
+                val=self.process_element(
+                    val,
+                    indent=self.next_indent(indent, multiplier=2),
+                    no_indent_start=True,
+                )
+            )
+
+    def _repr_callable(self, src, indent=0):
+        """Repr callable object (function or method).
+
+        :type src: typing.Union[types.FunctionType, types.MethodType]
+        :type indent: int
+        :rtype: str
+        """
+        param_str = ""
+
+        for param in _prepare_repr(src):
+            if isinstance(param, tuple):
+                param_str += "\n{spc:<{indent}}{key}={val},".format(
+                    spc='',
+                    indent=self.next_indent(indent),
+                    key=param[0],
+                    val=self.process_element(
+                        src=param[1],
+                        indent=indent,
+                        no_indent_start=True,
+                    )
+                )
+            else:
+                param_str += "\n{spc:<{indent}}{key},".format(
+                    spc='',
+                    indent=self.next_indent(indent),
+                    key=param
+                )
+
+        if param_str:
+            param_str += "\n" + " " * indent
+        return "\n{spc:<{indent}}<{obj!s} with interface ({args})>".format(
+            spc="",
+            indent=indent,
+            obj=src,
+            args=param_str,
+        )
+
+    @staticmethod
+    def _repr_iterable_item(
+        nl,
+        obj_type,
+        prefix,
+        indent,
+        result,
+        suffix,
+    ):
+        """Repr iterable item.
+
+        :param nl: newline before item
+        :type nl: bool
+        :param obj_type: Object type
+        :type obj_type: str
+        :param prefix: prefix
+        :type prefix: str
+        :param indent: start indentation
+        :type indent: int
+        :param result: result of pre-formatting
+        :type result: str
+        :param suffix: suffix
+        :type suffix: str
+        :rtype: str
+        """
+        return (
+            "{nl}"
+            "{spc:<{indent}}{prefix}{result}\n"
+            "{spc:<{indent}}{suffix}".format(
+                nl='\n' if nl else '',
+                spc='',
+                indent=indent,
+                prefix=prefix,
+                result=result,
+                suffix=suffix
+            )
+        )
+
+
 def pretty_repr(
     src,
     indent=0,
@@ -385,9 +636,7 @@ def pretty_repr(
     :return: formatted string
     :rtype: str
     """
-    return PrettyFormat(
-        simple_formatters=s_repr_formatters,
-        complex_formatters=c_repr_formatters,
+    return PrettyRepr(
         keyword='repr',
         max_indent=max_indent,
         indent_step=indent_step,
@@ -425,9 +674,7 @@ def pretty_str(
     :type py2_str: bool
     :return: formatted string
     """
-    return PrettyFormat(
-        simple_formatters=s_str_formatters,
-        complex_formatters=c_str_formatters,
+    return PrettyStr(
         keyword='str',
         max_indent=max_indent,
         indent_step=indent_step,

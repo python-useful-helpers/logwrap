@@ -45,7 +45,7 @@ __all__ = (
     'pretty_str'
 )
 
-__version__ = '2.7.3'
+__version__ = '3.0.0'
 __author__ = "Alexey Stepanov"
 __author_email__ = 'penguinolog@gmail.com'
 __url__ = 'https://github.com/penguinolog/logwrap'

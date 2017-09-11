@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+Version 3.0.0
+-------------
+* Drop formatters.
+
+Less magic (dict of methods).
+
+.. warning:: ``PrettyFormat`` API changed: formatters are set in subclasses.
+
 Version 2.7.3
 -------------
 Return cythonize. Error reason failed, crashing code will not be compiled.

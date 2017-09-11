@@ -59,7 +59,6 @@ requires_optimization = [
     _extension('logwrap._class_decorator'),
     _extension('logwrap._log_wrap_shared'),
     _extension('logwrap._repr_utils'),
-    _extension('logwrap._formatters'),
     _extension('logwrap.__init__'),
 ]
 

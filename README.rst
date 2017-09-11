@@ -45,7 +45,6 @@ Pros:
     Python 3.6
     PyPy
     PyPy3 3.5+
-    Jyton 2.7
 
 This package includes helpers:
 
@@ -239,8 +238,6 @@ Object signature:
 
     def __init__(
         self,
-        simple_formatters,  # Will be used to repr not complex. Keys is data types and 'default'.
-        complex_formatters,  # Currently only legacy pretty_repr formatters is supported, will be extended in the future
         keyword='repr',  # Currently 'repr' is supported, will be extended in the future
         max_indent=20,  # maximum allowed indent level
         indent_step=4,  # step between indents
