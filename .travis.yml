@@ -18,17 +18,6 @@ after_success:
 jobs:
   fast_finish: true
   include:
-  - stage: Test packaged
-    python: *mainstream_python
-    install:
-    - *upgrade_python_toolset
-    - pip install pytest pytest-sugar
-    - pip install -r build_requirements.txt
-    script:
-    - python setup.py bdist_wheel
-    - pip install logwrap --no-index -f dist
-    - py.test -vv test
-    after_success: skip
   - stage: deploy
     python: *mainstream_python
     services:
