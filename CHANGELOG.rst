@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+Version 3.0.1
+-------------
+* Fix documents.
+* Drop useless arguments.
+
 Version 3.0.0
 -------------
 * Drop formatters.

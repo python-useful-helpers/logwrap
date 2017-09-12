@@ -86,7 +86,6 @@ class PrettyFormat(object):
     """
 
     __slots__ = (
-        '__keyword',
         '__max_indent',
         '__indent_step',
         '__py2_str',
@@ -94,15 +93,12 @@ class PrettyFormat(object):
 
     def __init__(
         self,
-        keyword='repr',
         max_indent=20,
         indent_step=4,
         py2_str=False,
     ):
         """Pretty Formatter.
 
-        :param keyword: operation keyword (__pretty_{keyword}__)
-        :type keyword: str
         :param max_indent: maximal indent before classic repr() call
         :type max_indent: int
         :param indent_step: step for the next indentation level
@@ -110,7 +106,6 @@ class PrettyFormat(object):
         :param py2_str: use Python 2.x compatible strings instead of unicode
         :type py2_str: bool
         """
-        self.__keyword = keyword
         self.__max_indent = max_indent
         self.__indent_step = indent_step
         self.__py2_str = py2_str and not six.PY3  # Python 2 only behavior
@@ -217,6 +212,14 @@ class PrettyFormat(object):
                 indent=self.next_indent(indent),
             ) + ','
 
+    @property
+    def _magic_method_name(self):
+        """Magic method name.
+
+        :rtype: str
+        """
+        raise NotImplementedError  # pragma: no cover
+
     def process_element(self, src, indent=0, no_indent_start=False):
         """Make human readable representation of object.
 
@@ -232,10 +235,10 @@ class PrettyFormat(object):
         :return: formatted string
         :rtype: six.text_type
         """
-        if hasattr(src, '__pretty_{}__'.format(self.__keyword)):
+        if hasattr(src, self._magic_method_name):
             return getattr(
                 src,
-                '__pretty_{}__'.format(self.__keyword)
+                self._magic_method_name
             )(
                 self,
                 indent=indent,
@@ -317,6 +320,14 @@ class PrettyRepr(PrettyFormat):
     """
 
     __slots__ = ()
+
+    @property
+    def _magic_method_name(self):
+        """Magic method name.
+
+        :rtype: str
+        """
+        return '__pretty_repr__'
 
     @staticmethod
     def _strings_repr(indent, val):
@@ -469,6 +480,14 @@ class PrettyStr(PrettyFormat):
     """
 
     __slots__ = ()
+
+    @property
+    def _magic_method_name(self):
+        """Magic method name.
+
+        :rtype: str
+        """
+        return '__pretty_str__'
 
     @staticmethod
     def _strings_str(indent, val):
@@ -637,7 +656,6 @@ def pretty_repr(
     :rtype: str
     """
     return PrettyRepr(
-        keyword='repr',
         max_indent=max_indent,
         indent_step=indent_step,
         py2_str=py2_str
@@ -675,7 +693,6 @@ def pretty_str(
     :return: formatted string
     """
     return PrettyStr(
-        keyword='str',
         max_indent=max_indent,
         indent_step=indent_step,
         py2_str=py2_str
@@ -686,4 +703,10 @@ def pretty_str(
     )
 
 
-__all__ = ('PrettyFormat', 'pretty_repr', 'pretty_str')
+__all__ = (
+    'PrettyFormat',
+    'PrettyRepr',
+    'PrettyStr',
+    'pretty_repr',
+    'pretty_str',
+)

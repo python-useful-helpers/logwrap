@@ -26,7 +26,13 @@ from __future__ import absolute_import
 
 import sys
 
-from ._repr_utils import PrettyFormat, pretty_repr, pretty_str
+from ._repr_utils import (
+    PrettyFormat,
+    PrettyRepr,
+    PrettyStr,
+    pretty_repr,
+    pretty_str
+)
 
 PY3 = sys.version_info[:2] > (3, 0)
 
@@ -41,11 +47,13 @@ __all__ = (
     'LogWrap',
     'logwrap',
     'PrettyFormat',
+    'PrettyRepr',
+    'PrettyStr',
     'pretty_repr',
     'pretty_str'
 )
 
-__version__ = '3.0.0'
+__version__ = '3.0.1'
 __author__ = "Alexey Stepanov"
 __author_email__ = 'penguinolog@gmail.com'
 __url__ = 'https://github.com/penguinolog/logwrap'
