@@ -25,7 +25,6 @@ jobs:
     install: skip
     script:
     - ./tools/run_docker.sh "logwrap"
-    after_success: skip
     before_deploy:
     - pip install -r build_requirements.txt
     deploy:
