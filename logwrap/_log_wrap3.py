@@ -36,6 +36,9 @@ from . import _log_wrap_shared
 __all__ = ('logwrap', 'LogWrap')
 
 
+DEFAULT_DECORATOR_ARGUMENT = typing.Union[logging.Logger, typing.Callable]
+
+
 class LogWrap(_log_wrap_shared.BaseLogWrap):
     """Python 3.3+ version of LogWrap."""
 
@@ -109,13 +112,13 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 def logwrap(
-    log: typing.Union[logging.Logger, typing.Callable]=_log_wrap_shared.logger,
+    log: DEFAULT_DECORATOR_ARGUMENT = _log_wrap_shared.logger,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
-    spec: typing.Optional[typing.Callable]=None,
-    blacklisted_names: typing.Optional[typing.List[str]]=None,
-    blacklisted_exceptions: typing.Optional[typing.List[Exception]]=None,
+    spec: typing.Optional[typing.Callable] = None,
+    blacklisted_names: typing.Optional[typing.List[str]] = None,
+    blacklisted_exceptions: typing.Optional[typing.List[Exception]] = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_result_obj: bool = True,
