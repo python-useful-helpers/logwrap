@@ -19,6 +19,8 @@ jobs:
   fast_finish: true
   include:
   - stage: deploy
+    # This prevents job from appearing in test plan unless commit is tagged:
+    if: tag IS present
     python: *mainstream_python
     services:
     - docker
