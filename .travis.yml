@@ -15,6 +15,7 @@ install:
 script: tox
 after_success:
 - coveralls
+
 jobs:
   fast_finish: true
   include:
@@ -28,13 +29,24 @@ jobs:
     - tox -e pylint,bandit
     after_success: skip
 
+  - stage: Code style check
+    python: *mainstream_python
+    services: skip
+    install:
+    - *upgrade_python_toolset
+    - pip install tox
+    script:
+    - tox -e pep8,pep257
+    after_success: skip
+
   - stage: deploy
     # This prevents job from appearing in test plan unless commit is tagged:
     if: tag IS present
     python: *mainstream_python
     services:
     - docker
-    install: skip
+    install:
+    - *upgrade_python_toolset
     script:
     - ./tools/run_docker.sh "logwrap"
     before_deploy:
