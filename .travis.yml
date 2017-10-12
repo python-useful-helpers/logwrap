@@ -18,6 +18,16 @@ after_success:
 jobs:
   fast_finish: true
   include:
+  - stage: Static analisys
+    python: *mainstream_python
+    services: skip
+    install:
+    - *upgrade_python_toolset
+    - pip install tox
+    script:
+    - tox -e pylint,bandit
+    after_success: skip
+
   - stage: deploy
     # This prevents job from appearing in test plan unless commit is tagged:
     if: tag IS present
