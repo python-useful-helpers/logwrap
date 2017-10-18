@@ -230,7 +230,8 @@ Limitations:
 
 PrettyFormat
 ------------
-PrettyFormat is the main formatting implementation class. on `pretty_repr` instance of this class is created and executed.
+PrettyFormat is the main formatting implementation class.
+`pretty_repr` and `pretty_str` uses instances of subclasses `PrettyRepr` and `PrettyStr` from this class.
 This class is mostly exposed for typing reasons.
 Object signature:
 
@@ -238,7 +239,6 @@ Object signature:
 
     def __init__(
         self,
-        keyword='repr',  # Currently 'repr' is supported, will be extended in the future
         max_indent=20,  # maximum allowed indent level
         indent_step=4,  # step between indents
         py2_str=False,  # use bytes for python 2 __repr__ and __str__
@@ -271,6 +271,18 @@ pretty_repr behavior could be overridden for your classes by implementing specif
 
 This method will be executed instead of __repr__ on your object.
 
+.. code-block:: python
+
+    def __pretty_str__(
+        self,
+        parser  # PrettyFormat class instance,
+        indent  # start indent,
+        no_indent_start  # do not indent the first level
+    ):
+        return ...
+
+This method will be executed instead of __str__ on your object.
+
 Testing
 =======
 The main test mechanism for the package `logwrap` is using `tox`.
@@ -286,6 +298,7 @@ Test environments available:
     pypy
     pypy3
     pylint
+    pep257
     docs
 
 CI systems
