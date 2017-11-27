@@ -731,6 +731,7 @@ pip-selfcheck.json
 ### Test results
 /*_result*.xml
 /report.html
+/assets/*
 
 ### Generated code
 /logwrap/*.c
