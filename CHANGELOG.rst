@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 3.1.0
+-------------
+* Drop logwrap function. Use class as-is. `logwrap = LogWrap` (No API changes).
+
 Version 3.0.2
 -------------
 * Fix package README.

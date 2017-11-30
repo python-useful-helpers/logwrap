@@ -48,7 +48,7 @@ Pros:
 
 This package includes helpers:
 
-* `logwrap` - main helper
+* `logwrap` - main helper. The same is `LogWrap`.
 
 * `LogWrap` - class with `logwrap` implementation. May be used directly.
 
@@ -168,8 +168,6 @@ Limitations:
 
 LogWrap
 -------
-May be used as `logwrap` with possibility to read and change several parameters later.
-
 Example construction and read from test:
 
 .. code-block:: python

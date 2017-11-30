@@ -23,8 +23,6 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import logging
-
 import six
 # noinspection PyUnresolvedReferences
 import funcsigs
@@ -74,63 +72,4 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
         return wrapper
 
 
-# pylint: disable=unexpected-keyword-arg, no-value-for-parameter
-def logwrap(
-    log=_log_wrap_shared.logger,
-    log_level=logging.DEBUG,
-    exc_level=logging.ERROR,
-    max_indent=20,
-    spec=None,
-    blacklisted_names=None,
-    blacklisted_exceptions=None,
-    log_call_args=True,
-    log_call_args_on_exc=True,
-    log_result_obj=True,
-):
-    """Log function calls and return values.
-
-    :param log: logger object for decorator, by default used 'logwrap'
-    :type log: typing.Union[logging.Logger, typing.Callable]
-    :param log_level: log level for successful calls
-    :type log_level: int
-    :param exc_level: log level for exception cases
-    :type exc_level: int
-    :param max_indent: maximum indent before classic `repr()` call.
-    :type max_indent: int
-    :param spec: callable object used as spec for arguments bind.
-                 This is designed for the special cases only,
-                 when impossible to change signature of target object,
-                 but processed/redirected signature is accessible.
-                 Note: this object should provide fully compatible signature
-                 with decorated function, or arguments bind will be failed!
-    :type spec: typing.Optional[typing.Callable]
-    :param blacklisted_names: list of exception,
-                              which should be re-raised without
-                              producing log record.
-    :type blacklisted_names: typing.Optional[typing.Iterable[str]]
-    :param blacklisted_exceptions: list of exception,
-                                   which should be re-raised without
-                                   producing log record.
-    :type blacklisted_exceptions: typing.Optional[typing.Iterable[Exception]]
-    :param log_call_args: log call arguments before executing wrapped function.
-    :type log_call_args: bool
-    :param log_call_args_on_exc: log call arguments if exception raised.
-    :type log_call_args_on_exc: bool
-    :param log_result_obj: log result of function call.
-    :type log_result_obj: bool
-    :return: built real decorator.
-    :rtype: _log_wrap_shared.BaseLogWrap
-    """
-    return LogWrap(
-        log=log,
-        log_level=log_level,
-        exc_level=exc_level,
-        max_indent=max_indent,
-        spec=spec,
-        blacklisted_names=blacklisted_names,
-        blacklisted_exceptions=blacklisted_exceptions,
-        log_call_args=log_call_args,
-        log_call_args_on_exc=log_call_args_on_exc,
-        log_result_obj=log_result_obj
-    )
-# pylint: enable=unexpected-keyword-arg, no-value-for-parameter
+logwrap = LogWrap  # lowercase decorator
