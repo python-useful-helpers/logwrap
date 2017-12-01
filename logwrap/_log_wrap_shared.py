@@ -20,7 +20,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import functools
+import inspect  # noqa # pylint: disable=unused-import
 import logging
+import typing
 
 import logwrap as core
 from . import _class_decorator
@@ -36,6 +38,12 @@ fmt = "\n{spc:<{indent}}{{key!r}}={{val}},".format(
     indent=indent,
 ).format
 comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
+
+
+# Long arguments types:
+_LoggerArg = typing.Union[logging.Logger, typing.Callable]
+_BlacklistedNamesArg = typing.Optional[typing.Iterable[str]]
+_BlacklistedExceptionsArg = typing.Optional[typing.Iterable[Exception]]
 
 
 def _check_type(expected):
@@ -84,16 +92,16 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     def __init__(
         self,
-        log=logger,
-        log_level=logging.DEBUG,
-        exc_level=logging.ERROR,
-        max_indent=20,
-        spec=None,
-        blacklisted_names=None,
-        blacklisted_exceptions=None,
-        log_call_args=True,
-        log_call_args_on_exc=True,
-        log_result_obj=True,
+        log=logger,  # type: _LoggerArg
+        log_level=logging.DEBUG,  # type: int
+        exc_level=logging.ERROR,  # type: int
+        max_indent=20,  # type: int
+        spec=None,  # type: typing.Optional[typing.Callable]
+        blacklisted_names=None,  # type: _BlacklistedNamesArg
+        blacklisted_exceptions=None,  # type: _BlacklistedExceptionsArg
+        log_call_args=True,  # type: bool
+        log_call_args_on_exc=True,  # type: bool
+        log_result_obj=True,  # type: bool
 
     ):
         """Log function calls and return values.
@@ -113,7 +121,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
                      Note: this object should provide fully compatible
                      signature with decorated function, or arguments bind
                      will be failed!
-        :type spec: callable
+        :type spec: typing.Optional[typing.Callable]
         :param blacklisted_names: Blacklisted argument names.
                                   Arguments with this names will be skipped
                                   in log.
@@ -159,7 +167,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         # We are not interested to pass any arguments to object
 
     @property
-    def log_level(self):
+    def log_level(self):  # type: (BaseLogWrap) -> int
         """Log level for normal behavior.
 
         :rtype: int
@@ -168,7 +176,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @log_level.setter
     @_check_type(int)
-    def log_level(self, val):
+    def log_level(self, val):  # type: (BaseLogWrap, int) -> None
         """Log level for normal behavior.
 
         :type val: int
@@ -176,7 +184,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__log_level = val
 
     @property
-    def exc_level(self):
+    def exc_level(self):  # type: (BaseLogWrap) -> int
         """Log level for exceptions.
 
         :rtype: int
@@ -185,7 +193,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @exc_level.setter
     @_check_type(int)
-    def exc_level(self, val):
+    def exc_level(self, val):  # type: (BaseLogWrap, int) -> None
         """Log level for exceptions.
 
         :type val: int
@@ -193,7 +201,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__exc_level = val
 
     @property
-    def max_indent(self):
+    def max_indent(self):  # type: (BaseLogWrap) -> int
         """Maximum indentation.
 
         :rtype: int
@@ -202,7 +210,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @max_indent.setter
     @_check_type(int)
-    def max_indent(self, val):
+    def max_indent(self, val):  # type: (BaseLogWrap, int) -> None
         """Maximum indentation.
 
         :type val: int
@@ -210,7 +218,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__max_indent = val
 
     @property
-    def blacklisted_names(self):
+    def blacklisted_names(self):  # type: (BaseLogWrap) -> typing.List[str]
         """List of arguments names to ignore in log.
 
         :rtype: typing.List[str]
@@ -218,7 +226,9 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         return self.__blacklisted_names
 
     @property
-    def blacklisted_exceptions(self):
+    def blacklisted_exceptions(
+        self
+    ):  # type: (BaseLogWrap) -> typing.List[Exception]
         """List of exceptions to re-raise without log.
 
         :rtype: typing.List[Exception]
@@ -226,7 +236,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         return self.__blacklisted_exceptions
 
     @property
-    def log_call_args(self):
+    def log_call_args(self):  # type: (BaseLogWrap) -> bool
         """Flag: log call arguments before call.
 
         :rtype: bool
@@ -235,7 +245,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @log_call_args.setter
     @_check_type(bool)
-    def log_call_args(self, val):
+    def log_call_args(self, val):  # type: (BaseLogWrap, bool) -> None
         """Flag: log call arguments before call.
 
         :type val: bool
@@ -243,7 +253,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__log_call_args = val
 
     @property
-    def log_call_args_on_exc(self):
+    def log_call_args_on_exc(self):  # type: (BaseLogWrap) -> bool
         """Flag: log call arguments on exception.
 
         :rtype: bool
@@ -252,7 +262,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @log_call_args_on_exc.setter
     @_check_type(bool)
-    def log_call_args_on_exc(self, val):
+    def log_call_args_on_exc(self, val):  # type: (BaseLogWrap, bool) -> None
         """Flag: log call arguments on exception.
 
         :type val: bool
@@ -260,7 +270,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__log_call_args_on_exc = val
 
     @property
-    def log_result_obj(self):
+    def log_result_obj(self):  # type: (BaseLogWrap) -> bool
         """Flag: log result object.
 
         :rtype: bool
@@ -269,7 +279,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @log_result_obj.setter
     @_check_type(bool)
-    def log_result_obj(self, val):
+    def log_result_obj(self, val):  # type: (BaseLogWrap, bool) -> None
         """Flag: log result object.
 
         :type val: bool
@@ -277,7 +287,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__log_result_obj = val
 
     @property
-    def _logger(self):
+    def _logger(self):  # type: (BaseLogWrap) -> logging.Logger
         """logger instance.
 
         :rtype: logging.Logger
@@ -285,7 +295,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         return self.__logger
 
     @property
-    def _spec(self):
+    def _spec(self):  # type: (BaseLogWrap) -> typing.Callable
         """Spec for function arguments.
 
         :rtype: typing.Callable
@@ -312,7 +322,12 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
             )
         )
 
-    def _get_func_args_repr(self, sig, args, kwargs):
+    def _get_func_args_repr(
+        self,
+        sig,  # type: inspect.Signature
+        args,  # type: typing.Tuple
+        kwargs  # type: typing.Dict[str, typing.Any]
+    ):  # type: (...) -> str
         """Internal helper for reducing complexity of decorator code.
 
         :type sig: inspect.Signature
@@ -348,7 +363,11 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
             param_str += "\n"
         return param_str
 
-    def _make_done_record(self, func_name, result):
+    def _make_done_record(
+        self,
+        func_name,  # type: str
+        result  # type: typing.Any
+    ):
         """Construct success record.
 
         :type func_name: str
@@ -368,7 +387,12 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
             msg=msg
         )
 
-    def _make_calling_record(self, name, arguments, method='Calling'):
+    def _make_calling_record(
+        self,
+        name,  # type: str
+        arguments,  # type: str
+        method='Calling'  # type: str
+    ):
         """Make log record before execution.
 
         :type name: str
@@ -384,7 +408,11 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
             )
         )
 
-    def _make_exc_record(self, name, arguments):
+    def _make_exc_record(
+        self,
+        name,  # type: str
+        arguments  # type: str
+    ):
         """Make log record if exception raised.
 
         :type name: str

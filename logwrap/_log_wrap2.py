@@ -23,6 +23,8 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import typing  # noqa # pylint: disable=unused-import
+
 import six
 # noinspection PyUnresolvedReferences
 import funcsigs
@@ -37,7 +39,10 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
     __slots__ = ()
 
-    def _get_function_wrapper(self, func):
+    def _get_function_wrapper(
+        self,
+        func  # type: typing.Callable
+    ):  # type: (...) -> typing.Callable
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function

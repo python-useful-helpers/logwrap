@@ -30,7 +30,10 @@ class BaseDecorator(typing.Callable):
     Implements wrapping and __call__, wrapper getter is abstract.
     """
 
-    def __init__(self, func=None):
+    def __init__(
+        self,
+        func=None  # type: typing.Optional[typing.Callable]
+    ):
         """Decorator.
 
         :param func: function to wrap
@@ -47,7 +50,9 @@ class BaseDecorator(typing.Callable):
         super(BaseDecorator, self).__init__()
 
     @property
-    def _func(self):
+    def _func(
+        self
+    ):  # type: (BaseDecorator) -> typing.Optional[typing.Callable]
         """Get wrapped function.
 
         :rtype: typing.Optional[typing.Callable]
@@ -55,7 +60,10 @@ class BaseDecorator(typing.Callable):
         return self.__func  # pragma: no cover
 
     @abc.abstractmethod
-    def _get_function_wrapper(self, func):
+    def _get_function_wrapper(
+        self,
+        func  # type: typing.Callable
+    ):  # type: (...) -> typing.Callable
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
