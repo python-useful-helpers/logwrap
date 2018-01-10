@@ -167,7 +167,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         # We are not interested to pass any arguments to object
 
     @property
-    def log_level(self):  # type: (BaseLogWrap) -> int
+    def log_level(self):  # type: () -> int
         """Log level for normal behavior.
 
         :rtype: int
@@ -176,7 +176,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @log_level.setter
     @_check_type(int)
-    def log_level(self, val):  # type: (BaseLogWrap, int) -> None
+    def log_level(self, val):  # type: (int) -> None
         """Log level for normal behavior.
 
         :type val: int
@@ -184,7 +184,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__log_level = val
 
     @property
-    def exc_level(self):  # type: (BaseLogWrap) -> int
+    def exc_level(self):  # type: () -> int
         """Log level for exceptions.
 
         :rtype: int
@@ -193,7 +193,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @exc_level.setter
     @_check_type(int)
-    def exc_level(self, val):  # type: (BaseLogWrap, int) -> None
+    def exc_level(self, val):  # type: (int) -> None
         """Log level for exceptions.
 
         :type val: int
@@ -201,7 +201,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__exc_level = val
 
     @property
-    def max_indent(self):  # type: (BaseLogWrap) -> int
+    def max_indent(self):  # type: () -> int
         """Maximum indentation.
 
         :rtype: int
@@ -210,7 +210,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @max_indent.setter
     @_check_type(int)
-    def max_indent(self, val):  # type: (BaseLogWrap, int) -> None
+    def max_indent(self, val):  # type: (int) -> None
         """Maximum indentation.
 
         :type val: int
@@ -218,7 +218,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__max_indent = val
 
     @property
-    def blacklisted_names(self):  # type: (BaseLogWrap) -> typing.List[str]
+    def blacklisted_names(self):  # type: () -> typing.List[str]
         """List of arguments names to ignore in log.
 
         :rtype: typing.List[str]
@@ -228,7 +228,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
     @property
     def blacklisted_exceptions(
         self
-    ):  # type: (BaseLogWrap) -> typing.List[Exception]
+    ):  # type: () -> typing.List[Exception]
         """List of exceptions to re-raise without log.
 
         :rtype: typing.List[Exception]
@@ -236,7 +236,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         return self.__blacklisted_exceptions
 
     @property
-    def log_call_args(self):  # type: (BaseLogWrap) -> bool
+    def log_call_args(self):  # type: () -> bool
         """Flag: log call arguments before call.
 
         :rtype: bool
@@ -245,7 +245,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @log_call_args.setter
     @_check_type(bool)
-    def log_call_args(self, val):  # type: (BaseLogWrap, bool) -> None
+    def log_call_args(self, val):  # type: (bool) -> None
         """Flag: log call arguments before call.
 
         :type val: bool
@@ -253,7 +253,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__log_call_args = val
 
     @property
-    def log_call_args_on_exc(self):  # type: (BaseLogWrap) -> bool
+    def log_call_args_on_exc(self):  # type: () -> bool
         """Flag: log call arguments on exception.
 
         :rtype: bool
@@ -262,7 +262,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @log_call_args_on_exc.setter
     @_check_type(bool)
-    def log_call_args_on_exc(self, val):  # type: (BaseLogWrap, bool) -> None
+    def log_call_args_on_exc(self, val):  # type: (bool) -> None
         """Flag: log call arguments on exception.
 
         :type val: bool
@@ -270,7 +270,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__log_call_args_on_exc = val
 
     @property
-    def log_result_obj(self):  # type: (BaseLogWrap) -> bool
+    def log_result_obj(self):  # type: () -> bool
         """Flag: log result object.
 
         :rtype: bool
@@ -279,7 +279,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @log_result_obj.setter
     @_check_type(bool)
-    def log_result_obj(self, val):  # type: (BaseLogWrap, bool) -> None
+    def log_result_obj(self, val):  # type: (bool) -> None
         """Flag: log result object.
 
         :type val: bool
@@ -287,7 +287,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self.__log_result_obj = val
 
     @property
-    def _logger(self):  # type: (BaseLogWrap) -> logging.Logger
+    def _logger(self):  # type: () -> logging.Logger
         """logger instance.
 
         :rtype: logging.Logger
@@ -295,7 +295,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         return self.__logger
 
     @property
-    def _spec(self):  # type: (BaseLogWrap) -> typing.Callable
+    def _spec(self):  # type: () -> typing.Callable
         """Spec for function arguments.
 
         :rtype: typing.Callable

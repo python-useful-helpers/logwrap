@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+Version 3.2.0
+-------------
+* Return logwrap function back with 2 branches: with arguments and not due to
+  instances of classes are not converted to methods during class compilation.
+
+Unit tests for found issue created.
+
 Version 3.1.0
 -------------
 * Drop logwrap function. Use class as-is. `logwrap = LogWrap` (No API changes).

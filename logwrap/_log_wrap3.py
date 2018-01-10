@@ -27,12 +27,16 @@ from __future__ import unicode_literals
 import asyncio
 import functools
 import inspect
+import logging
 import typing
 
 
 from . import _log_wrap_shared
 
 __all__ = ('logwrap', 'LogWrap')
+
+
+DEFAULT_DECORATOR_ARGUMENT = typing.Union[logging.Logger, typing.Callable]
 
 
 class LogWrap(_log_wrap_shared.BaseLogWrap):
@@ -106,4 +110,77 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
         return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper
 
 
-logwrap = LogWrap  # lowercase decorator
+# pylint: disable=unexpected-keyword-arg, no-value-for-parameter
+def logwrap(
+    log: DEFAULT_DECORATOR_ARGUMENT = _log_wrap_shared.logger,
+    log_level: int = logging.DEBUG,
+    exc_level: int = logging.ERROR,
+    max_indent: int = 20,
+    spec: typing.Optional[typing.Callable] = None,
+    blacklisted_names: typing.Optional[typing.List[str]] = None,
+    blacklisted_exceptions: typing.Optional[typing.List[Exception]] = None,
+    log_call_args: bool = True,
+    log_call_args_on_exc: bool = True,
+    log_result_obj: bool = True,
+) -> typing.Union[LogWrap, typing.Callable]:
+    """Log function calls and return values. Python 3.4+ version.
+
+    :param log: logger object for decorator, by default used 'logwrap'
+    :type log: typing.Union[logging.Logger, typing.Callable]
+    :param log_level: log level for successful calls
+    :type log_level: int
+    :param exc_level: log level for exception cases
+    :type exc_level: int
+    :param max_indent: maximum indent before classic `repr()` call.
+    :type max_indent: int
+    :param spec: callable object used as spec for arguments bind.
+                 This is designed for the special cases only,
+                 when impossible to change signature of target object,
+                 but processed/redirected signature is accessible.
+                 Note: this object should provide fully compatible signature
+                 with decorated function, or arguments bind will be failed!
+    :type spec: typing.Optional[typing.Callable]
+    :param blacklisted_names: list of exception,
+                              which should be re-raised without
+                              producing log record.
+    :type blacklisted_names: typing.Optional[typing.Iterable[str]]
+    :param blacklisted_exceptions: list of exception,
+                                   which should be re-raised without
+                                   producing log record.
+    :type blacklisted_exceptions: typing.Optional[typing.Iterable[Exception]]
+    :param log_call_args: log call arguments before executing wrapped function.
+    :type log_call_args: bool
+    :param log_call_args_on_exc: log call arguments if exception raised.
+    :type log_call_args_on_exc: bool
+    :param log_result_obj: log result of function call.
+    :type log_result_obj: bool
+    :return: built real decorator.
+    :rtype: _log_wrap_shared.BaseLogWrap
+    """
+    if not isinstance(log, logging.Logger):
+        wrapper = LogWrap(
+            log=_log_wrap_shared.logger,
+            log_level=log_level,
+            exc_level=exc_level,
+            max_indent=max_indent,
+            spec=spec,
+            blacklisted_names=blacklisted_names,
+            blacklisted_exceptions=blacklisted_exceptions,
+            log_call_args=log_call_args,
+            log_call_args_on_exc=log_call_args_on_exc,
+            log_result_obj=log_result_obj
+        )
+        return wrapper(log)
+    return LogWrap(
+        log=log,
+        log_level=log_level,
+        exc_level=exc_level,
+        max_indent=max_indent,
+        spec=spec,
+        blacklisted_names=blacklisted_names,
+        blacklisted_exceptions=blacklisted_exceptions,
+        log_call_args=log_call_args,
+        log_call_args_on_exc=log_call_args_on_exc,
+        log_result_obj=log_result_obj
+    )
+# pylint: enable=unexpected-keyword-arg, no-value-for-parameter

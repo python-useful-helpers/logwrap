@@ -382,6 +382,59 @@ class TestLogWrap(unittest.TestCase):
             ]
         )
 
+    def test_method(self, logger):
+        class Tst(object):
+            @logwrap.logwrap
+            def func(tst_self):
+                return 'No args'
+
+            def __repr__(tst_self):
+                return '<Tst_instance>'
+
+        tst = Tst()
+        result = tst.func()
+        self.assertEqual(result, 'No args')
+        self.assertEqual(
+            logger.mock_calls,
+            [
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Calling: \n"
+                        "'func'(\n"
+                        "    # POSITIONAL_OR_KEYWORD:\n"
+                        "    'tst_self'=<Tst_instance>,\n"
+                        ")"
+                ),
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Done: 'func' with result:\n{}".format(
+                        logwrap.pretty_repr(result))
+                ),
+            ]
+        )
+
+    def test_class_decorator(self, logger):
+        @logwrap.LogWrap
+        def func():
+            return 'No args'
+
+        result = func()
+        self.assertEqual(result, 'No args')
+        self.assertEqual(
+            logger.mock_calls,
+            [
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Calling: \n'func'()"
+                ),
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Done: 'func' with result:\n{}".format(
+                        logwrap.pretty_repr(result))
+                ),
+            ]
+        )
+
     @unittest.skipUnless(
         six.PY3,
         'Strict python 3 syntax'

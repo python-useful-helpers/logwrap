@@ -66,7 +66,10 @@ def _prepare_repr(func):
 
     params = iter(parameters)
     if not isfunction and func.__self__ is not None:
-        yield next(params).name, func.__self__
+        try:
+            yield next(params).name, func.__self__
+        except StopIteration:  # pragma: no cover
+            return
     for arg in params:
         if arg.default != Parameter.empty:
             yield arg.name, arg.default
