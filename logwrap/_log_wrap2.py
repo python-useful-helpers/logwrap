@@ -129,21 +129,12 @@ def logwrap(
     :return: built real decorator.
     :rtype: _log_wrap_shared.BaseLogWrap
     """
-    if not isinstance(log, logging.Logger):
-        wrapper = LogWrap(
-            log=_log_wrap_shared.logger,
-            log_level=log_level,
-            exc_level=exc_level,
-            max_indent=max_indent,
-            spec=spec,
-            blacklisted_names=blacklisted_names,
-            blacklisted_exceptions=blacklisted_exceptions,
-            log_call_args=log_call_args,
-            log_call_args_on_exc=log_call_args_on_exc,
-            log_result_obj=log_result_obj
-        )
-        return wrapper(log)
-    return LogWrap(
+    if isinstance(log, logging.Logger):
+        log, func = log, None
+    else:
+        log, func = _log_wrap_shared.logger, log
+
+    wrapper = LogWrap(
         log=log,
         log_level=log_level,
         exc_level=exc_level,
@@ -155,4 +146,7 @@ def logwrap(
         log_call_args_on_exc=log_call_args_on_exc,
         log_result_obj=log_result_obj
     )
+    if func is not None:
+        return wrapper(func)
+    return wrapper
 # pylint: enable=unexpected-keyword-arg, no-value-for-parameter
