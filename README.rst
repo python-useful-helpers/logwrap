@@ -3,6 +3,8 @@ logwrap
 
 .. image:: https://travis-ci.org/penguinolog/logwrap.svg?branch=master
     :target: https://travis-ci.org/penguinolog/logwrap
+.. image:: https://img.shields.io/appveyor/ci/penguinolog/logwrap.svg
+    :target: https://ci.appveyor.com/project/penguinolog/logwrap
 .. image:: https://coveralls.io/repos/github/penguinolog/logwrap/badge.svg?branch=master
     :target: https://coveralls.io/github/penguinolog/logwrap?branch=master
 .. image:: https://readthedocs.org/projects/logwrap/badge/?version=latest
@@ -305,7 +307,9 @@ For code checking several CI systems is used in parallel:
 
 1. `Travis CI: <https://travis-ci.org/penguinolog/logwrap>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests. Also it's publishes coverage on coveralls.
 
-2. `coveralls: <https://coveralls.io/github/penguinolog/logwrap>`_ is used for coverage display.
+2. `AppVeyor: <https://ci.appveyor.com/project/penguinolog/threaded>`_ is used for checking windows compatibility.
+
+3. `coveralls: <https://coveralls.io/github/penguinolog/logwrap>`_ is used for coverage display.
 
 CD system
 =========

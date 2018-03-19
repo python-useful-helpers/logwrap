@@ -59,8 +59,11 @@ requires_optimization = [
     _extension('logwrap._class_decorator'),
     _extension('logwrap._log_wrap_shared'),
     _extension('logwrap._repr_utils'),
-    _extension('logwrap.__init__'),
 ]
+if 'win32' != sys.platform:
+    requires_optimization.append(
+        _extension('logwrap.__init__')
+    )
 
 ext_modules = cythonize(
     requires_optimization,
@@ -107,7 +110,7 @@ class AllowFailRepair(build_ext.build_ext):
                     shutil.copyfile(src, dst)
         except (
             distutils.errors.DistutilsPlatformError,
-            FileNotFoundError
+            globals()['__builtins__'].get('FileNotFoundError', OSError)
         ):
             raise BuildFailed()
 
