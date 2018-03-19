@@ -24,6 +24,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import types
+import typing  # noqa # pylint: disable=unused-import
 
 import six
 
@@ -96,9 +97,9 @@ class PrettyFormat(object):
 
     def __init__(
         self,
-        max_indent=20,
-        indent_step=4,
-        py2_str=False,
+        max_indent=20,  # type: int
+        indent_step=4,  # type: int
+        py2_str=False,  # type: bool
     ):
         """Pretty Formatter.
 
@@ -114,7 +115,7 @@ class PrettyFormat(object):
         self.__py2_str = py2_str and not six.PY3  # Python 2 only behavior
 
     @property
-    def max_indent(self):
+    def max_indent(self):  # type: () -> int
         """Max indent getter.
 
         :rtype: int
@@ -122,14 +123,14 @@ class PrettyFormat(object):
         return self.__max_indent
 
     @property
-    def indent_step(self):
+    def indent_step(self):  # type: () -> int
         """Indent step getter.
 
         :rtype: int
         """
         return self.__indent_step
 
-    def next_indent(self, indent, multiplier=1):
+    def next_indent(self, indent, multiplier=1):  # type: (int, int) -> int
         """Next indentation value.
 
         :param indent: current indentation value
@@ -223,7 +224,12 @@ class PrettyFormat(object):
         """
         raise NotImplementedError  # pragma: no cover
 
-    def process_element(self, src, indent=0, no_indent_start=False):
+    def process_element(
+        self,
+        src,  # type: typing.Any
+        indent=0,  # type: int
+        no_indent_start=False  # type: bool
+    ):  # type: (...) -> six.text_type
         """Make human readable representation of object.
 
         :param src: object to process
@@ -285,10 +291,10 @@ class PrettyFormat(object):
 
     def __call__(
         self,
-        src,
-        indent=0,
-        no_indent_start=False
-    ):
+        src,  # type: typing.Any
+        indent=0,  # type: int
+        no_indent_start=False  # type: bool
+    ):  # type: (...) -> typing.Union[six.text_type, str]
         """Make human readable representation of object. The main entry point.
 
         :param src: object to process
@@ -632,13 +638,13 @@ class PrettyStr(PrettyFormat):
 
 
 def pretty_repr(
-    src,
-    indent=0,
-    no_indent_start=False,
-    max_indent=20,
-    indent_step=4,
-    py2_str=False,
-):
+    src,  # type: typing.Any
+    indent=0,  # type: int
+    no_indent_start=False,  # type: bool
+    max_indent=20,  # type: int
+    indent_step=4,  # type: int
+    py2_str=False,  # type: bool
+):  # type: (...) -> typing.Union[six.text_type, str]
     """Make human readable repr of object.
 
     :param src: object to process
@@ -670,13 +676,13 @@ def pretty_repr(
 
 
 def pretty_str(
-    src,
-    indent=0,
-    no_indent_start=False,
-    max_indent=20,
-    indent_step=4,
-    py2_str=False,
-):
+    src,  # type: typing.Any
+    indent=0,  # type: int
+    no_indent_start=False,  # type: bool
+    max_indent=20,  # type: int
+    indent_step=4,  # type: int
+    py2_str=False,  # type: bool
+):  # type: (...) -> typing.Union[six.text_type, str]
     """Make human readable str of object.
 
     :param src: object to process
