@@ -60,6 +60,7 @@ requires_optimization = [
     _extension('logwrap._log_wrap_shared'),
     _extension('logwrap._repr_utils'),
 ]
+
 if 'win32' != sys.platform:
     requires_optimization.append(
         _extension('logwrap.__init__')
@@ -110,7 +111,7 @@ class AllowFailRepair(build_ext.build_ext):
                     shutil.copyfile(src, dst)
         except (
             distutils.errors.DistutilsPlatformError,
-            globals()['__builtins__'].get('FileNotFoundError', OSError)
+            getattr(globals()['__builtins__'], 'FileNotFoundError', OSError)
         ):
             raise BuildFailed()
 
