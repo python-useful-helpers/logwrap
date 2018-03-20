@@ -14,7 +14,7 @@ fi
 arch=`uname -m`
 
 # Clean-up
-rm -rf /io/dist/.tox
+rm -rf /io/.tox
 rm -rf /io/*.egg-info
 rm -rf /io/.pytest_cache
 find -name *.py[co] -delete
