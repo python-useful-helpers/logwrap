@@ -2,7 +2,8 @@
 /*_result*.xml
 /report.html
 /assets/*
-/.cache/*
+.cache/*
+.pytest_cache/*
 
 ### Generated code
 /logwrap/*.c
