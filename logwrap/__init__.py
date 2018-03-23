@@ -53,10 +53,10 @@ __all__ = (
     'pretty_str'
 )
 
-__version__ = '3.2.1'
+__version__ = '3.2.2'
 __author__ = "Alexey Stepanov"
 __author_email__ = 'penguinolog@gmail.com'
-__url__ = 'https://github.com/penguinolog/logwrap'
+__url__ = 'https://github.com/python-useful-helpers/logwrap'
 __description__ = (
     "Decorator for logging function arguments and "
     "return value by human-readable way"

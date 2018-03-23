@@ -2,11 +2,9 @@ logwrap
 =======
 
 .. image:: https://travis-ci.org/penguinolog/logwrap.svg?branch=master
-    :target: https://travis-ci.org/penguinolog/logwrap
-.. image:: https://img.shields.io/appveyor/ci/penguinolog/logwrap.svg
-    :target: https://ci.appveyor.com/project/penguinolog/logwrap
-.. image:: https://coveralls.io/repos/github/penguinolog/logwrap/badge.svg?branch=master
-    :target: https://coveralls.io/github/penguinolog/logwrap?branch=master
+    :target: https://travis-ci.org/python-useful-helpers/logwrap
+.. image:: https://coveralls.io/repos/github/python-useful-helpers/logwrap/badge.svg?branch=master
+    :target: https://coveralls.io/github/python-useful-helpers/logwrap?branch=master
 .. image:: https://readthedocs.org/projects/logwrap/badge/?version=latest
     :target: http://logwrap.readthedocs.io/
     :alt: Documentation Status
@@ -16,8 +14,8 @@ logwrap
     :target: https://pypi.python.org/pypi/logwrap
 .. image:: https://img.shields.io/pypi/status/logwrap.svg
     :target: https://pypi.python.org/pypi/logwrap
-.. image:: https://img.shields.io/github/license/penguinolog/logwrap.svg
-    :target: https://raw.githubusercontent.com/penguinolog/logwrap/master/LICENSE
+.. image:: https://img.shields.io/github/license/python-useful-helpers/logwrap.svg
+    :target: https://raw.githubusercontent.com/python-useful-helpers/logwrap/master/LICENSE
 
 
 logwrap is a helper for logging in human-readable format function arguments and call result on function call.
@@ -33,7 +31,7 @@ Pros:
   (Especially actual for testing/development environments and for Kibana users).
 * Service free: job is done by this library and it's dependencies. It works at virtualenv
 * Free software: Apache license
-* Open Source: https://github.com/penguinolog/logwrap
+* Open Source: https://github.com/python-useful-helpers/logwrap
 * PyPI packaged: https://pypi.python.org/pypi/logwrap
 * Self-documented code: docstrings with types in comments
 * Tested: see bages on top
@@ -305,12 +303,10 @@ CI systems
 ==========
 For code checking several CI systems is used in parallel:
 
-1. `Travis CI: <https://travis-ci.org/penguinolog/logwrap>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests. Also it's publishes coverage on coveralls.
+1. `Travis CI: <https://travis-ci.org/python-useful-helpers/logwrap>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests. Also it's publishes coverage on coveralls.
 
-2. `AppVeyor: <https://ci.appveyor.com/project/penguinolog/threaded>`_ is used for checking windows compatibility.
-
-3. `coveralls: <https://coveralls.io/github/penguinolog/logwrap>`_ is used for coverage display.
+2. `coveralls: <https://coveralls.io/github/python-useful-helpers/logwrap>`_ is used for coverage display.
 
 CD system
 =========
-`Travis CI: <https://travis-ci.org/penguinolog/logwrap>`_ is used for package delivery on PyPI.
+`Travis CI: <https://travis-ci.org/python-useful-helpers/logwrap>`_ is used for package delivery on PyPI.
