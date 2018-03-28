@@ -1,7 +1,7 @@
 logwrap
 =======
 
-.. image:: https://travis-ci.org/penguinolog/logwrap.svg?branch=master
+.. image:: https://travis-ci.org/python-useful-helpers/logwrap.svg?branch=master
     :target: https://travis-ci.org/python-useful-helpers/logwrap
 .. image:: https://coveralls.io/repos/github/python-useful-helpers/logwrap/badge.svg?branch=master
     :target: https://coveralls.io/github/python-useful-helpers/logwrap?branch=master
