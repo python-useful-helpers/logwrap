@@ -56,6 +56,11 @@ __all__ = (
 __version__ = '3.2.2'
 __author__ = "Alexey Stepanov"
 __author_email__ = 'penguinolog@gmail.com'
+__maintainers__ = {
+    'Alexey Stepanov': 'penguinolog@gmail.com',
+    'Antonio Esposito': 'esposito.cloud@gmail.com',
+    'Dennis Dmitriev': 'dis-xcom@gmail.com',
+}
 __url__ = 'https://github.com/python-useful-helpers/logwrap'
 __description__ = (
     "Decorator for logging function arguments and "
