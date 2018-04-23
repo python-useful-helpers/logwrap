@@ -19,12 +19,12 @@ from __future__ import absolute_import
 import abc
 import functools
 import sys
-import typing
+import typing  # noqa  # pylint: disable=unused-import
 
 PY3 = sys.version_info[:2] > (3, 0)
 
 
-class BaseDecorator(typing.Callable):
+class BaseDecorator(object):
     """Base class for decorators.
 
     Implements wrapping and __call__, wrapper getter is abstract.
@@ -33,7 +33,7 @@ class BaseDecorator(typing.Callable):
     def __init__(
         self,
         func=None  # type: typing.Optional[typing.Callable]
-    ):
+    ):  # type: (...) -> None
         """Decorator.
 
         :param func: function to wrap
