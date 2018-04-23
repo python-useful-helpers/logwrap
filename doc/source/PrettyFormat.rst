@@ -52,19 +52,21 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
     :rtype: str
 
 
-.. py:class:: PrettyFormat(max_indent=20, indent_step=4, py2_str=False, )
+.. py:class:: PrettyFormat(object)
 
     Designed for usage as __repr__ and __str__ replacement on complex objects
 
     .. versionadded:: 1.0.2
     .. versionchanged:: 3.0.1
 
-    :param max_indent: maximal indent before classic repr() call
-    :type max_indent: int
-    :param indent_step: step for the next indentation level
-    :type indent_step: int
-    :param py2_str: use Python 2.x compatible strings instead of unicode
-    :type py2_str: bool
+    .. py:method:: __init__(max_indent=20, indent_step=4, py2_str=False, )
+
+        :param max_indent: maximal indent before classic repr() call
+        :type max_indent: int
+        :param indent_step: step for the next indentation level
+        :type indent_step: int
+        :param py2_str: use Python 2.x compatible strings instead of unicode
+        :type py2_str: bool
 
     .. note:: Attributes is read-only
 
@@ -115,31 +117,35 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
         :rtype: str
 
 
-.. py:class:: PrettyRepr(max_indent=20, indent_step=4, py2_str=False, )
+.. py:class:: PrettyRepr(PrettyFormat)
 
     Designed for usage as __repr__ replacement on complex objects
 
     .. versionadded:: 3.0.0
     .. versionchanged:: 3.0.1
 
-    :param max_indent: maximal indent before classic repr() call
-    :type max_indent: int
-    :param indent_step: step for the next indentation level
-    :type indent_step: int
-    :param py2_str: use Python 2.x compatible strings instead of unicode
-    :type py2_str: bool
+    .. py:method:: __init__(max_indent=20, indent_step=4, py2_str=False, )
+
+        :param max_indent: maximal indent before classic repr() call
+        :type max_indent: int
+        :param indent_step: step for the next indentation level
+        :type indent_step: int
+        :param py2_str: use Python 2.x compatible strings instead of unicode
+        :type py2_str: bool
 
 
-.. py:class:: PrettyStr(max_indent=20, indent_step=4, py2_str=False, )
+.. py:class:: PrettyStr(PrettyFormat)
 
     Designed for usage as __repr__ replacement on complex objects
 
     .. versionadded:: 3.0.0
     .. versionchanged:: 3.0.1
 
-    :param max_indent: maximal indent before classic repr() call
-    :type max_indent: int
-    :param indent_step: step for the next indentation level
-    :type indent_step: int
-    :param py2_str: use Python 2.x compatible strings instead of unicode
-    :type py2_str: bool
+    .. py:method:: __init__(max_indent=20, indent_step=4, py2_str=False, )
+
+        :param max_indent: maximal indent before classic repr() call
+        :type max_indent: int
+        :param indent_step: step for the next indentation level
+        :type indent_step: int
+        :param py2_str: use Python 2.x compatible strings instead of unicode
+        :type py2_str: bool

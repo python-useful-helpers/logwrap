@@ -102,8 +102,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         log_call_args=True,  # type: bool
         log_call_args_on_exc=True,  # type: bool
         log_result_obj=True,  # type: bool
-
-    ):
+    ):  # type: (...) -> None
         """Log function calls and return values.
 
         :param log: logger object for decorator, by default used 'logwrap'

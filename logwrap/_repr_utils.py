@@ -100,7 +100,7 @@ class PrettyFormat(object):
         max_indent=20,  # type: int
         indent_step=4,  # type: int
         py2_str=False,  # type: bool
-    ):
+    ):  # type: (...) -> None
         """Pretty Formatter.
 
         :param max_indent: maximal indent before classic repr() call
