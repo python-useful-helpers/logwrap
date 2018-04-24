@@ -22,6 +22,7 @@ import ast
 import collections
 from distutils.command import build_ext
 import distutils.errors
+import glob
 import os.path
 import shutil
 import sys
@@ -260,6 +261,12 @@ setup_args = dict(
         ],
     },
     install_requires=required,
+    package_data={
+        'logwrap': [
+            os.path.basename(filename)
+            for filename in glob.glob(os.path.join('logwrap', '*.pyi'))
+        ],
+    },
 )
 if PY3 and cythonize is not None:
     setup_args['ext_modules'] = ext_modules

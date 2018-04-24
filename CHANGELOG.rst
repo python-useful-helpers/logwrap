@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+Version 3.3.0
+-------------
+* Type hints and stubs
+* PEP0518
+
 Version 3.2.0
 -------------
 * Return logwrap function back with 2 branches: with arguments and not due to

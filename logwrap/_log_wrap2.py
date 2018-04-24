@@ -35,10 +35,6 @@ from . import _log_wrap_shared
 __all__ = ('logwrap', 'LogWrap')
 
 
-DEFAULT_DECORATOR_ARGUMENT = typing.Union[logging.Logger, typing.Callable]
-BLACKLISTED_EXCEPTIONS_ARGUMENT = typing.Optional[typing.List[Exception]]
-
-
 class LogWrap(_log_wrap_shared.BaseLogWrap):
     """LogWrap."""
 
@@ -84,13 +80,13 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 def logwrap(
-    log=_log_wrap_shared.logger,  # type: DEFAULT_DECORATOR_ARGUMENT
+    log=_log_wrap_shared.logger,  # type: typing.Union[logging.Logger, typing.Callable]
     log_level=logging.DEBUG,  # type: int
     exc_level=logging.ERROR,  # type: int
     max_indent=20,  # type: int
     spec=None,  # type: typing.Optional[typing.Callable]
     blacklisted_names=None,  # type: typing.Optional[typing.List[str]]
-    blacklisted_exceptions=None,  # type: BLACKLISTED_EXCEPTIONS_ARGUMENT
+    blacklisted_exceptions=None,  # type: typing.Optional[typing.List[Exception]]
     log_call_args=True,  # type: bool
     log_call_args_on_exc=True,  # type: bool
     log_result_obj=True,  # type: bool
@@ -112,9 +108,8 @@ def logwrap(
                  Note: this object should provide fully compatible signature
                  with decorated function, or arguments bind will be failed!
     :type spec: typing.Optional[typing.Callable]
-    :param blacklisted_names: list of exception,
-                              which should be re-raised without
-                              producing log record.
+    :param blacklisted_names: Blacklisted argument names.
+                              Arguments with this names will be skipped in log.
     :type blacklisted_names: typing.Optional[typing.List[str]]
     :param blacklisted_exceptions: list of exception,
                                    which should be re-raised without
@@ -130,9 +125,9 @@ def logwrap(
     :rtype: _log_wrap_shared.BaseLogWrap
     """
     if isinstance(log, logging.Logger):
-        log, func = log, None
+        func = None
     else:
-        log, func = _log_wrap_shared.logger, log
+        log, func = _log_wrap_shared.logger, log  # type: logging.Logger, typing.Callable
 
     wrapper = LogWrap(
         log=log,

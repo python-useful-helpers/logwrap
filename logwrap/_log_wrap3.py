@@ -36,9 +36,6 @@ from . import _log_wrap_shared
 __all__ = ('logwrap', 'LogWrap')
 
 
-DEFAULT_DECORATOR_ARGUMENT = typing.Union[logging.Logger, typing.Callable]
-
-
 class LogWrap(_log_wrap_shared.BaseLogWrap):
     """Python 3.3+ version of LogWrap."""
 
@@ -55,7 +52,7 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
         :return: wrapped coroutine or function
         :rtype: typing.Callable
         """
-        sig = inspect.signature(obj=self._spec or func)
+        sig = inspect.signature(self._spec or func)
 
         # pylint: disable=missing-docstring
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
@@ -112,7 +109,7 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 def logwrap(
-    log: DEFAULT_DECORATOR_ARGUMENT = _log_wrap_shared.logger,
+    log: typing.Union[logging.Logger, typing.Callable] = _log_wrap_shared.logger,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -140,9 +137,8 @@ def logwrap(
                  Note: this object should provide fully compatible signature
                  with decorated function, or arguments bind will be failed!
     :type spec: typing.Optional[typing.Callable]
-    :param blacklisted_names: list of exception,
-                              which should be re-raised without
-                              producing log record.
+    :param blacklisted_names: Blacklisted argument names.
+                              Arguments with this names will be skipped in log.
     :type blacklisted_names: typing.Optional[typing.Iterable[str]]
     :param blacklisted_exceptions: list of exception,
                                    which should be re-raised without
@@ -158,9 +154,9 @@ def logwrap(
     :rtype: _log_wrap_shared.BaseLogWrap
     """
     if isinstance(log, logging.Logger):
-        log, func = log, None
+        func = None
     else:
-        log, func = _log_wrap_shared.logger, log
+        log, func = _log_wrap_shared.logger, log  # type: logging.Logger, typing.Callable
 
     wrapper = LogWrap(
         log=log,
