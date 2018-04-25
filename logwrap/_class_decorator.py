@@ -1,4 +1,6 @@
-#    Copyright 2017 Alexey Stepanov aka penguinolog
+#!/usr/bin/env python
+
+#    Copyright 2017-2018 Alexey Stepanov aka penguinolog
 ##
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -15,19 +17,55 @@
 """Base class for decorators."""
 
 from __future__ import absolute_import
+from __future__ import print_function
 
 import abc
 import functools
 import sys
 import typing  # noqa  # pylint: disable=unused-import
 
-PY3 = sys.version_info[:2] > (3, 0)
+PY3 = sys.version_info[:2] > (3, 0)  # type: bool
 
 
 class BaseDecorator(object):
     """Base class for decorators.
 
     Implements wrapping and __call__, wrapper getter is abstract.
+
+    Note:
+        wrapper getter is called only on function call,
+        if decorator used without braces.
+
+    Usage example:
+
+    >>> class TestDecorator(BaseDecorator):
+    ...     def _get_function_wrapper(self, func):
+    ...         print('Wrapping: {}'.format(func.__name__))
+    ...         @functools.wraps(func)
+    ...         def wrapper(*args, **kwargs):
+    ...             print('call_function: {}'.format(func.__name__))
+    ...             return func(*args, **kwargs)
+    ...         return wrapper
+
+    >>> @TestDecorator
+    ... def func_no_init():
+    ...     pass
+    >>> func_no_init()
+    Wrapping: func_no_init
+    call_function: func_no_init
+    >>> isinstance(func_no_init, TestDecorator)
+    True
+    >>> func_no_init._func is func_no_init.__wrapped__
+    True
+
+    >>> @TestDecorator()
+    ... def func_init():
+    ...     pass
+    Wrapping: func_init
+    >>> func_init()
+    call_function: func_init
+    >>> isinstance(func_init, TestDecorator)
+    False
     """
 
     def __init__(
@@ -40,11 +78,11 @@ class BaseDecorator(object):
         :type func: typing.Optional[typing.Callable]
         """
         # pylint: disable=assigning-non-slot
-        self.__func = func
+        self.__func = func  # type: typing.Optional[typing.Callable]
         if self.__func is not None:
             functools.update_wrapper(self, self.__func)
             if not PY3:  # pragma: no cover
-                self.__wrapped__ = self.__func
+                self.__wrapped__ = self.__func  # type: typing.Callable
         # pylint: enable=assigning-non-slot
         # noinspection PyArgumentList
         super(BaseDecorator, self).__init__()
@@ -52,7 +90,7 @@ class BaseDecorator(object):
     @property
     def _func(
         self
-    ):  # type: (BaseDecorator) -> typing.Optional[typing.Callable]
+    ):  # type: () -> typing.Optional[typing.Callable]
         """Get wrapped function.
 
         :rtype: typing.Optional[typing.Callable]
@@ -72,7 +110,11 @@ class BaseDecorator(object):
         """
         raise NotImplementedError()  # pragma: no cover
 
-    def __call__(self, *args, **kwargs):
+    def __call__(
+        self,
+        *args,  # type: typing.Any
+        **kwargs  # type: typing.Any
+    ):  # type: (...) -> typing.Any
         """Main decorator getter."""
         args = list(args)
         wrapped = self.__func or args.pop(0)
@@ -88,3 +130,10 @@ class BaseDecorator(object):
             func=self.__func,
             id=id(self)
         )  # pragma: no cover
+
+
+# 8<----------------------------------------------------------------------------
+
+if __name__ == '__main__':
+    import doctest  # pragma: no cover
+    doctest.testmod(verbose=True)  # pragma: no cover

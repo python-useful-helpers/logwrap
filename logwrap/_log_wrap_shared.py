@@ -22,14 +22,14 @@ from __future__ import unicode_literals
 import functools
 import inspect  # noqa # pylint: disable=unused-import
 import logging
-import typing
+import typing  # noqa # pylint: disable=unused-import
 
 import logwrap as core
 from . import _class_decorator
 
 __all__ = ('BaseLogWrap', )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)  # type: logging.Logger
 
 
 indent = 4
@@ -40,18 +40,12 @@ fmt = "\n{spc:<{indent}}{{key!r}}={{val}},".format(
 comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
 
 
-# Long arguments types:
-_LoggerArg = typing.Union[logging.Logger, typing.Callable]
-_BlacklistedNamesArg = typing.Optional[typing.Iterable[str]]
-_BlacklistedExceptionsArg = typing.Optional[typing.Iterable[Exception]]
-
-
-def _check_type(expected):
+def _check_type(expected):  # type: (type) -> typing.Callable
     """Check type before assign.
 
     :type expected: type
     """
-    def deco(func):
+    def deco(func):  # type: (typing.Callable) -> typing.Callable
         """Check type before assign."""
         # pylint: disable=missing-docstring
         # noinspection PyMissingOrEmptyDocstring
@@ -92,13 +86,13 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     def __init__(
         self,
-        log=logger,  # type: _LoggerArg
+        log=logger,  # type: typing.Union[logging.Logger, typing.Callable]
         log_level=logging.DEBUG,  # type: int
         exc_level=logging.ERROR,  # type: int
         max_indent=20,  # type: int
         spec=None,  # type: typing.Optional[typing.Callable]
-        blacklisted_names=None,  # type: _BlacklistedNamesArg
-        blacklisted_exceptions=None,  # type: _BlacklistedExceptionsArg
+        blacklisted_names=None,  # type: typing.Optional[typing.Iterable[str]]
+        blacklisted_exceptions=None,  # type: typing.Optional[typing.Iterable[Exception]]
         log_call_args=True,  # type: bool
         log_call_args_on_exc=True,  # type: bool
         log_result_obj=True,  # type: bool
@@ -141,18 +135,18 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         """
         # Typing fix:
         if blacklisted_names is None:
-            self.__blacklisted_names = []
+            self.__blacklisted_names = []  # type: typing.List[str]
         else:
             self.__blacklisted_names = list(blacklisted_names)
         if blacklisted_exceptions is None:
-            self.__blacklisted_exceptions = []
+            self.__blacklisted_exceptions = []  # type: typing.List[Exception]
         else:
             self.__blacklisted_exceptions = list(blacklisted_exceptions)
 
         if not isinstance(log, logging.Logger):
-            func, self.__logger = log, logger
+            func, self.__logger = log, logger  # type: typing.Callable, logging.Logger
         else:
-            func, self.__logger = None, log
+            func, self.__logger = None, log  # type: None, logging.Logger
         super(BaseLogWrap, self).__init__(func=func)
 
         self.__log_level = log_level

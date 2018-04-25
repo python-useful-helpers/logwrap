@@ -43,25 +43,27 @@ else:  # pragma: no cover
 # pylint: enable=ungrouped-imports, no-name-in-module
 
 
-def _known_callable(item):
+def _known_callable(item):  # type: (typing.Any) -> bool
     """Check for possibility to parse callable."""
     return isinstance(item, (types.FunctionType, types.MethodType))
 
 
-def _simple(item):
+def _simple(item):  # type: (typing.Any) -> bool
     """Check for nested iterations: True, if not."""
     return not isinstance(item, (list, set, tuple, dict, frozenset))
 
 
 # pylint: disable=no-member
-def _prepare_repr(func):
+def _prepare_repr(
+    func  # type: typing.Union[types.FunctionType, types.MethodType]
+):  # type: (...) -> typing.Iterator[typing.Union[str, typing.Tuple[str, typing.Any]]]
     """Get arguments lists with defaults.
 
     :type func: typing.Union[types.FunctionType, types.MethodType]
-    :rtype: typing.Generator[str]
+    :rtype: typing.Iterator[typing.Union[str, typing.Tuple[str, typing.Any]]]
     """
     isfunction = isinstance(func, types.FunctionType)
-    real_func = func if isfunction else func.__func__
+    real_func = func if isfunction else func.__func__  # type: typing.Callable
 
     parameters = list(signature(real_func).parameters.values())
 
@@ -141,7 +143,11 @@ class PrettyFormat(object):
         """
         return indent + multiplier * self.indent_step
 
-    def _repr_callable(self, src, indent=0):
+    def _repr_callable(
+        self,
+        src,  # type: typing.Union[types.FunctionType, types.MethodType]
+        indent=0  # type: int
+    ):  # type: (...) -> six.text_type
         """Repr callable object (function or method).
 
         :type src: typing.Union[types.FunctionType, types.MethodType]
@@ -150,7 +156,12 @@ class PrettyFormat(object):
         """
         raise NotImplementedError  # pragma: no cover
 
-    def _repr_simple(self, src, indent=0, no_indent_start=False):
+    def _repr_simple(
+        self,
+        src,  # type: typing.Any
+        indent=0,  # type: int
+        no_indent_start=False  # type: bool
+    ):  # type: (...) -> six.text_type
         """Repr object without iteration.
 
         :type src: typing.Union[
@@ -163,26 +174,30 @@ class PrettyFormat(object):
         """
         raise NotImplementedError()  # pragma: no cover
 
-    def _repr_dict_items(self, src, indent=0):
+    def _repr_dict_items(
+        self,
+        src,  # type: typing.Dict
+        indent=0  # type: int
+    ):  # type: (...) -> typing.Iterator[str]
         """Repr dict items.
 
         :param src: object to process
-        :type src: dict
+        :type src: typing.Dict
         :param indent: start indentation
         :type indent: int
-        :rtype: typing.Generator[str]
+        :rtype: typing.Iterator[str]
         """
         raise NotImplementedError()  # pragma: no cover
 
     @staticmethod
     def _repr_iterable_item(
-        nl,
-        obj_type,
-        prefix,
-        indent,
-        result,
-        suffix,
-    ):
+        nl,  # type: bool
+        obj_type,  # type: str
+        prefix,  # type: str
+        indent,  # type: int
+        result,  # type: str
+        suffix,  # type: str
+    ):  # type: (...) -> six.text_type
         """Repr iterable item.
 
         :param nl: newline before item
@@ -201,14 +216,18 @@ class PrettyFormat(object):
         """
         raise NotImplementedError()  # pragma: no cover
 
-    def _repr_iterable_items(self, src, indent=0):
+    def _repr_iterable_items(
+        self,
+        src,  # type: typing.Iterable
+        indent=0  # type: int
+    ):  # type: (...) -> typing.Iterator[str]
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
         :type src: typing.Iterable
         :param indent: start indentation
         :type indent: int
-        :rtype: typing.Generator[str]
+        :rtype: typing.Iterator[str]
         """
         for elem in src:
             yield '\n' + self.process_element(
@@ -217,7 +236,7 @@ class PrettyFormat(object):
             ) + ','
 
     @property
-    def _magic_method_name(self):
+    def _magic_method_name(self):  # type: () -> six.text_type
         """Magic method name.
 
         :rtype: str
@@ -331,7 +350,7 @@ class PrettyRepr(PrettyFormat):
     __slots__ = ()
 
     @property
-    def _magic_method_name(self):
+    def _magic_method_name(self):  # type: () -> six.text_type
         """Magic method name.
 
         :rtype: str
@@ -339,7 +358,10 @@ class PrettyRepr(PrettyFormat):
         return '__pretty_repr__'
 
     @staticmethod
-    def _strings_repr(indent, val):
+    def _strings_repr(
+        indent,  # type: int
+        val  # type: typing.Union[six.binary_type, six.text_type]
+    ):  # type: (...) -> six.text_type
         """Custom repr for strings and binary strings."""
         if isinstance(val, six.binary_type):
             val = val.decode(
@@ -356,7 +378,12 @@ class PrettyRepr(PrettyFormat):
             string=val
         )
 
-    def _repr_simple(self, src, indent=0, no_indent_start=False):
+    def _repr_simple(
+        self,
+        src,  # type: typing.Any
+        indent=0,  # type: int
+        no_indent_start=False  # type: bool
+    ):  # type: (...) -> six.text_type
         """Repr object without iteration.
 
         :type src: typing.Union[
@@ -382,14 +409,18 @@ class PrettyRepr(PrettyFormat):
             val=src,
         )
 
-    def _repr_dict_items(self, src, indent=0):
+    def _repr_dict_items(
+        self,
+        src,  # type: typing.Dict
+        indent=0  # type: int
+    ):  # type: (...) -> typing.Iterator[str]
         """Repr dict items.
 
         :param src: object to process
         :type src: dict
         :param indent: start indentation
         :type indent: int
-        :rtype: typing.Generator[str]
+        :rtype: typing.Iterator[str]
         """
         max_len = max((len(repr(key)) for key in src)) if src else 0
         for key, val in src.items():
@@ -405,7 +436,11 @@ class PrettyRepr(PrettyFormat):
                 )
             )
 
-    def _repr_callable(self, src, indent=0):
+    def _repr_callable(
+        self,
+        src,  # type: typing.Union[types.FunctionType, types.MethodType]
+        indent=0  # type: int
+    ):  # type: (...) -> six.text_type
         """Repr callable object (function or method).
 
         :type src: typing.Union[types.FunctionType, types.MethodType]
@@ -444,13 +479,13 @@ class PrettyRepr(PrettyFormat):
 
     @staticmethod
     def _repr_iterable_item(
-        nl,
-        obj_type,
-        prefix,
-        indent,
-        result,
-        suffix,
-    ):
+        nl,  # type: bool
+        obj_type,  # type: str
+        prefix,  # type: str
+        indent,  # type: int
+        result,  # type: str
+        suffix,  # type: str
+    ):  # type: (...) -> six.text_type
         """Repr iterable item.
 
         :param nl: newline before item
@@ -491,7 +526,7 @@ class PrettyStr(PrettyFormat):
     __slots__ = ()
 
     @property
-    def _magic_method_name(self):
+    def _magic_method_name(self):  # type: () -> six.text_type
         """Magic method name.
 
         :rtype: str
@@ -499,7 +534,10 @@ class PrettyStr(PrettyFormat):
         return '__pretty_str__'
 
     @staticmethod
-    def _strings_str(indent, val):
+    def _strings_str(
+        indent,  # type: int
+        val  # type: typing.Union[six.binary_type, six.text_type]
+    ):  # type: (...) -> six.text_type
         """Custom repr for strings and binary strings."""
         if isinstance(val, six.binary_type):
             val = val.decode(
@@ -512,7 +550,12 @@ class PrettyStr(PrettyFormat):
             string=val
         )
 
-    def _repr_simple(self, src, indent=0, no_indent_start=False):
+    def _repr_simple(
+        self,
+        src,  # type: typing.Any
+        indent=0,  # type: int
+        no_indent_start=False  # type: bool
+    ):  # type: (...) -> six.text_type
         """Repr object without iteration.
 
         :type src: typing.Union[
@@ -538,7 +581,11 @@ class PrettyStr(PrettyFormat):
             val=src,
         )
 
-    def _repr_dict_items(self, src, indent=0):
+    def _repr_dict_items(
+        self,
+        src,  # type: typing.Dict
+        indent=0  # type: int
+    ):  # type: (...) -> typing.Iterator[str]
         """Repr dict items.
 
         :param src: object to process
@@ -561,7 +608,11 @@ class PrettyStr(PrettyFormat):
                 )
             )
 
-    def _repr_callable(self, src, indent=0):
+    def _repr_callable(
+        self,
+        src,  # type: typing.Union[types.FunctionType, types.MethodType]
+        indent=0  # type: int
+    ):  # type: (...) -> six.text_type
         """Repr callable object (function or method).
 
         :type src: typing.Union[types.FunctionType, types.MethodType]
@@ -600,13 +651,13 @@ class PrettyStr(PrettyFormat):
 
     @staticmethod
     def _repr_iterable_item(
-        nl,
-        obj_type,
-        prefix,
-        indent,
-        result,
-        suffix,
-    ):
+        nl,  # type: bool
+        obj_type,  # type: str
+        prefix,  # type: str
+        indent,  # type: int
+        result,  # type: str
+        suffix,  # type: str
+    ):  # type: (...) -> six.text_type
         """Repr iterable item.
 
         :param nl: newline before item
