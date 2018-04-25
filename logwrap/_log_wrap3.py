@@ -1,4 +1,4 @@
-#    Copyright 2016-2017 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2018 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -37,7 +37,7 @@ __all__ = ('logwrap', 'LogWrap')
 
 
 class LogWrap(_log_wrap_shared.BaseLogWrap):
-    """Python 3.3+ version of LogWrap."""
+    """Python 3.4+ version of LogWrap."""
 
     __slots__ = ()
 

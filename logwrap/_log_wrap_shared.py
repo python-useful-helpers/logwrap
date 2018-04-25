@@ -1,4 +1,4 @@
-#    Copyright 2016-2017 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2018 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -24,6 +24,8 @@ import inspect  # noqa # pylint: disable=unused-import
 import logging
 import typing  # noqa # pylint: disable=unused-import
 
+import six  # noqa # pylint: disable=unused-import
+
 import logwrap as core
 from . import _class_decorator
 
@@ -40,7 +42,7 @@ fmt = "\n{spc:<{indent}}{{key!r}}={{val}},".format(
 comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
 
 
-def _check_type(expected):  # type: (type) -> typing.Callable
+def _check_type(expected):  # type: (typing.Type) -> typing.Callable
     """Check type before assign.
 
     :type expected: type
@@ -320,7 +322,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         sig,  # type: inspect.Signature
         args,  # type: typing.Tuple
         kwargs  # type: typing.Dict[str, typing.Any]
-    ):  # type: (...) -> str
+    ):  # type: (...) -> six.text_type
         """Internal helper for reducing complexity of decorator code.
 
         :type sig: inspect.Signature
@@ -360,7 +362,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self,
         func_name,  # type: str
         result  # type: typing.Any
-    ):
+    ):  # type: (...) -> None
         """Construct success record.
 
         :type func_name: str
@@ -385,7 +387,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         name,  # type: str
         arguments,  # type: str
         method='Calling'  # type: str
-    ):
+    ):  # type: (...) -> None
         """Make log record before execution.
 
         :type name: str
@@ -405,7 +407,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         self,
         name,  # type: str
         arguments  # type: str
-    ):
+    ):  # type: (...) -> None
         """Make log record if exception raised.
 
         :type name: str
