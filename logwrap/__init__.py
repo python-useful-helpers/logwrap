@@ -1,4 +1,4 @@
-#    Copyright 2016-2017 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2018 Alexey Stepanov aka penguinolog
 #
 #    Copyright 2016 Mirantis, Inc.
 #
@@ -62,8 +62,5 @@ __maintainers__ = {
     'Dennis Dmitriev': 'dis-xcom@gmail.com',
 }
 __url__ = 'https://github.com/python-useful-helpers/logwrap'
-__description__ = (
-    "Decorator for logging function arguments and "
-    "return value by human-readable way"
-)
+__description__ = "Decorator for logging function arguments and return value by human-readable way"
 __license__ = "Apache License, Version 2.0"

@@ -1,8 +1,14 @@
+import inspect
 import logging
 import typing
+
+import six
+
 from . import _class_decorator
 
 logger: logging.Logger
+
+def _check_type(expected: typing.Type) -> typing.Callable: ...
 
 class BaseLogWrap(_class_decorator.BaseDecorator):
     def __init__(
@@ -60,3 +66,35 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @log_result_obj.setter
     def log_result_obj(self, val: bool) -> None: ...
+
+    @property
+    def _logger(self) -> logging.Logger: ...
+
+    @property
+    def _spec(self) -> typing.Callable: ...
+
+    def _get_func_args_repr(
+        self,
+        sig: inspect.Signature,
+        args: typing.Tuple,
+        kwargs: typing.Dict[str, typing.Any]
+    ) -> six.text_type: ...
+
+    def _make_done_record(
+        self,
+        func_name: str,
+        result: typing.Any
+    ) -> None: ...
+
+    def _make_calling_record(
+        self,
+        name: str,
+        arguments: str,
+        method: str='Calling',
+    ) -> None: ...
+
+    def _make_exc_record(
+        self,
+        name: str,
+        arguments: str
+    ) -> None: ...

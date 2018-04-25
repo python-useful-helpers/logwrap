@@ -23,6 +23,7 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import abc
 import types
 import typing  # noqa # pylint: disable=unused-import
 
@@ -143,6 +144,7 @@ class PrettyFormat(object):
         """
         return indent + multiplier * self.indent_step
 
+    @abc.abstractmethod
     def _repr_callable(
         self,
         src,  # type: typing.Union[types.FunctionType, types.MethodType]
@@ -154,8 +156,9 @@ class PrettyFormat(object):
         :type indent: int
         :rtype: str
         """
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError()  # pragma: no cover
 
+    @abc.abstractmethod
     def _repr_simple(
         self,
         src,  # type: typing.Any
@@ -174,6 +177,7 @@ class PrettyFormat(object):
         """
         raise NotImplementedError()  # pragma: no cover
 
+    @abc.abstractmethod
     def _repr_dict_items(
         self,
         src,  # type: typing.Dict
@@ -236,12 +240,13 @@ class PrettyFormat(object):
             ) + ','
 
     @property
+    @abc.abstractmethod
     def _magic_method_name(self):  # type: () -> six.text_type
         """Magic method name.
 
         :rtype: str
         """
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError()  # pragma: no cover
 
     def process_element(
         self,

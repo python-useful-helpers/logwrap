@@ -2,7 +2,8 @@ import logging
 import typing
 from . import _log_wrap_shared
 
-class LogWrap(_log_wrap_shared.BaseLogWrap): ...
+class LogWrap(_log_wrap_shared.BaseLogWrap):
+    def _get_function_wrapper(self, func: typing.Callable) -> typing.Callable: ...
 
 def logwrap(
     log: typing.Union[logging.Logger, typing.Callable]=...,
