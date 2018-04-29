@@ -13,7 +13,8 @@ def _check_type(expected: typing.Type) -> typing.Callable: ...
 class BaseLogWrap(_class_decorator.BaseDecorator):
     def __init__(
         self,
-        log: typing.Union[logging.Logger, typing.Callable]=...,
+        func: typing.Optional[typing.Callable]=None,
+        log: logging.Logger=...,
         log_level: int=...,
         exc_level: int=...,
         max_indent: int=...,

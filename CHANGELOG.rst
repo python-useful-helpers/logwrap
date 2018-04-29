@@ -4,6 +4,8 @@ Version 3.3.0
 -------------
 * Type hints and stubs
 * PEP0518
+* Deprecation of *args for logwrap
+* Fix empty *args and **kwargs
 
 Version 3.2.0
 -------------

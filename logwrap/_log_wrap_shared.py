@@ -88,7 +88,8 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     def __init__(
         self,
-        log=logger,  # type: typing.Union[logging.Logger, typing.Callable]
+        func=None,  # type: typing.Optional[typing.Callable]
+        log=logger,  # type: logging.Logger
         log_level=logging.DEBUG,  # type: int
         exc_level=logging.ERROR,  # type: int
         max_indent=20,  # type: int
@@ -101,8 +102,10 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
     ):  # type: (...) -> None
         """Log function calls and return values.
 
+        :param func: function to wrap
+        :type func: typing.Optional[typing.Callable]
         :param log: logger object for decorator, by default used 'logwrap'
-        :type log: typing.Union[logging.Logger, typing.Callable]
+        :type log: logging.Logger
         :param log_level: log level for successful calls
         :type log_level: int
         :param exc_level: log level for exception cases
@@ -134,7 +137,11 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         :type log_call_args_on_exc: bool
         :param log_result_obj: log result of function call.
         :type log_result_obj: bool
+
+        .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
         """
+        super(BaseLogWrap, self).__init__(func=func)
+
         # Typing fix:
         if blacklisted_names is None:
             self.__blacklisted_names = []  # type: typing.List[str]
@@ -145,11 +152,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         else:
             self.__blacklisted_exceptions = list(blacklisted_exceptions)
 
-        if not isinstance(log, logging.Logger):
-            func, self.__logger = log, logger  # type: typing.Callable, logging.Logger
-        else:
-            func, self.__logger = None, log  # type: None, logging.Logger
-        super(BaseLogWrap, self).__init__(func=func)
+        self.__logger = log
 
         self.__log_level = log_level
         self.__exc_level = exc_level
@@ -345,10 +348,18 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
             if last_kind != param.kind:
                 param_str += comment(kind=param.kind)
                 last_kind = param.kind
+
+            src = bound.get(param.name, param.default)
+            if param.empty == src:
+                if param.VAR_POSITIONAL == param.kind:
+                    src = ()
+                elif param.VAR_KEYWORD == param.kind:
+                    src = {}
+
             param_str += fmt(
                 key=param.name,
                 val=core.pretty_repr(
-                    src=bound.get(param.name, param.default),
+                    src=src,
                     indent=indent + 4,
                     no_indent_start=True,
                     max_indent=self.max_indent,
