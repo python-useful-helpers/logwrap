@@ -12,10 +12,12 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
     .. versionadded:: 2.2.0
 
-    .. py:method:: __init__(log=logging.getLogger('logwrap'), log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, spec=None, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_result_obj=True, )
+    .. py:method:: __init__(func=None, *, log=logging.getLogger('logwrap'), log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, spec=None, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_result_obj=True, )
 
+        :param func: function to wrap
+        :type func: typing.Optional[typing.Callable]
         :param log: logger object for decorator, by default used 'logwrap'
-        :type log: typing.Union[logging.Logger, typing.Callable]
+        :type log: logging.Logger
         :param log_level: log level for successful calls
         :type log_level: int
         :param exc_level: log level for exception cases
@@ -43,6 +45,9 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type log_call_args_on_exc: bool
         :param log_result_obj: log result of function call.
         :type log_result_obj: bool
+
+        .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
+        .. versionchanged:: 3.3.0 Deprecation of *args
 
     .. note:: Attributes/properties names the same as argument names and changes
               the same fields.

@@ -65,6 +65,9 @@ logwrap
 -------
 The main decorator. Could be used as not argumented (`@logwrap.logwrap`) and argumented (`@logwrap.logwrap()`).
 Not argumented usage simple calls with default values for all positions.
+
+.. note:: Argumens should be set via keywords only.
+
 Argumented usage with arguments from signature:
 
 .. code-block:: python
