@@ -258,6 +258,7 @@ setup_args = dict(
     extras_require={
         ':python_version == "2.7"': [
             'funcsigs>=1.0',
+            'enum34>=1.1',
         ],
     },
     install_requires=required,

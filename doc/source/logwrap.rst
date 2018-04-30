@@ -47,7 +47,35 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type log_result_obj: bool
 
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
-        .. versionchanged:: 3.3.0 Deprecation of *args
+        .. versionchanged:: 3.3.0 Deprecation of `*args`
+
+    .. py:method:: pre_process_param(self, arg)
+
+        Process parameter for the future logging.
+
+        :param arg: bound parameter
+        :type arg: BoundParameter
+        :return: value, value override for logging or None if argument should not be logged.
+        :rtype: typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]
+
+        Override this method if some modifications required for parameter value before logging
+
+        .. versionadded:: 3.3.0
+
+    .. py:method:: post_process_param(self, arg, arg_repr)
+
+        Process parameter for the future logging.
+
+        :param arg: bound parameter
+        :type arg: BoundParameter
+        :param arg_repr: repr for value
+        :type arg_repr: six.text_type
+        :return: processed repr for value
+        :rtype: six.text_type
+
+        Override this method if some modifications required for result of repr() over parameter
+
+        .. versionadded:: 3.3.0
 
     .. note:: Attributes/properties names the same as argument names and changes
               the same fields.

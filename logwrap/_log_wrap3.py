@@ -57,17 +57,10 @@ def _apply_old_spec(*args, **kwargs) -> typing.Dict[str, typing.Any]:
     # pylint: enable=unused-argument
 
     sig = inspect.signature(old_spec)  # type: inspect.Signature
-    parameters = tuple(sig.parameters.values())  # type: typing.Tuple[inspect.Parameter, ...]
-
-    real_parameters = {
-        parameter.name: parameter.default for parameter in parameters
-    }  # type: typing.Dict[str, typing.Any]
-
-    bound = sig.bind(*args, **kwargs).arguments
 
     final_kwargs = {
-        key: bound.get(key, real_parameters[key])
-        for key in real_parameters
+        parameter.name: parameter.value
+        for parameter in _log_wrap_shared.bind_args_kwargs(sig, *args, **kwargs)
     }  # type: typing.Dict[str, typing.Any]
 
     return final_kwargs

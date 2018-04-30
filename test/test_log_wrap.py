@@ -1,4 +1,4 @@
-#    Copyright 2016 - 2017 Alexey Stepanov aka penguinolog
+#    Copyright 2016 - 2018 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -750,7 +750,7 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
 
 
 class TestObject(unittest.TestCase):
-    def test_basic(self):
+    def test_001_basic(self):
         log_call = logwrap.LogWrap()
         self.assertEqual(log_call.log_level, logging.DEBUG)
         self.assertEqual(log_call.exc_level, logging.ERROR)
@@ -800,6 +800,113 @@ class TestObject(unittest.TestCase):
                 obj=log_call
             ),
             repr(log_call),
+        )
+
+    def test_002_override_skip_arg(self):
+        class SkipArg(logwrap.LogWrap):
+            def pre_process_param(
+                self,
+                arg,
+            ):
+                if 'skip' in arg.name:
+                    return None
+                return arg
+
+        log = mock.Mock(spec=logging.Logger, name='logger')
+
+        wrapper = SkipArg(log=log, log_result_obj=False)
+
+        @wrapper
+        def func(arg, arg_skip, arg2=None, skip_arg=None):
+            pass
+
+        func(1, 2)
+        self.assertEqual(
+            log.mock_calls,
+            [
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Calling: \n"
+                        "'func'(\n"
+                        "    # POSITIONAL_OR_KEYWORD:\n"
+                        "    'arg'=1,\n"
+                        "    'arg2'=None,\n"
+                        ")"),
+                mock.call.log(level=logging.DEBUG, msg="Done: 'func'")
+            ]
+        )
+
+    def test_003_override_change_arg(self):
+        class ChangeArg(logwrap.LogWrap):
+            def pre_process_param(
+                self,
+                arg,
+            ):
+                if 'secret' in arg.name:
+                    return arg, None
+                return arg
+
+        log = mock.Mock(spec=logging.Logger, name='logger')
+
+        wrapper = ChangeArg(log=log, log_result_obj=False)
+
+        @wrapper
+        def func(arg, arg_secret, arg2='public', secret_arg=('key')):
+            pass
+
+        func('data', 'key')
+        self.assertEqual(
+            log.mock_calls,
+            [
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Calling: \n"
+                        "'func'(\n"
+                        "    # POSITIONAL_OR_KEYWORD:\n"
+                        "    'arg'=u'''data''',\n"
+                        "    'arg_secret'=None,\n"
+                        "    'arg2'=u'''public''',\n"
+                        "    'secret_arg'=None,\n"
+                        ")"),
+                mock.call.log(level=logging.DEBUG, msg="Done: 'func'")
+            ]
+        )
+
+    def test_003_override_change_repr(self):
+        class ChangeRepr(logwrap.LogWrap):
+            def post_process_param(
+                self,
+                arg,
+                arg_repr
+            ):
+                if 'secret' in arg.name:
+                    return "<*hidden*>"
+                return arg_repr
+
+        log = mock.Mock(spec=logging.Logger, name='logger')
+
+        wrapper = ChangeRepr(log=log, log_result_obj=False)
+
+        @wrapper
+        def func(arg, arg_secret, arg2='public', secret_arg=('key')):
+            pass
+
+        func('data', 'key')
+        self.assertEqual(
+            log.mock_calls,
+            [
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Calling: \n"
+                        "'func'(\n"
+                        "    # POSITIONAL_OR_KEYWORD:\n"
+                        "    'arg'=u'''data''',\n"
+                        "    'arg_secret'=<*hidden*>,\n"
+                        "    'arg2'=u'''public''',\n"
+                        "    'secret_arg'=<*hidden*>,\n"
+                        ")"),
+                mock.call.log(level=logging.DEBUG, msg="Done: 'func'")
+            ]
         )
 
 
