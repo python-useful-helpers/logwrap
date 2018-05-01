@@ -108,7 +108,10 @@ class BoundParameter(object):
         """Parameter-like object store BOUND with value parameter.
 
         :param parameter: parameter from signature
+        :type parameter: inspect.Parameter
         :param value: parameter real value
+        :type value: typing.Any
+        :raises ValueError: No default value and no value
         """
         self._parameter = parameter
 
@@ -150,7 +153,10 @@ class BoundParameter(object):
         return self._value
 
     def __hash__(self):  # pragma: no cover
-        """Block hashing."""
+        """Block hashing.
+
+        :raises TypeError: Not hashable.
+        """
         msg = "unhashable type: '{0}'".format(self.__class__.__name__)
         raise TypeError(msg)
 

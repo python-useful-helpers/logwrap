@@ -3,6 +3,9 @@ import typing
 from . import _log_wrap_shared
 
 class LogWrap(_log_wrap_shared.BaseLogWrap):
+
+    __slots__ = ()
+
     def __init__(
         self,
         func: typing.Optional[typing.Callable]=None,

@@ -33,6 +33,7 @@ from ._repr_utils import (
     pretty_repr,
     pretty_str
 )
+from ._log_wrap_shared import BoundParameter, bind_args_kwargs
 
 PY3 = sys.version_info[:2] > (3, 0)  # type: bool
 
@@ -50,7 +51,9 @@ __all__ = (
     'PrettyRepr',
     'PrettyStr',
     'pretty_repr',
-    'pretty_str'
+    'pretty_str',
+    'BoundParameter',
+    'bind_args_kwargs'
 )
 
 __version__ = '3.2.2'
