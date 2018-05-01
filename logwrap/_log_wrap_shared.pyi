@@ -1,3 +1,4 @@
+import enum
 import inspect
 import logging
 import typing
@@ -6,9 +7,65 @@ import six
 
 from . import _class_decorator
 
+if six.PY3:
+    from inspect import Parameter
+    from inspect import Signature
+else:
+    from funcsigs import Parameter
+    from funcsigs import Signature
+
+
 logger: logging.Logger
 
 def _check_type(expected: typing.Type) -> typing.Callable: ...
+
+
+class BoundParameter(object):
+
+    __slots__ = (
+        '_parameter',
+        '_value'
+    )
+
+    POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY  # type: enum.IntEnum
+    POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD  # type: enum.IntEnum
+    VAR_POSITIONAL = Parameter.VAR_POSITIONAL  # type: enum.IntEnum
+    KEYWORD_ONLY = Parameter.KEYWORD_ONLY  # type: enum.IntEnum
+    VAR_KEYWORD = Parameter.VAR_KEYWORD  # type: enum.IntEnum
+
+    empty = Parameter.empty  # type: typing.Type
+
+    def __init__(
+        self,
+        parameter: Parameter,
+        value: typing.Any=...
+    ) -> None: ...
+
+    @property
+    def parameter(self) -> Parameter: ...
+
+    @property
+    def name(self) -> typing.Union[None, str]: ...
+
+    @property
+    def default(self) -> typing.Any: ...
+
+    @property
+    def annotation(self) -> typing.Union[Parameter.empty, str]: ...
+
+    @property
+    def kind(self) -> enum.IntEnum: ...
+
+    @property
+    def value(self) -> typing.Any: ...
+
+
+def bind_args_kwargs(
+        sig: Signature,
+        *args,
+        **kwargs
+    ) -> typing.Iterator[BoundParameter]: ...
+
 
 class BaseLogWrap(_class_decorator.BaseDecorator):
     def __init__(
@@ -73,6 +130,24 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
 
     @property
     def _spec(self) -> typing.Callable: ...
+
+    @staticmethod
+    def _bind_args_kwargs(
+        sig: Signature,
+        *args,
+        **kwargs
+    ) -> typing.Iterator[BoundParameter]: ...
+
+    def pre_process_param(
+        self,
+        arg: BoundParameter,
+    ) -> typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]: ...
+
+    def post_process_param(
+        self,
+        arg: BoundParameter,
+        arg_repr: six.text_type
+    ) -> six.text_type: ...
 
     def _get_func_args_repr(
         self,

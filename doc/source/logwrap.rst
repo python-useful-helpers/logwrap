@@ -47,7 +47,35 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type log_result_obj: bool
 
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
-        .. versionchanged:: 3.3.0 Deprecation of *args
+        .. versionchanged:: 3.3.0 Deprecation of `*args`
+
+    .. py:method:: pre_process_param(self, arg)
+
+        Process parameter for the future logging.
+
+        :param arg: bound parameter
+        :type arg: BoundParameter
+        :return: value, value override for logging or None if argument should not be logged.
+        :rtype: typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]
+
+        Override this method if some modifications required for parameter value before logging
+
+        .. versionadded:: 3.3.0
+
+    .. py:method:: post_process_param(self, arg, arg_repr)
+
+        Process parameter for the future logging.
+
+        :param arg: bound parameter
+        :type arg: BoundParameter
+        :param arg_repr: repr for value
+        :type arg_repr: six.text_type
+        :return: processed repr for value
+        :rtype: six.text_type
+
+        Override this method if some modifications required for result of repr() over parameter
+
+        .. versionadded:: 3.3.0
 
     .. note:: Attributes/properties names the same as argument names and changes
               the same fields.
@@ -76,3 +104,104 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
         :returns: Decorated function. On python 3.3+ awaitable is supported.
         :rtype: typing.Union[typing.Callable, typing.Awaitable]
+
+
+.. py:class:: BoundParameter(object)
+
+    Parameter-like object store BOUND with value parameter.
+
+    .. versionadded:: 3.3.0
+
+    .. py:method:: __init__(self, parameter, value=Parameter.empty)
+
+        Parameter-like object store BOUND with value parameter.
+
+        :param parameter: parameter from signature
+        :type parameter: ``inspect.Parameter``
+        :param value: parameter real value
+        :type value: typing.Any
+        :raises ValueError: No default value and no value
+
+    .. py:attribute:: POSITIONAL_ONLY
+
+        ``enum.IntEnum``
+        Parameter.POSITIONAL_ONLY
+
+    .. py:attribute:: POSITIONAL_OR_KEYWORD
+
+        ``enum.IntEnum``
+        Parameter.POSITIONAL_OR_KEYWORD
+
+    .. py:attribute:: VAR_POSITIONAL
+
+        ``enum.IntEnum``
+        Parameter.VAR_POSITIONAL
+
+    .. py:attribute:: KEYWORD_ONLY
+
+        ``enum.IntEnum``
+        Parameter.KEYWORD_ONLY
+
+    .. py:attribute:: VAR_KEYWORD
+
+        ``enum.IntEnum``
+        Parameter.VAR_KEYWORD
+
+    .. py:attribute:: empty
+
+        ``typing.Type``
+        Parameter.empty
+
+    .. py:attribute:: parameter
+
+        Parameter object.
+
+        :rtype: inspect.Parameter
+
+    .. py:attribute:: name
+
+        Parameter name.
+
+        :rtype: typing.Union[None, str]
+
+    .. py:attribute:: default
+
+        Parameter default value.
+
+        :rtype: typing.Any
+
+    .. py:attribute:: annotation
+
+        Parameter annotation.
+
+        :rtype: typing.Union[Parameter.empty, str]
+
+    .. py:attribute:: kind
+
+        Parameter kind.
+
+        :rtype: enum.IntEnum
+
+    .. py:attribute:: value
+
+        Parameter value.
+
+        :rtype: typing.Any
+
+    .. py:method:: __hash__(self)
+
+        Block hashing.
+
+        :raises TypeError: Not hashable.
+
+
+.. py:function:: bind_args_kwargs(sig, *args, **kwargs)
+
+    Bind `*args` and `**kwargs` to signature and get Bound Parameters.
+
+    :param sig: source signature
+    :type sig: inspect.Signature
+    :return: Iterator for bound parameters with all information about it
+    :rtype: typing.Iterator[BoundParameter]
+
+    .. versionadded:: 3.3.0

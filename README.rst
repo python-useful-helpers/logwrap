@@ -188,6 +188,11 @@ Example construction and read from test:
 
 On object change, variable types is validated.
 
+In special cases, when special processing required for parameters logging (hide or change parameters in log),
+it can be done by override `pre_process_param` and `post_process_param`.
+
+See API documentation for details.
+
 
 pretty_repr
 -----------

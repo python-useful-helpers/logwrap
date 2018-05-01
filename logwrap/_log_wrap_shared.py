@@ -29,7 +29,21 @@ import six  # noqa # pylint: disable=unused-import
 import logwrap as core
 from . import _class_decorator
 
-__all__ = ('BaseLogWrap', )
+# pylint: disable=ungrouped-imports, no-name-in-module
+if six.PY3:  # pragma: no cover
+    from inspect import formatannotation
+    from inspect import Parameter
+    from inspect import Signature  # noqa # pylint: disable=unused-import
+else:  # pragma: no cover
+    # noinspection PyUnresolvedReferences,PyProtectedMember,PyPackageRequirements
+    from funcsigs import formatannotation
+    # noinspection PyUnresolvedReferences,PyPackageRequirements
+    from funcsigs import Parameter
+    # noinspection PyUnresolvedReferences,PyPackageRequirements
+    from funcsigs import Signature  # noqa # pylint: disable=unused-import
+# pylint: enable=ungrouped-imports, no-name-in-module
+
+__all__ = ('BaseLogWrap', 'BoundParameter', 'bind_args_kwargs')
 
 logger = logging.getLogger(__name__)  # type: logging.Logger
 
@@ -66,9 +80,146 @@ def _check_type(expected):  # type: (typing.Type) -> typing.Callable
         return wrapper
     return deco
 
+
+class BoundParameter(object):
+    """Parameter-like object store BOUND with value parameter.
+
+    .. versionadded:: 3.3.0
+    """
+
+    __slots__ = (
+        '_parameter',
+        '_value'
+    )
+
+    POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY
+    POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD
+    VAR_POSITIONAL = Parameter.VAR_POSITIONAL
+    KEYWORD_ONLY = Parameter.KEYWORD_ONLY
+    VAR_KEYWORD = Parameter.VAR_KEYWORD
+
+    empty = Parameter.empty
+
+    def __init__(
+        self,
+        parameter,  # type: Parameter
+        value=Parameter.empty  # type: typing.Any
+    ):  # type: (...) -> None
+        """Parameter-like object store BOUND with value parameter.
+
+        :param parameter: parameter from signature
+        :type parameter: inspect.Parameter
+        :param value: parameter real value
+        :type value: typing.Any
+        :raises ValueError: No default value and no value
+        """
+        self._parameter = parameter
+
+        if value is self.empty:
+            if parameter.default is self.empty and parameter.kind not in (self.VAR_POSITIONAL, self.VAR_KEYWORD):
+                raise ValueError('Value is not set and no default value')
+            self._value = parameter.default
+        else:
+            self._value = value
+
+    @property
+    def parameter(self):  # type: () -> Parameter
+        """Parameter object."""
+        return self._parameter
+
+    @property
+    def name(self):  # type: () -> typing.Union[None, str]
+        """Parameter name."""
+        return self.parameter.name
+
+    @property
+    def default(self):  # type: () -> typing.Any
+        """Parameter default value."""
+        return self.parameter.default
+
+    @property
+    def annotation(self):  # type: () -> typing.Union[Parameter.empty, str]
+        """Parameter annotation."""
+        return self.parameter.annotation
+
+    @property
+    def kind(self):  # type: () -> int
+        """Parameter kind."""
+        return self.parameter.kind
+
+    @property
+    def value(self):  # type: () -> typing.Any
+        """Parameter value."""
+        return self._value
+
+    def __hash__(self):  # pragma: no cover
+        """Block hashing.
+
+        :raises TypeError: Not hashable.
+        """
+        msg = "unhashable type: '{0}'".format(self.__class__.__name__)
+        raise TypeError(msg)
+
+    def __str__(self):
+        """Debug purposes."""
+        as_str = self.name
+
+        # POSITIONAL_ONLY is only in precompiled functions
+        if self.kind == self.POSITIONAL_ONLY:  # pragma: no cover
+            as_str = '' if as_str is None else '<{as_str}>'.format(as_str=as_str)
+
+        # Add annotation if applicable (python 3 only)
+        if self.annotation is not self.empty:  # pragma: no cover
+            as_str += ': {annotation!s}'.format(annotation=formatannotation(self.annotation))
+
+        value = self.value
+        if self.empty == value:
+            if self.VAR_POSITIONAL == self.kind:
+                value = ()
+            elif self.VAR_KEYWORD == self.kind:
+                value = {}
+
+        as_str += '={value!r}'.format(value=value)
+
+        if self.default is not self.empty:
+            as_str += '  # {self.default!r}'.format(self=self)
+
+        if self.kind == self.VAR_POSITIONAL:
+            as_str = '*' + as_str
+        elif self.kind == self.VAR_KEYWORD:
+            as_str = '**' + as_str
+
+        return as_str
+
+    def __repr__(self):
+        """Debug purposes."""
+        return '<{} "{}">'.format(self.__class__.__name__, self)
+
+
+def bind_args_kwargs(
+    sig,  # type: Signature
+    *args,
+    **kwargs
+):  # type: (...) -> typing.Iterator[BoundParameter]
+    """Bind *args and **kwargs to signature and get Bound Parameters.
+
+    :param sig: source signature
+    :type sig: Signature
+    :return: Iterator for bound parameters with all information about it
+    :rtype: typing.Iterator[BoundParameter]
+
+    .. versionadded:: 3.3.0
+    """
+    bound = sig.bind(*args, **kwargs).arguments
+    parameters = list(sig.parameters.values())
+    for param in parameters:
+        yield BoundParameter(
+            parameter=param,
+            value=bound.get(param.name, param.default)
+        )
+
+
 # pylint: disable=assigning-non-slot,abstract-method
-
-
 # noinspection PyAbstractClass
 class BaseLogWrap(_class_decorator.BaseDecorator):
     """Base class for LogWrap implementation."""
@@ -320,6 +471,62 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
             )
         )
 
+    @staticmethod
+    def _bind_args_kwargs(
+        sig,  # type: Signature
+        *args,
+        **kwargs
+    ):  # type: (...) -> typing.Iterator[BoundParameter]
+        """Bind *args and **kwargs to signature and get Bound Parameters.
+
+        :param sig: source signature
+        :type sig: Signature
+        :return: Iterator for bound parameters with all information about it
+        :rtype: typing.Iterator[BoundParameter]
+
+        .. versionadded:: 3.3.0
+        """
+        return bind_args_kwargs(sig, *args, **kwargs)
+
+    # noinspection PyMethodMayBeStatic
+    def pre_process_param(  # pylint: disable=no-self-use
+        self,
+        arg,  # type: BoundParameter
+    ):  # type: (...) -> typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]
+        """Process parameter for the future logging.
+
+        :param arg: bound parameter
+        :type arg: BoundParameter
+        :return: value, value override for logging or None if argument should not be logged.
+        :rtype: typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]
+
+        Override this method if some modifications required for parameter value before logging
+
+        .. versionadded:: 3.3.0
+        """
+        return arg
+
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    def post_process_param(  # pylint: disable=no-self-use,unused-argument
+        self,
+        arg,  # type: BoundParameter
+        arg_repr  # type: six.text_type
+    ):  # type: (...) -> six.text_type
+        """Process parameter for the future logging.
+
+        :param arg: bound parameter
+        :type arg: BoundParameter
+        :param arg_repr: repr for value
+        :type arg_repr: six.text_type
+        :return: processed repr for value
+        :rtype: six.text_type
+
+        Override this method if some modifications required for result of repr() over parameter
+
+        .. versionadded:: 3.3.0
+        """
+        return arg_repr
+
     def _get_func_args_repr(
         self,
         sig,  # type: inspect.Signature
@@ -332,38 +539,50 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         :type args: tuple
         :type kwargs: dict
         :rtype: str
+
+        .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
         """
         if not (self.log_call_args or self.log_call_args_on_exc):
             return ''
 
-        bound = sig.bind(*args, **kwargs).arguments
-
         param_str = ""
 
         last_kind = None
-        for param in sig.parameters.values():
+        for param in self._bind_args_kwargs(sig, *args, **kwargs):
             if param.name in self.blacklisted_names:
                 continue
+
+            preprocessed = self.pre_process_param(param)
+            if preprocessed is None:
+                continue
+
+            if isinstance(preprocessed, (tuple, list)):
+                param, value = preprocessed
+            else:
+                value = param.value
+
+            if param.empty == value:
+                if param.VAR_POSITIONAL == param.kind:
+                    value = ()
+                elif param.VAR_KEYWORD == param.kind:
+                    value = {}
+
+            val = core.pretty_repr(
+                src=value,
+                indent=indent + 4,
+                no_indent_start=True,
+                max_indent=self.max_indent,
+            )
+
+            val = self.post_process_param(param, val)
 
             if last_kind != param.kind:
                 param_str += comment(kind=param.kind)
                 last_kind = param.kind
 
-            src = bound.get(param.name, param.default)
-            if param.empty == src:
-                if param.VAR_POSITIONAL == param.kind:
-                    src = ()
-                elif param.VAR_KEYWORD == param.kind:
-                    src = {}
-
             param_str += fmt(
                 key=param.name,
-                val=core.pretty_repr(
-                    src=src,
-                    indent=indent + 4,
-                    no_indent_start=True,
-                    max_indent=self.max_indent,
-                ),
+                val=val,
             )
         if param_str:
             param_str += "\n"
