@@ -267,6 +267,8 @@ setup_args = dict(
         'logwrap': [
             os.path.basename(filename)
             for filename in glob.glob(os.path.join('logwrap', '*.pyi'))
+        ] + [
+            'py.typed'
         ],
     },
 )

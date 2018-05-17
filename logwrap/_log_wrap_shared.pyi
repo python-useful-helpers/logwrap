@@ -27,11 +27,11 @@ class BoundParameter(object):
         '_value'
     )
 
-    POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY  # type: enum.IntEnum
-    POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD  # type: enum.IntEnum
-    VAR_POSITIONAL = Parameter.VAR_POSITIONAL  # type: enum.IntEnum
-    KEYWORD_ONLY = Parameter.KEYWORD_ONLY  # type: enum.IntEnum
-    VAR_KEYWORD = Parameter.VAR_KEYWORD  # type: enum.IntEnum
+    POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY
+    POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD
+    VAR_POSITIONAL = Parameter.VAR_POSITIONAL
+    KEYWORD_ONLY = Parameter.KEYWORD_ONLY
+    VAR_KEYWORD = Parameter.VAR_KEYWORD
 
     empty = Parameter.empty  # type: typing.Type
 
