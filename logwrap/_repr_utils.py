@@ -54,14 +54,93 @@ def _simple(item):  # type: (typing.Any) -> bool
     return not isinstance(item, (list, set, tuple, dict, frozenset))
 
 
+class ReprParameter(object):
+    """Parameter wrapper wor repr and str operations over signature."""
+
+    __slots__ = (
+        '_value',
+        '_parameter'
+    )
+
+    POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY
+    POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD
+    VAR_POSITIONAL = Parameter.VAR_POSITIONAL
+    KEYWORD_ONLY = Parameter.KEYWORD_ONLY
+    VAR_KEYWORD = Parameter.VAR_KEYWORD
+
+    empty = Parameter.empty
+
+    def __init__(
+        self,
+        parameter,  # type: Parameter
+        value=None  # type: typing.Optional[typing.Any]
+    ):  # type: (...) -> None
+        """Parameter-like object store for repr and str tasks.
+
+        :param parameter: parameter from signature
+        :type parameter: inspect.Parameter
+        :param value: default value override
+        :type value: typing.Any
+        """
+        self._parameter = parameter
+        self._value = value if value is not None else parameter.default
+
+    @property
+    def parameter(self):  # type: () -> Parameter
+        """Parameter object."""
+        return self._parameter
+
+    @property
+    def name(self):  # type: () -> typing.Union[None, str]
+        """Parameter name.
+
+        For `*args` and `**kwargs` add prefixes
+        """
+        if self.kind == Parameter.VAR_POSITIONAL:
+            return '*' + self.parameter.name
+        elif self.kind == Parameter.VAR_KEYWORD:
+            return '**' + self.parameter.name
+        return self.parameter.name
+
+    @property
+    def value(self):  # type: () -> typing.Any
+        """Parameter value to log.
+
+        If function is bound to class -> value is class instance else default value.
+        """
+        return self._value
+
+    @property
+    def annotation(self):  # type: () -> typing.Union[Parameter.empty, str]
+        """Parameter annotation."""
+        return self.parameter.annotation
+
+    @property
+    def kind(self):  # type: () -> int
+        """Parameter kind."""
+        return self.parameter.kind
+
+    def __hash__(self):  # pragma: no cover
+        """Block hashing.
+
+        :raises TypeError: Not hashable.
+        """
+        msg = "unhashable type: '{0}'".format(self.__class__.__name__)
+        raise TypeError(msg)
+
+    def __repr__(self):
+        """Debug purposes."""
+        return '<{} "{}">'.format(self.__class__.__name__, self)
+
+
 # pylint: disable=no-member
 def _prepare_repr(
     func  # type: typing.Union[types.FunctionType, types.MethodType]
-):  # type: (...) -> typing.Iterator[typing.Union[str, typing.Tuple[str, typing.Any]]]
+):  # type: (...) -> typing.Iterator[ReprParameter]
     """Get arguments lists with defaults.
 
     :type func: typing.Union[types.FunctionType, types.MethodType]
-    :rtype: typing.Iterator[typing.Union[str, typing.Tuple[str, typing.Any]]]
+    :rtype: typing.Iterator[ReprParameter]
     """
     isfunction = isinstance(func, types.FunctionType)
     real_func = func if isfunction else func.__func__  # type: typing.Callable
@@ -71,18 +150,11 @@ def _prepare_repr(
     params = iter(parameters)
     if not isfunction and func.__self__ is not None:
         try:
-            yield next(params).name, func.__self__
+            yield ReprParameter(next(params), value=func.__self__)
         except StopIteration:  # pragma: no cover
             return
     for arg in params:
-        if arg.default != Parameter.empty:
-            yield arg.name, arg.default
-        elif arg.kind == Parameter.VAR_POSITIONAL:
-            yield '*' + arg.name
-        elif arg.kind == Parameter.VAR_KEYWORD:
-            yield '**' + arg.name
-        else:
-            yield arg.name
+        yield ReprParameter(arg)
 # pylint: enable=no-member
 
 
@@ -455,31 +527,35 @@ class PrettyRepr(PrettyFormat):
         param_str = ""
 
         for param in _prepare_repr(src):
-            if isinstance(param, tuple):
-                param_str += "\n{spc:<{indent}}{key}={val},".format(
-                    spc='',
-                    indent=self.next_indent(indent),
-                    key=param[0],
+            param_str += "\n{spc:<{indent}}{param.name}".format(
+                spc='',
+                indent=self.next_indent(indent),
+                param=param
+            )
+            if param.annotation != param.empty:
+                param_str += ': {param.annotation}'.format(param=param)
+            if param.value != param.empty:
+                param_str += '={val}'.format(
                     val=self.process_element(
-                        src=param[1],
+                        src=param.value,
                         indent=indent,
                         no_indent_start=True,
                     )
                 )
-            else:
-                param_str += "\n{spc:<{indent}}{key},".format(
-                    spc='',
-                    indent=self.next_indent(indent),
-                    key=param
-                )
+            param_str += ','
 
         if param_str:
             param_str += "\n" + " " * indent
-        return "\n{spc:<{indent}}<{obj!r} with interface ({args})>".format(
+
+        sig = signature(src)
+        annotation = '' if sig.return_annotation == Parameter.empty else ' -> {sig.return_annotation!r}'.format(sig=sig)
+
+        return "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format(
             spc="",
             indent=indent,
             obj=src,
             args=param_str,
+            annotation=annotation
         )
 
     @staticmethod
@@ -627,31 +703,35 @@ class PrettyStr(PrettyFormat):
         param_str = ""
 
         for param in _prepare_repr(src):
-            if isinstance(param, tuple):
-                param_str += "\n{spc:<{indent}}{key}={val},".format(
-                    spc='',
-                    indent=self.next_indent(indent),
-                    key=param[0],
+            param_str += "\n{spc:<{indent}}{param.name}".format(
+                spc='',
+                indent=self.next_indent(indent),
+                param=param
+            )
+            if param.annotation != param.empty:
+                param_str += ': {param.annotation}'.format(param=param)
+            if param.value != param.empty:
+                param_str += '={val}'.format(
                     val=self.process_element(
-                        src=param[1],
+                        src=param.value,
                         indent=indent,
                         no_indent_start=True,
                     )
                 )
-            else:
-                param_str += "\n{spc:<{indent}}{key},".format(
-                    spc='',
-                    indent=self.next_indent(indent),
-                    key=param
-                )
+            param_str += ','
 
         if param_str:
             param_str += "\n" + " " * indent
-        return "\n{spc:<{indent}}<{obj!s} with interface ({args})>".format(
+
+        sig = signature(src)
+        annotation = '' if sig.return_annotation == Parameter.empty else ' -> {sig.return_annotation!r}'.format(sig=sig)
+
+        return "\n{spc:<{indent}}<{obj!s} with interface ({args}){annotation}>".format(
             spc="",
             indent=indent,
             obj=src,
             args=param_str,
+            annotation=annotation
         )
 
     @staticmethod

@@ -116,7 +116,7 @@ Get decorator for use without parameters:
 
 Call example:
 
-.. code-block:: python3
+.. code-block:: python
 
    import logwrap
 
@@ -140,18 +140,18 @@ This code during execution will produce log records:
     Calling:
     'example_function1'(
         # POSITIONAL_OR_KEYWORD:
-        'arg1'=u'''arg1''',
-        'arg2'=u'''arg2''',
+        'arg1'=u'''arg1''',  # type: <class 'str'>
+        'arg2'=u'''arg2''',  # type: <class 'str'>
         # VAR_POSITIONAL:
         'args'=(),
         # KEYWORD_ONLY:
-        'kwarg1'=u'''kwarg1''',
-        'kwarg2'=u'''kwarg2''',
+        'kwarg1'=u'''kwarg1''',  # type: <class 'str'>
+        'kwarg2'=u'''kwarg2''',  # type: <class 'str'>
         # VAR_KEYWORD:
         'kwargs'=
-             dict({
+            dict({
                 'kwarg3': u'''kwarg3''',
-             }),
+            }),
     )
     Done: 'example_function1' with result:
 

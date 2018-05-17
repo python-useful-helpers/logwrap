@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)  # type: logging.Logger
 
 
 indent = 4
-fmt = "\n{spc:<{indent}}{{key!r}}={{val}},".format(
+fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(
     spc='',
     indent=indent,
 ).format
@@ -580,8 +580,14 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
                 param_str += comment(kind=param.kind)
                 last_kind = param.kind
 
+            if param.empty == param.annotation:
+                annotation = ""
+            else:
+                annotation = "  # type: {param.annotation!s}".format(param=param)
+
             param_str += fmt(
                 key=param.name,
+                annotation=annotation,
                 val=val,
             )
         if param_str:
