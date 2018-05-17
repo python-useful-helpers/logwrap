@@ -69,9 +69,9 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :param arg: bound parameter
         :type arg: BoundParameter
         :param arg_repr: repr for value
-        :type arg_repr: six.text_type
+        :type arg_repr: typing.Text
         :return: processed repr for value
-        :rtype: six.text_type
+        :rtype: typing.Text
 
         Override this method if some modifications required for result of repr() over parameter
 

@@ -510,16 +510,16 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
     def post_process_param(  # pylint: disable=no-self-use,unused-argument
         self,
         arg,  # type: BoundParameter
-        arg_repr  # type: six.text_type
-    ):  # type: (...) -> six.text_type
+        arg_repr  # type: typing.Text
+    ):  # type: (...) -> typing.Text
         """Process parameter for the future logging.
 
         :param arg: bound parameter
         :type arg: BoundParameter
         :param arg_repr: repr for value
-        :type arg_repr: six.text_type
+        :type arg_repr: typing.Text
         :return: processed repr for value
-        :rtype: six.text_type
+        :rtype: typing.Text
 
         Override this method if some modifications required for result of repr() over parameter
 
@@ -532,13 +532,13 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         sig,  # type: inspect.Signature
         args,  # type: typing.Tuple
         kwargs  # type: typing.Dict[str, typing.Any]
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Internal helper for reducing complexity of decorator code.
 
         :type sig: inspect.Signature
         :type args: tuple
         :type kwargs: dict
-        :rtype: str
+        :rtype: typing.Text
 
         .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
         """

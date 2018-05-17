@@ -96,18 +96,11 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
                      signature with decorated function, or arguments bind
                      will be failed!
         :type spec: typing.Optional[typing.Callable]
-        :param blacklisted_names: Blacklisted argument names.
-                                  Arguments with this names will be skipped
-                                  in log.
+        :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
         :type blacklisted_names: typing.Optional[typing.Iterable[str]]
-        :param blacklisted_exceptions: list of exception,
-                                       which should be re-raised without
-                                       producing log record.
-        :type blacklisted_exceptions: typing.Optional[
-                                          typing.Iterable[Exception]
-                                      ]
-        :param log_call_args: log call arguments before executing
-                              wrapped function.
+        :param blacklisted_exceptions: list of exception, which should be re-raised without producing log record.
+        :type blacklisted_exceptions: typing.Optional[typing.Iterable[Exception]]
+        :param log_call_args: log call arguments before executing wrapped function.
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
         :type log_call_args_on_exc: bool
@@ -192,12 +185,9 @@ def logwrap(  # pylint: disable=keyword-arg-before-vararg
                  Note: this object should provide fully compatible signature
                  with decorated function, or arguments bind will be failed!
     :type spec: typing.Optional[typing.Callable]
-    :param blacklisted_names: Blacklisted argument names.
-                              Arguments with this names will be skipped in log.
+    :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
     :type blacklisted_names: typing.Optional[typing.List[str]]
-    :param blacklisted_exceptions: list of exception,
-                                   which should be re-raised without
-                                   producing log record.
+    :param blacklisted_exceptions: list of exception, which should be re-raised without producing log record.
     :type blacklisted_exceptions: typing.Optional[typing.List[Exception]]
     :param log_call_args: log call arguments before executing wrapped function.
     :type log_call_args: bool
