@@ -21,11 +21,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import sys
 import unittest
 
 import logwrap
-# noinspection PyProtectedMember
-from logwrap import _repr_utils
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
@@ -112,74 +111,6 @@ class TestPrettyRepr(unittest.TestCase):
             '])'
         )
         self.assertEqual(exp_repr, logwrap.pretty_repr(test_obj))
-
-    def test_prepare_repr(self):
-        def empty_func():
-            pass
-
-        def full_func(arg, darg=1, *positional, **named):
-            pass
-
-        # noinspection PyMissingOrEmptyDocstring
-        class TstClass(object):
-            def tst_method(self, arg, darg=1, *positional, **named):
-                pass
-
-            @classmethod
-            def tst_classmethod(cls, arg, darg=1, *positional, **named):
-                pass
-
-            @staticmethod
-            def tst_staticmethod(arg, darg=1, *positional, **named):
-                pass
-
-        tst_instance = TstClass()
-
-        self.assertEqual(
-            list(_repr_utils._prepare_repr(empty_func)),
-            []
-        )
-
-        self.assertEqual(
-            list(_repr_utils._prepare_repr(full_func)),
-            ['arg', ('darg', 1), '*positional', '**named']
-        )
-
-        self.assertEqual(
-            list(_repr_utils._prepare_repr(TstClass.tst_method)),
-            ['self', 'arg', ('darg', 1), '*positional', '**named']
-        )
-
-        self.assertEqual(
-            list(_repr_utils._prepare_repr(TstClass.tst_classmethod)),
-            [('cls', TstClass), 'arg', ('darg', 1), '*positional', '**named']
-        )
-
-        self.assertEqual(
-            list(_repr_utils._prepare_repr(TstClass.tst_staticmethod)),
-            ['arg', ('darg', 1), '*positional', '**named']
-        )
-
-        self.assertEqual(
-            list(_repr_utils._prepare_repr(tst_instance.tst_method)),
-            [
-                ('self', tst_instance),
-                'arg',
-                ('darg', 1),
-                '*positional',
-                '**named',
-            ]
-        )
-
-        self.assertEqual(
-            list(_repr_utils._prepare_repr(tst_instance.tst_classmethod)),
-            [('cls', TstClass), 'arg', ('darg', 1), '*positional', '**named']
-        )
-
-        self.assertEqual(
-            list(_repr_utils._prepare_repr(tst_instance.tst_staticmethod)),
-            ['arg', ('darg', 1), '*positional', '**named']
-        )
 
     def test_callable(self):
         fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args})>".format
@@ -355,3 +286,115 @@ class TestPrettyRepr(unittest.TestCase):
 
     def test_py2_compatibility_flag(self):
         self.assertIsInstance(logwrap.pretty_repr(u'Text', py2_str=True), str)
+
+
+# noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
+@unittest.skipIf(
+    sys.version_info[:2] < (3, 4),
+    'Strict python 3.3+ API'
+)
+class TestAnnotated(unittest.TestCase):
+    def test_001_annotation_args(self):
+        fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
+        namespace = {}
+
+        exec("""
+import typing
+def func(a: typing.Optional[int]=None):
+    pass
+                        """,
+             namespace
+             )
+        func = namespace['func']  # type: typing.Callable[..., None]
+
+        self.assertEqual(
+            logwrap.pretty_repr(func),
+            fmt(
+                spc='',
+                indent=0,
+                obj=func,
+                args="\n    a: typing.Union[int, NoneType]=None,\n",
+                annotation=""
+            )
+        )
+
+        self.assertEqual(
+            logwrap.pretty_str(func),
+            fmt(
+                spc='',
+                indent=0,
+                obj=func,
+                args="\n    a: typing.Union[int, NoneType]=None,\n",
+                annotation=""
+            )
+        )
+
+    def test_002_annotation_return(self):
+        fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
+        namespace = {}
+
+        exec("""
+import typing
+def func() -> None:
+    pass
+                                """,
+             namespace
+             )
+        func = namespace['func']  # type: typing.Callable[[], None]
+
+        self.assertEqual(
+            logwrap.pretty_repr(func),
+            fmt(
+                spc='',
+                indent=0,
+                obj=func,
+                args='',
+                annotation=' -> None'
+            )
+        )
+
+        self.assertEqual(
+            logwrap.pretty_str(func),
+            fmt(
+                spc='',
+                indent=0,
+                obj=func,
+                args='',
+                annotation=' -> None'
+            )
+        )
+
+    def test_003_complex(self):
+        fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
+        namespace = {}
+
+        exec("""
+import typing
+def func(a: typing.Optional[int]=None) -> None:
+    pass
+                                """,
+             namespace
+             )
+        func = namespace['func']  # type: typing.Callable[..., None]
+
+        self.assertEqual(
+            logwrap.pretty_repr(func),
+            fmt(
+                spc='',
+                indent=0,
+                obj=func,
+                args="\n    a: typing.Union[int, NoneType]=None,\n",
+                annotation=" -> None"
+            )
+        )
+
+        self.assertEqual(
+            logwrap.pretty_str(func),
+            fmt(
+                spc='',
+                indent=0,
+                obj=func,
+                args="\n    a: typing.Union[int, NoneType]=None,\n",
+                annotation=" -> None"
+            )
+        )

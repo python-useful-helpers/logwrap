@@ -21,6 +21,8 @@ try:
 except ImportError:
     asyncio = None
 import logging
+import sys
+import typing  # noqa # pylint: disable=unused-import
 import unittest
 try:
     from unittest import mock
@@ -137,5 +139,44 @@ class TestLogWrapAsync(unittest.TestCase):
                     level=logging.DEBUG,
                     msg="Awaiting: \n'func'()"
                 ),
+            ]
+        )
+
+
+# noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
+@mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
+@unittest.skipIf(
+    sys.version_info[:2] < (3, 4),
+    'Strict python 3.3+ API'
+)
+class TestAnnotated(unittest.TestCase):
+    def test_annotation_args(self, logger):
+        namespace = {'logwrap': logwrap}
+
+        exec("""
+import typing
+@logwrap.logwrap
+def func(a: typing.Optional[int]=None):
+    pass
+                        """,
+             namespace
+             )
+        func = namespace['func']  # type: typing.Callable[..., None]
+        func()
+        self.assertEqual(
+            logger.mock_calls,
+            [
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Calling: \n"
+                        "'func'(\n"
+                        "    # POSITIONAL_OR_KEYWORD:\n"
+                        "    'a'=None,  # type: typing.Union[int, NoneType]\n"
+                        ")"
+                ),
+                mock.call.log(
+                    level=logging.DEBUG,
+                    msg="Done: 'func' with result:\nNone"
+                )
             ]
         )
