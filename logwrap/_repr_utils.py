@@ -1,4 +1,4 @@
-#    Copyright 2016 Alexey Stepanov aka penguinolog
+#    Copyright 2018 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -221,12 +221,12 @@ class PrettyFormat(object):
         self,
         src,  # type: typing.Union[types.FunctionType, types.MethodType]
         indent=0  # type: int
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Repr callable object (function or method).
 
         :type src: typing.Union[types.FunctionType, types.MethodType]
         :type indent: int
-        :rtype: str
+        :rtype: typing.Text
         """
         raise NotImplementedError()  # pragma: no cover
 
@@ -236,16 +236,16 @@ class PrettyFormat(object):
         src,  # type: typing.Any
         indent=0,  # type: int
         no_indent_start=False  # type: bool
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Repr object without iteration.
 
         :type src: typing.Union[
-                   six.binary_type, six.text_type, int, typing.Iterable,
+                   typing.AnyStr, int, typing.Iterable,
                    object,
                    ]
         :type indent: int
         :type no_indent_start: bool
-        :rtype: str
+        :rtype: typing.Text
         """
         raise NotImplementedError()  # pragma: no cover
 
@@ -254,14 +254,14 @@ class PrettyFormat(object):
         self,
         src,  # type: typing.Dict
         indent=0  # type: int
-    ):  # type: (...) -> typing.Iterator[str]
+    ):  # type: (...) -> typing.Iterator[typing.Text]
         """Repr dict items.
 
         :param src: object to process
         :type src: typing.Dict
         :param indent: start indentation
         :type indent: int
-        :rtype: typing.Iterator[str]
+        :rtype: typing.Iterator[typing.Text]
         """
         raise NotImplementedError()  # pragma: no cover
 
@@ -273,7 +273,7 @@ class PrettyFormat(object):
         indent,  # type: int
         result,  # type: str
         suffix,  # type: str
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Repr iterable item.
 
         :param nl: newline before item
@@ -288,7 +288,7 @@ class PrettyFormat(object):
         :type result: str
         :param suffix: suffix
         :type suffix: str
-        :rtype: str
+        :rtype: typing.Text
         """
         raise NotImplementedError()  # pragma: no cover
 
@@ -296,14 +296,14 @@ class PrettyFormat(object):
         self,
         src,  # type: typing.Iterable
         indent=0  # type: int
-    ):  # type: (...) -> typing.Iterator[str]
+    ):  # type: (...) -> typing.Iterator[typing.Text]
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
         :type src: typing.Iterable
         :param indent: start indentation
         :type indent: int
-        :rtype: typing.Iterator[str]
+        :rtype: typing.Iterator[typing.Text]
         """
         for elem in src:
             yield '\n' + self.process_element(
@@ -313,10 +313,10 @@ class PrettyFormat(object):
 
     @property
     @abc.abstractmethod
-    def _magic_method_name(self):  # type: () -> six.text_type
+    def _magic_method_name(self):  # type: () -> typing.Text
         """Magic method name.
 
-        :rtype: str
+        :rtype: typing.Text
         """
         raise NotImplementedError()  # pragma: no cover
 
@@ -325,12 +325,12 @@ class PrettyFormat(object):
         src,  # type: typing.Any
         indent=0,  # type: int
         no_indent_start=False  # type: bool
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Make human readable representation of object.
 
         :param src: object to process
         :type src: typing.Union[
-                   six.binary_type, six.text_type, int, typing.Iterable, object
+                   typing.AnyStr, int, typing.Iterable, object
                    ]
         :param indent: start indentation
         :type indent: int
@@ -338,7 +338,7 @@ class PrettyFormat(object):
             do not indent open bracket and simple parameters
         :type no_indent_start: bool
         :return: formatted string
-        :rtype: six.text_type
+        :rtype: typing.Text
         """
         if hasattr(src, self._magic_method_name):
             return getattr(
@@ -395,7 +395,7 @@ class PrettyFormat(object):
 
         :param src: object to process
         :type src: typing.Union[
-                   six.binary_type, six.text_type, int, typing.Iterable, object
+                   typing.AnyStr, int, typing.Iterable, object
                    ]
         :param indent: start indentation
         :type indent: int
@@ -427,18 +427,18 @@ class PrettyRepr(PrettyFormat):
     __slots__ = ()
 
     @property
-    def _magic_method_name(self):  # type: () -> six.text_type
+    def _magic_method_name(self):  # type: () -> typing.Text
         """Magic method name.
 
-        :rtype: str
+        :rtype: typing.Text
         """
         return '__pretty_repr__'
 
     @staticmethod
     def _strings_repr(
         indent,  # type: int
-        val  # type: typing.Union[six.binary_type, six.text_type]
-    ):  # type: (...) -> six.text_type
+        val  # type: typing.AnyStr
+    ):  # type: (...) -> typing.Text
         """Custom repr for strings and binary strings."""
         if isinstance(val, six.binary_type):
             val = val.decode(
@@ -460,16 +460,16 @@ class PrettyRepr(PrettyFormat):
         src,  # type: typing.Any
         indent=0,  # type: int
         no_indent_start=False  # type: bool
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Repr object without iteration.
 
         :type src: typing.Union[
-                   six.binary_type, six.text_type, int, typing.Iterable,
+                   typing.AnyStr, int, typing.Iterable,
                    object,
                    ]
         :type indent: int
         :type no_indent_start: bool
-        :rtype: str
+        :rtype: typing.Text
         """
         indent = 0 if no_indent_start else indent
         if isinstance(src, set):
@@ -490,14 +490,14 @@ class PrettyRepr(PrettyFormat):
         self,
         src,  # type: typing.Dict
         indent=0  # type: int
-    ):  # type: (...) -> typing.Iterator[str]
+    ):  # type: (...) -> typing.Iterator[typing.Text]
         """Repr dict items.
 
         :param src: object to process
         :type src: dict
         :param indent: start indentation
         :type indent: int
-        :rtype: typing.Iterator[str]
+        :rtype: typing.Iterator[typing.Text]
         """
         max_len = max((len(repr(key)) for key in src)) if src else 0
         for key, val in src.items():
@@ -517,12 +517,12 @@ class PrettyRepr(PrettyFormat):
         self,
         src,  # type: typing.Union[types.FunctionType, types.MethodType]
         indent=0  # type: int
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Repr callable object (function or method).
 
         :type src: typing.Union[types.FunctionType, types.MethodType]
         :type indent: int
-        :rtype: str
+        :rtype: typing.Text
         """
         param_str = ""
 
@@ -566,7 +566,7 @@ class PrettyRepr(PrettyFormat):
         indent,  # type: int
         result,  # type: str
         suffix,  # type: str
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Repr iterable item.
 
         :param nl: newline before item
@@ -581,7 +581,7 @@ class PrettyRepr(PrettyFormat):
         :type result: str
         :param suffix: suffix
         :type suffix: str
-        :rtype: str
+        :rtype: typing.Text
         """
         return (
             "{nl}"
@@ -607,18 +607,18 @@ class PrettyStr(PrettyFormat):
     __slots__ = ()
 
     @property
-    def _magic_method_name(self):  # type: () -> six.text_type
+    def _magic_method_name(self):  # type: () -> typing.Text
         """Magic method name.
 
-        :rtype: str
+        :rtype: typing.Text
         """
         return '__pretty_str__'
 
     @staticmethod
     def _strings_str(
         indent,  # type: int
-        val  # type: typing.Union[six.binary_type, six.text_type]
-    ):  # type: (...) -> six.text_type
+        val  # type: typing.AnyStr
+    ):  # type: (...) -> typing.Text
         """Custom repr for strings and binary strings."""
         if isinstance(val, six.binary_type):
             val = val.decode(
@@ -636,16 +636,16 @@ class PrettyStr(PrettyFormat):
         src,  # type: typing.Any
         indent=0,  # type: int
         no_indent_start=False  # type: bool
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Repr object without iteration.
 
         :type src: typing.Union[
-                   six.binary_type, six.text_type, int, typing.Iterable,
+                   typing.AnyStr, int, typing.Iterable,
                    object,
                    ]
         :type indent: int
         :type no_indent_start: bool
-        :rtype: str
+        :rtype: typing.Text
         """
         indent = 0 if no_indent_start else indent
         if isinstance(src, set):
@@ -666,14 +666,14 @@ class PrettyStr(PrettyFormat):
         self,
         src,  # type: typing.Dict
         indent=0  # type: int
-    ):  # type: (...) -> typing.Iterator[str]
+    ):  # type: (...) -> typing.Iterator[typing.Text]
         """Repr dict items.
 
         :param src: object to process
         :type src: dict
         :param indent: start indentation
         :type indent: int
-        :rtype: typing.Generator[str]
+        :rtype: typing.Generator[typing.Text]
         """
         max_len = max((len(str(key)) for key in src)) if src else 0
         for key, val in src.items():
@@ -693,12 +693,12 @@ class PrettyStr(PrettyFormat):
         self,
         src,  # type: typing.Union[types.FunctionType, types.MethodType]
         indent=0  # type: int
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Repr callable object (function or method).
 
         :type src: typing.Union[types.FunctionType, types.MethodType]
         :type indent: int
-        :rtype: str
+        :rtype: typing.Text
         """
         param_str = ""
 
@@ -742,7 +742,7 @@ class PrettyStr(PrettyFormat):
         indent,  # type: int
         result,  # type: str
         suffix,  # type: str
-    ):  # type: (...) -> six.text_type
+    ):  # type: (...) -> typing.Text
         """Repr iterable item.
 
         :param nl: newline before item
@@ -757,7 +757,7 @@ class PrettyStr(PrettyFormat):
         :type result: str
         :param suffix: suffix
         :type suffix: str
-        :rtype: str
+        :rtype: typing.Text
         """
         return (
             "{nl}"
@@ -785,7 +785,7 @@ def pretty_repr(
 
     :param src: object to process
     :type src: typing.Union[
-               six.binary_type, six.text_type, int, typing.Iterable, object
+               typing.AnyStr, int, typing.Iterable, object
                ]
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
@@ -823,7 +823,7 @@ def pretty_str(
 
     :param src: object to process
     :type src: typing.Union[
-               six.binary_type, six.text_type, int, typing.Iterable, object
+               typing.AnyStr, int, typing.Iterable, object
                ]
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int

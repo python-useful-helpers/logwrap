@@ -25,7 +25,7 @@ class PrettyFormat:
         self,
         src: typing.Union[types.FunctionType, types.MethodType],
         indent: int=0
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
     @abc.abstractmethod
     def _repr_simple(
@@ -33,14 +33,14 @@ class PrettyFormat:
         src: typing.Any,
         indent: int=0,
         no_indent_start: bool=False
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
     @abc.abstractmethod
     def _repr_dict_items(
         self,
         src: typing.Dict,
         indent: int=0
-    ) -> typing.Iterator[str]: ...
+    ) -> typing.Iterator[typing.Text]: ...
 
     @staticmethod
     def _repr_iterable_item(
@@ -50,7 +50,7 @@ class PrettyFormat:
         indent: int,
         result: str,
         suffix: str,
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
     def _repr_iterable_items(
         self,
@@ -60,40 +60,40 @@ class PrettyFormat:
 
     @property
     @abc.abstractmethod
-    def _magic_method_name(self) -> six.text_type: ...
+    def _magic_method_name(self) -> typing.Text: ...
 
-    def process_element(self, src: typing.Any, indent: int=..., no_indent_start: bool=...) -> six.text_type: ...
+    def process_element(self, src: typing.Any, indent: int=..., no_indent_start: bool=...) -> typing.Text: ...
 
     def __call__(self, src: typing.Any, indent: int=..., no_indent_start: bool=...) -> typing.Union[six.text_type, str]: ...
 
 class PrettyRepr(PrettyFormat):
     @property
-    def _magic_method_name(self) -> six.text_type: ...
+    def _magic_method_name(self) -> typing.Text: ...
 
     @staticmethod
     def _strings_repr(
         indent: int,
-        val: typing.Union[six.binary_type, six.text_type]
-    ) -> six.text_type: ...
+        val: typing.AnyStr
+    ) -> typing.Text: ...
 
     def _repr_simple(
         self,
         src: typing.Any,
         indent: int=0,
         no_indent_start: bool=False
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
     def _repr_dict_items(
         self,
         src: typing.Dict,
         indent: int=0
-    ) -> typing.Iterator[str]: ...
+    ) -> typing.Iterator[typing.Text]: ...
 
     def _repr_callable(
         self,
         src: typing.Union[types.FunctionType, types.MethodType],
         indent: int=0
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
     @staticmethod
     def _repr_iterable_item(
@@ -103,36 +103,36 @@ class PrettyRepr(PrettyFormat):
         indent: int,
         result: str,
         suffix: str,
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
 class PrettyStr(PrettyFormat):
     @property
-    def _magic_method_name(self) -> six.text_type: ...
+    def _magic_method_name(self) -> typing.Text: ...
 
     @staticmethod
     def _strings_str(
         indent: int,
-        val: typing.Union[six.binary_type, six.text_type]
-    ) -> six.text_type: ...
+        val: typing.AnyStr
+    ) -> typing.Text: ...
 
     def _repr_simple(
         self,
         src: typing.Any,
         indent: int=0,
         no_indent_start: bool=False
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
     def _repr_dict_items(
         self,
         src: typing.Dict,
         indent: int=0
-    ) -> typing.Iterator[str]: ...
+    ) -> typing.Iterator[typing.Text]: ...
 
     def _repr_callable(
         self,
         src: typing.Union[types.FunctionType, types.MethodType],
         indent: int=0
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
     @staticmethod
     def _repr_iterable_item(
@@ -142,7 +142,7 @@ class PrettyStr(PrettyFormat):
         indent: int,
         result: str,
         suffix: str,
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
 def pretty_repr(
     src: typing.Any,

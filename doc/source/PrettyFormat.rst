@@ -12,7 +12,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
 
     :param src: object to process
     :type src: typing.Union[
-               six.binary_type, six.text_type, int, typing.Iterable, object
+               typing.AnyStr, int, typing.Iterable, object
                ]
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
@@ -36,7 +36,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
 
     :param src: object to process
     :type src: typing.Union[
-               six.binary_type, six.text_type, int, typing.Iterable, object
+               typing.AnyStr, int, typing.Iterable, object
                ]
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
@@ -90,7 +90,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
 
         :param src: object to process
         :type src: typing.Union[
-                   six.binary_type, six.text_type, int, typing.Iterable, object
+                   typing.AnyStr, int, typing.Iterable, object
                    ]
         :param indent: start indentation
         :type indent: int
@@ -98,7 +98,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
             do not indent open bracket and simple parameters
         :type no_indent_start: bool
         :return: formatted string
-        :rtype: six.text_type
+        :rtype: typing.Text
 
     .. py:method:: __call__(src, indent=0, no_indent_start=False)
 
@@ -106,7 +106,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
 
         :param src: object to process
         :type src: typing.Union[
-                   six.binary_type, six.text_type, int, typing.Iterable, object
+                   typing.AnyStr, int, typing.Iterable, object
                    ]
         :param indent: start indentation
         :type indent: int

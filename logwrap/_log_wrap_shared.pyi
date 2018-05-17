@@ -146,15 +146,15 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
     def post_process_param(
         self,
         arg: BoundParameter,
-        arg_repr: six.text_type
-    ) -> six.text_type: ...
+        arg_repr: typing.Text
+    ) -> typing.Text: ...
 
     def _get_func_args_repr(
         self,
         sig: inspect.Signature,
         args: typing.Tuple,
         kwargs: typing.Dict[str, typing.Any]
-    ) -> six.text_type: ...
+    ) -> typing.Text: ...
 
     def _make_done_record(
         self,
