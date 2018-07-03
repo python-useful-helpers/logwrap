@@ -21,7 +21,7 @@ jobs:
   fast_finish: true
   include:
   - stage: Static analisys
-    python: *mainstream_python
+    python: 3.6
     services: skip
     install:
     - *upgrade_python_toolset
@@ -31,7 +31,7 @@ jobs:
     after_success: skip
 
   - stage: Code style check
-    python: 3.6
+    python: *mainstream_python
     services: skip
     install:
     - *upgrade_python_toolset
