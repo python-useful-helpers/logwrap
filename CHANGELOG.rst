@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+Version 3.3.1
+-------------
+* Python 3.7 support validated
+
 Version 3.3.0
 -------------
 * Type hints and stubs
