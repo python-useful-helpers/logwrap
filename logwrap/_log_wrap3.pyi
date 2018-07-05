@@ -16,7 +16,7 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
         max_indent: int=...,
         spec: typing.Optional[typing.Callable]=...,
         blacklisted_names: typing.Optional[typing.List[str]]=...,
-        blacklisted_exceptions: typing.Optional[typing.List[Exception]]=...,
+        blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]]=...,
         log_call_args: bool=...,
         log_call_args_on_exc: bool=...,
         log_result_obj: bool=...
@@ -33,7 +33,7 @@ def logwrap(
     max_indent: int=...,
     spec: typing.Optional[typing.Callable]=...,
     blacklisted_names: typing.Optional[typing.List[str]]=...,
-    blacklisted_exceptions: typing.Optional[typing.List[Exception]]=...,
+    blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]]=...,
     log_call_args: bool=...,
     log_call_args_on_exc: bool=...,
     log_result_obj: bool=...

@@ -56,7 +56,7 @@ __all__ = (
     'bind_args_kwargs'
 )
 
-__version__ = '3.3.1'
+__version__ = '4.0.0'
 __author__ = "Alexey Stepanov"
 __author_email__ = 'penguinolog@gmail.com'
 __maintainers__ = {

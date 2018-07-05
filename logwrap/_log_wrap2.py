@@ -25,7 +25,6 @@ from __future__ import unicode_literals
 
 import logging
 import typing  # noqa # pylint: disable=unused-import
-import warnings
 
 import six
 # noinspection PyUnresolvedReferences
@@ -36,45 +35,24 @@ from . import _log_wrap_shared
 __all__ = ('logwrap', 'LogWrap')
 
 
-def _apply_old_spec(*args, **kwargs):  # type: (...) -> typing.Dict[str, typing.Any]
-    # pylint: disable=unused-argument
-    def old_spec(
-        log=_log_wrap_shared.logger,  # type: typing.Union[logging.Logger, typing.Callable]
-        log_level=logging.DEBUG,  # type: int
-        exc_level=logging.ERROR,  # type: int
-        max_indent=20,  # type: int
-        spec=None,  # type: typing.Optional[typing.Callable]
-        blacklisted_names=None,  # type: typing.Optional[typing.List[str]]
-        blacklisted_exceptions=None,  # type: typing.Optional[typing.List[Exception]]
-        log_call_args=True,  # type: bool
-        log_call_args_on_exc=True,  # type: bool
-        log_result_obj=True,  # type: bool
-    ):  # type: (...) -> None
-        """Old spec."""
-        pass  # pragma: no cover
-
-    # pylint: enable=unused-argument
-
-    sig = funcsigs.signature(old_spec)  # type: funcsigs.Signature
-
-    final_kwargs = {
-        parameter.name: parameter.value
-        for parameter in _log_wrap_shared.bind_args_kwargs(sig, *args, **kwargs)
-    }  # type: typing.Dict[str, typing.Any]
-
-    return final_kwargs
-
-
 class LogWrap(_log_wrap_shared.BaseLogWrap):
     """LogWrap."""
 
     __slots__ = ()
 
-    def __init__(  # pylint: disable=keyword-arg-before-vararg
+    def __init__(
         self,
         func=None,  # type: typing.Optional[typing.Callable]
-        *args,
-        **kwargs
+        log=_log_wrap_shared.logger,  # type: logging.Logger
+        log_level=logging.DEBUG,  # type: int
+        exc_level=logging.ERROR,  # type: int
+        max_indent=20,  # type: int
+        spec=None,  # type: typing.Optional[typing.Callable]
+        blacklisted_names=None,  # type: typing.Optional[typing.List[str]]
+        blacklisted_exceptions=None,  # type: typing.Optional[typing.List[typing.Type[Exception]]]
+        log_call_args=True,  # type: bool
+        log_call_args_on_exc=True,  # type: bool
+        log_result_obj=True,  # type: bool
     ):  # type: (...) -> None
         """Log function calls and return values.
 
@@ -99,7 +77,7 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
         :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
         :type blacklisted_names: typing.Optional[typing.Iterable[str]]
         :param blacklisted_exceptions: list of exception, which should be re-raised without producing log record.
-        :type blacklisted_exceptions: typing.Optional[typing.Iterable[Exception]]
+        :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
         :param log_call_args: log call arguments before executing wrapped function.
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
@@ -109,18 +87,19 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
         """
-        if isinstance(func, logging.Logger):
-            args = (func,) + args
-            func = None
-
-        if args:
-            warnings.warn(
-                'Logwrap should use keyword-only parameters starting from version 3.4.0\n'
-                'After version 3.4.0 arguments list and order may be changed.',
-                DeprecationWarning
-            )
-
-        super(LogWrap, self).__init__(func=func, **_apply_old_spec(*args, **kwargs))
+        super(LogWrap, self).__init__(
+            func=func,
+            log=log,
+            log_level=log_level,
+            exc_level=exc_level,
+            max_indent=max_indent,
+            spec=spec,
+            blacklisted_names=blacklisted_names,
+            blacklisted_exceptions=blacklisted_exceptions,
+            log_call_args=log_call_args,
+            log_call_args_on_exc=log_call_args_on_exc,
+            log_result_obj=log_result_obj
+        )
 
     def _get_function_wrapper(
         self,
@@ -161,10 +140,18 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
 
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
-def logwrap(  # pylint: disable=keyword-arg-before-vararg
+def logwrap(
     func=None,  # type: typing.Optional[typing.Callable]
-    *args,
-    **kwargs
+    log=_log_wrap_shared.logger,  # type: logging.Logger
+    log_level=logging.DEBUG,  # type: int
+    exc_level=logging.ERROR,  # type: int
+    max_indent=20,  # type: int
+    spec=None,  # type: typing.Optional[typing.Callable]
+    blacklisted_names=None,  # type: typing.Optional[typing.List[str]]
+    blacklisted_exceptions=None,  # type: typing.Optional[typing.List[typing.Type[Exception]]]
+    log_call_args=True,  # type: bool
+    log_call_args_on_exc=True,  # type: bool
+    log_result_obj=True,  # type: bool
 ):  # type: (...) -> typing.Union[LogWrap, typing.Callable]
     """Log function calls and return values.
 
@@ -188,7 +175,7 @@ def logwrap(  # pylint: disable=keyword-arg-before-vararg
     :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
     :type blacklisted_names: typing.Optional[typing.List[str]]
     :param blacklisted_exceptions: list of exception, which should be re-raised without producing log record.
-    :type blacklisted_exceptions: typing.Optional[typing.List[Exception]]
+    :type blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]]
     :param log_call_args: log call arguments before executing wrapped function.
     :type log_call_args: bool
     :param log_call_args_on_exc: log call arguments if exception raised.
@@ -200,19 +187,17 @@ def logwrap(  # pylint: disable=keyword-arg-before-vararg
 
     .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
     """
-    if isinstance(func, logging.Logger):
-        args = (func, ) + args
-        func = None
-
-    if args:
-        warnings.warn(
-            'Logwrap should use keyword-only parameters starting from version 3.4.0\n'
-            'After version 3.4.0 arguments list and order may be changed.',
-            DeprecationWarning
-        )
-
     wrapper = LogWrap(
-        **_apply_old_spec(*args, **kwargs)
+        log=log,
+        log_level=log_level,
+        exc_level=exc_level,
+        max_indent=max_indent,
+        spec=spec,
+        blacklisted_names=blacklisted_names,
+        blacklisted_exceptions=blacklisted_exceptions,
+        log_call_args=log_call_args,
+        log_call_args_on_exc=log_call_args_on_exc,
+        log_result_obj=log_result_obj
     )
     if func is not None:
         return wrapper(func)
