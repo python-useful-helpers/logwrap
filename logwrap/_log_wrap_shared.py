@@ -45,14 +45,11 @@ else:  # pragma: no cover
 
 __all__ = ('BaseLogWrap', 'BoundParameter', 'bind_args_kwargs')
 
-logger = logging.getLogger(__name__)  # type: logging.Logger
+logger = logging.getLogger('logwrap')  # type: logging.Logger
 
 
 indent = 4
-fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(
-    spc='',
-    indent=indent,
-).format
+fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc='', indent=indent, ).format
 comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
 
 
@@ -246,7 +243,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
         max_indent=20,  # type: int
         spec=None,  # type: typing.Optional[typing.Callable]
         blacklisted_names=None,  # type: typing.Optional[typing.Iterable[str]]
-        blacklisted_exceptions=None,  # type: typing.Optional[typing.Iterable[Exception]]
+        blacklisted_exceptions=None,  # type: typing.Optional[typing.Iterable[typing.Type[Exception]]]
         log_call_args=True,  # type: bool
         log_call_args_on_exc=True,  # type: bool
         log_result_obj=True,  # type: bool
@@ -271,18 +268,11 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
                      signature with decorated function, or arguments bind
                      will be failed!
         :type spec: typing.Optional[typing.Callable]
-        :param blacklisted_names: Blacklisted argument names.
-                                  Arguments with this names will be skipped
-                                  in log.
+        :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
         :type blacklisted_names: typing.Optional[typing.Iterable[str]]
-        :param blacklisted_exceptions: list of exception,
-                                       which should be re-raised without
-                                       producing log record.
-        :type blacklisted_exceptions: typing.Optional[
-                                          typing.Iterable[Exception]
-                                      ]
-        :param log_call_args: log call arguments before executing
-                              wrapped function.
+        :param blacklisted_exceptions: list of exception, which should be re-raised without producing log record.
+        :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
+        :param log_call_args: log call arguments before executing wrapped function.
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
         :type log_call_args_on_exc: bool
@@ -377,10 +367,10 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
     @property
     def blacklisted_exceptions(
         self
-    ):  # type: () -> typing.List[Exception]
+    ):  # type: () -> typing.List[typing.Type[Exception]]
         """List of exceptions to re-raise without log.
 
-        :rtype: typing.List[Exception]
+        :rtype: typing.List[typing.Type[Exception]]
         """
         return self.__blacklisted_exceptions
 

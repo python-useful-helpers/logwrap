@@ -38,7 +38,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :param blacklisted_exceptions: list of exception,
                                        which should be re-raised without
                                        producing log record.
-        :type blacklisted_exceptions: typing.Optional[typing.Iterable[Exception]]
+        :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
         :param log_call_args: log call arguments before executing wrapped function.
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
@@ -48,6 +48,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
         .. versionchanged:: 3.3.0 Deprecation of `*args`
+        .. versionchanged:: 4.0.0 Drop of *args
 
     .. py:method:: pre_process_param(self, arg)
 
@@ -88,7 +89,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         ``typing.List[str]``, modified via mutability
     .. py:attribute:: blacklisted_exceptions
 
-        ``typing.List[Exception]``, modified via mutability
+        ``typing.List[typing.Type[Exception]]``, modified via mutability
     .. py:attribute:: log_call_args
     .. py:attribute:: log_call_args_on_exc
     .. py:attribute:: log_result_obj

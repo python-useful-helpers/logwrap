@@ -34,7 +34,6 @@ import logwrap
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
-@mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 @unittest.skipIf(
     asyncio is None,
     'Strict python 3.3+ API'
@@ -44,7 +43,22 @@ class TestLogWrapAsync(unittest.TestCase):
     def setUpClass(cls):
         cls.loop = asyncio.get_event_loop()
 
-    def test_coroutine_async(self, logger):
+    def setUp(self):
+        """Preparation for tests.
+
+        Due to no possibility of proper mock patch of function defaults, modify directly.
+        """
+        self.logger = mock.Mock(spec=logging.Logger)
+        self.logwrap_defaults = logwrap.logwrap.__kwdefaults__['log']
+        self.logwrap_cls_defaults = logwrap.LogWrap.__init__.__kwdefaults__['log']
+        logwrap.logwrap.__kwdefaults__['log'] = logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logger
+
+    def tearDown(self):
+        """Revert modifications."""
+        logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logwrap_cls_defaults
+        logwrap.logwrap.__kwdefaults__['log'] = self.logwrap_defaults
+
+    def test_coroutine_async(self):
         @logwrap.logwrap
         @asyncio.coroutine
         def func():
@@ -52,7 +66,6 @@ class TestLogWrapAsync(unittest.TestCase):
 
         self.loop.run_until_complete(func())
         self.assertEqual(
-            logger.mock_calls,
             [
                 mock.call.log(
                     level=logging.DEBUG,
@@ -62,10 +75,11 @@ class TestLogWrapAsync(unittest.TestCase):
                     level=logging.DEBUG,
                     msg="Done: 'func' with result:\nNone"
                 )
-            ]
+            ],
+            self.logger.mock_calls,
         )
 
-    def test_coroutine_async_as_argumented(self, logger):
+    def test_coroutine_async_as_argumented(self):
         new_logger = mock.Mock(spec=logging.Logger, name='logger')
         log = mock.Mock(name='log')
         new_logger.attach_mock(log, 'log')
@@ -78,7 +92,6 @@ class TestLogWrapAsync(unittest.TestCase):
         self.loop.run_until_complete(func())
 
         self.assertEqual(
-            log.mock_calls,
             [
                 mock.call.log(
                     level=logging.DEBUG,
@@ -88,10 +101,11 @@ class TestLogWrapAsync(unittest.TestCase):
                     level=logging.DEBUG,
                     msg="Done: 'func' with result:\nNone"
                 )
-            ]
+            ],
+            log.mock_calls,
         )
 
-    def test_coroutine_fail(self, logger):
+    def test_coroutine_fail(self):
         @logwrap.logwrap
         @asyncio.coroutine
         def func():
@@ -101,7 +115,6 @@ class TestLogWrapAsync(unittest.TestCase):
             self.loop.run_until_complete(func())
 
         self.assertEqual(
-            logger.mock_calls,
             [
                 mock.call.log(
                     level=logging.DEBUG,
@@ -112,10 +125,11 @@ class TestLogWrapAsync(unittest.TestCase):
                     msg="Failed: \n'func'()",
                     exc_info=True
                 )
-            ]
+            ],
+            self.logger.mock_calls,
         )
 
-    def test_exceptions_blacklist(self, logger):
+    def test_exceptions_blacklist(self):
         new_logger = mock.Mock(spec=logging.Logger, name='logger')
         log = mock.Mock(name='log')
         new_logger.attach_mock(log, 'log')
@@ -131,26 +145,40 @@ class TestLogWrapAsync(unittest.TestCase):
         # While we're not expanding result coroutine object from namespace,
         # do not check execution result
 
-        self.assertEqual(len(logger.mock_calls), 0)
+        self.assertEqual(len(self.logger.mock_calls), 0)
         self.assertEqual(
-            log.mock_calls,
             [
                 mock.call(
                     level=logging.DEBUG,
                     msg="Awaiting: \n'func'()"
                 ),
-            ]
+            ],
+            log.mock_calls,
         )
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
-@mock.patch('logwrap._log_wrap_shared.logger', autospec=True)
 @unittest.skipIf(
     sys.version_info[:2] < (3, 4),
     'Strict python 3.3+ API'
 )
 class TestAnnotated(unittest.TestCase):
-    def test_annotation_args(self, logger):
+    def setUp(self):
+        """Preparation for tests.
+
+        Due to no possibility of proper mock patch of function defaults, modify directly.
+        """
+        self.logger = mock.Mock(spec=logging.Logger)
+        self.logwrap_defaults = logwrap.logwrap.__kwdefaults__['log']
+        self.logwrap_cls_defaults = logwrap.LogWrap.__init__.__kwdefaults__['log']
+        logwrap.logwrap.__kwdefaults__['log'] = logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logger
+
+    def tearDown(self):
+        """Revert modifications."""
+        logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logwrap_cls_defaults
+        logwrap.logwrap.__kwdefaults__['log'] = self.logwrap_defaults
+
+    def test_annotation_args(self):
         namespace = {'logwrap': logwrap}
 
         exec("""
@@ -164,7 +192,6 @@ def func(a: typing.Optional[int]=None):
         func = namespace['func']  # type: typing.Callable[..., None]
         func()
         self.assertEqual(
-            logger.mock_calls,
             [
                 mock.call.log(
                     level=logging.DEBUG,
@@ -178,5 +205,6 @@ def func(a: typing.Optional[int]=None):
                     level=logging.DEBUG,
                     msg="Done: 'func' with result:\nNone"
                 )
-            ]
+            ],
+            self.logger.mock_calls,
         )
