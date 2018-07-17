@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fpython-useful-helpers%2Flogwrap.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fpython-useful-helpers%2Flogwrap?ref=badge_shield)
+
 logwrap
 =======
 
@@ -306,3 +308,6 @@ For code checking several CI systems is used in parallel:
 CD system
 =========
 `Travis CI: <https://travis-ci.org/python-useful-helpers/logwrap>`_ is used for package delivery on PyPI.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fpython-useful-helpers%2Flogwrap.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fpython-useful-helpers%2Flogwrap?ref=badge_large)
