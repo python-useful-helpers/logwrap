@@ -63,8 +63,8 @@ class BoundParameter(object):
 
 def bind_args_kwargs(
         sig: Signature,
-        *args,
-        **kwargs
+        *args: typing.Tuple,
+        **kwargs: typing.Dict
     ) -> typing.Iterator[BoundParameter]: ...
 
 
@@ -135,8 +135,8 @@ class BaseLogWrap(_class_decorator.BaseDecorator, metaclass=abc.ABCMeta):
     @staticmethod
     def _bind_args_kwargs(
         sig: Signature,
-        *args,
-        **kwargs
+        *args: typing.Tuple,
+        **kwargs: typing.Dict
     ) -> typing.Iterator[BoundParameter]: ...
 
     def pre_process_param(
