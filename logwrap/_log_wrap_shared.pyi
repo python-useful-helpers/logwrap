@@ -1,3 +1,4 @@
+import abc
 import enum
 import inspect
 import logging
@@ -33,7 +34,7 @@ class BoundParameter(object):
     KEYWORD_ONLY = Parameter.KEYWORD_ONLY
     VAR_KEYWORD = Parameter.VAR_KEYWORD
 
-    empty = Parameter.empty  # type: typing.Type
+    empty: typing.Type = Parameter.empty
 
     def __init__(
         self,
@@ -62,12 +63,12 @@ class BoundParameter(object):
 
 def bind_args_kwargs(
         sig: Signature,
-        *args,
-        **kwargs
+        *args: typing.Tuple,
+        **kwargs: typing.Dict
     ) -> typing.Iterator[BoundParameter]: ...
 
 
-class BaseLogWrap(_class_decorator.BaseDecorator):
+class BaseLogWrap(_class_decorator.BaseDecorator, metaclass=abc.ABCMeta):
     def __init__(
         self,
         func: typing.Optional[typing.Callable]=None,
@@ -134,8 +135,8 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
     @staticmethod
     def _bind_args_kwargs(
         sig: Signature,
-        *args,
-        **kwargs
+        *args: typing.Tuple,
+        **kwargs: typing.Dict
     ) -> typing.Iterator[BoundParameter]: ...
 
     def pre_process_param(

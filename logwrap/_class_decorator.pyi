@@ -3,7 +3,7 @@ import typing
 
 PY3: bool
 
-class BaseDecorator:
+class BaseDecorator(object, metaclass=abc.ABCMeta):
     def __init__(self, func: typing.Optional[typing.Callable]=...) -> None: ...
 
     @property

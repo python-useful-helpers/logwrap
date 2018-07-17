@@ -23,8 +23,10 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
     def _get_function_wrapper(self, func: typing.Callable) -> typing.Callable: ...
 
+
+@typing.overload
 def logwrap(
-    func: typing.Optional[typing.Callable]=None,
+    func: None=...,
     log: logging.Logger=...,
     log_level: int=...,
     exc_level: int=...,
@@ -35,4 +37,20 @@ def logwrap(
     log_call_args: bool=...,
     log_call_args_on_exc: bool=...,
     log_result_obj: bool=...
-) -> typing.Union[LogWrap, typing.Callable]: ...
+) -> LogWrap: ...
+
+
+@typing.overload
+def logwrap(
+    func: typing.Callable=...,
+    log: logging.Logger=...,
+    log_level: int=...,
+    exc_level: int=...,
+    max_indent: int=...,
+    spec: typing.Optional[typing.Callable]=...,
+    blacklisted_names: typing.Optional[typing.List[str]]=...,
+    blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]]=...,
+    log_call_args: bool=...,
+    log_call_args_on_exc: bool=...,
+    log_result_obj: bool=...
+) -> typing.Callable: ...
