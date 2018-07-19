@@ -8,18 +8,18 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
     def __init__(
         self,
-        func: typing.Optional[typing.Callable]=...,
+        func: typing.Optional[typing.Callable] = ...,
         *,
-        log: logging.Logger=...,
-        log_level: int=...,
-        exc_level: int=...,
-        max_indent: int=...,
-        spec: typing.Optional[typing.Callable]=...,
-        blacklisted_names: typing.Optional[typing.List[str]]=...,
-        blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]]=...,
-        log_call_args: bool=...,
-        log_call_args_on_exc: bool=...,
-        log_result_obj: bool=...
+        log: logging.Logger = ...,
+        log_level: int = ...,
+        exc_level: int = ...,
+        max_indent: int = ...,
+        spec: typing.Optional[typing.Callable] = ...,
+        blacklisted_names: typing.Optional[typing.List[str]] = ...,
+        blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]] = ...,
+        log_call_args: bool = ...,
+        log_call_args_on_exc: bool = ...,
+        log_result_obj: bool = ...
     ) -> None: ...
 
     def _get_function_wrapper(self, func: typing.Callable) -> typing.Callable: ...
@@ -27,33 +27,32 @@ class LogWrap(_log_wrap_shared.BaseLogWrap):
 
 @typing.overload
 def logwrap(
-    func: None=...,
+    func: None = ...,
     *,
-    log: logging.Logger=...,
-    log_level: int=...,
-    exc_level: int=...,
-    max_indent: int=...,
-    spec: typing.Optional[typing.Callable]=...,
-    blacklisted_names: typing.Optional[typing.List[str]]=...,
-    blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]]=...,
-    log_call_args: bool=...,
-    log_call_args_on_exc: bool=...,
-    log_result_obj: bool=...
+    log: logging.Logger = ...,
+    log_level: int = ...,
+    exc_level: int = ...,
+    max_indent: int = ...,
+    spec: typing.Optional[typing.Callable] = ...,
+    blacklisted_names: typing.Optional[typing.List[str]] = ...,
+    blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]] = ...,
+    log_call_args: bool = ...,
+    log_call_args_on_exc: bool = ...,
+    log_result_obj: bool = ...
 ) -> LogWrap: ...
-
 
 @typing.overload
 def logwrap(
-    func: typing.Callable=...,
+    func: typing.Callable = ...,
     *,
-    log: logging.Logger=...,
-    log_level: int=...,
-    exc_level: int=...,
-    max_indent: int=...,
-    spec: typing.Optional[typing.Callable]=...,
-    blacklisted_names: typing.Optional[typing.List[str]]=...,
-    blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]]=...,
-    log_call_args: bool=...,
-    log_call_args_on_exc: bool=...,
-    log_result_obj: bool=...
+    log: logging.Logger = ...,
+    log_level: int = ...,
+    exc_level: int = ...,
+    max_indent: int = ...,
+    spec: typing.Optional[typing.Callable] = ...,
+    blacklisted_names: typing.Optional[typing.List[str]] = ...,
+    blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]] = ...,
+    log_call_args: bool = ...,
+    log_call_args_on_exc: bool = ...,
+    log_result_obj: bool = ...
 ) -> typing.Callable: ...
