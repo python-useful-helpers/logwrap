@@ -15,7 +15,6 @@ else:
     from funcsigs import Parameter
     from funcsigs import Signature
 
-
 logger: logging.Logger
 
 def _check_type(expected: typing.Type) -> typing.Callable: ...
@@ -23,10 +22,7 @@ def _check_type(expected: typing.Type) -> typing.Callable: ...
 
 class BoundParameter(object):
 
-    __slots__ = (
-        '_parameter',
-        '_value'
-    )
+    __slots__ = ("_parameter", "_value")
 
     POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY
     POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD
@@ -36,11 +32,7 @@ class BoundParameter(object):
 
     empty: typing.Type = Parameter.empty
 
-    def __init__(
-        self,
-        parameter: Parameter,
-        value: typing.Any=...
-    ) -> None: ...
+    def __init__(self, parameter: Parameter, value: typing.Any = ...) -> None: ...
 
     @property
     def parameter(self) -> Parameter: ...
@@ -62,26 +54,26 @@ class BoundParameter(object):
 
 
 def bind_args_kwargs(
-        sig: Signature,
-        *args: typing.Tuple,
-        **kwargs: typing.Dict
-    ) -> typing.Iterator[BoundParameter]: ...
+    sig: Signature,
+    *args: typing.Tuple,
+    **kwargs: typing.Dict
+) -> typing.Iterator[BoundParameter]: ...
 
 
 class BaseLogWrap(_class_decorator.BaseDecorator, metaclass=abc.ABCMeta):
     def __init__(
         self,
-        func: typing.Optional[typing.Callable]=None,
-        log: logging.Logger=...,
-        log_level: int=...,
-        exc_level: int=...,
-        max_indent: int=...,
-        spec: typing.Optional[typing.Callable]=...,
-        blacklisted_names: typing.Optional[typing.Iterable[str]]=...,
-        blacklisted_exceptions: typing.Optional[typing.Iterable[Exception]]=...,
-        log_call_args: bool=...,
-        log_call_args_on_exc: bool=...,
-        log_result_obj: bool=...
+        func: typing.Optional[typing.Callable] = None,
+        log: logging.Logger = ...,
+        log_level: int = ...,
+        exc_level: int = ...,
+        max_indent: int = ...,
+        spec: typing.Optional[typing.Callable] = ...,
+        blacklisted_names: typing.Optional[typing.Iterable[str]] = ...,
+        blacklisted_exceptions: typing.Optional[typing.Iterable[Exception]] = ...,
+        log_call_args: bool = ...,
+        log_call_args_on_exc: bool = ...,
+        log_result_obj: bool = ...,
     ) -> None: ...
 
     @property
@@ -141,7 +133,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator, metaclass=abc.ABCMeta):
 
     def pre_process_param(
         self,
-        arg: BoundParameter,
+        arg: BoundParameter
     ) -> typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]: ...
 
     def post_process_param(
@@ -167,7 +159,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator, metaclass=abc.ABCMeta):
         self,
         name: str,
         arguments: str,
-        method: str='Calling',
+        method: str = "Calling"
     ) -> None: ...
 
     def _make_exc_record(
