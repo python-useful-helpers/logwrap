@@ -18,9 +18,6 @@
 
 """pretty_str specific tests"""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import unittest
 
 import logwrap
@@ -212,6 +209,3 @@ class TestPrettyStr(unittest.TestCase):
             result,
             "Test Class".format(id(Tst))
         )
-
-    def test_py2_compatibility_flag(self):
-        self.assertIsInstance(logwrap.pretty_str(u'Text', py2_str=True), str)

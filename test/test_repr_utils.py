@@ -18,10 +18,6 @@
 
 """_repr_utils (internal helpers) specific tests."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-import sys
 import unittest
 
 import logwrap
@@ -284,15 +280,8 @@ class TestPrettyRepr(unittest.TestCase):
             "u'''<Test Class at 0x{:X}>'''".format(id(Tst))
         )
 
-    def test_py2_compatibility_flag(self):
-        self.assertIsInstance(logwrap.pretty_repr(u'Text', py2_str=True), str)
-
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
-@unittest.skipIf(
-    sys.version_info[:2] < (3, 4),
-    'Strict python 3.3+ API'
-)
 class TestAnnotated(unittest.TestCase):
     def test_001_annotation_args(self):
         fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format

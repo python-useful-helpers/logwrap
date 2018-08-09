@@ -16,24 +16,11 @@
 
 """_repr_utils (internal helpers) specific tests."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
-import sys
+from inspect import signature
 import unittest
 
-import six
-
 # noinspection PyProtectedMember
-from logwrap import _log_wrap_shared
-
-# pylint: disable=ungrouped-imports, no-name-in-module
-if six.PY3:  # pragma: no cover
-    from inspect import signature
-else:  # pragma: no cover
-    # noinspection PyUnresolvedReferences
-    from funcsigs import signature
-# pylint: enable=ungrouped-imports, no-name-in-module
+from logwrap import _log_wrap
 
 
 def example_function(
@@ -48,7 +35,7 @@ sig = signature(example_function)
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestBind(unittest.TestCase):
     def test_001_positive(self):
-        params = list(_log_wrap_shared.bind_args_kwargs(sig, 1, arg3=33))
+        params = list(_log_wrap.bind_args_kwargs(sig, 1, arg3=33))
         arg_1_bound = params[0]
         self.assertEqual(arg_1_bound.name, 'arg1')
         self.assertEqual(arg_1_bound.value, 1)
@@ -90,7 +77,7 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(kwargs_bound), "**kwargs={}")
 
     def test_002_args_kwargs(self):
-        params = list(_log_wrap_shared.bind_args_kwargs(sig, 1, 2, 3, 4, arg5=5))
+        params = list(_log_wrap.bind_args_kwargs(sig, 1, 2, 3, 4, arg5=5))
 
         args_bound = params[3]
         self.assertEqual(args_bound.name, 'args')
@@ -109,19 +96,18 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(kwargs_bound), "**kwargs={'arg5': 5}")
 
     def test_003_no_value(self):
-        params = list(_log_wrap_shared.bind_args_kwargs(sig, 1, arg3=33))
+        params = list(_log_wrap.bind_args_kwargs(sig, 1, arg3=33))
         arg_1_bound = params[0]
         arg1_parameter = arg_1_bound.parameter
         with self.assertRaises(ValueError):
-            _log_wrap_shared.BoundParameter(arg1_parameter, arg1_parameter.empty)
+            _log_wrap.BoundParameter(arg1_parameter, arg1_parameter.empty)
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 4), 'python 3 syntax')
     def test_004_annotations(self):
         namespace = {}
         exec("""def func(arg1, arg2: int, arg3: int=3): pass""", namespace)
         func = namespace['func']
         sig = signature(func)
-        params = list(_log_wrap_shared.bind_args_kwargs(sig, 1, 2, 4))
+        params = list(_log_wrap.bind_args_kwargs(sig, 1, 2, 4))
 
         arg_1_bound = params[0]
         self.assertEqual(arg_1_bound.name, 'arg1')

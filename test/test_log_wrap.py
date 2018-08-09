@@ -18,22 +18,14 @@
 
 """Python independent logwrap tests."""
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
+import functools
+import io
 import logging
 import unittest
 
-import six
-
 import logwrap
 
-# pylint: disable=import-error
-if six.PY2:
-    # noinspection PyUnresolvedReferences
-    import mock
-else:
-    from unittest import mock
+from unittest import mock
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
@@ -43,37 +35,19 @@ class TestLogWrap(unittest.TestCase):
 
         Due to no possibility of proper mock patch of function defaults, modify directly.
         """
-        self.logger = mock.Mock(spec=logging.Logger)
-        if six.PY2:
-            self.logwrap_defaults = logwrap.logwrap.func_defaults
-            self.logwrap_cls_defaults = logwrap.LogWrap.__init__.im_func.func_defaults
-            logwrap.logwrap.func_defaults = logwrap.LogWrap.__init__.im_func.func_defaults = tuple((
-                None,
-                self.logger,
-                logging.DEBUG,
-                logging.ERROR,
-                20,
-                None,
-                None,
-                None,
-                True,
-                True,
-                True
-            ))
-            # raise ValueError(logwrap.logwrap.func_defaults)
-        else:
-            self.logwrap_defaults = logwrap.logwrap.__kwdefaults__['log']
-            self.logwrap_cls_defaults = logwrap.LogWrap.__init__.__kwdefaults__['log']
-            logwrap.logwrap.__kwdefaults__['log'] = logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logger
+        self.logger = logging.getLogger('logwrap')
+        self.logger.setLevel(logging.DEBUG)
+
+        self.stream = io.StringIO()
+
+        self.logger.handlers.clear()
+        handler = logging.StreamHandler(self.stream)
+        handler.setFormatter(logging.Formatter(fmt='%(levelname)s>%(message)s'))
+        self.logger.addHandler(handler)
 
     def tearDown(self):
         """Revert modifications."""
-        if six.PY2:
-            logwrap.logwrap.func_defaults = self.logwrap_defaults
-            logwrap.LogWrap.__init__.im_func.func_defaults = self.logwrap_cls_defaults
-        else:
-            logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logwrap_cls_defaults
-            logwrap.logwrap.__kwdefaults__['log'] = self.logwrap_defaults
+        self.logger.handlers.clear()
 
     def test_001_no_args(self):
         @logwrap.logwrap
@@ -82,19 +56,13 @@ class TestLogWrap(unittest.TestCase):
 
         result = func()
         self.assertEqual(result, 'No args')
+
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Calling: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\n{}".format(
-                        logwrap.pretty_repr(result))
-                ),
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'()\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "u'''No args'''\n",
+            self.stream.getvalue(),
         )
 
     def test_002_args_simple(self):
@@ -107,30 +75,14 @@ class TestLogWrap(unittest.TestCase):
         result = func(arg)
         self.assertEqual(result, arg)
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg=(
-                        "Calling: \n"
-                        "'func'(\n"
-                        "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'tst'={},\n"
-                        ")".format(
-                            logwrap.pretty_repr(
-                                arg,
-                                indent=8,
-                                no_indent_start=True
-                            )
-                        )
-                    )
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\n{}".format(
-                        logwrap.pretty_repr(result))
-                ),
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # POSITIONAL_OR_KEYWORD:\n"
+            "    'tst'=u'''test arg''',\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "u'''test arg'''\n",
+            self.stream.getvalue(),
         )
 
     def test_003_args_defaults(self):
@@ -144,29 +96,14 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(result, arg)
 
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg=(
-                        "Calling: \n"
-                        "'func'(\n"
-                        "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'tst'={},\n"
-                        ")".format(
-                            logwrap.pretty_repr(
-                                arg,
-                                indent=8,
-                                no_indent_start=True)
-                        )
-                    )
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\n{}".format(
-                        logwrap.pretty_repr(result))
-                ),
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # POSITIONAL_OR_KEYWORD:\n"
+            "    'tst'=u'''test arg''',\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "u'''test arg'''\n",
+            self.stream.getvalue(),
         )
 
     def test_004_args_complex(self):
@@ -181,32 +118,23 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(result, (string, dictionary))
 
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg=(
-                        "Calling: \n"
-                        "'func'(\n"
-                        "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'param_string'={string},\n"
-                        "    'param_dictionary'={dictionary},\n"
-                        ")".format(
-                            string=logwrap.pretty_repr(
-                                string,
-                                indent=8, no_indent_start=True),
-                            dictionary=logwrap.pretty_repr(
-                                dictionary,
-                                indent=8, no_indent_start=True)
-                        )
-                    )
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\n{}".format(
-                        logwrap.pretty_repr(result))
-                ),
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # POSITIONAL_OR_KEYWORD:\n"
+            "    'param_string'=u'''string''',\n"
+            "    'param_dictionary'=\n"
+            "        dict({\n"
+            "            'key': u'''dictionary''',\n"
+            "        }),\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "tuple((\n"
+            "    u'''string''',\n"
+            "    dict({\n"
+            "        'key': u'''dictionary''',\n"
+            "    }),\n"
+            "))\n",
+            self.stream.getvalue(),
         )
 
     def test_005_args_kwargs(self):
@@ -221,32 +149,31 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(result, (tuple(targs), tkwargs))
 
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg=(
-                        "Calling: \n"
-                        "'func'(\n"
-                        "    # VAR_POSITIONAL:\n"
-                        "    'args'={args},\n"
-                        "    # VAR_KEYWORD:\n"
-                        "    'kwargs'={kwargs},\n)".format(
-                            args=logwrap.pretty_repr(
-                                tuple(targs),
-                                indent=8, no_indent_start=True),
-                            kwargs=logwrap.pretty_repr(
-                                tkwargs,
-                                indent=8, no_indent_start=True)
-                        )
-                    )
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\n{}".format(
-                        logwrap.pretty_repr(result))
-                ),
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # VAR_POSITIONAL:\n"
+            "    'args'=\n"
+            "        tuple((\n"
+            "            u'''string1''',\n"
+            "            u'''string2''',\n"
+            "        )),\n"
+            "    # VAR_KEYWORD:\n"
+            "    'kwargs'=\n"
+            "        dict({\n"
+            "            'key': u'''tkwargs''',\n"
+            "        }),\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "tuple((\n"
+            "    tuple((\n"
+            "        u'''string1''',\n"
+            "        u'''string2''',\n"
+            "    )),\n"
+            "    dict({\n"
+            "        'key': u'''tkwargs''',\n"
+            "    }),\n"
+            "))\n",
+            self.stream.getvalue(),
         )
 
     def test_006_renamed_args_kwargs(self):
@@ -262,37 +189,34 @@ class TestLogWrap(unittest.TestCase):
         result = func(arg, *targs, **tkwargs)
         self.assertEqual(result, (arg, tuple(targs), tkwargs))
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg=(
-                        "Calling: \n"
-                        "'func'(\n"
-                        "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'arg'={arg},\n"
-                        "    # VAR_POSITIONAL:\n"
-                        "    'positional'={args},\n"
-                        "    # VAR_KEYWORD:\n"
-                        "    'named'={kwargs},\n)".format(
-                            arg=logwrap.pretty_repr(
-                                arg,
-                                indent=8, no_indent_start=True),
-                            args=logwrap.pretty_repr(
-                                tuple(targs),
-                                indent=8, no_indent_start=True),
-                            kwargs=logwrap.pretty_repr(
-                                tkwargs,
-                                indent=8, no_indent_start=True)
-                        )
-                    )
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\n{}".format(
-                        logwrap.pretty_repr(result))
-                ),
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # POSITIONAL_OR_KEYWORD:\n"
+            "    'arg'=u'''arg''',\n"
+            "    # VAR_POSITIONAL:\n"
+            "    'positional'=\n"
+            "        tuple((\n"
+            "            u'''string1''',\n"
+            "            u'''string2''',\n"
+            "        )),\n"
+            "    # VAR_KEYWORD:\n"
+            "    'named'=\n"
+            "        dict({\n"
+            "            'key': u'''tkwargs''',\n"
+            "        }),\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "tuple((\n"
+            "    u'''arg''',\n"
+            "    tuple((\n"
+            "        u'''string1''',\n"
+            "        u'''string2''',\n"
+            "    )),\n"
+            "    dict({\n"
+            "        'key': u'''tkwargs''',\n"
+            "    }),\n"
+            "))\n",
+            self.stream.getvalue(),
         )
 
     def test_007_negative(self):
@@ -304,18 +228,12 @@ class TestLogWrap(unittest.TestCase):
             func()
 
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Calling: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.ERROR,
-                    msg="Failed: \n'func'()",
-                    exc_info=True
-                ),
-            ],
-            self.logger.mock_calls,
+            'DEBUG>Calling: \n'
+            "'func'()\n"
+            'ERROR>Failed: \n'
+            "'func'()\n"
+            'Traceback (most recent call last):',
+            '\n'.join(self.stream.getvalue().split('\n')[:5]),
         )
 
     def test_008_negative_substitutions(self):
@@ -334,7 +252,6 @@ class TestLogWrap(unittest.TestCase):
         with self.assertRaises(ValueError):
             func()
 
-        self.assertEqual(len(self.logger.mock_calls), 0)
         self.assertEqual(
             [
                 mock.call(
@@ -431,22 +348,14 @@ class TestLogWrap(unittest.TestCase):
         result = tst.func()
         self.assertEqual(result, 'No args')
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Calling: \n"
-                        "'func'(\n"
-                        "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'tst_self'=<Tst_instance>,\n"
-                        ")"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\n{}".format(
-                        logwrap.pretty_repr(result))
-                ),
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # POSITIONAL_OR_KEYWORD:\n"
+            "    'tst_self'=<Tst_instance>,\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "u'''No args'''\n",
+            self.stream.getvalue(),
         )
 
     def test_012_class_decorator(self):
@@ -457,24 +366,13 @@ class TestLogWrap(unittest.TestCase):
         result = func()
         self.assertEqual(result, 'No args')
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Calling: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\n{}".format(
-                        logwrap.pretty_repr(result))
-                ),
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'()\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "u'''No args'''\n",
+            self.stream.getvalue(),
         )
 
-    @unittest.skipUnless(
-        six.PY3,
-        'Strict python 3 syntax'
-    )
     def test_013_py3_args(self):
         new_logger = mock.Mock(spec=logging.Logger, name='logger')
         log = mock.Mock(name='log')
@@ -482,15 +380,10 @@ class TestLogWrap(unittest.TestCase):
 
         log_call = logwrap.logwrap(log=new_logger)
 
-        namespace = {}
+        def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
+            pass
 
-        exec("""
-def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
-    pass
-        """,
-             namespace
-             )
-        wrapped = log_call(namespace['tst'])
+        wrapped = log_call(tst)
         wrapped(0, 1, 2, kwarg=3, somekwarg=5)
 
         self.assertEqual(
@@ -527,7 +420,7 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
     def test_014_wrapped(self):
         # noinspection PyShadowingNames
         def simpledeco(func):
-            @six.wraps(func)
+            @functools.wraps(func)
             def wrapped(*args, **kwargs):
                 return func(*args, **kwargs)
             return wrapped
@@ -543,40 +436,34 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
             (0, 1, (2, ), {'arg3': 3})
         )
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=10,
-                    msg="Calling: \n"
-                        "'func'(\n"
-                        "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'arg'=0,\n"
-                        "    'darg'=1,\n"
-                        "    # VAR_POSITIONAL:\n"
-                        "    'args'=\n"
-                        "        tuple((\n"
-                        "            2,\n"
-                        "        )),\n"
-                        "    # VAR_KEYWORD:\n"
-                        "    'kwargs'=\n"
-                        "        dict({\n"
-                        "            'arg3': 3,\n"
-                        "        }),\n"
-                        ")"),
-                mock.call.log(
-                    level=10,
-                    msg="Done: 'func' with result:\n"
-                        "tuple((\n"
-                        "    0,\n"
-                        "    1,\n"
-                        "    tuple((\n"
-                        "        2,\n"
-                        "    )),\n"
-                        "    dict({\n"
-                        "        'arg3': 3,\n"
-                        "    }),\n"
-                        "))")
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # POSITIONAL_OR_KEYWORD:\n"
+            "    'arg'=0,\n"
+            "    'darg'=1,\n"
+            "    # VAR_POSITIONAL:\n"
+            "    'args'=\n"
+            "        tuple((\n"
+            "            2,\n"
+            "        )),\n"
+            "    # VAR_KEYWORD:\n"
+            "    'kwargs'=\n"
+            "        dict({\n"
+            "            'arg3': 3,\n"
+            "        }),\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "tuple((\n"
+            "    0,\n"
+            "    1,\n"
+            "    tuple((\n"
+            "        2,\n"
+            "    )),\n"
+            "    dict({\n"
+            "        'arg3': 3,\n"
+            "    }),\n"
+            "))\n",
+            self.stream.getvalue(),
         )
 
     def test_015_args_blacklist(self):
@@ -632,7 +519,6 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
         with self.assertRaises(TypeError):
             func()
 
-        self.assertEqual(len(self.logger.mock_calls), 0)
         self.assertEqual(
             [
                 mock.call(
@@ -688,7 +574,6 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
         with self.assertRaises(TypeError):
             func(arg1, arg2)
 
-        self.assertEqual(len(self.logger.mock_calls), 0)
         self.assertEqual(
             [
                 mock.call(
@@ -741,7 +626,6 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
         with self.assertRaises(TypeError):
             func(arg1, arg2)
 
-        self.assertEqual(len(self.logger.mock_calls), 0)
         self.assertEqual(
             [
                 mock.call(
@@ -769,7 +653,6 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
 
         func()
 
-        self.assertEqual(len(self.logger.mock_calls), 0)
         self.assertEqual(
             [
                 mock.call(
@@ -792,24 +675,16 @@ def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
         result = func()
         self.assertEqual(result, 'No args')
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Calling: \n"
-                        "'func'(\n"
-                        "    # VAR_POSITIONAL:\n"
-                        "    'args'=(),\n"
-                        "    # VAR_KEYWORD:\n"
-                        "    'kwargs'={},\n"
-                        ")"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\n{}".format(
-                        logwrap.pretty_repr(result))
-                ),
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # VAR_POSITIONAL:\n"
+            "    'args'=(),\n"
+            "    # VAR_KEYWORD:\n"
+            "    'kwargs'={},\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "u'''No args'''\n",
+            self.stream.getvalue(),
         )
 
 
