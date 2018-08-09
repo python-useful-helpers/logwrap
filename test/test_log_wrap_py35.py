@@ -16,27 +16,16 @@
 
 """Python 3 specific tests"""
 
-try:
-    import asyncio
-except ImportError:
-    asyncio = None
+import asyncio
+import io
 import logging
-import sys
 import unittest
-try:
-    from unittest import mock
-except ImportError:
-    # noinspection PyUnresolvedReferences
-    import mock
+from unittest import mock
 
 import logwrap
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
-@unittest.skipIf(
-    asyncio is None or sys.version_info[:2] < (3, 5),
-    'Strict python 3.5+ API'
-)
 class TestLogWrapAsync(unittest.TestCase):
     """async def differs from asyncio.coroutine."""
     @classmethod
@@ -48,41 +37,32 @@ class TestLogWrapAsync(unittest.TestCase):
 
         Due to no possibility of proper mock patch of function defaults, modify directly.
         """
-        self.logger = mock.Mock(spec=logging.Logger)
-        self.logwrap_defaults = logwrap.logwrap.__kwdefaults__['log']
-        self.logwrap_cls_defaults = logwrap.LogWrap.__init__.__kwdefaults__['log']
-        logwrap.logwrap.__kwdefaults__['log'] = logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logger
+        self.logger = logging.getLogger('logwrap')
+        self.logger.setLevel(logging.DEBUG)
+
+        self.stream = io.StringIO()
+
+        self.logger.handlers.clear()
+        handler = logging.StreamHandler(self.stream)
+        handler.setFormatter(logging.Formatter(fmt='%(levelname)s>%(message)s'))
+        self.logger.addHandler(handler)
 
     def tearDown(self):
         """Revert modifications."""
-        logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logwrap_cls_defaults
-        logwrap.logwrap.__kwdefaults__['log'] = self.logwrap_defaults
+        self.logger.handlers.clear()
 
     def test_coroutine_async(self):
-        namespace = {'logwrap': logwrap}
-
-        exec("""
-@logwrap.logwrap
-async def func():
-    pass
-                """,
-             namespace
-             )
-        func = namespace['func']
+        @logwrap.logwrap
+        async def func():
+            pass
 
         self.loop.run_until_complete(func())
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\nNone"
-                )
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Awaiting: \n"
+            "'func'()\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "None\n",
+            self.stream.getvalue(),
         )
 
     def test_coroutine_async_as_argumented(self):
@@ -90,16 +70,9 @@ async def func():
         log = mock.Mock(name='log')
         new_logger.attach_mock(log, 'log')
 
-        namespace = {'logwrap': logwrap, 'new_logger': new_logger}
-
-        exec("""
-@logwrap.logwrap(log=new_logger)
-async def func():
-    pass
-                        """,
-             namespace
-             )
-        func = namespace['func']
+        @logwrap.logwrap(log=new_logger)
+        async def func():
+            pass
 
         self.loop.run_until_complete(func())
 
@@ -118,33 +91,20 @@ async def func():
         )
 
     def test_coroutine_fail(self):
-        namespace = {'logwrap': logwrap}
-
-        exec("""
-@logwrap.logwrap
-async def func():
-    raise Exception('Expected')
-                                """,
-             namespace
-             )
-        func = namespace['func']
+        @logwrap.logwrap
+        async def func():
+            raise Exception('Expected')
 
         with self.assertRaises(Exception):
             self.loop.run_until_complete(func())
 
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.ERROR,
-                    msg="Failed: \n'func'()",
-                    exc_info=True
-                )
-            ],
-            self.logger.mock_calls,
+            'DEBUG>Awaiting: \n'
+            "'func'()\n"
+            'ERROR>Failed: \n'
+            "'func'()\n"
+            'Traceback (most recent call last):',
+            '\n'.join(self.stream.getvalue().split('\n')[:5]),
         )
 
     def test_exceptions_blacklist(self):
@@ -152,16 +112,9 @@ async def func():
         log = mock.Mock(name='log')
         new_logger.attach_mock(log, 'log')
 
-        namespace = {'logwrap': logwrap, 'new_logger': new_logger}
-
-        exec("""
-@logwrap.logwrap(log=new_logger, blacklisted_exceptions=[TypeError])
-async def func():
-    raise TypeError('Blacklisted')
-                                """,
-             namespace
-             )
-        func = namespace['func']
+        @logwrap.logwrap(log=new_logger, blacklisted_exceptions=[TypeError])
+        async def func():
+            raise TypeError('Blacklisted')
 
         with self.assertRaises(TypeError):
             self.loop.run_until_complete(func())
@@ -169,7 +122,6 @@ async def func():
         # While we're not expanding result coroutine object from namespace,
         # do not check execution result
 
-        self.assertEqual(len(self.logger.mock_calls), 0)
         self.assertEqual(
             [
                 mock.call(

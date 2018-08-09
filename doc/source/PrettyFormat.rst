@@ -6,14 +6,12 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
 .. py:module:: logwrap
 .. py:currentmodule:: logwrap
 
-.. py:function:: pretty_repr(src, indent=0, no_indent_start=False, max_indent=20, indent_step=4, py2_str=False, )
+.. py:function:: pretty_repr(src, indent=0, no_indent_start=False, max_indent=20, indent_step=4, )
 
     Make human readable repr of object.
 
     :param src: object to process
-    :type src: typing.Union[
-               typing.AnyStr, int, typing.Iterable, object
-               ]
+    :type src: typing.Any
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
@@ -22,22 +20,18 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
     :type max_indent: int
     :param indent_step: step for the next indentation level
     :type indent_step: int
-    :param py2_str: use Python 2.x compatible strings instead of unicode
-    :type py2_str: bool
     :return: formatted string
     :rtype: str
 
 
-.. py:function:: pretty_str(src, indent=0, no_indent_start=False, max_indent=20, indent_step=4, py2_str=False, )
+.. py:function:: pretty_str(src, indent=0, no_indent_start=False, max_indent=20, indent_step=4, )
 
     Make human readable str of object.
 
     .. versionadded:: 1.1.0
 
     :param src: object to process
-    :type src: typing.Union[
-               typing.AnyStr, int, typing.Iterable, object
-               ]
+    :type src: typing.Any
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
@@ -46,8 +40,6 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
     :type max_indent: int
     :param indent_step: step for the next indentation level
     :type indent_step: int
-    :param py2_str: use Python 2.x compatible strings instead of unicode
-    :type py2_str: bool
     :return: formatted string
     :rtype: str
 
@@ -59,14 +51,12 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
     .. versionadded:: 1.0.2
     .. versionchanged:: 3.0.1
 
-    .. py:method:: __init__(max_indent=20, indent_step=4, py2_str=False, )
+    .. py:method:: __init__(max_indent=20, indent_step=4, )
 
         :param max_indent: maximal indent before classic repr() call
         :type max_indent: int
         :param indent_step: step for the next indentation level
         :type indent_step: int
-        :param py2_str: use Python 2.x compatible strings instead of unicode
-        :type py2_str: bool
 
     .. note:: Attributes is read-only
 
@@ -89,9 +79,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
         Make human readable representation of object.
 
         :param src: object to process
-        :type src: typing.Union[
-                   typing.AnyStr, int, typing.Iterable, object
-                   ]
+        :type src: typing.Any
         :param indent: start indentation
         :type indent: int
         :param no_indent_start:
@@ -105,9 +93,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
         Make human readable representation of object. The main entry point.
 
         :param src: object to process
-        :type src: typing.Union[
-                   typing.AnyStr, int, typing.Iterable, object
-                   ]
+        :type src: typing.Any
         :param indent: start indentation
         :type indent: int
         :param no_indent_start:
@@ -124,14 +110,12 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
     .. versionadded:: 3.0.0
     .. versionchanged:: 3.0.1
 
-    .. py:method:: __init__(max_indent=20, indent_step=4, py2_str=False, )
+    .. py:method:: __init__(max_indent=20, indent_step=4, )
 
         :param max_indent: maximal indent before classic repr() call
         :type max_indent: int
         :param indent_step: step for the next indentation level
         :type indent_step: int
-        :param py2_str: use Python 2.x compatible strings instead of unicode
-        :type py2_str: bool
 
 
 .. py:class:: PrettyStr(PrettyFormat)
@@ -141,11 +125,9 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
     .. versionadded:: 3.0.0
     .. versionchanged:: 3.0.1
 
-    .. py:method:: __init__(max_indent=20, indent_step=4, py2_str=False, )
+    .. py:method:: __init__(max_indent=20, indent_step=4, )
 
         :param max_indent: maximal indent before classic repr() call
         :type max_indent: int
         :param indent_step: step for the next indentation level
         :type indent_step: int
-        :param py2_str: use Python 2.x compatible strings instead of unicode
-        :type py2_str: bool

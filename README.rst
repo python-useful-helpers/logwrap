@@ -39,13 +39,12 @@ Pros:
 
 ::
 
-    Python 2.7
-    Python 3.4
     Python 3.5
     Python 3.6
     Python 3.7
-    PyPy
     PyPy3 3.5+
+
+.. note:: Python 3.4 and 2.7 is supported in versions < 5.0.0
 
 This package includes helpers:
 
@@ -207,7 +206,6 @@ Signature is self-documenting:
         no_indent_start=False,  # do not indent the first level
         max_indent=20,  # maximum allowed indent level
         indent_step=4,  # step between indents
-        py2_str=False,  # use bytes for python 2 __repr__ and __str__
     )
 
 Limitation: Dict like objects is always marked inside `{}` for readability, even if it is `collections.OrderedDict` (standard repr as list of tuples).
@@ -225,7 +223,6 @@ Signature is self-documenting:
         no_indent_start=False,  # do not indent the first level
         max_indent=20,  # maximum allowed indent level
         indent_step=4,  # step between indents
-        py2_str=False,  # use bytes for python 2 __repr__ and __str__
     )
 
 Limitations:
@@ -248,7 +245,6 @@ Object signature:
         self,
         max_indent=20,  # maximum allowed indent level
         indent_step=4,  # step between indents
-        py2_str=False,  # use bytes for python 2 __repr__ and __str__
     )
 
 Callable object (`PrettyFormat` instance) signature:

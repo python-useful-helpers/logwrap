@@ -16,28 +16,17 @@
 
 """Python 3 specific tests"""
 
-try:
-    import asyncio
-except ImportError:
-    asyncio = None
+import asyncio
+import io
 import logging
-import sys
 import typing  # noqa # pylint: disable=unused-import
 import unittest
-try:
-    from unittest import mock
-except ImportError:
-    # noinspection PyUnresolvedReferences
-    import mock
+from unittest import mock
 
 import logwrap
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
-@unittest.skipIf(
-    asyncio is None,
-    'Strict python 3.3+ API'
-)
 class TestLogWrapAsync(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -48,15 +37,19 @@ class TestLogWrapAsync(unittest.TestCase):
 
         Due to no possibility of proper mock patch of function defaults, modify directly.
         """
-        self.logger = mock.Mock(spec=logging.Logger)
-        self.logwrap_defaults = logwrap.logwrap.__kwdefaults__['log']
-        self.logwrap_cls_defaults = logwrap.LogWrap.__init__.__kwdefaults__['log']
-        logwrap.logwrap.__kwdefaults__['log'] = logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logger
+        self.logger = logging.getLogger('logwrap')
+        self.logger.setLevel(logging.DEBUG)
+
+        self.stream = io.StringIO()
+
+        self.logger.handlers.clear()
+        handler = logging.StreamHandler(self.stream)
+        handler.setFormatter(logging.Formatter(fmt='%(levelname)s>%(message)s'))
+        self.logger.addHandler(handler)
 
     def tearDown(self):
         """Revert modifications."""
-        logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logwrap_cls_defaults
-        logwrap.logwrap.__kwdefaults__['log'] = self.logwrap_defaults
+        self.logger.handlers.clear()
 
     def test_coroutine_async(self):
         @logwrap.logwrap
@@ -66,17 +59,11 @@ class TestLogWrapAsync(unittest.TestCase):
 
         self.loop.run_until_complete(func())
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\nNone"
-                )
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Awaiting: \n"
+            "'func'()\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "None\n",
+            self.stream.getvalue(),
         )
 
     def test_coroutine_async_as_argumented(self):
@@ -115,18 +102,12 @@ class TestLogWrapAsync(unittest.TestCase):
             self.loop.run_until_complete(func())
 
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
-                ),
-                mock.call.log(
-                    level=logging.ERROR,
-                    msg="Failed: \n'func'()",
-                    exc_info=True
-                )
-            ],
-            self.logger.mock_calls,
+            'DEBUG>Awaiting: \n'
+            "'func'()\n"
+            'ERROR>Failed: \n'
+            "'func'()\n"
+            'Traceback (most recent call last):',
+            '\n'.join(self.stream.getvalue().split('\n')[:5]),
         )
 
     def test_exceptions_blacklist(self):
@@ -145,7 +126,6 @@ class TestLogWrapAsync(unittest.TestCase):
         # While we're not expanding result coroutine object from namespace,
         # do not check execution result
 
-        self.assertEqual(len(self.logger.mock_calls), 0)
         self.assertEqual(
             [
                 mock.call(
@@ -158,53 +138,39 @@ class TestLogWrapAsync(unittest.TestCase):
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
-@unittest.skipIf(
-    sys.version_info[:2] < (3, 4),
-    'Strict python 3.3+ API'
-)
 class TestAnnotated(unittest.TestCase):
     def setUp(self):
         """Preparation for tests.
 
         Due to no possibility of proper mock patch of function defaults, modify directly.
         """
-        self.logger = mock.Mock(spec=logging.Logger)
-        self.logwrap_defaults = logwrap.logwrap.__kwdefaults__['log']
-        self.logwrap_cls_defaults = logwrap.LogWrap.__init__.__kwdefaults__['log']
-        logwrap.logwrap.__kwdefaults__['log'] = logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logger
+        self.logger = logging.getLogger('logwrap')
+        self.logger.setLevel(logging.DEBUG)
+
+        self.stream = io.StringIO()
+
+        self.logger.handlers.clear()
+        handler = logging.StreamHandler(self.stream)
+        handler.setFormatter(logging.Formatter(fmt='%(levelname)s>%(message)s'))
+        self.logger.addHandler(handler)
 
     def tearDown(self):
         """Revert modifications."""
-        logwrap.LogWrap.__init__.__kwdefaults__['log'] = self.logwrap_cls_defaults
-        logwrap.logwrap.__kwdefaults__['log'] = self.logwrap_defaults
+        self.logger.handlers.clear()
 
     def test_annotation_args(self):
-        namespace = {'logwrap': logwrap}
+        @logwrap.logwrap
+        def func(a: typing.Optional[int] = None):
+            pass
 
-        exec("""
-import typing
-@logwrap.logwrap
-def func(a: typing.Optional[int]=None):
-    pass
-                        """,
-             namespace
-             )
-        func = namespace['func']  # type: typing.Callable[..., None]
         func()
         self.assertEqual(
-            [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Calling: \n"
-                        "'func'(\n"
-                        "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'a'=None,  # type: typing.Union[int, NoneType]\n"
-                        ")"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\nNone"
-                )
-            ],
-            self.logger.mock_calls,
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # POSITIONAL_OR_KEYWORD:\n"
+            "    'a'=None,  # type: typing.Union[int, NoneType]\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "None\n",
+            self.stream.getvalue(),
         )
