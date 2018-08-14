@@ -493,9 +493,9 @@ class PrettyRepr(PrettyFormat):
                 indent=self.next_indent(indent),
                 param=param
             )
-            if param.annotation != param.empty:
+            if param.annotation is not param.empty:
                 param_str += ': {param.annotation}'.format(param=param)
-            if param.value != param.empty:
+            if param.value is not param.empty:
                 param_str += '={val}'.format(
                     val=self.process_element(
                         src=param.value,
@@ -509,7 +509,7 @@ class PrettyRepr(PrettyFormat):
             param_str += "\n" + " " * indent
 
         sig = inspect.signature(src)
-        if sig.return_annotation == inspect.Parameter.empty:
+        if sig.return_annotation is inspect.Parameter.empty:
             annotation = ''
         else:
             annotation = ' -> {sig.return_annotation!r}'.format(sig=sig)
@@ -666,9 +666,9 @@ class PrettyStr(PrettyFormat):
                 indent=self.next_indent(indent),
                 param=param
             )
-            if param.annotation != param.empty:
+            if param.annotation is not param.empty:
                 param_str += ': {param.annotation}'.format(param=param)
-            if param.value != param.empty:
+            if param.value is not param.empty:
                 param_str += '={val}'.format(
                     val=self.process_element(
                         src=param.value,
@@ -682,7 +682,7 @@ class PrettyStr(PrettyFormat):
             param_str += "\n" + " " * indent
 
         sig = inspect.signature(src)
-        if sig.return_annotation == inspect.Parameter.empty:
+        if sig.return_annotation is inspect.Parameter.empty:
             annotation = ''
         else:
             annotation = ' -> {sig.return_annotation!r}'.format(sig=sig)
