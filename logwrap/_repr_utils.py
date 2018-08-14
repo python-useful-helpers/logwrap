@@ -532,9 +532,9 @@ class PrettyRepr(PrettyFormat):
                 indent=self.next_indent(indent),
                 param=param
             )
-            if param.annotation != param.empty:
+            if param.annotation is not param.empty:
                 param_str += ': {param.annotation}'.format(param=param)
-            if param.value != param.empty:
+            if param.value is not param.empty:
                 param_str += '={val}'.format(
                     val=self.process_element(
                         src=param.value,
@@ -548,7 +548,7 @@ class PrettyRepr(PrettyFormat):
             param_str += "\n" + " " * indent
 
         sig = signature(src)
-        annotation = '' if sig.return_annotation == Parameter.empty else ' -> {sig.return_annotation!r}'.format(sig=sig)
+        annotation = '' if sig.return_annotation is Parameter.empty else ' -> {sig.return_annotation!r}'.format(sig=sig)
 
         return "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format(
             spc="",
@@ -724,7 +724,7 @@ class PrettyStr(PrettyFormat):
             param_str += "\n" + " " * indent
 
         sig = signature(src)
-        annotation = '' if sig.return_annotation == Parameter.empty else ' -> {sig.return_annotation!r}'.format(sig=sig)
+        annotation = '' if sig.return_annotation is Parameter.empty else ' -> {sig.return_annotation!r}'.format(sig=sig)
 
         return "\n{spc:<{indent}}<{obj!s} with interface ({args}){annotation}>".format(
             spc="",

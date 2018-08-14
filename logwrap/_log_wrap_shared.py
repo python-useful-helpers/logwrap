@@ -170,7 +170,7 @@ class BoundParameter(object):
             as_str += ': {annotation!s}'.format(annotation=formatannotation(self.annotation))
 
         value = self.value
-        if self.empty == value:
+        if self.empty is value:
             if self.VAR_POSITIONAL == self.kind:
                 value = ()
             elif self.VAR_KEYWORD == self.kind:
@@ -551,7 +551,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
             else:
                 value = param.value
 
-            if param.empty == value:
+            if param.empty is value:
                 if param.VAR_POSITIONAL == param.kind:
                     value = ()
                 elif param.VAR_KEYWORD == param.kind:
@@ -570,7 +570,7 @@ class BaseLogWrap(_class_decorator.BaseDecorator):
                 param_str += comment(kind=param.kind)
                 last_kind = param.kind
 
-            if param.empty == param.annotation:
+            if param.empty is param.annotation:
                 annotation = ""
             else:
                 annotation = "  # type: {param.annotation!s}".format(param=param)
