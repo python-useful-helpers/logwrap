@@ -158,8 +158,8 @@ class BoundParameter:
 
 def bind_args_kwargs(
     sig: inspect.Signature,
-    *args: typing.Tuple,
-    **kwargs: typing.Dict
+    *args: typing.Any,
+    **kwargs: typing.Any
 ) -> typing.Iterator[BoundParameter]:
     """Bind *args and **kwargs to signature and get Bound Parameters.
 
@@ -459,23 +459,6 @@ class LogWrap(_class_decorator.BaseDecorator):
             )
         )
 
-    @staticmethod
-    def _bind_args_kwargs(
-        sig: inspect.Signature,
-        *args: typing.Tuple,
-        **kwargs: typing.Dict
-    ) -> typing.Iterator[BoundParameter]:
-        """Bind *args and **kwargs to signature and get Bound Parameters.
-
-        :param sig: source signature
-        :type sig: inspect.Signature
-        :return: Iterator for bound parameters with all information about it
-        :rtype: typing.Iterator[BoundParameter]
-
-        .. versionadded:: 3.3.0
-        """
-        return bind_args_kwargs(sig, *args, **kwargs)  # type: ignore
-
     # noinspection PyMethodMayBeStatic
     def pre_process_param(  # pylint: disable=no-self-use
         self,
@@ -536,7 +519,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         param_str = ""
 
         last_kind = None
-        for param in self._bind_args_kwargs(sig, *args, **kwargs):
+        for param in bind_args_kwargs(sig, *args, **kwargs):
             if param.name in self.blacklisted_names:
                 continue
 
@@ -660,8 +643,8 @@ class LogWrap(_class_decorator.BaseDecorator):
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         async def async_wrapper(
-            *args,  # type: typing.Tuple
-            **kwargs  # type: typing.Dict
+            *args,  # type: typing.Any
+            **kwargs  # type: typing.Any
         ) -> typing.Any:
             args_repr = self._get_func_args_repr(
                 sig=sig,
@@ -687,8 +670,8 @@ class LogWrap(_class_decorator.BaseDecorator):
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         def wrapper(
-            *args,  # type: typing.Tuple
-            **kwargs  # type: typing.Dict
+            *args,  # type: typing.Any
+            **kwargs  # type: typing.Any
         ) -> typing.Any:
             args_repr = self._get_func_args_repr(
                 sig=sig,
@@ -715,11 +698,11 @@ class LogWrap(_class_decorator.BaseDecorator):
 
     def __call__(  # pylint: disable=useless-super-delegation
         self,
-        *args: typing.Union[typing.Tuple, typing.Callable],
-        **kwargs: typing.Dict
+        *args: typing.Union[typing.Callable, typing.Any],
+        **kwargs: typing.Any
     ) -> typing.Union[typing.Callable[..., typing.Any], typing.Any]:
         """Callable instance."""
-        return super(LogWrap, self).__call__(*args, **kwargs)  # type: ignore
+        return super(LogWrap, self).__call__(*args, **kwargs)
 
 
 # pylint: enable=assigning-non-slot, abstract-method
@@ -742,7 +725,7 @@ def logwrap(
     log_result_obj: bool = True
 ) -> LogWrap:
     """Overload: with no func."""
-    pass
+    pass  # pragma: no cover
 
 
 @typing.overload  # noqa: F811
@@ -761,7 +744,7 @@ def logwrap(
     log_result_obj: bool = True
 ) -> typing.Callable:
     """Overload: func provided."""
-    pass
+    pass  # pragma: no cover
 
 
 # pylint: enable=unused-argument
