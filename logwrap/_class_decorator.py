@@ -104,8 +104,8 @@ class BaseDecorator(metaclass=abc.ABCMeta):
 
     def __call__(
         self,
-        *args: typing.Union[typing.Tuple, typing.Callable],
-        **kwargs: typing.Dict
+        *args: typing.Union[typing.Callable, typing.Any],
+        **kwargs: typing.Any
     ) -> typing.Any:
         """Main decorator getter."""
         l_args = list(args)
@@ -113,7 +113,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         if self._func:
             wrapped = self._func  # type: typing.Callable
         else:
-            wrapped = l_args.pop(0)  # type: ignore
+            wrapped = l_args.pop(0)
 
         wrapper = self._get_function_wrapper(wrapped)
         if self.__func:

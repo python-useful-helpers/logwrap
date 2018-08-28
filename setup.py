@@ -22,7 +22,6 @@ import ast
 import collections
 from distutils.command import build_ext
 import distutils.errors
-import glob
 import os.path
 import shutil
 import sys
@@ -262,12 +261,7 @@ setup_args = dict(
                    "!=36.2.0",
     install_requires=required,
     package_data={
-        'logwrap': [
-            os.path.basename(filename)
-            for filename in glob.glob(os.path.join('logwrap', '*.pyi'))
-        ] + [
-            'py.typed'
-        ],
+        'logwrap': ['py.typed'],
     },
 )
 if cythonize is not None:
