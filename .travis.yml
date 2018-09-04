@@ -2,7 +2,7 @@ sudo: false
 language: python
 os: linux
 python:
-- &mainstream_python 2.7=
+- &mainstream_python 2.7
 - &pypy pypy
 install:
 - &upgrade_python_toolset pip install --upgrade pip setuptools wheel
