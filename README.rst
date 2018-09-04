@@ -40,12 +40,9 @@ Pros:
 ::
 
     Python 2.7
-    Python 3.4
-    Python 3.5
-    Python 3.6
-    Python 3.7
     PyPy
-    PyPy3 3.5+
+
+.. note:: 3.4 is supported in versions 4.9.*, 3.5+ in versions > 5.0.0.
 
 This package includes helpers:
 

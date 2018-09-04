@@ -24,8 +24,6 @@ later it has been reworked and extended for support of special cases.
 
 from __future__ import absolute_import
 
-import sys
-
 from ._repr_utils import (
     PrettyFormat,
     PrettyRepr,
@@ -33,16 +31,14 @@ from ._repr_utils import (
     pretty_repr,
     pretty_str
 )
-from ._log_wrap_shared import BoundParameter, bind_args_kwargs
 
-PY3 = sys.version_info[:2] > (3, 0)  # type: bool
 
-# pylint: disable=no-name-in-module
-if PY3:  # pragma: no cover
-    from ._log_wrap3 import logwrap, LogWrap
-else:  # pragma: no cover
-    from ._log_wrap2 import logwrap, LogWrap
-# pylint: enable=no-name-in-module
+from ._log_wrap import (
+    logwrap,
+    LogWrap,
+    BoundParameter,
+    bind_args_kwargs
+)
 
 __all__ = (
     'LogWrap',
