@@ -558,10 +558,7 @@ class LogWrap(_class_decorator.BaseDecorator):
                 param_str += comment(kind=param.kind)
                 last_kind = param.kind
 
-            if param.empty is param.annotation:
-                annotation = ""
-            else:
-                annotation = "  # type: {param.annotation!s}".format(param=param)
+            annotation = ""
 
             param_str += fmt(
                 key=param.name,
