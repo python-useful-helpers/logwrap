@@ -518,8 +518,6 @@ class PrettyRepr(PrettyFormat):
                 indent=self.next_indent(indent),
                 param=param
             )
-            if param.annotation is not param.empty:
-                param_str += ': {param.annotation}'.format(param=param)
             if param.value is not param.empty:
                 param_str += '={val}'.format(
                     val=self.process_element(
@@ -690,8 +688,6 @@ class PrettyStr(PrettyFormat):
                 indent=self.next_indent(indent),
                 param=param
             )
-            if param.annotation is not param.empty:
-                param_str += ': {param.annotation}'.format(param=param)
             if param.value is not param.empty:
                 param_str += '={val}'.format(
                     val=self.process_element(
