@@ -642,7 +642,8 @@ class LogWrap(_class_decorator.BaseDecorator):
         # pylint: disable=missing-docstring
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
-        async def async_wrapper(
+        @asyncio.coroutine
+        def async_wrapper(
             *args,  # type: typing.Any
             **kwargs  # type: typing.Any
         ) -> typing.Any:
@@ -658,7 +659,7 @@ class LogWrap(_class_decorator.BaseDecorator):
                     arguments=args_repr,
                     method='Awaiting'
                 )
-                result = await func(*args, **kwargs)
+                result = yield from func(*args, **kwargs)
                 self._make_done_record(func.__name__, result)
             except BaseException as e:
                 if isinstance(e, tuple(self.blacklisted_exceptions)):

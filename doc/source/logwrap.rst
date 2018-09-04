@@ -1,5 +1,3 @@
-.. logwrap function and LogWrap class description.
-
 API: Decorators: `LogWrap` class and `logwrap` function.
 ========================================================
 

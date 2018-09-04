@@ -2,10 +2,7 @@ sudo: false
 language: python
 os: linux
 python:
-- 3.5
-- 3.6
-- &mainstream_python 3.7-dev
-- &pypy pypy3.5
+- &mainstream_python 3.4
 install:
 - &upgrade_python_toolset pip install --upgrade pip setuptools wheel
 - pip install tox-travis
@@ -40,7 +37,7 @@ jobs:
   - stage: deploy
     # This prevents job from appearing in test plan unless commit is tagged:
     if: tag IS present
-    python: *pypy
+    python: *mainstream_python
     services:
     - docker
     install:
@@ -48,7 +45,7 @@ jobs:
     script:
     - ./tools/run_docker.sh "logwrap"
     before_deploy:
-    - pip install -r build_requirements.txt
+    - pip install -r requirements.txt
     - python setup.py bdist_wheel
     deploy:
     - provider: pypi
