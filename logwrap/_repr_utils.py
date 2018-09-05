@@ -30,17 +30,11 @@ import typing  # noqa # pylint: disable=unused-import
 import six
 
 # pylint: disable=ungrouped-imports, no-name-in-module
-if six.PY3:  # pragma: no cover
-    from inspect import (
-        Parameter,
-        signature,
-    )
-else:  # pragma: no cover
-    # noinspection PyUnresolvedReferences
-    from funcsigs import (
-        Parameter,
-        signature,
-    )
+# noinspection PyUnresolvedReferences
+from funcsigs import (  # type: ignore
+    Parameter,
+    signature,
+)
 # pylint: enable=ungrouped-imports, no-name-in-module
 
 
@@ -97,10 +91,10 @@ class ReprParameter(object):
         For `*args` and `**kwargs` add prefixes
         """
         if self.kind == Parameter.VAR_POSITIONAL:
-            return '*' + self.parameter.name
+            return '*' + self.parameter.name  # type: ignore
         elif self.kind == Parameter.VAR_KEYWORD:
-            return '**' + self.parameter.name
-        return self.parameter.name
+            return '**' + self.parameter.name  # type: ignore
+        return self.parameter.name  # type: ignore
 
     @property
     def value(self):  # type: () -> typing.Any
@@ -118,9 +112,9 @@ class ReprParameter(object):
     @property
     def kind(self):  # type: () -> int
         """Parameter kind."""
-        return self.parameter.kind
+        return self.parameter.kind  # type: ignore
 
-    def __hash__(self):  # pragma: no cover
+    def __hash__(self):  # type: () -> int  # pragma: no cover
         """Block hashing.
 
         :raises TypeError: Not hashable.
@@ -128,7 +122,7 @@ class ReprParameter(object):
         msg = "unhashable type: '{0}'".format(self.__class__.__name__)
         raise TypeError(msg)
 
-    def __repr__(self):
+    def __repr__(self):  # type: () -> str
         """Debug purposes."""
         return '<{} "{}">'.format(self.__class__.__name__, self)
 
@@ -143,14 +137,17 @@ def _prepare_repr(
     :rtype: typing.Iterator[ReprParameter]
     """
     isfunction = isinstance(func, types.FunctionType)
-    real_func = func if isfunction else func.__func__  # type: typing.Callable
+    if isfunction:
+        real_func = func
+    else:
+        real_func = func.__func__  # type: ignore
 
     parameters = list(signature(real_func).parameters.values())
 
     params = iter(parameters)
-    if not isfunction and func.__self__ is not None:
+    if not isfunction and func.__self__ is not None:  # type: ignore
         try:
-            yield ReprParameter(next(params), value=func.__self__)
+            yield ReprParameter(next(params), value=func.__self__)  # type: ignore
         except StopIteration:  # pragma: no cover
             return
     for arg in params:
@@ -239,10 +236,7 @@ class PrettyFormat(object):
     ):  # type: (...) -> typing.Text
         """Repr object without iteration.
 
-        :type src: typing.Union[
-                   typing.AnyStr, int, typing.Iterable,
-                   object,
-                   ]
+        :type src: typing.Any
         :type indent: int
         :type no_indent_start: bool
         :rtype: typing.Text
@@ -329,19 +323,16 @@ class PrettyFormat(object):
         """Make human readable representation of object.
 
         :param src: object to process
-        :type src: typing.Union[
-                   typing.AnyStr, int, typing.Iterable, object
-                   ]
+        :type src: typing.Any
         :param indent: start indentation
         :type indent: int
-        :param no_indent_start:
-            do not indent open bracket and simple parameters
+        :param no_indent_start: do not indent open bracket and simple parameters
         :type no_indent_start: bool
         :return: formatted string
         :rtype: typing.Text
         """
         if hasattr(src, self._magic_method_name):
-            return getattr(
+            result = getattr(
                 src,
                 self._magic_method_name
             )(
@@ -349,6 +340,7 @@ class PrettyFormat(object):
                 indent=indent,
                 no_indent_start=no_indent_start
             )
+            return result  # type: ignore
 
         if _known_callable(src):
             return self._repr_callable(
@@ -390,17 +382,14 @@ class PrettyFormat(object):
         src,  # type: typing.Any
         indent=0,  # type: int
         no_indent_start=False  # type: bool
-    ):  # type: (...) -> typing.Union[six.text_type, str]
+    ):  # type: (...) -> typing.Union[six.text_type, six.binary_type]
         """Make human readable representation of object. The main entry point.
 
         :param src: object to process
-        :type src: typing.Union[
-                   typing.AnyStr, int, typing.Iterable, object
-                   ]
+        :type src: typing.Any
         :param indent: start indentation
         :type indent: int
-        :param no_indent_start:
-            do not indent open bracket and simple parameters
+        :param no_indent_start: do not indent open bracket and simple parameters
         :type no_indent_start: bool
         :return: formatted string
         :rtype: str
@@ -437,7 +426,7 @@ class PrettyRepr(PrettyFormat):
     @staticmethod
     def _strings_repr(
         indent,  # type: int
-        val  # type: typing.AnyStr
+        val  # type: typing.Union[six.text_type, six.binary_type]
     ):  # type: (...) -> typing.Text
         """Custom repr for strings and binary strings."""
         if isinstance(val, six.binary_type):
@@ -463,10 +452,7 @@ class PrettyRepr(PrettyFormat):
     ):  # type: (...) -> typing.Text
         """Repr object without iteration.
 
-        :type src: typing.Union[
-                   typing.AnyStr, int, typing.Iterable,
-                   object,
-                   ]
+        :type src: typing.Any
         :type indent: int
         :type no_indent_start: bool
         :rtype: typing.Text
@@ -532,8 +518,6 @@ class PrettyRepr(PrettyFormat):
                 indent=self.next_indent(indent),
                 param=param
             )
-            if param.annotation is not param.empty:
-                param_str += ': {param.annotation}'.format(param=param)
             if param.value is not param.empty:
                 param_str += '={val}'.format(
                     val=self.process_element(
@@ -547,8 +531,7 @@ class PrettyRepr(PrettyFormat):
         if param_str:
             param_str += "\n" + " " * indent
 
-        sig = signature(src)
-        annotation = '' if sig.return_annotation is Parameter.empty else ' -> {sig.return_annotation!r}'.format(sig=sig)
+        annotation = ''
 
         return "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format(
             spc="",
@@ -617,7 +600,7 @@ class PrettyStr(PrettyFormat):
     @staticmethod
     def _strings_str(
         indent,  # type: int
-        val  # type: typing.AnyStr
+        val  # type: typing.Union[six.text_type, six.binary_type]
     ):  # type: (...) -> typing.Text
         """Custom repr for strings and binary strings."""
         if isinstance(val, six.binary_type):
@@ -639,10 +622,7 @@ class PrettyStr(PrettyFormat):
     ):  # type: (...) -> typing.Text
         """Repr object without iteration.
 
-        :type src: typing.Union[
-                   typing.AnyStr, int, typing.Iterable,
-                   object,
-                   ]
+        :type src: typing.Any
         :type indent: int
         :type no_indent_start: bool
         :rtype: typing.Text
@@ -708,9 +688,7 @@ class PrettyStr(PrettyFormat):
                 indent=self.next_indent(indent),
                 param=param
             )
-            if param.annotation != param.empty:
-                param_str += ': {param.annotation}'.format(param=param)
-            if param.value != param.empty:
+            if param.value is not param.empty:
                 param_str += '={val}'.format(
                     val=self.process_element(
                         src=param.value,
@@ -723,8 +701,7 @@ class PrettyStr(PrettyFormat):
         if param_str:
             param_str += "\n" + " " * indent
 
-        sig = signature(src)
-        annotation = '' if sig.return_annotation is Parameter.empty else ' -> {sig.return_annotation!r}'.format(sig=sig)
+        annotation = ''  # No annotations in python 2
 
         return "\n{spc:<{indent}}<{obj!s} with interface ({args}){annotation}>".format(
             spc="",
@@ -780,13 +757,11 @@ def pretty_repr(
     max_indent=20,  # type: int
     indent_step=4,  # type: int
     py2_str=False,  # type: bool
-):  # type: (...) -> typing.Union[six.text_type, str]
+):  # type: (...) -> typing.Union[six.text_type, six.binary_type]
     """Make human readable repr of object.
 
     :param src: object to process
-    :type src: typing.Union[
-               typing.AnyStr, int, typing.Iterable, object
-               ]
+    :type src: typing.Any
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
@@ -818,13 +793,11 @@ def pretty_str(
     max_indent=20,  # type: int
     indent_step=4,  # type: int
     py2_str=False,  # type: bool
-):  # type: (...) -> typing.Union[six.text_type, str]
+):  # type: (...) -> typing.Union[six.text_type, six.binary_type]
     """Make human readable str of object.
 
     :param src: object to process
-    :type src: typing.Union[
-               typing.AnyStr, int, typing.Iterable, object
-               ]
+    :type src: typing.Any
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters

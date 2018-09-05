@@ -29,11 +29,8 @@ import six
 import logwrap
 
 # pylint: disable=import-error
-if six.PY2:
-    # noinspection PyUnresolvedReferences
-    import mock
-else:
-    from unittest import mock
+# noinspection PyUnresolvedReferences
+import mock
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
@@ -469,59 +466,6 @@ class TestLogWrap(unittest.TestCase):
                 ),
             ],
             self.logger.mock_calls,
-        )
-
-    @unittest.skipUnless(
-        six.PY3,
-        'Strict python 3 syntax'
-    )
-    def test_013_py3_args(self):
-        new_logger = mock.Mock(spec=logging.Logger, name='logger')
-        log = mock.Mock(name='log')
-        new_logger.attach_mock(log, 'log')
-
-        log_call = logwrap.logwrap(log=new_logger)
-
-        namespace = {}
-
-        exec("""
-def tst(arg, darg=1, *args, kwarg, dkwarg=4, **kwargs):
-    pass
-        """,
-             namespace
-             )
-        wrapped = log_call(namespace['tst'])
-        wrapped(0, 1, 2, kwarg=3, somekwarg=5)
-
-        self.assertEqual(
-            log.mock_calls,
-            [
-                mock.call(
-                    level=logging.DEBUG,
-                    msg="Calling: \n"
-                        "'tst'(\n"
-                        "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'arg'=0,\n"
-                        "    'darg'=1,\n"
-                        "    # VAR_POSITIONAL:\n"
-                        "    'args'=\n"
-                        "        tuple((\n"
-                        "            2,\n"
-                        "        )),\n"
-                        "    # KEYWORD_ONLY:\n"
-                        "    'kwarg'=3,\n"
-                        "    'dkwarg'=4,\n"
-                        "    # VAR_KEYWORD:\n"
-                        "    'kwargs'=\n"
-                        "        dict({\n"
-                        "            'somekwarg': 5,\n"
-                        "        }),\n"
-                        ")"),
-                mock.call(
-                    level=logging.DEBUG,
-                    msg="Done: 'tst' with result:\n"
-                        "None"),
-            ]
         )
 
     def test_014_wrapped(self):
