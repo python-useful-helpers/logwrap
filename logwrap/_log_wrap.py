@@ -165,6 +165,10 @@ def bind_args_kwargs(
 
     :param sig: source signature
     :type sig: inspect.Signature
+    :param args: not keyworded arguments
+    :type args: tuple
+    :param kwargs: keyworded arguments
+    :type kwargs: dict
     :return: Iterator for bound parameters with all information about it
     :rtype: typing.Iterator[BoundParameter]
 
@@ -366,7 +370,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def log_call_args(self, val: bool) -> None:
         """Flag: log call arguments before call.
 
+        :param val: Enable flag
         :type val: bool
+        :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
             raise TypeError(
@@ -389,7 +395,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def log_call_args_on_exc(self, val: bool) -> None:
         """Flag: log call arguments on exception.
 
+        :param val: Enable flag
         :type val: bool
+        :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
             raise TypeError(
@@ -412,7 +420,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def log_result_obj(self, val: bool) -> None:
         """Flag: log result object.
 
+        :param val: Enable flag
         :type val: bool
+        :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
             raise TypeError(
@@ -425,7 +435,7 @@ class LogWrap(_class_decorator.BaseDecorator):
 
     @property
     def _logger(self) -> logging.Logger:
-        """logger instance.
+        """Logger instance.
 
         :rtype: logging.Logger
         """
@@ -506,9 +516,13 @@ class LogWrap(_class_decorator.BaseDecorator):
     ) -> str:
         """Internal helper for reducing complexity of decorator code.
 
+        :param sig: function signature
         :type sig: inspect.Signature
+        :param args: not keyworded arguments
         :type args: tuple
+        :param kwargs: keyworded arguments
         :type kwargs: dict
+        :return: repr over function arguments
         :rtype: str
 
         .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
