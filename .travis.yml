@@ -8,7 +8,7 @@ install:
 - pip install --upgrade pytest-cov coveralls
 
 _helpers:
-- &install_cython pip install Cython
+- &install_cython pip install --upgrade Cython
 - &build_package python setup.py bdist_wheel
 - &install_built pip install logwrap --no-index -f dist
 - &test_no_cov  py.test -vv {posargs:test}
@@ -55,7 +55,7 @@ jobs:
     install:
     - *upgrade_python_toolset
     - *install_deps
-    - pip install --upgrade pylint >= 2.0
+    - pip install --upgrade "pylint >= 2.0"
     script:
     - pylint logwrap
     after_success: skip
@@ -78,7 +78,7 @@ jobs:
     install:
     - *upgrade_python_toolset
     - *install_deps
-    - pip install --upgrade mypy>=0.620
+    - pip install --upgrade "mypy >= 0.620"
     script:
     - mypy --strict logwrap
     after_success: skip
