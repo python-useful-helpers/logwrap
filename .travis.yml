@@ -11,7 +11,7 @@ _helpers:
 - &install_cython pip install --upgrade Cython
 - &build_package python setup.py bdist_wheel
 - &install_built pip install logwrap --no-index -f dist
-- &test_no_cov  py.test -vv {posargs:test}
+- &test_no_cov  py.test -vv test
 - &test_cythonized
   install:
   - *upgrade_python_toolset
@@ -22,11 +22,12 @@ _helpers:
   - *build_package
   - *install_built
   - *test_no_cov
+  after_success: skip
 
 script:
 - pip install -e .
-- py.test -vv --cov-config .coveragerc --cov-report term-missing --cov=logwrap test
-- coverage report --fail-under 87
+- py.test -vv --cov-config .coveragerc --cov-report= --cov=logwrap test
+- coverage report -m --fail-under 87
 after_success:
 - coveralls
 
@@ -87,19 +88,16 @@ jobs:
     name: "Python 3.5"
     python: 3.5
     <<: *test_cythonized
-    after_success: skip
   - stage: Test cythonized
     name: "Python 3.6"
     python: 3.6
     <<: *test_cythonized
-    after_success: skip
   - stage: Test cythonized
     name: "Python 3.7"
     python: 3.7
     dist: xenial
     sudo: true
     <<: *test_cythonized
-    after_success: skip
 
   - stage: Code style check
     name: "PEP8"
@@ -133,7 +131,7 @@ jobs:
     - ./tools/run_docker.sh "logwrap"
     before_deploy:
     - pip install -r build_requirements.txt
-    - python setup.py bdist_wheel
+    - *build_package
     deploy:
     - provider: pypi
       # `skip_cleanup: true` is required to preserve binary wheels, built
