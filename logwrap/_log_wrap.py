@@ -425,7 +425,7 @@ class LogWrap(_class_decorator.BaseDecorator):
 
     @property
     def _logger(self) -> logging.Logger:
-        """logger instance.
+        """Logger instance.
 
         :rtype: logging.Logger
         """
