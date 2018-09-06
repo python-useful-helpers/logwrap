@@ -24,6 +24,7 @@ _helpers:
   - *test_no_cov
 
 script:
+- pip install -e .
 - py.test -vv --cov-config .coveragerc --cov-report term-missing --cov=logwrap test
 - coverage report --fail-under 87
 after_success:
