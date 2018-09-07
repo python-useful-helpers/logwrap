@@ -133,7 +133,9 @@ def _prepare_repr(
 ):  # type: (...) -> typing.Iterator[ReprParameter]
     """Get arguments lists with defaults.
 
+    :param func: Callable object to process
     :type func: typing.Union[types.FunctionType, types.MethodType]
+    :return: repr of callable parameter from signature
     :rtype: typing.Iterator[ReprParameter]
     """
     isfunction = isinstance(func, types.FunctionType)
@@ -209,6 +211,7 @@ class PrettyFormat(object):
         :type indent: int
         :param multiplier: step multiplier
         :type multiplier: int
+        :return: next indentation value
         :rtype: int
         """
         return indent + multiplier * self.indent_step
@@ -221,8 +224,11 @@ class PrettyFormat(object):
     ):  # type: (...) -> typing.Text
         """Repr callable object (function or method).
 
+        :param src: Callable to process
         :type src: typing.Union[types.FunctionType, types.MethodType]
+        :param indent: start indentation
         :type indent: int
+        :return: Repr of function or method with signature.
         :rtype: typing.Text
         """
         raise NotImplementedError()  # pragma: no cover
@@ -236,9 +242,13 @@ class PrettyFormat(object):
     ):  # type: (...) -> typing.Text
         """Repr object without iteration.
 
+        :param src: Source object
         :type src: typing.Any
+        :param indent: start indentation
         :type indent: int
+        :param no_indent_start: ignore indent
         :type no_indent_start: bool
+        :return: simple repr() over object
         :rtype: typing.Text
         """
         raise NotImplementedError()  # pragma: no cover
@@ -297,6 +307,7 @@ class PrettyFormat(object):
         :type src: typing.Iterable
         :param indent: start indentation
         :type indent: int
+        :return: repr of element in iterable item
         :rtype: typing.Iterator[typing.Text]
         """
         for elem in src:
@@ -452,9 +463,13 @@ class PrettyRepr(PrettyFormat):
     ):  # type: (...) -> typing.Text
         """Repr object without iteration.
 
+        :param src: Source object
         :type src: typing.Any
+        :param indent: start indentation
         :type indent: int
+        :param no_indent_start: ignore indent
         :type no_indent_start: bool
+        :return: simple repr() over object, except strings (add prefix) and set (uniform py2/py3)
         :rtype: typing.Text
         """
         indent = 0 if no_indent_start else indent
@@ -483,6 +498,7 @@ class PrettyRepr(PrettyFormat):
         :type src: dict
         :param indent: start indentation
         :type indent: int
+        :return: repr of key/value pair from dict
         :rtype: typing.Iterator[typing.Text]
         """
         max_len = max((len(repr(key)) for key in src)) if src else 0
@@ -506,8 +522,11 @@ class PrettyRepr(PrettyFormat):
     ):  # type: (...) -> typing.Text
         """Repr callable object (function or method).
 
+        :param src: Callable to process
         :type src: typing.Union[types.FunctionType, types.MethodType]
+        :param indent: start indentation
         :type indent: int
+        :return: Repr of function or method with signature.
         :rtype: typing.Text
         """
         param_str = ""
@@ -564,6 +583,7 @@ class PrettyRepr(PrettyFormat):
         :type result: str
         :param suffix: suffix
         :type suffix: str
+        :return: formatted repr of "result" with prefix and suffix to explain type.
         :rtype: typing.Text
         """
         return (
@@ -622,9 +642,13 @@ class PrettyStr(PrettyFormat):
     ):  # type: (...) -> typing.Text
         """Repr object without iteration.
 
+        :param src: Source object
         :type src: typing.Any
+        :param indent: start indentation
         :type indent: int
+        :param no_indent_start: ignore indent
         :type no_indent_start: bool
+        :return: simple repr() over object, except strings (decode) and set (uniform py2/py3)
         :rtype: typing.Text
         """
         indent = 0 if no_indent_start else indent
@@ -653,7 +677,8 @@ class PrettyStr(PrettyFormat):
         :type src: dict
         :param indent: start indentation
         :type indent: int
-        :rtype: typing.Generator[typing.Text]
+        :return: repr of key/value pair from dict
+        :rtype: typing.Iterator[typing.Text]
         """
         max_len = max((len(str(key)) for key in src)) if src else 0
         for key, val in src.items():
@@ -676,8 +701,11 @@ class PrettyStr(PrettyFormat):
     ):  # type: (...) -> typing.Text
         """Repr callable object (function or method).
 
+        :param src: Callable to process
         :type src: typing.Union[types.FunctionType, types.MethodType]
+        :param indent: start indentation
         :type indent: int
+        :return: Repr of function or method with signature.
         :rtype: typing.Text
         """
         param_str = ""
@@ -734,6 +762,7 @@ class PrettyStr(PrettyFormat):
         :type result: str
         :param suffix: suffix
         :type suffix: str
+        :return: formatted repr of "result" with prefix and suffix to explain type.
         :rtype: typing.Text
         """
         return (

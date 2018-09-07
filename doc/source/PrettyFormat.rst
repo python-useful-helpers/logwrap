@@ -11,9 +11,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
     Make human readable repr of object.
 
     :param src: object to process
-    :type src: typing.Union[
-               typing.AnyStr, int, typing.Iterable, object
-               ]
+    :type src: typing.Any
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
@@ -35,9 +33,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
     .. versionadded:: 1.1.0
 
     :param src: object to process
-    :type src: typing.Union[
-               typing.AnyStr, int, typing.Iterable, object
-               ]
+    :type src: typing.Any
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
@@ -89,9 +85,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
         Make human readable representation of object.
 
         :param src: object to process
-        :type src: typing.Union[
-                   typing.AnyStr, int, typing.Iterable, object
-                   ]
+        :type src: typing.Any
         :param indent: start indentation
         :type indent: int
         :param no_indent_start:
@@ -105,9 +99,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
         Make human readable representation of object. The main entry point.
 
         :param src: object to process
-        :type src: typing.Union[
-                   typing.AnyStr, int, typing.Iterable, object
-                   ]
+        :type src: typing.Any
         :param indent: start indentation
         :type indent: int
         :param no_indent_start:

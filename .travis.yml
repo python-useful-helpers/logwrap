@@ -1,52 +1,104 @@
 sudo: false
 language: python
 os: linux
-python:
-- &mainstream_python 2.7
-- &pypy pypy
 install:
 - &upgrade_python_toolset pip install --upgrade pip setuptools wheel
-- pip install tox-travis
-- pip install coveralls
-script: tox
+- pip install --upgrade pytest pytest-sugar
+- &install_deps pip install -r CI_REQUIREMENTS.txt
+- pip install --upgrade pytest-cov coveralls
+
+_python:
+- &python27
+  name: "Python 2.7"
+  python: 2.7
+- &pypy
+  name: "PyPy"
+  python: pypy
+- &python37
+  name: "Python 3.7"
+  python: 3.7
+  dist: xenial
+  sudo: true
+
+_helpers:
+- &build_package python setup.py bdist_wheel
+
+- &static_analysis
+  stage: Static analysis
+  <<: *python27
+  after_success: skip
+
+- &code_style_check
+  stage: Code style check
+  <<: *python27
+  after_success: skip
+
+script:
+- pip install -e .
+- py.test -vv --cov-config .coveragerc --cov-report= --cov=logwrap test
+- coverage report -m --fail-under 87
 after_success:
 - coveralls
 
 jobs:
   fast_finish: true
   include:
-  - stage: Static analisys
-    python: 3.6
-    services: []
-    install:
-    - *upgrade_python_toolset
-    - pip install tox
-    script:
-    - tox -e pylint,bandit,mypy
-    after_success: skip
+  - stage: test
+    <<: *python27
+  - stage: test
+    <<: *pypy
 
-  - stage: Code style check
-    python: *mainstream_python
-    services: []
+  - <<: *static_analysis
+    name: "PyLint"
     install:
     - *upgrade_python_toolset
-    - pip install tox
+    - *install_deps
+    - pip install --upgrade "pylint < 2.0"
     script:
-    - tox -e pep8,pep257
-    after_success: skip
+    - pylint logwrap
+  - <<: *static_analysis
+    name: "Bandit"
+    install:
+    - *upgrade_python_toolset
+    - pip install --upgrade bandit
+    script:
+    - bandit -r logwrap
+  - <<: *static_analysis
+    <<: *python37
+    name: "MyPy"
+    install:
+    - *upgrade_python_toolset
+    - *install_deps
+    - pip install --upgrade "mypy >= 0.620"
+    script:
+    - mypy --strict logwrap
+
+  - <<: *code_style_check
+    name: "PEP8"
+    install:
+    - *upgrade_python_toolset
+    - pip install --upgrade flake8
+    script:
+    - flake8
+  - <<: *code_style_check
+    name: "PEP257"
+    install:
+    - *upgrade_python_toolset
+    - pip install --upgrade pydocstyle
+    script:
+    - pydocstyle logwrap
 
   - stage: deploy
     # This prevents job from appearing in test plan unless commit is tagged:
     if: tag IS present
     python: *pypy
-    services:
-    - docker
+    services: []
     install:
     - *upgrade_python_toolset
-    script: []
-    before_deploy:
-    - pip install -r build_requirements.txt
-    - python setup.py bdist_wheel
+    - *install_deps
+    script:
+    - *build_package
+    before_deploy: []
     deploy:
     - provider: pypi
       # `skip_cleanup: true` is required to preserve binary wheels, built
