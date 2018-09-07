@@ -97,7 +97,7 @@ jobs:
     - mypy --strict logwrap
 
   - <<: *test_cythonized
-    <<: *python36
+    <<: *python35
   - <<: *test_cythonized
     <<: *python36
   - <<: *test_cythonized
