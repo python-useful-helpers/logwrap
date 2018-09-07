@@ -91,7 +91,8 @@ jobs:
   - stage: deploy
     # This prevents job from appearing in test plan unless commit is tagged:
     if: tag IS present
-    python: *pypy
+    <<: *pypy
+    name: Build universal bdist_wheel. Deploy bdist and sdist.
     services: []
     install:
     - *upgrade_python_toolset
