@@ -166,9 +166,9 @@ def bind_args_kwargs(
     :param sig: source signature
     :type sig: inspect.Signature
     :param args: not keyworded arguments
-    :type args: tuple
+    :type args: typing.Any
     :param kwargs: keyworded arguments
-    :type kwargs: dict
+    :type kwargs: typing.Any
     :return: Iterator for bound parameters with all information about it
     :rtype: typing.Iterator[BoundParameter]
 
@@ -285,7 +285,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def log_level(self, val: int) -> None:
         """Log level for normal behavior.
 
+        :param val: log level to use for calls and returns
         :type val: int
+        :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
             raise TypeError(
@@ -308,7 +310,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def exc_level(self, val: int) -> None:
         """Log level for exceptions.
 
+        :param val: log level to use for captured exceptions
         :type val: int
+        :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
             raise TypeError(
@@ -331,7 +335,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def max_indent(self, val: int) -> None:
         """Maximum indentation.
 
+        :param val: Maximal indentation before use of simple repr()
         :type val: int
+        :raises TypeError: indent is not integer
         """
         if not isinstance(val, int):
             raise TypeError(
@@ -519,9 +525,9 @@ class LogWrap(_class_decorator.BaseDecorator):
         :param sig: function signature
         :type sig: inspect.Signature
         :param args: not keyworded arguments
-        :type args: tuple
+        :type args: typing.Tuple
         :param kwargs: keyworded arguments
-        :type kwargs: dict
+        :type kwargs: typing.Dict[str, typing.Any]
         :return: repr over function arguments
         :rtype: str
 
