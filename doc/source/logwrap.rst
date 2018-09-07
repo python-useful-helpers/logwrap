@@ -1,3 +1,5 @@
+.. logwrap function and LogWrap class description.
+
 API: Decorators: `LogWrap` class and `logwrap` function.
 ========================================================
 
@@ -46,7 +48,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
         .. versionchanged:: 3.3.0 Deprecation of `*args`
-        .. versionchanged:: 4.0.0 Drop of *args
+        .. versionchanged:: 4.0.0 Drop of `*args`
 
     .. py:method:: pre_process_param(self, arg)
 

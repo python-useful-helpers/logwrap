@@ -165,6 +165,10 @@ def bind_args_kwargs(
 
     :param sig: source signature
     :type sig: inspect.Signature
+    :param args: not keyworded arguments
+    :type args: typing.Any
+    :param kwargs: keyworded arguments
+    :type kwargs: typing.Any
     :return: Iterator for bound parameters with all information about it
     :rtype: typing.Iterator[BoundParameter]
 
@@ -281,7 +285,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def log_level(self, val: int) -> None:
         """Log level for normal behavior.
 
+        :param val: log level to use for calls and returns
         :type val: int
+        :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
             raise TypeError(
@@ -304,7 +310,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def exc_level(self, val: int) -> None:
         """Log level for exceptions.
 
+        :param val: log level to use for captured exceptions
         :type val: int
+        :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
             raise TypeError(
@@ -327,7 +335,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def max_indent(self, val: int) -> None:
         """Maximum indentation.
 
+        :param val: Maximal indentation before use of simple repr()
         :type val: int
+        :raises TypeError: indent is not integer
         """
         if not isinstance(val, int):
             raise TypeError(
@@ -366,7 +376,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def log_call_args(self, val: bool) -> None:
         """Flag: log call arguments before call.
 
+        :param val: Enable flag
         :type val: bool
+        :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
             raise TypeError(
@@ -389,7 +401,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def log_call_args_on_exc(self, val: bool) -> None:
         """Flag: log call arguments on exception.
 
+        :param val: Enable flag
         :type val: bool
+        :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
             raise TypeError(
@@ -412,7 +426,9 @@ class LogWrap(_class_decorator.BaseDecorator):
     def log_result_obj(self, val: bool) -> None:
         """Flag: log result object.
 
+        :param val: Enable flag
         :type val: bool
+        :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
             raise TypeError(
@@ -425,7 +441,7 @@ class LogWrap(_class_decorator.BaseDecorator):
 
     @property
     def _logger(self) -> logging.Logger:
-        """logger instance.
+        """Logger instance.
 
         :rtype: logging.Logger
         """
@@ -506,9 +522,13 @@ class LogWrap(_class_decorator.BaseDecorator):
     ) -> str:
         """Internal helper for reducing complexity of decorator code.
 
+        :param sig: function signature
         :type sig: inspect.Signature
-        :type args: tuple
-        :type kwargs: dict
+        :param args: not keyworded arguments
+        :type args: typing.Tuple
+        :param kwargs: keyworded arguments
+        :type kwargs: typing.Dict[str, typing.Any]
+        :return: repr over function arguments
         :rtype: str
 
         .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
