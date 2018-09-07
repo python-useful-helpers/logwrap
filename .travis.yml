@@ -114,7 +114,7 @@ jobs:
     script:
     - ./tools/run_docker.sh "logwrap"
     before_deploy:
-    - pip install -r build_requirements.txt
+    - pip install -r requirements.txt
     - *build_package
     deploy:
     - provider: pypi
