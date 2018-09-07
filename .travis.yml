@@ -123,7 +123,7 @@ jobs:
     if: tag IS present
     # Run on pypy to build not cythonized wheel
     <<: *pypy3
-    name: Build universal and cythonized bdist_wheel, sdist and deploy.
+    name: Build universal and cythonized bdist_wheel. Deploy bdist and sdist.
     services:
     - docker
     install:
