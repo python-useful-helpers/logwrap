@@ -22,13 +22,7 @@ Original code was made for Mirantis Inc by Alexey Stepanov,
 later it has been reworked and extended for support of special cases.
 """
 
-from ._repr_utils import (
-    PrettyFormat,
-    PrettyRepr,
-    PrettyStr,
-    pretty_repr,
-    pretty_str
-)
+from ._repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, pretty_str
 from ._log_wrap import logwrap, LogWrap, BoundParameter, bind_args_kwargs
 
 __all__ = (
@@ -40,7 +34,7 @@ __all__ = (
     'pretty_repr',
     'pretty_str',
     'BoundParameter',
-    'bind_args_kwargs'
+    'bind_args_kwargs',
 )
 
 __version__ = '5.0.2'
