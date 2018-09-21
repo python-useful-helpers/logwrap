@@ -16,7 +16,8 @@ logwrap
     :target: https://pypi.python.org/pypi/logwrap
 .. image:: https://img.shields.io/github/license/python-useful-helpers/logwrap.svg
     :target: https://raw.githubusercontent.com/python-useful-helpers/logwrap/master/LICENSE
-
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
 
 logwrap is a helper for logging in human-readable format function arguments and call result on function call.
 Why? Because logging of `*args, **kwargs` become useless with project grow and you need more details in call log.
