@@ -117,7 +117,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
 
 # 8<----------------------------------------------------------------------------
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest  # pragma: no cover
 
     doctest.testmod(verbose=True)  # pragma: no cover

@@ -26,14 +26,14 @@ import logwrap as core
 from . import _class_decorator
 
 
-__all__ = ('LogWrap', 'logwrap', 'BoundParameter', 'bind_args_kwargs')
+__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
-logger = logging.getLogger('logwrap')  # type: logging.Logger
+logger = logging.getLogger("logwrap")  # type: logging.Logger
 
 
 indent = 4
-fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc='', indent=indent).format
-comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
+fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc="", indent=indent).format
+comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc="", indent=indent).format
 
 
 class BoundParameter:
@@ -42,7 +42,7 @@ class BoundParameter:
     .. versionadded:: 3.3.0
     """
 
-    __slots__ = ('_parameter', '_value')
+    __slots__ = ("_parameter", "_value")
 
     POSITIONAL_ONLY = inspect.Parameter.POSITIONAL_ONLY
     POSITIONAL_OR_KEYWORD = inspect.Parameter.POSITIONAL_OR_KEYWORD
@@ -65,7 +65,7 @@ class BoundParameter:
 
         if value is self.empty:
             if parameter.default is self.empty and parameter.kind not in (self.VAR_POSITIONAL, self.VAR_KEYWORD):
-                raise ValueError('Value is not set and no default value')
+                raise ValueError("Value is not set and no default value")
             self._value = parameter.default
         else:
             self._value = value
@@ -113,13 +113,13 @@ class BoundParameter:
         """Debug purposes."""
         # POSITIONAL_ONLY is only in precompiled functions
         if self.kind == self.POSITIONAL_ONLY:  # pragma: no cover
-            as_str = '' if self.name is None else '<{as_str}>'.format(as_str=self.name)
+            as_str = "" if self.name is None else "<{as_str}>".format(as_str=self.name)
         else:
-            as_str = self.name or ''
+            as_str = self.name or ""
 
         # Add annotation if applicable (python 3 only)
         if self.annotation is not self.empty:  # pragma: no cover
-            as_str += ': {annotation!s}'.format(annotation=inspect.formatannotation(self.annotation))
+            as_str += ": {annotation!s}".format(annotation=inspect.formatannotation(self.annotation))
 
         value = self.value
         if self.empty is value:
@@ -128,15 +128,15 @@ class BoundParameter:
             elif self.VAR_KEYWORD == self.kind:
                 value = {}
 
-        as_str += '={value!r}'.format(value=value)
+        as_str += "={value!r}".format(value=value)
 
         if self.default is not self.empty:
-            as_str += '  # {self.default!r}'.format(self=self)
+            as_str += "  # {self.default!r}".format(self=self)
 
         if self.kind == self.VAR_POSITIONAL:
-            as_str = '*' + as_str
+            as_str = "*" + as_str
         elif self.kind == self.VAR_KEYWORD:
-            as_str = '**' + as_str
+            as_str = "**" + as_str
 
         return as_str
 
@@ -173,16 +173,16 @@ class LogWrap(_class_decorator.BaseDecorator):
     """Base class for LogWrap implementation."""
 
     __slots__ = (
-        '__blacklisted_names',
-        '__blacklisted_exceptions',
-        '__logger',
-        '__log_level',
-        '__exc_level',
-        '__max_indent',
-        '__spec',
-        '__log_call_args',
-        '__log_call_args_on_exc',
-        '__log_result_obj',
+        "__blacklisted_names",
+        "__blacklisted_exceptions",
+        "__logger",
+        "__log_level",
+        "__exc_level",
+        "__max_indent",
+        "__spec",
+        "__log_call_args",
+        "__log_call_args_on_exc",
+        "__log_result_obj",
     )
 
     def __init__(
@@ -274,7 +274,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
-            raise TypeError('Unexpected type: {}. Should be {}.'.format(val.__class__.__name__, int.__name__))
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, int.__name__))
         self.__log_level = val
 
     @property
@@ -294,7 +294,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
-            raise TypeError('Unexpected type: {}. Should be {}.'.format(val.__class__.__name__, int.__name__))
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, int.__name__))
         self.__exc_level = val
 
     @property
@@ -314,7 +314,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         :raises TypeError: indent is not integer
         """
         if not isinstance(val, int):
-            raise TypeError('Unexpected type: {}. Should be {}.'.format(val.__class__.__name__, int.__name__))
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, int.__name__))
         self.__max_indent = val
 
     @property
@@ -350,7 +350,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError('Unexpected type: {}. Should be {}.'.format(val.__class__.__name__, bool.__name__))
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
         self.__log_call_args = val
 
     @property
@@ -370,7 +370,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError('Unexpected type: {}. Should be {}.'.format(val.__class__.__name__, bool.__name__))
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
         self.__log_call_args_on_exc = val
 
     @property
@@ -390,7 +390,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError('Unexpected type: {}. Should be {}.'.format(val.__class__.__name__, bool.__name__))
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
         self.__log_result_obj = val
 
     @property
@@ -478,7 +478,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
         """
         if not (self.log_call_args or self.log_call_args_on_exc):
-            return ''
+            return ""
 
         param_str = ""
 
@@ -542,7 +542,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         self._logger.log(  # type: ignore
             level=self.log_level,
             msg="{method}: \n{name!r}({arguments})".format(
-                method=method, name=name, arguments=arguments if self.log_call_args else ''
+                method=method, name=name, arguments=arguments if self.log_call_args else ""
             ),
         )
 
@@ -555,7 +555,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         self._logger.log(  # type: ignore
             level=self.exc_level,
             msg="Failed: \n{name!r}({arguments})".format(
-                name=name, arguments=arguments if self.log_call_args_on_exc else ''
+                name=name, arguments=arguments if self.log_call_args_on_exc else ""
             ),
             exc_info=True,
         )
@@ -577,7 +577,7 @@ class LogWrap(_class_decorator.BaseDecorator):
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
-                self._make_calling_record(name=func.__name__, arguments=args_repr, method='Awaiting')
+                self._make_calling_record(name=func.__name__, arguments=args_repr, method="Awaiting")
                 result = await func(*args, **kwargs)
                 self._make_done_record(func.__name__, result)
             except BaseException as e:

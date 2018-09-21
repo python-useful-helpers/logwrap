@@ -39,7 +39,7 @@ def _simple(item: typing.Any) -> bool:
 class ReprParameter:
     """Parameter wrapper wor repr and str operations over signature."""
 
-    __slots__ = ('_value', '_parameter')
+    __slots__ = ("_value", "_parameter")
 
     POSITIONAL_ONLY = inspect.Parameter.POSITIONAL_ONLY
     POSITIONAL_OR_KEYWORD = inspect.Parameter.POSITIONAL_OR_KEYWORD
@@ -72,9 +72,9 @@ class ReprParameter:
         For `*args` and `**kwargs` add prefixes
         """
         if self.kind == inspect.Parameter.VAR_POSITIONAL:
-            return '*' + self.parameter.name
+            return "*" + self.parameter.name
         if self.kind == inspect.Parameter.VAR_KEYWORD:
-            return '**' + self.parameter.name
+            return "**" + self.parameter.name
         return self.parameter.name
 
     @property
@@ -145,7 +145,7 @@ class PrettyFormat:
     Designed for usage as __repr__ and __str__ replacement on complex objects
     """
 
-    __slots__ = ('__max_indent', '__indent_step')
+    __slots__ = ("__max_indent", "__indent_step")
 
     def __init__(self, max_indent: int = 20, indent_step: int = 4) -> None:
         """Pretty Formatter.
@@ -257,7 +257,7 @@ class PrettyFormat:
         :rtype: typing.Iterator[str]
         """
         for elem in src:
-            yield '\n' + self.process_element(src=elem, indent=self.next_indent(indent)) + ','
+            yield "\n" + self.process_element(src=elem, indent=self.next_indent(indent)) + ","
 
     @property
     @abc.abstractmethod
@@ -291,16 +291,16 @@ class PrettyFormat:
             return self._repr_simple(src=src, indent=indent, no_indent_start=no_indent_start)
 
         if isinstance(src, dict):
-            prefix, suffix = '{', '}'
-            result = ''.join(self._repr_dict_items(src=src, indent=indent))
+            prefix, suffix = "{", "}"
+            result = "".join(self._repr_dict_items(src=src, indent=indent))
         else:
             if isinstance(src, list):
-                prefix, suffix = '[', ']'
+                prefix, suffix = "[", "]"
             elif isinstance(src, tuple):
-                prefix, suffix = '(', ')'
+                prefix, suffix = "(", ")"
             else:
-                prefix, suffix = '{', '}'
-            result = ''.join(self._repr_iterable_items(src=src, indent=indent))
+                prefix, suffix = "{", "}"
+            result = "".join(self._repr_iterable_items(src=src, indent=indent))
         return self._repr_iterable_item(
             nl=no_indent_start,
             obj_type=src.__class__.__name__,
@@ -340,17 +340,17 @@ class PrettyRepr(PrettyFormat):
 
         :rtype: str
         """
-        return '__pretty_repr__'
+        return "__pretty_repr__"
 
     @staticmethod
     def _strings_repr(indent: int, val: typing.Union[bytes, str]) -> str:
         """Custom repr for strings and binary strings."""
         if isinstance(val, bytes):
-            val = val.decode(encoding='utf-8', errors='backslashreplace')
-            prefix = 'b'
+            val = val.decode(encoding="utf-8", errors="backslashreplace")
+            prefix = "b"
         else:
-            prefix = 'u'
-        return "{spc:<{indent}}{prefix}'''{string}'''".format(spc='', indent=indent, prefix=prefix, string=val)
+            prefix = "u"
+        return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=val)
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Repr object without iteration.
@@ -366,10 +366,10 @@ class PrettyRepr(PrettyFormat):
         """
         indent = 0 if no_indent_start else indent
         if isinstance(src, set):
-            return "{spc:<{indent}}{val}".format(spc='', indent=indent, val="set(" + ' ,'.join(map(repr, src)) + ")")
+            return "{spc:<{indent}}{val}".format(spc="", indent=indent, val="set(" + " ,".join(map(repr, src)) + ")")
         if isinstance(src, (bytes, str)):
             return self._strings_repr(indent=indent, val=src)
-        return "{spc:<{indent}}{val!r}".format(spc='', indent=indent, val=src)
+        return "{spc:<{indent}}{val!r}".format(spc="", indent=indent, val=src)
 
     def _repr_dict_items(self, src: typing.Dict, indent: int = 0) -> typing.Iterator[str]:
         """Repr dict items.
@@ -384,7 +384,7 @@ class PrettyRepr(PrettyFormat):
         max_len = max((len(repr(key)) for key in src)) if src else 0
         for key, val in src.items():
             yield "\n{spc:<{indent}}{key!r:{size}}: {val},".format(
-                spc='',
+                spc="",
                 indent=self.next_indent(indent),
                 size=max_len,
                 key=key,
@@ -404,23 +404,23 @@ class PrettyRepr(PrettyFormat):
         param_str = ""
 
         for param in _prepare_repr(src):
-            param_str += "\n{spc:<{indent}}{param.name}".format(spc='', indent=self.next_indent(indent), param=param)
+            param_str += "\n{spc:<{indent}}{param.name}".format(spc="", indent=self.next_indent(indent), param=param)
             if param.annotation is not param.empty:
-                param_str += ': {param.annotation}'.format(param=param)
+                param_str += ": {param.annotation}".format(param=param)
             if param.value is not param.empty:
-                param_str += '={val}'.format(
+                param_str += "={val}".format(
                     val=self.process_element(src=param.value, indent=indent, no_indent_start=True)
                 )
-            param_str += ','
+            param_str += ","
 
         if param_str:
             param_str += "\n" + " " * indent
 
         sig = inspect.signature(src)
         if sig.return_annotation is inspect.Parameter.empty:
-            annotation = ''
+            annotation = ""
         else:
-            annotation = ' -> {sig.return_annotation!r}'.format(sig=sig)
+            annotation = " -> {sig.return_annotation!r}".format(sig=sig)
 
         return "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format(
             spc="", indent=indent, obj=src, args=param_str, annotation=annotation
@@ -449,8 +449,8 @@ class PrettyRepr(PrettyFormat):
             "{nl}"
             "{spc:<{indent}}{obj_type:}({prefix}{result}\n"
             "{spc:<{indent}}{suffix})".format(
-                nl='\n' if nl else '',
-                spc='',
+                nl="\n" if nl else "",
+                spc="",
                 indent=indent,
                 obj_type=obj_type,
                 prefix=prefix,
@@ -474,14 +474,14 @@ class PrettyStr(PrettyFormat):
 
         :rtype: str
         """
-        return '__pretty_str__'
+        return "__pretty_str__"
 
     @staticmethod
     def _strings_str(indent: int, val: typing.Union[bytes, str]) -> str:
         """Custom repr for strings and binary strings."""
         if isinstance(val, bytes):
-            val = val.decode(encoding='utf-8', errors='backslashreplace')
-        return "{spc:<{indent}}{string}".format(spc='', indent=indent, string=val)
+            val = val.decode(encoding="utf-8", errors="backslashreplace")
+        return "{spc:<{indent}}{string}".format(spc="", indent=indent, string=val)
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Repr object without iteration.
@@ -497,10 +497,10 @@ class PrettyStr(PrettyFormat):
         """
         indent = 0 if no_indent_start else indent
         if isinstance(src, set):
-            return "{spc:<{indent}}{val}".format(spc='', indent=indent, val="set(" + ' ,'.join(map(str, src)) + ")")
+            return "{spc:<{indent}}{val}".format(spc="", indent=indent, val="set(" + " ,".join(map(str, src)) + ")")
         if isinstance(src, (bytes, str)):
             return self._strings_str(indent=indent, val=src)
-        return "{spc:<{indent}}{val!s}".format(spc='', indent=indent, val=src)
+        return "{spc:<{indent}}{val!s}".format(spc="", indent=indent, val=src)
 
     def _repr_dict_items(self, src: typing.Dict, indent: int = 0) -> typing.Iterator[str]:
         """Repr dict items.
@@ -515,7 +515,7 @@ class PrettyStr(PrettyFormat):
         max_len = max((len(str(key)) for key in src)) if src else 0
         for key, val in src.items():
             yield "\n{spc:<{indent}}{key!s:{size}}: {val},".format(
-                spc='',
+                spc="",
                 indent=self.next_indent(indent),
                 size=max_len,
                 key=key,
@@ -535,23 +535,23 @@ class PrettyStr(PrettyFormat):
         param_str = ""
 
         for param in _prepare_repr(src):
-            param_str += "\n{spc:<{indent}}{param.name}".format(spc='', indent=self.next_indent(indent), param=param)
+            param_str += "\n{spc:<{indent}}{param.name}".format(spc="", indent=self.next_indent(indent), param=param)
             if param.annotation is not param.empty:
-                param_str += ': {param.annotation}'.format(param=param)
+                param_str += ": {param.annotation}".format(param=param)
             if param.value is not param.empty:
-                param_str += '={val}'.format(
+                param_str += "={val}".format(
                     val=self.process_element(src=param.value, indent=indent, no_indent_start=True)
                 )
-            param_str += ','
+            param_str += ","
 
         if param_str:
             param_str += "\n" + " " * indent
 
         sig = inspect.signature(src)
         if sig.return_annotation is inspect.Parameter.empty:
-            annotation = ''
+            annotation = ""
         else:
-            annotation = ' -> {sig.return_annotation!r}'.format(sig=sig)
+            annotation = " -> {sig.return_annotation!r}".format(sig=sig)
 
         return "\n{spc:<{indent}}<{obj!s} with interface ({args}){annotation}>".format(
             spc="", indent=indent, obj=src, args=param_str, annotation=annotation
@@ -580,7 +580,7 @@ class PrettyStr(PrettyFormat):
             "{nl}"
             "{spc:<{indent}}{prefix}{result}\n"
             "{spc:<{indent}}{suffix}".format(
-                nl='\n' if nl else '', spc='', indent=indent, prefix=prefix, result=result, suffix=suffix
+                nl="\n" if nl else "", spc="", indent=indent, prefix=prefix, result=result, suffix=suffix
             )
         )
 
@@ -630,4 +630,4 @@ def pretty_str(
     )
 
 
-__all__ = ('PrettyFormat', 'PrettyRepr', 'PrettyStr', 'pretty_repr', 'pretty_str')
+__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")

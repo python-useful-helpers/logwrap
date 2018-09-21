@@ -26,25 +26,25 @@ from ._repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, prett
 from ._log_wrap import logwrap, LogWrap, BoundParameter, bind_args_kwargs
 
 __all__ = (
-    'LogWrap',
-    'logwrap',
-    'PrettyFormat',
-    'PrettyRepr',
-    'PrettyStr',
-    'pretty_repr',
-    'pretty_str',
-    'BoundParameter',
-    'bind_args_kwargs',
+    "LogWrap",
+    "logwrap",
+    "PrettyFormat",
+    "PrettyRepr",
+    "PrettyStr",
+    "pretty_repr",
+    "pretty_str",
+    "BoundParameter",
+    "bind_args_kwargs",
 )
 
-__version__ = '5.0.2'
+__version__ = "5.0.2"
 __author__ = "Alexey Stepanov"
-__author_email__ = 'penguinolog@gmail.com'
+__author_email__ = "penguinolog@gmail.com"
 __maintainers__ = {
-    'Alexey Stepanov': 'penguinolog@gmail.com',
-    'Antonio Esposito': 'esposito.cloud@gmail.com',
-    'Dennis Dmitriev': 'dis-xcom@gmail.com',
+    "Alexey Stepanov": "penguinolog@gmail.com",
+    "Antonio Esposito": "esposito.cloud@gmail.com",
+    "Dennis Dmitriev": "dis-xcom@gmail.com",
 }
-__url__ = 'https://github.com/python-useful-helpers/logwrap'
+__url__ = "https://github.com/python-useful-helpers/logwrap"
 __description__ = "Decorator for logging function arguments and return value by human-readable way"
 __license__ = "Apache License, Version 2.0"
