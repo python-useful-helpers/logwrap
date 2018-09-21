@@ -62,10 +62,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
     False
     """
 
-    def __init__(
-        self,
-        func: typing.Optional[typing.Callable] = None
-    ) -> None:
+    def __init__(self, func: typing.Optional[typing.Callable] = None) -> None:
         """Decorator.
 
         :param func: function to wrap
@@ -80,9 +77,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         # pylint: enable=assigning-non-slot
 
     @property
-    def _func(
-        self
-    ) -> typing.Optional[typing.Callable]:
+    def _func(self) -> typing.Optional[typing.Callable]:
         """Get wrapped function.
 
         :rtype: typing.Optional[typing.Callable]
@@ -90,10 +85,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         return self.__func  # pragma: no cover
 
     @abc.abstractmethod
-    def _get_function_wrapper(
-        self,
-        func: typing.Callable
-    ) -> typing.Callable:
+    def _get_function_wrapper(self, func: typing.Callable) -> typing.Callable:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -102,11 +94,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError()  # pragma: no cover
 
-    def __call__(
-        self,
-        *args: typing.Union[typing.Callable, typing.Any],
-        **kwargs: typing.Any
-    ) -> typing.Any:
+    def __call__(self, *args: typing.Union[typing.Callable, typing.Any], **kwargs: typing.Any) -> typing.Any:
         """Main decorator getter."""
         l_args = list(args)
 
@@ -123,14 +111,13 @@ class BaseDecorator(metaclass=abc.ABCMeta):
     def __repr__(self) -> str:
         """For debug purposes."""
         return "<{cls}({func!r}) at 0x{id:X}>".format(
-            cls=self.__class__.__name__,
-            func=self.__func,
-            id=id(self)
+            cls=self.__class__.__name__, func=self.__func, id=id(self)
         )  # pragma: no cover
 
 
 # 8<----------------------------------------------------------------------------
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest  # pragma: no cover
+
     doctest.testmod(verbose=True)  # pragma: no cover
