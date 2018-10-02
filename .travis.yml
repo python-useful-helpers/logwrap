@@ -105,7 +105,7 @@ jobs:
     - *upgrade_python_toolset
     - pip install --upgrade black
     script:
-    - black --check exec_helpers
+    - black --check logwrap
 
   - stage: test
     <<: *python35
