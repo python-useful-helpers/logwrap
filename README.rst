@@ -84,6 +84,7 @@ Argumented usage with arguments from signature:
         blacklisted_exceptions=None,  # Exceptions to skip in log
         log_call_args=True,  # Log call arguments before call
         log_call_args_on_exc=True,  # Log call arguments if exception happens
+        log_traceback: bool = True,  # Log traceback if exception happens
         log_result_obj=True,  # Log result object
     )
 
@@ -185,6 +186,7 @@ Example construction and read from test:
     log_call.blacklisted_exceptions == []
     log_call.log_call_args == True
     log_call.log_call_args_on_exc == True
+    log_call.log_traceback == True
     log_call.log_result_obj == True
 
 On object change, variable types is validated.
