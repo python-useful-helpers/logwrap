@@ -20,6 +20,8 @@ import asyncio
 import functools
 import inspect
 import logging
+import sys
+import traceback
 import typing
 
 import logwrap as core
@@ -552,12 +554,20 @@ class LogWrap(_class_decorator.BaseDecorator):
         :type name: str
         :type arguments: str
         """
+        exc_info = sys.exc_info()
+        stack = traceback.extract_stack()
+        tb = traceback.extract_tb(exc_info[2])
+        full_tb = stack[:2] + tb  # cut decorator and build full traceback
+        exc_line = traceback.format_exception_only(*exc_info[:2])
+        # Make standard traceback string
+        tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
+
         self._logger.log(  # type: ignore
             level=self.exc_level,
-            msg="Failed: \n{name!r}({arguments})".format(
-                name=name, arguments=arguments if self.log_call_args_on_exc else ""
+            msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
+                name=name, arguments=arguments if self.log_call_args_on_exc else "", tb_text=tb_text
             ),
-            exc_info=True,
+            exc_info=False,
         )
 
     def _get_function_wrapper(self, func: typing.Callable) -> typing.Callable:
