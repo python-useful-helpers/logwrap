@@ -14,7 +14,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-# pylint: disable=missing-docstring, unused-argument
+# pylint: disable=missing-docstring, unused-argument, no-self-argument, no-self-use, keyword-arg-before-vararg
 
 """Python independent logwrap tests."""
 
@@ -22,10 +22,9 @@ import functools
 import io
 import logging
 import unittest
+from unittest import mock
 
 import logwrap
-
-from unittest import mock
 
 
 class AnyStringWith(str):
@@ -341,7 +340,7 @@ class TestLogWrap(unittest.TestCase):
         )
 
     def test_011_method(self):
-        class Tst(object):
+        class Tst:
             @logwrap.logwrap
             def func(tst_self):
                 return 'No args'
@@ -672,7 +671,7 @@ class TestLogWrap(unittest.TestCase):
             log.mock_calls,
         )
 
-    def test_empty_args_kwargs(self):
+    def test_021_empty_args_kwargs(self):
         @logwrap.logwrap
         def func(*args, **kwargs):
             return 'No args'
@@ -692,6 +691,45 @@ class TestLogWrap(unittest.TestCase):
             self.stream.getvalue(),
         )
 
+    def test_022_disable_traceback(self):
+        new_logger = mock.Mock(spec=logging.Logger, name='logger')
+        log = mock.Mock(name='log')
+        new_logger.attach_mock(log, 'log')
+
+        @logwrap.logwrap(
+            log=new_logger,
+            log_traceback=False
+        )
+        def func():
+            raise TypeError('Blacklisted')
+
+        with self.assertRaises(TypeError):
+            func()
+
+        self.assertEqual(
+            [
+                mock.call(
+                    level=logging.DEBUG,
+                    msg="Calling: \n"
+                        "'func'()"
+                ),
+                mock.call(
+                    level=logging.ERROR,
+                    msg=AnyStringWith("Failed: \n'func'()"),
+                    exc_info=False
+                ),
+            ],
+            log.mock_calls,
+        )
+        self.assertNotEqual(
+            mock.call(
+                level=logging.ERROR,
+                msg=AnyStringWith("Failed: \n'func'()\nTraceback (most recent call last):"),
+                exc_info=False
+            ),
+            log.mock_calls[1],
+        )
+
 
 class TestObject(unittest.TestCase):
     def test_001_basic(self):
@@ -703,6 +741,7 @@ class TestObject(unittest.TestCase):
         self.assertEqual(log_call.blacklisted_exceptions, [])
         self.assertTrue(log_call.log_call_args)
         self.assertTrue(log_call.log_call_args_on_exc)
+        self.assertTrue(log_call.log_traceback)
         self.assertTrue(log_call.log_result_obj)
 
         log_call.log_level = logging.INFO
@@ -712,6 +751,7 @@ class TestObject(unittest.TestCase):
         log_call.blacklisted_exceptions.append(IOError)
         log_call.log_call_args = False
         log_call.log_call_args_on_exc = False
+        log_call.log_traceback = False
         log_call.log_result_obj = False
 
         self.assertEqual(log_call.log_level, logging.INFO)
@@ -721,6 +761,7 @@ class TestObject(unittest.TestCase):
         self.assertEqual(log_call.blacklisted_exceptions, [IOError])
         self.assertFalse(log_call.log_call_args)
         self.assertFalse(log_call.log_call_args_on_exc)
+        self.assertFalse(log_call.log_traceback)
         self.assertFalse(log_call.log_result_obj)
 
         with self.assertRaises(TypeError):
