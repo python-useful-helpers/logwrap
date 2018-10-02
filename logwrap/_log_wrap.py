@@ -184,6 +184,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         "__spec",
         "__log_call_args",
         "__log_call_args_on_exc",
+        "__log_traceback",
         "__log_result_obj",
     )
 
@@ -200,6 +201,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
         log_call_args: bool = True,
         log_call_args_on_exc: bool = True,
+        log_traceback: bool = True,
         log_result_obj: bool = True
     ) -> None:
         """Log function calls and return values.
@@ -230,10 +232,13 @@ class LogWrap(_class_decorator.BaseDecorator):
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
         :type log_call_args_on_exc: bool
+        :param log_traceback: log traceback on excaption in addition to failure info
+        :type log_traceback: bool
         :param log_result_obj: log result of function call.
         :type log_result_obj: bool
 
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
+        .. versionchanged:: 5.1.0 log_traceback parameter
         """
         super(LogWrap, self).__init__(func=func)
 
@@ -255,6 +260,7 @@ class LogWrap(_class_decorator.BaseDecorator):
         self.__spec = spec or self._func
         self.__log_call_args = log_call_args
         self.__log_call_args_on_exc = log_call_args_on_exc
+        self.__log_traceback = log_traceback
         self.__log_result_obj = log_result_obj
 
         # We are not interested to pass any arguments to object
@@ -374,6 +380,26 @@ class LogWrap(_class_decorator.BaseDecorator):
         if not isinstance(val, bool):
             raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
         self.__log_call_args_on_exc = val
+
+    @property
+    def log_traceback(self) -> bool:
+        """Flag: log traceback on exception.
+
+        :rtype: bool
+        """
+        return self.__log_traceback
+
+    @log_traceback.setter
+    def log_traceback(self, val: bool) -> None:
+        """Flag: log traceback on exception.
+
+        :param val: Enable flag
+        :type val: bool
+        :raises TypeError: Value is not bool
+        """
+        if not isinstance(val, bool):
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
+        self.__log_traceback = val
 
     @property
     def log_result_obj(self) -> bool:
@@ -565,7 +591,9 @@ class LogWrap(_class_decorator.BaseDecorator):
         self._logger.log(  # type: ignore
             level=self.exc_level,
             msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
-                name=name, arguments=arguments if self.log_call_args_on_exc else "", tb_text=tb_text
+                name=name,
+                arguments=arguments if self.log_call_args_on_exc else "",
+                tb_text=tb_text if self.log_traceback else "",
             ),
             exc_info=False,
         )
@@ -640,6 +668,7 @@ def logwrap(
     blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]] = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
+    log_traceback: bool = True,
     log_result_obj: bool = True
 ) -> LogWrap:
     """Overload: with no func."""
@@ -659,6 +688,7 @@ def logwrap(
     blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]] = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
+    log_traceback: bool = True,
     log_result_obj: bool = True
 ) -> typing.Callable:
     """Overload: func provided."""
@@ -678,6 +708,7 @@ def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-f
     blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
+    log_traceback: bool = True,
     log_result_obj: bool = True
 ) -> typing.Union[LogWrap, typing.Callable]:
     """Log function calls and return values. Python 3.4+ version.
@@ -707,6 +738,8 @@ def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-f
     :type log_call_args: bool
     :param log_call_args_on_exc: log call arguments if exception raised.
     :type log_call_args_on_exc: bool
+    :param log_traceback: log traceback on excaption in addition to failure info
+    :type log_traceback: bool
     :param log_result_obj: log result of function call.
     :type log_result_obj: bool
     :return: built real decorator.
@@ -715,6 +748,7 @@ def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-f
     .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
     .. versionchanged:: 3.3.0 Deprecation of *args
     .. versionchanged:: 4.0.0 Drop of *args
+    .. versionchanged:: 5.1.0 log_traceback parameter
     """
     wrapper = LogWrap(
         log=log,
@@ -726,6 +760,7 @@ def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-f
         blacklisted_exceptions=blacklisted_exceptions,
         log_call_args=log_call_args,
         log_call_args_on_exc=log_call_args_on_exc,
+        log_traceback=log_traceback,
         log_result_obj=log_result_obj,
     )
     if func is not None:

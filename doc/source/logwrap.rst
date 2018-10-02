@@ -12,7 +12,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
     .. versionadded:: 2.2.0
 
-    .. py:method:: __init__(func=None, *, log=logging.getLogger('logwrap'), log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, spec=None, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_result_obj=True, )
+    .. py:method:: __init__(func=None, *, log=logging.getLogger('logwrap'), log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, spec=None, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
 
         :param func: function to wrap
         :type func: typing.Optional[typing.Callable]
@@ -43,12 +43,15 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
         :type log_call_args_on_exc: bool
+        :param log_traceback: log traceback on excaption in addition to failure info
+        :type log_traceback: bool
         :param log_result_obj: log result of function call.
         :type log_result_obj: bool
 
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
         .. versionchanged:: 3.3.0 Deprecation of `*args`
-        .. versionchanged:: 4.0.0 Drop of *args
+        .. versionchanged:: 4.0.0 Drop of `*args`
+        .. versionchanged:: 5.1.0 log_traceback parameter
 
     .. py:method:: pre_process_param(self, arg)
 
@@ -92,6 +95,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         ``typing.List[typing.Type[Exception]]``, modified via mutability
     .. py:attribute:: log_call_args
     .. py:attribute:: log_call_args_on_exc
+    .. py:attribute:: log_traceback
     .. py:attribute:: log_result_obj
 
     .. py:attribute:: _func
