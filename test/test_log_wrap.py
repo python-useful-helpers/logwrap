@@ -28,6 +28,11 @@ import logwrap
 from unittest import mock
 
 
+class AnyStringWith(str):
+    def __eq__(self, other):
+        return self in other
+
+
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestLogWrap(unittest.TestCase):
     def setUp(self):
@@ -260,8 +265,8 @@ class TestLogWrap(unittest.TestCase):
                 ),
                 mock.call(
                     level=logging.WARNING,
-                    msg="Failed: \n'func'()",
-                    exc_info=True
+                    msg=AnyStringWith("Failed: \n'func'()"),
+                    exc_info=False
                 ),
             ],
             log.mock_calls,
@@ -600,8 +605,8 @@ class TestLogWrap(unittest.TestCase):
                 ),
                 mock.call(
                     level=logging.ERROR,
-                    msg="Failed: \n'func'()",
-                    exc_info=True
+                    msg=AnyStringWith("Failed: \n'func'()"),
+                    exc_info=False
                 ),
             ],
             log.mock_calls,
@@ -635,8 +640,8 @@ class TestLogWrap(unittest.TestCase):
                 ),
                 mock.call(
                     level=logging.ERROR,
-                    msg="Failed: \n'func'()",
-                    exc_info=True
+                    msg=AnyStringWith("Failed: \n'func'()"),
+                    exc_info=False
                 ),
             ],
             log.mock_calls,
