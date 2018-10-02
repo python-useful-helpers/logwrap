@@ -53,11 +53,7 @@ after_success:
 - coveralls
 
 jobs:
-  fast_finish: true
   include:
-  - stage: test
-    <<: *python34
-
   - <<: *static_analysis
     name: "PyLint"
     install:
@@ -83,9 +79,6 @@ jobs:
     script:
     - mypy --strict logwrap
 
-  - <<: *test_cythonized
-    <<: *python34
-
   - <<: *code_style_check
     name: "PEP8"
     install:
@@ -100,6 +93,12 @@ jobs:
     - pip install --upgrade pydocstyle
     script:
     - pydocstyle logwrap
+
+  - stage: test
+    <<: *python34
+
+  - <<: *test_cythonized
+    <<: *python34
 
   - stage: deploy
     # This prevents job from appearing in test plan unless commit is tagged:
