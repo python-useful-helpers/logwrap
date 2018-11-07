@@ -139,7 +139,7 @@ def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> t
 # pylint: enable=no-member
 
 
-class PrettyFormat:
+class PrettyFormat(metaclass=abc.ABCMeta):
     """Pretty Formatter.
 
     Designed for usage as __repr__ and __str__ replacement on complex objects
