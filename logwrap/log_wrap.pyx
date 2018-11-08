@@ -22,11 +22,11 @@ import sys
 import traceback
 import typing
 
-from . cimport repr_utils
-from . cimport class_decorator
+from logwrap cimport repr_utils
+from logwrap cimport class_decorator
 
 
-__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+cdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
 logger = logging.getLogger("logwrap")  # type: logging.Logger
 
@@ -111,6 +111,8 @@ class BoundParameter:
 
     def __str__(self) -> str:
         """Debug purposes."""
+        cdef str as_str
+
         # POSITIONAL_ONLY is only in precompiled functions
         if self.kind == self.POSITIONAL_ONLY:
             as_str = "" if self.name is None else "<{as_str}>".format(as_str=self.name)
@@ -253,7 +255,9 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         if not (self.log_call_args or self.log_call_args_on_exc):
             return ""
 
-        param_str = ""
+        cdef str param_str = ""
+        cdef str val
+        cdef str annotation
 
         last_kind = None
         for param in bind_args_kwargs(sig, *args, **kwargs):
@@ -295,7 +299,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
     cdef void _make_done_record(self, str func_name, result: typing.Any):
         """Construct success record."""
-        msg = "Done: {name!r}".format(name=func_name)
+        cdef str msg = "Done: {name!r}".format(name=func_name)
 
         if self.log_result_obj:
             msg += " with result:\n{result}".format(
@@ -327,7 +331,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         full_tb = stack[:2] + tb  # cut decorator and build full traceback
         exc_line = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
-        tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
+        cdef str tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
 
         self._logger.log(  # type: ignore
             level=self.exc_level,
