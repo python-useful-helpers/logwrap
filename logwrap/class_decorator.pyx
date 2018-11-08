@@ -37,7 +37,7 @@ cdef class BaseDecorator:
 
     def __call__(self, *args: typing.Union[typing.Callable, typing.Any], **kwargs: typing.Any) -> typing.Any:
         """Main decorator getter."""
-        l_args = list(args)
+        cdef list l_args = list(args)
 
         if self._func:
             wrapped = self._func  # type: typing.Callable
