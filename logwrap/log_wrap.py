@@ -711,7 +711,7 @@ def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-f
     log_traceback: bool = True,
     log_result_obj: bool = True
 ) -> typing.Union[LogWrap, typing.Callable]:
-    """Log function calls and return values. Python 3.4+ version.
+    """Log function calls and return values.
 
     :param func: function to wrap
     :type func: typing.Optional[typing.Callable]

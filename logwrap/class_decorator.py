@@ -26,9 +26,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
 
     Implements wrapping and __call__, wrapper getter is abstract.
 
-    Note:
-        wrapper getter is called only on function call,
-        if decorator used without braces.
+    .. note:: wrapper getter is called only on function call, if decorator used without braces.
 
     Usage example:
 
