@@ -44,13 +44,14 @@ cdef class LogWrap(class_decorator.BaseDecorator):
     cdef public bint log_traceback
     cdef public bint log_result_obj
 
+    cdef readonly object _spec
+    cdef readonly object _logger
+
     cdef list __blacklisted_names
     cdef list __blacklisted_exceptions
-    cdef object __logger
-    cdef object __spec
 
     cdef str _get_func_args_repr(
-        self, sig: inspect.Signature, args: typing.Tuple, kwargs: typing.Dict[str, typing.Any]
+        self, sig: inspect.Signature, tuple args, dict kwargs
     )
     cdef void _make_done_record(self, str func_name, result: typing.Any)
     cdef void _make_calling_record(self, str name, str arguments, str method=?)

@@ -19,10 +19,19 @@ import typing
 
 
 cdef class BaseDecorator:
-    """Base class for decorators."""
+    """Base class for decorators.
+
+    Implements wrapping and __call__, wrapper getter is abstract.
+
+    .. note:: wrapper getter is called only on function call, if decorator used without braces.
+    """
 
     def __init__(self, func: typing.Optional[typing.Callable] = None) -> None:
-        """Decorator."""
+        """Decorator.
+
+        :param func: function to wrap
+        :type func: typing.Optional[typing.Callable]
+        """
         # noinspection PyArgumentList
         super(BaseDecorator, self).__init__()
         # pylint: disable=assigning-non-slot
@@ -32,7 +41,12 @@ cdef class BaseDecorator:
         # pylint: enable=assigning-non-slot
 
     def _get_function_wrapper(self, func: typing.Callable) -> typing.Callable:
-        """Here should be constructed and returned real decorator."""
+        """Here should be constructed and returned real decorator.
+
+        :param func: Wrapped function
+        :type func: typing.Callable
+        :rtype: typing.Callable
+        """
         raise NotImplementedError()  # pragma: no cover
 
     def __call__(self, *args: typing.Union[typing.Callable, typing.Any], **kwargs: typing.Any) -> typing.Any:
