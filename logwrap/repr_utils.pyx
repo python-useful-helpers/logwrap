@@ -23,6 +23,9 @@ import types
 import typing
 
 
+cdef tuple __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+
+
 cdef bint _known_callable(item: typing.Any):
     """Check for possibility to parse callable."""
     return isinstance(item, (types.FunctionType, types.MethodType))
@@ -168,6 +171,10 @@ cdef class PrettyFormat:
 
     def process_element(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False) -> str:
         """Make human readable representation of object."""
+        cdef str prefix
+        cdef str suffix
+        cdef str result
+
         if hasattr(src, self._magic_method_name):
             result = getattr(src, self._magic_method_name)(self, indent=indent, no_indent_start=no_indent_start)
             return result  # type: ignore
@@ -217,6 +224,8 @@ cdef class PrettyRepr(PrettyFormat):
 
     cdef str _strings_repr(self, unsigned int indent, val: typing.Union[bytes, str]):
         """Custom repr for strings and binary strings."""
+        cdef str prefix
+
         if isinstance(val, bytes):
             val = val.decode(encoding="utf-8", errors="backslashreplace")
             prefix = "b"
@@ -235,7 +244,8 @@ cdef class PrettyRepr(PrettyFormat):
 
     def _repr_dict_items(self, dict src, unsigned int indent=0) -> typing.Iterator[str]:
         """Repr dict items."""
-        max_len = max((len(repr(key)) for key in src)) if src else 0
+        cdef unsigned int max_len = max((len(repr(key)) for key in src)) if src else 0
+
         for key, val in src.items():
             yield "\n{spc:<{indent}}{key!r:{size}}: {val},".format(
                 spc="",
@@ -247,7 +257,8 @@ cdef class PrettyRepr(PrettyFormat):
 
     cdef str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0):
         """Repr callable object (function or method)."""
-        param_str = ""
+        cdef str param_str = ""
+        cdef str annotation
 
         for param in _prepare_repr(src):
             param_str += "\n{spc:<{indent}}{param.name}".format(spc="", indent=self.next_indent(indent), param=param)
@@ -312,7 +323,7 @@ cdef class PrettyStr(PrettyFormat):
 
     def _repr_dict_items(self, dict src, unsigned int indent=0) -> typing.Iterator[str]:
         """Repr dict items."""
-        max_len = max((len(str(key)) for key in src)) if src else 0
+        cdef unsigned int max_len = max((len(str(key)) for key in src)) if src else 0
         for key, val in src.items():
             yield "\n{spc:<{indent}}{key!s:{size}}: {val},".format(
                 spc="",
@@ -324,7 +335,8 @@ cdef class PrettyStr(PrettyFormat):
 
     cdef str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0):
         """Repr callable object (function or method)."""
-        param_str = ""
+        cdef str param_str = ""
+        cdef str annotation
 
         for param in _prepare_repr(src):
             param_str += "\n{spc:<{indent}}{param.name}".format(spc="", indent=self.next_indent(indent), param=param)
