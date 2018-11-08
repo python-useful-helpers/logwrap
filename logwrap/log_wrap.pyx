@@ -63,7 +63,14 @@ class BoundParameter:
     empty = inspect.Parameter.empty
 
     def __init__(self, parameter: inspect.Parameter, value: typing.Any = inspect.Parameter.empty) -> None:
-        """Parameter-like object store BOUND with value parameter."""
+        """Parameter-like object store BOUND with value parameter.
+
+        :param parameter: parameter from signature
+        :type parameter: inspect.Parameter
+        :param value: parameter real value
+        :type value: typing.Any
+        :raises ValueError: No default value and no value
+        """
         self._parameter = parameter
 
         if value is self.empty:
@@ -105,7 +112,10 @@ class BoundParameter:
 
     # noinspection PyTypeChecker
     def __hash__(self) -> int:
-        """Block hashing."""
+        """Block hashing.
+
+        :raises TypeError: Not hashable.
+        """
         msg = "unhashable type: '{0}'".format(self.__class__.__name__)
         raise TypeError(msg)
 
@@ -150,7 +160,19 @@ class BoundParameter:
 def bind_args_kwargs(
     sig: inspect.Signature, *args: typing.Any, **kwargs: typing.Any
 ) -> typing.Iterator[BoundParameter]:
-    """Bind *args and **kwargs to signature and get Bound Parameters."""
+    """Bind *args and **kwargs to signature and get Bound Parameters.
+
+    :param sig: source signature
+    :type sig: inspect.Signature
+    :param args: not keyworded arguments
+    :type args: typing.Any
+    :param kwargs: keyworded arguments
+    :type kwargs: typing.Any
+    :return: Iterator for bound parameters with all information about it
+    :rtype: typing.Iterator[BoundParameter]
+
+    .. versionadded:: 3.3.0
+    """
     bound = sig.bind(*args, **kwargs).arguments
     parameters = list(sig.parameters.values())
     for param in parameters:
@@ -176,7 +198,42 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         bint log_traceback=True,
         bint log_result_obj=True
     ) -> None:
-        """Log function calls and return values."""
+        """Log function calls and return values.
+
+        :param func: function to wrap
+        :type func: typing.Optional[typing.Callable]
+        :param log: logger object for decorator, by default used 'logwrap'
+        :type log: logging.Logger
+        :param log_level: log level for successful calls
+        :type log_level: int
+        :param exc_level: log level for exception cases
+        :type exc_level: int
+        :param max_indent: maximum indent before classic `repr()` call.
+        :type max_indent: int
+        :param spec: callable object used as spec for arguments bind.
+                     This is designed for the special cases only,
+                     when impossible to change signature of target object,
+                     but processed/redirected signature is accessible.
+                     Note: this object should provide fully compatible
+                     signature with decorated function, or arguments bind
+                     will be failed!
+        :type spec: typing.Optional[typing.Callable]
+        :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
+        :type blacklisted_names: typing.Optional[typing.Iterable[str]]
+        :param blacklisted_exceptions: list of exception, which should be re-raised without producing log record.
+        :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
+        :param log_call_args: log call arguments before executing wrapped function.
+        :type log_call_args: bool
+        :param log_call_args_on_exc: log call arguments if exception raised.
+        :type log_call_args_on_exc: bool
+        :param log_traceback: log traceback on excaption in addition to failure info
+        :type log_traceback: bool
+        :param log_result_obj: log result of function call.
+        :type log_result_obj: bool
+
+        .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
+        .. versionchanged:: 5.1.0 log_traceback parameter
+        """
         super(LogWrap, self).__init__(func=func)
 
         self.log_level = log_level
@@ -198,9 +255,8 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         else:
             self.__blacklisted_exceptions = list(blacklisted_exceptions)
 
-        self.__logger = log
-
-        self.__spec = spec or self._func
+        self._logger = log
+        self._spec = spec or self._func
 
         # We are not interested to pass any arguments to object
 
@@ -213,16 +269,6 @@ cdef class LogWrap(class_decorator.BaseDecorator):
     def blacklisted_exceptions(self) -> typing.List[typing.Type[Exception]]:
         """List of exceptions to re-raise without log."""
         return self.__blacklisted_exceptions
-
-    @property
-    def _logger(self) -> logging.Logger:
-        """Logger instance."""
-        return self.__logger
-
-    @property
-    def _spec(self) -> typing.Optional[typing.Callable]:
-        """Spec for function arguments."""
-        return self.__spec
 
     def __repr__(self) -> str:
         """Repr for debug purposes."""
@@ -243,15 +289,49 @@ cdef class LogWrap(class_decorator.BaseDecorator):
     def pre_process_param(
         self, arg: BoundParameter
     ) -> typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]:
-        """Process parameter for the future logging."""
+        """Process parameter for the future logging.
+
+        :param arg: bound parameter
+        :type arg: BoundParameter
+        :return: value, value override for logging or None if argument should not be logged.
+        :rtype: typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]
+
+        Override this method if some modifications required for parameter value before logging
+
+        .. versionadded:: 3.3.0
+        """
         return arg
 
     def post_process_param(self, arg: BoundParameter, str arg_repr: str) -> str:
-        """Process parameter for the future logging."""
+        """Process parameter for the future logging.
+
+        :param arg: bound parameter
+        :type arg: BoundParameter
+        :param arg_repr: repr for value
+        :type arg_repr: str
+        :return: processed repr for value
+        :rtype: str
+
+        Override this method if some modifications required for result of repr() over parameter
+
+        .. versionadded:: 3.3.0
+        """
         return arg_repr
 
-    cdef str _get_func_args_repr(self, sig: inspect.Signature, args: typing.Tuple, kwargs: typing.Dict[str, typing.Any]):
-        """Internal helper for reducing complexity of decorator code."""
+    cdef str _get_func_args_repr(self, sig: inspect.Signature, tuple args, dict kwargs):
+        """Internal helper for reducing complexity of decorator code.
+
+        :param sig: function signature
+        :type sig: inspect.Signature
+        :param args: not keyworded arguments
+        :type args: typing.Tuple
+        :param kwargs: keyworded arguments
+        :type kwargs: typing.Dict[str, typing.Any]
+        :return: repr over function arguments
+        :rtype: str
+
+        .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
+        """
         if not (self.log_call_args or self.log_call_args_on_exc):
             return ""
 
@@ -298,7 +378,11 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         return param_str
 
     cdef void _make_done_record(self, str func_name, result: typing.Any):
-        """Construct success record."""
+        """Construct success record.
+
+        :type func_name: str
+        :type result: typing.Any
+        """
         cdef str msg = "Done: {name!r}".format(name=func_name)
 
         if self.log_result_obj:
@@ -315,7 +399,12 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         self._logger.log(level=self.log_level, msg=msg)  # type: ignore
 
     cdef void _make_calling_record(self, str name, str arguments, str method="Calling"):
-        """Make log record before execution."""
+        """Make log record before execution.
+
+        :type name: str
+        :type arguments: str
+        :type method: str
+        """
         self._logger.log(  # type: ignore
             level=self.log_level,
             msg="{method}: \n{name!r}({arguments})".format(
@@ -324,7 +413,11 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         )
 
     cdef void _make_exc_record(self, str name, str arguments):
-        """Make log record if exception raised."""
+        """Make log record if exception raised.
+
+        :type name: str
+        :type arguments: str
+        """
         exc_info = sys.exc_info()
         stack = traceback.extract_stack()
         tb = traceback.extract_tb(exc_info[2])
@@ -344,7 +437,13 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         )
 
     def _get_function_wrapper(self, func: typing.Callable) -> typing.Callable:
-        """Here should be constructed and returned real decorator."""
+        """Here should be constructed and returned real decorator.
+
+        :param func: Wrapped function
+        :type func: typing.Callable
+        :return: wrapped coroutine or function
+        :rtype: typing.Callable
+        """
         sig = inspect.signature(self._spec or func)
 
         @functools.wraps(func)
@@ -402,7 +501,45 @@ def logwrap(
     bint log_traceback=True,
     bint log_result_obj=True
 ) -> typing.Union[LogWrap, typing.Callable]:
-    """Log function calls and return values."""
+    """Log function calls and return values.
+
+    :param func: function to wrap
+    :type func: typing.Optional[typing.Callable]
+    :param log: logger object for decorator, by default used 'logwrap'
+    :type log: logging.Logger
+    :param log_level: log level for successful calls
+    :type log_level: int
+    :param exc_level: log level for exception cases
+    :type exc_level: int
+    :param max_indent: maximum indent before classic `repr()` call.
+    :type max_indent: int
+    :param spec: callable object used as spec for arguments bind.
+                 This is designed for the special cases only,
+                 when impossible to change signature of target object,
+                 but processed/redirected signature is accessible.
+                 Note: this object should provide fully compatible signature
+                 with decorated function, or arguments bind will be failed!
+    :type spec: typing.Optional[typing.Callable]
+    :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
+    :type blacklisted_names: typing.Optional[typing.Iterable[str]]
+    :param blacklisted_exceptions: list of exceptions, which should be re-raised without producing log record.
+    :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
+    :param log_call_args: log call arguments before executing wrapped function.
+    :type log_call_args: bool
+    :param log_call_args_on_exc: log call arguments if exception raised.
+    :type log_call_args_on_exc: bool
+    :param log_traceback: log traceback on excaption in addition to failure info
+    :type log_traceback: bool
+    :param log_result_obj: log result of function call.
+    :type log_result_obj: bool
+    :return: built real decorator.
+    :rtype: _log_wrap_shared.BaseLogWrap
+
+    .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
+    .. versionchanged:: 3.3.0 Deprecation of *args
+    .. versionchanged:: 4.0.0 Drop of *args
+    .. versionchanged:: 5.1.0 log_traceback parameter
+    """
     wrapper = LogWrap(
         log=log,
         log_level=log_level,

@@ -26,6 +26,9 @@ import types
 import typing
 
 
+__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+
+
 def _known_callable(item: typing.Any) -> bool:
     """Check for possibility to parse callable."""
     return isinstance(item, (types.FunctionType, types.MethodType))
@@ -628,6 +631,3 @@ def pretty_str(
     return PrettyStr(max_indent=max_indent, indent_step=indent_step)(
         src=src, indent=indent, no_indent_start=no_indent_start
     )
-
-
-__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
