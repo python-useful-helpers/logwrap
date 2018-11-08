@@ -17,7 +17,7 @@
 import inspect
 import typing
 
-from . cimport class_decorator
+from logwrap cimport class_decorator
 
 
 cdef unsigned int indent

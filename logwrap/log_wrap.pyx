@@ -22,11 +22,11 @@ import sys
 import traceback
 import typing
 
-from . cimport repr_utils
-from . cimport class_decorator
+from logwrap cimport repr_utils
+from logwrap cimport class_decorator
 
 
-__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+cdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
 logger = logging.getLogger("logwrap")  # type: logging.Logger
 

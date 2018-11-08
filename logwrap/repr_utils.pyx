@@ -23,6 +23,9 @@ import types
 import typing
 
 
+cdef tuple __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+
+
 cdef bint _known_callable(item: typing.Any):
     """Check for possibility to parse callable."""
     return isinstance(item, (types.FunctionType, types.MethodType))
