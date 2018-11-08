@@ -25,7 +25,7 @@ import traceback
 import typing
 
 import logwrap as core
-from . import _class_decorator
+from . import class_decorator
 
 
 __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
@@ -171,7 +171,7 @@ def bind_args_kwargs(
 
 # pylint: disable=assigning-non-slot,abstract-method
 # noinspection PyAbstractClass
-class LogWrap(_class_decorator.BaseDecorator):
+class LogWrap(class_decorator.BaseDecorator):
     """Base class for LogWrap implementation."""
 
     __slots__ = (

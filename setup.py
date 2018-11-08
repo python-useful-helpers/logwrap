@@ -50,9 +50,9 @@ def _extension(modpath):
 
 
 requires_optimization = [
-    _extension("logwrap._class_decorator"),
-    _extension("logwrap._log_wrap"),
-    _extension("logwrap._repr_utils"),
+    setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
+    setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
+    setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
 ]
 
 if "win32" != sys.platform:
@@ -92,9 +92,6 @@ class AllowFailRepair(build_ext.build_ext):
 
             src_files = (
                 os.path.join("logwrap", "__init__.py"),
-                # _log_wrap3 should not be compiled due to specific bug:
-                # Exception inside `async def` crashes python.
-                os.path.join("logwrap", "_log_wrap.py"),
             )
 
             for src_file in src_files:

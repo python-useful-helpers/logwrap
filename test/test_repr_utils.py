@@ -18,6 +18,7 @@
 
 """_repr_utils (internal helpers) specific tests."""
 
+import typing
 import unittest
 
 import logwrap
@@ -285,16 +286,9 @@ class TestPrettyRepr(unittest.TestCase):
 class TestAnnotated(unittest.TestCase):
     def test_001_annotation_args(self):
         fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
-        namespace = {}
 
-        exec("""
-import typing
-def func(a: typing.Optional[int]=None):
-    pass
-                        """,
-             namespace
-             )
-        func = namespace['func']  # type: typing.Callable[..., None]
+        def func(a: typing.Optional[int] = None):
+            pass
 
         self.assertEqual(
             logwrap.pretty_repr(func),
@@ -320,16 +314,9 @@ def func(a: typing.Optional[int]=None):
 
     def test_002_annotation_return(self):
         fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
-        namespace = {}
 
-        exec("""
-import typing
-def func() -> None:
-    pass
-                                """,
-             namespace
-             )
-        func = namespace['func']  # type: typing.Callable[[], None]
+        def func() -> None:
+            pass
 
         self.assertEqual(
             logwrap.pretty_repr(func),
@@ -355,16 +342,9 @@ def func() -> None:
 
     def test_003_complex(self):
         fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
-        namespace = {}
 
-        exec("""
-import typing
-def func(a: typing.Optional[int]=None) -> None:
-    pass
-                                """,
-             namespace
-             )
-        func = namespace['func']  # type: typing.Callable[..., None]
+        def func(a: typing.Optional[int] = None) -> None:
+            pass
 
         self.assertEqual(
             logwrap.pretty_repr(func),

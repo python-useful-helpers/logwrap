@@ -22,8 +22,8 @@ Original code was made for Mirantis Inc by Alexey Stepanov,
 later it has been reworked and extended for support of special cases.
 """
 
-from ._repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, pretty_str
-from ._log_wrap import logwrap, LogWrap, BoundParameter, bind_args_kwargs
+from .repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, pretty_str
+from .log_wrap import logwrap, LogWrap, BoundParameter, bind_args_kwargs
 
 __all__ = (
     "LogWrap",
@@ -37,7 +37,7 @@ __all__ = (
     "bind_args_kwargs",
 )
 
-__version__ = "5.1.0"
+__version__ = "5.2.0"
 __author__ = "Alexey Stepanov"
 __author_email__ = "penguinolog@gmail.com"
 __maintainers__ = {
