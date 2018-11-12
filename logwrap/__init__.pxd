@@ -1,1 +1,1 @@
-cdef tuple __all__
+cpdef tuple __all__
