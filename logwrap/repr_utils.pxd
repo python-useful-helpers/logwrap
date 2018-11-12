@@ -22,18 +22,41 @@ import types
 import typing
 
 
-cdef class PrettyFormat:
-    cdef readonly unsigned int max_indent
-    cdef readonly unsigned int indent_step
-    cdef readonly str _magic_method_name
+cdef:
+    class PrettyFormat:
+        cdef:
+            readonly unsigned int max_indent
+            readonly unsigned int indent_step
+            readonly str _magic_method_name
 
-    cdef int next_indent(self, unsigned int indent, unsigned int multiplier=?)
-    cdef str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=?)
-    cdef str _repr_simple(self, src: typing.Any, unsigned int indent=?, bint no_indent_start=?)
-    cdef str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix)
+        cpdef int next_indent(self, unsigned int indent, unsigned int multiplier=?)
 
-cdef class PrettyRepr(PrettyFormat):
-    cdef str _strings_repr(self, unsigned int indent, val: typing.Union[bytes, str])
+        cdef:
+            str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=?)
+            str _repr_simple(self, src: typing.Any, unsigned int indent=?, bint no_indent_start=?)
+            str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix)
 
-cdef class PrettyStr(PrettyFormat):
-    cdef str _strings_str(self, unsigned int indent, val: typing.Union[bytes, str])
+        cpdef str process_element(self, src: typing.Any, unsigned int indent=?, bint no_indent_start=?)
+
+    class PrettyRepr(PrettyFormat):
+        cdef str _strings_repr(self, unsigned int indent, val: typing.Union[bytes, str])
+
+    class PrettyStr(PrettyFormat):
+        cdef str _strings_str(self, unsigned int indent, val: typing.Union[bytes, str])
+
+
+cpdef str pretty_repr(
+    src: typing.Any,
+    unsigned int indent=?,
+    bint no_indent_start=?,
+    unsigned int max_indent=?,
+    unsigned int indent_step=?
+)
+
+cpdef  str pretty_str(
+    src: typing.Any,
+    unsigned int indent=?,
+    bint no_indent_start=?,
+    unsigned int max_indent=?,
+    unsigned int indent_step=?
+)

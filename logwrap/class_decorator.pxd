@@ -16,5 +16,6 @@
 
 
 cdef class BaseDecorator:
-    cdef readonly object _func
-    cdef dict __dict__
+    cdef:
+        readonly object _func
+        dict __dict__
