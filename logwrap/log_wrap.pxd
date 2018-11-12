@@ -20,39 +20,34 @@ import typing
 from logwrap cimport class_decorator
 
 
-cdef unsigned int indent
+cdef:
+    unsigned int indent
 
 
-cdef str pretty_repr(
-    src: typing.Any,
-    unsigned int indent=?,
-    bint no_indent_start=?,
-    unsigned int max_indent=?,
-    unsigned int indent_step=?
-)
+    class LogWrap(class_decorator.BaseDecorator):
+        """Base class for LogWrap implementation."""
 
+        cdef:
+            public unsigned int log_level
+            public unsigned int exc_level
+            public unsigned int max_indent
 
-cdef class LogWrap(class_decorator.BaseDecorator):
-    """Base class for LogWrap implementation."""
+            public bint log_call_args
+            public bint log_call_args_on_exc
+            public bint log_traceback
+            public bint log_result_obj
 
-    cdef public unsigned int log_level
-    cdef public unsigned int exc_level
-    cdef public unsigned int max_indent
+            readonly object _spec
+            readonly object _logger
 
-    cdef public bint log_call_args
-    cdef public bint log_call_args_on_exc
-    cdef public bint log_traceback
-    cdef public bint log_result_obj
+            list __blacklisted_names
+            list __blacklisted_exceptions
 
-    cdef readonly object _spec
-    cdef readonly object _logger
+        cpdef object pre_process_param(self, object arg)
+        cpdef str post_process_param(self, object arg, str arg_repr)
 
-    cdef list __blacklisted_names
-    cdef list __blacklisted_exceptions
-
-    cdef str _get_func_args_repr(
-        self, sig: inspect.Signature, tuple args, dict kwargs
-    )
-    cdef void _make_done_record(self, str func_name, result: typing.Any)
-    cdef void _make_calling_record(self, str name, str arguments, str method=?)
-    cdef void _make_exc_record(self, str name, str arguments)
+        cdef:
+            str _get_func_args_repr(self, sig: inspect.Signature, tuple args, dict kwargs)
+            void _make_done_record(self, str func_name, result: typing.Any)
+            void _make_calling_record(self, str name, str arguments, str method=?)
+            void _make_exc_record(self, str name, str arguments)
