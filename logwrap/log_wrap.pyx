@@ -26,7 +26,7 @@ from logwrap cimport repr_utils
 from logwrap cimport class_decorator
 
 
-cdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+cpdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
 logger = logging.getLogger("logwrap")  # type: logging.Logger
 
@@ -34,19 +34,6 @@ logger = logging.getLogger("logwrap")  # type: logging.Logger
 cdef unsigned int indent = 4
 fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc="", indent=indent).format
 comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc="", indent=indent).format
-
-
-cdef str pretty_repr(
-    src: typing.Any,
-    unsigned int indent=0,
-    bint no_indent_start=False,
-    unsigned int max_indent=20,
-    unsigned int indent_step=4
-):
-    """Make human readable repr of object."""
-    return repr_utils.PrettyRepr(max_indent=max_indent, indent_step=indent_step)(
-        src=src, indent=indent, no_indent_start=no_indent_start
-    )
 
 
 class BoundParameter:
@@ -286,9 +273,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             "log_result_obj={self.log_result_obj}, )".format(cls=self.__class__.__name__, self=self, spec=self._spec)
         )
 
-    def pre_process_param(
-        self, arg: BoundParameter
-    ) -> typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]:
+    cpdef object pre_process_param(self, object arg: BoundParameter):
         """Process parameter for the future logging.
 
         :param arg: bound parameter
@@ -302,7 +287,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         """
         return arg
 
-    def post_process_param(self, arg: BoundParameter, str arg_repr: str) -> str:
+    cpdef str post_process_param(self, object arg: BoundParameter, str arg_repr):
         """Process parameter for the future logging.
 
         :param arg: bound parameter
@@ -318,123 +303,125 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         """
         return arg_repr
 
-    cdef str _get_func_args_repr(self, sig: inspect.Signature, tuple args, dict kwargs):
-        """Internal helper for reducing complexity of decorator code.
+    cdef:
+        str _get_func_args_repr(self, sig: inspect.Signature, tuple args, dict kwargs):
+            """Internal helper for reducing complexity of decorator code.
+    
+            :param sig: function signature
+            :type sig: inspect.Signature
+            :param args: not keyworded arguments
+            :type args: typing.Tuple
+            :param kwargs: keyworded arguments
+            :type kwargs: typing.Dict[str, typing.Any]
+            :return: repr over function arguments
+            :rtype: str
+    
+            .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
+            """
+            if not (self.log_call_args or self.log_call_args_on_exc):
+                return ""
 
-        :param sig: function signature
-        :type sig: inspect.Signature
-        :param args: not keyworded arguments
-        :type args: typing.Tuple
-        :param kwargs: keyworded arguments
-        :type kwargs: typing.Dict[str, typing.Any]
-        :return: repr over function arguments
-        :rtype: str
+            cdef:
+                str param_str = ""
+                str val
+                str annotation
 
-        .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
-        """
-        if not (self.log_call_args or self.log_call_args_on_exc):
-            return ""
+            last_kind = None
+            for param in bind_args_kwargs(sig, *args, **kwargs):
+                if param.name in self.blacklisted_names:
+                    continue
 
-        cdef str param_str = ""
-        cdef str val
-        cdef str annotation
+                preprocessed = self.pre_process_param(param)
+                if preprocessed is None:
+                    continue
 
-        last_kind = None
-        for param in bind_args_kwargs(sig, *args, **kwargs):
-            if param.name in self.blacklisted_names:
-                continue
+                if isinstance(preprocessed, (tuple, list)):
+                    param, value = preprocessed
+                else:
+                    value = param.value
 
-            preprocessed = self.pre_process_param(param)
-            if preprocessed is None:
-                continue
+                if param.empty is value:
+                    if param.VAR_POSITIONAL == param.kind:
+                        value = ()
+                    elif param.VAR_KEYWORD == param.kind:
+                        value = {}
 
-            if isinstance(preprocessed, (tuple, list)):
-                param, value = preprocessed
-            else:
-                value = param.value
+                val = repr_utils.pretty_repr(src=value, indent=indent + 4, no_indent_start=True, max_indent=self.max_indent)
 
-            if param.empty is value:
-                if param.VAR_POSITIONAL == param.kind:
-                    value = ()
-                elif param.VAR_KEYWORD == param.kind:
-                    value = {}
+                val = self.post_process_param(param, val)
 
-            val = pretty_repr(src=value, indent=indent + 4, no_indent_start=True, max_indent=self.max_indent)
+                if last_kind != param.kind:
+                    param_str += comment(kind=param.kind)
+                    last_kind = param.kind
 
-            val = self.post_process_param(param, val)
+                if param.empty is param.annotation:
+                    annotation = ""
+                else:
+                    annotation = "  # type: {param.annotation!s}".format(param=param)
 
-            if last_kind != param.kind:
-                param_str += comment(kind=param.kind)
-                last_kind = param.kind
+                param_str += fmt(key=param.name, annotation=annotation, val=val)
+            if param_str:
+                param_str += "\n"
+            return param_str
 
-            if param.empty is param.annotation:
-                annotation = ""
-            else:
-                annotation = "  # type: {param.annotation!s}".format(param=param)
+        void _make_done_record(self, str func_name, result: typing.Any):
+            """Construct success record.
+    
+            :type func_name: str
+            :type result: typing.Any
+            """
+            cdef str msg = "Done: {name!r}".format(name=func_name)
 
-            param_str += fmt(key=param.name, annotation=annotation, val=val)
-        if param_str:
-            param_str += "\n"
-        return param_str
+            if self.log_result_obj:
+                msg += " with result:\n{result}".format(
+                    result=repr_utils.pretty_repr(
+                        result,
+                        indent=0,
+                        no_indent_start=False,
+                        max_indent=self.max_indent,
+                        indent_step=4
 
-    cdef void _make_done_record(self, str func_name, result: typing.Any):
-        """Construct success record.
-
-        :type func_name: str
-        :type result: typing.Any
-        """
-        cdef str msg = "Done: {name!r}".format(name=func_name)
-
-        if self.log_result_obj:
-            msg += " with result:\n{result}".format(
-                result=pretty_repr(
-                    result,
-                    indent=0,
-                    no_indent_start=False,
-                    max_indent=self.max_indent,
-                    indent_step=4
-
+                    )
                 )
+            self._logger.log(level=self.log_level, msg=msg)  # type: ignore
+
+        void _make_calling_record(self, str name, str arguments, str method="Calling"):
+            """Make log record before execution.
+    
+            :type name: str
+            :type arguments: str
+            :type method: str
+            """
+            self._logger.log(  # type: ignore
+                level=self.log_level,
+                msg="{method}: \n{name!r}({arguments})".format(
+                    method=method, name=name, arguments=arguments if self.log_call_args else ""
+                ),
             )
-        self._logger.log(level=self.log_level, msg=msg)  # type: ignore
 
-    cdef void _make_calling_record(self, str name, str arguments, str method="Calling"):
-        """Make log record before execution.
+        void _make_exc_record(self, str name, str arguments):
+            """Make log record if exception raised.
+    
+            :type name: str
+            :type arguments: str
+            """
+            exc_info = sys.exc_info()
+            stack = traceback.extract_stack()
+            tb = traceback.extract_tb(exc_info[2])
+            full_tb = stack[:2] + tb  # cut decorator and build full traceback
+            exc_line = traceback.format_exception_only(*exc_info[:2])
+            # Make standard traceback string
+            cdef str tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
 
-        :type name: str
-        :type arguments: str
-        :type method: str
-        """
-        self._logger.log(  # type: ignore
-            level=self.log_level,
-            msg="{method}: \n{name!r}({arguments})".format(
-                method=method, name=name, arguments=arguments if self.log_call_args else ""
-            ),
-        )
-
-    cdef void _make_exc_record(self, str name, str arguments):
-        """Make log record if exception raised.
-
-        :type name: str
-        :type arguments: str
-        """
-        exc_info = sys.exc_info()
-        stack = traceback.extract_stack()
-        tb = traceback.extract_tb(exc_info[2])
-        full_tb = stack[:2] + tb  # cut decorator and build full traceback
-        exc_line = traceback.format_exception_only(*exc_info[:2])
-        # Make standard traceback string
-        cdef str tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
-
-        self._logger.log(  # type: ignore
-            level=self.exc_level,
-            msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
-                name=name,
-                arguments=arguments if self.log_call_args_on_exc else "",
-                tb_text=tb_text if self.log_traceback else "",
-            ),
-            exc_info=False,
-        )
+            self._logger.log(  # type: ignore
+                level=self.exc_level,
+                msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
+                    name=name,
+                    arguments=arguments if self.log_call_args_on_exc else "",
+                    tb_text=tb_text if self.log_traceback else "",
+                ),
+                exc_info=False,
+            )
 
     def _get_function_wrapper(self, func: typing.Callable) -> typing.Callable:
         """Here should be constructed and returned real decorator.
