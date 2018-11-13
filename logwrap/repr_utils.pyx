@@ -169,7 +169,7 @@ cdef class PrettyFormat:
         return indent + multiplier * self.indent_step
 
     cdef:
-        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0):
+        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0) except *:
             """Repr callable object (function or method).
     
             :param src: Callable to process
@@ -181,7 +181,7 @@ cdef class PrettyFormat:
             """
             raise NotImplementedError()
 
-        str _repr_simple(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False):
+        str _repr_simple(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False) except *:
             """Repr object without iteration.
     
             :param src: Source object
@@ -195,7 +195,7 @@ cdef class PrettyFormat:
             """
             raise NotImplementedError()
 
-        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix):
+        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix) except *:
             """Repr iterable item.
     
             :param nl: newline before item
@@ -324,7 +324,7 @@ cdef class PrettyRepr(PrettyFormat):
                 prefix = "u"
             return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=val)
 
-        str _repr_simple(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False):
+        str _repr_simple(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False) except *:
             """Repr object without iteration.
     
             :param src: Source object
@@ -343,7 +343,7 @@ cdef class PrettyRepr(PrettyFormat):
                 return self._strings_repr(indent=indent, val=src)
             return "{spc:<{indent}}{val!r}".format(spc="", indent=indent, val=src)
 
-        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0):
+        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0) except *:
             """Repr callable object (function or method).
     
             :param src: Callable to process
@@ -380,7 +380,7 @@ cdef class PrettyRepr(PrettyFormat):
                 spc="", indent=indent, obj=src, args=param_str, annotation=annotation
             )
 
-        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix):
+        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix) except *:
             """Repr iterable item.
     
             :param nl: newline before item
@@ -450,7 +450,7 @@ cdef class PrettyStr(PrettyFormat):
                 val = val.decode(encoding="utf-8", errors="backslashreplace")
             return "{spc:<{indent}}{string}".format(spc="", indent=indent, string=val)
 
-        str _repr_simple(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False):
+        str _repr_simple(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False) except *:
             """Repr object without iteration.
     
             :param src: Source object
@@ -469,7 +469,7 @@ cdef class PrettyStr(PrettyFormat):
                 return self._strings_str(indent=indent, val=src)
             return "{spc:<{indent}}{val!s}".format(spc="", indent=indent, val=src)
 
-        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0):
+        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0) except *:
             """Repr callable object (function or method).
     
             :param src: Callable to process
@@ -506,7 +506,7 @@ cdef class PrettyStr(PrettyFormat):
                 spc="", indent=indent, obj=src, args=param_str, annotation=annotation
             )
 
-        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix):
+        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix) except *:
             """Repr iterable item.
     
             :param nl: newline before item

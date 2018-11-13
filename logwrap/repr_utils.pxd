@@ -32,9 +32,9 @@ cdef:
         cpdef int next_indent(self, unsigned int indent, unsigned int multiplier=?)
 
         cdef:
-            str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=?)
-            str _repr_simple(self, src: typing.Any, unsigned int indent=?, bint no_indent_start=?)
-            str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix)
+            str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=?) except *
+            str _repr_simple(self, src: typing.Any, unsigned int indent=?, bint no_indent_start=?) except *
+            str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix) except *
 
         cpdef str process_element(self, src: typing.Any, unsigned int indent=?, bint no_indent_start=?)
 
