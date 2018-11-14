@@ -48,6 +48,6 @@ cdef:
 
         cdef:
             str _get_func_args_repr(self, sig: inspect.Signature, tuple args, dict kwargs)
-            void _make_done_record(self, str func_name, result: typing.Any)
-            void _make_calling_record(self, str name, str arguments, str method=?)
-            void _make_exc_record(self, str name, str arguments)
+            void _make_done_record(self, str func_name, result: typing.Any) except *
+            void _make_calling_record(self, str name, str arguments, str method=?) except *
+            void _make_exc_record(self, str name, str arguments) except *
