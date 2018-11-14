@@ -44,6 +44,7 @@ except pkg_resources.DistributionNotFound:
     # package is not installed, try to get from SCM
     try:
         import setuptools_scm  # type: ignore
+
         __version__ = setuptools_scm.get_version()
     except ImportError:
         pass
