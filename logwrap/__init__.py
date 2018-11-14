@@ -21,6 +21,7 @@ Contents: 'logwrap', 'pretty_repr', 'pretty_str'
 Original code was made for Mirantis Inc by Alexey Stepanov,
 later it has been reworked and extended for support of special cases.
 """
+import pkg_resources
 
 from .repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, pretty_str
 from .log_wrap import logwrap, LogWrap, BoundParameter, bind_args_kwargs
@@ -37,7 +38,17 @@ __all__ = (
     "bind_args_kwargs",
 )
 
-__version__ = "4.9.3"
+try:
+    __version__ = pkg_resources.get_distribution(__name__).version
+except pkg_resources.DistributionNotFound:
+    # package is not installed, try to get from SCM
+    try:
+        import setuptools_scm  # type: ignore
+
+        __version__ = setuptools_scm.get_version()
+    except ImportError:
+        pass
+
 __author__ = "Alexey Stepanov"
 __author_email__ = "penguinolog@gmail.com"
 __maintainers__ = {
