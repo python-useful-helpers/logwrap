@@ -153,7 +153,6 @@ SETUP_ARGS = dict(
         for name, email in VARIABLES['__maintainers__'].items()
     ),
     url=VARIABLES['__url__'],
-    version=VARIABLES['__version__'],
     license=VARIABLES['__license__'],
     description=VARIABLES['__description__'],
     long_description=LONG_DESCRIPTION,
@@ -166,9 +165,13 @@ SETUP_ARGS = dict(
     # situations as progressive releases of projects are done.
     # Blacklist setuptools 34.0.0-34.3.2 due to https://github.com/pypa/setuptools/issues/951
     # Blacklist setuptools 36.2.0 due to https://github.com/pypa/setuptools/issues/1086
-    setup_requires="setuptools >= 21.0.0,!=24.0.0,"
-                   "!=34.0.0,!=34.0.1,!=34.0.2,!=34.0.3,!=34.1.0,!=34.1.1,!=34.2.0,!=34.3.0,!=34.3.1,!=34.3.2,"
-                   "!=36.2.0",
+    setup_requires=[
+        "setuptools >= 21.0.0,!=24.0.0,"
+        "!=34.0.0,!=34.0.1,!=34.0.2,!=34.0.3,!=34.1.0,!=34.1.1,!=34.2.0,!=34.3.0,!=34.3.1,!=34.3.2,"
+        "!=36.2.0",
+        "setuptools_scm"
+    ],
+    use_scm_version=True,
     install_requires=REQUIRED,
     package_data={
         'logwrap': ['py.typed'],
