@@ -364,7 +364,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 param_str += "\n"
             return param_str
 
-        void _make_done_record(self, str func_name, result: typing.Any):
+        void _make_done_record(self, str func_name, result: typing.Any) except *:
             """Construct success record.
     
             :type func_name: str
@@ -385,7 +385,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 )
             self._logger.log(level=self.log_level, msg=msg)  # type: ignore
 
-        void _make_calling_record(self, str name, str arguments, str method="Calling"):
+        void _make_calling_record(self, str name, str arguments, str method="Calling") except *:
             """Make log record before execution.
     
             :type name: str
@@ -399,7 +399,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 ),
             )
 
-        void _make_exc_record(self, str name, str arguments):
+        void _make_exc_record(self, str name, str arguments) except *:
             """Make log record if exception raised.
     
             :type name: str
