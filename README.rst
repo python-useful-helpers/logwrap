@@ -3,6 +3,9 @@ logwrap
 
 .. image:: https://travis-ci.org/python-useful-helpers/logwrap.svg?branch=master
     :target: https://travis-ci.org/python-useful-helpers/logwrap
+.. image:: https://dev.azure.com/python-useful-helpers/logwrap/_apis/build/status/python-useful-helpers.logwrap?branchName=master
+    :alt: Azure DevOps builds
+    :target: https://dev.azure.com/python-useful-helpers/logwrap/_build?definitionId=1
 .. image:: https://coveralls.io/repos/github/python-useful-helpers/logwrap/badge.svg?branch=master
     :target: https://coveralls.io/github/python-useful-helpers/logwrap?branch=master
 .. image:: https://readthedocs.org/projects/logwrap/badge/?version=latest
@@ -299,6 +302,8 @@ For code checking several CI systems is used in parallel:
 
 2. `coveralls: <https://coveralls.io/github/python-useful-helpers/logwrap>`_ is used for coverage display.
 
-CD system
-=========
-`Travis CI: <https://travis-ci.org/python-useful-helpers/logwrap>`_ is used for package delivery on PyPI.
+3. `Azure CI: <https://dev.azure.com/python-useful-helpers/logwrap/_build?definitionId=1>`_ is used for functional tests on Windows.
+
+CD systems
+==========
+1. `Travis CI: <https://travis-ci.org/python-useful-helpers/logwrap>`_ is used for linux and SDIST package delivery on PyPI.
