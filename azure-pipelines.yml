@@ -1,0 +1,80 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+jobs:
+- job: 'PyLint'
+  pool:
+    vmIMage: 'VS2017-Win2016'
+  strategy:
+    maxParallel: 1
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.4'
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -U setuptools
+      pip install -r requirements.txt
+    displayName: 'Install dependencies'
+
+  - script: |
+      pip install -U pylint
+      pylint -f msvs logwrap
+    displayName: 'PyLint'
+
+- template: .azure_pipelines/run_tests.yml
+  parameters: {name: 'Python_34', python: '3.4', architecture: 'x64', kind: 'native'}
+
+#- template: .azure_pipelines/run_tests.yml
+#  parameters: {name: 'Python_34', python: '3.4', architecture: 'x64', kind: 'cython'}
+#- template: .azure_pipelines/run_tests.yml
+#  parameters: {name: 'Python_34', python: '3.4', architecture: 'x86', kind: 'cython'}
+
+
+#- job: 'Build_and_deploy'
+#  dependsOn:
+#  - Python_34_x64_native
+
+#  - Python_34_x64_cython
+#  - Python_34_x86_cython
+
+#  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+#  pool:
+#    vmIMage: 'VS2017-Win2016'
+#  strategy:
+#    maxParallel: 6
+#    matrix:
+#      Python34_x64:
+#        python.version: '3.4'
+#      Python34_x86:
+#        python.version: '3.4'
+#        architecture: 'x86'
+
+#  steps:
+#  - task: UsePythonVersion@0
+#    inputs:
+#      versionSpec: '$(python.version)'
+#      architecture: '$(python.architecture)'
+
+#  - script: |
+#      python -m pip install --upgrade pip
+#      pip install -U setuptools
+#      pip install -r build_requirements.txt
+#    displayName: 'Install dependencies'
+
+#  - script: |
+#      python setup.py bdist_wheel
+#    displayName: 'Build'
+
+#  - task: TwineAuthenticate@0
+#    displayName: 'Twine Authenticate '
+#    inputs:
+#      externalFeeds: PyPI
+
+#  - script: |
+#      pip install -U twine
+#      twine upload -r PyPI --config-file $(PYPIRC_PATH) dist/logwrap-* --skip-existing
+#    displayName: 'Deploy'

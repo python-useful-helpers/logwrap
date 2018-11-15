@@ -98,7 +98,7 @@ class TestBind(unittest.TestCase):
     def test_003_no_value(self):
         params = list(log_wrap.bind_args_kwargs(sig, 1, arg3=33))
         arg_1_bound = params[0]
-        arg1_parameter = arg_1_bound.parameter
+        arg1_parameter = arg_1_bound
         with self.assertRaises(ValueError):
             log_wrap.BoundParameter(arg1_parameter, arg1_parameter.empty)
 

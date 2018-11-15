@@ -52,7 +52,9 @@ class ReprParameter:
 
     empty = inspect.Parameter.empty
 
-    def __init__(self, parameter: inspect.Parameter, value: typing.Optional[typing.Any] = None) -> None:
+    def __init__(
+        self, parameter: inspect.Parameter, value: typing.Optional[typing.Any] = inspect.Parameter.empty
+    ) -> None:
         """Parameter-like object store for repr and str tasks.
 
         :param parameter: parameter from signature
@@ -61,7 +63,7 @@ class ReprParameter:
         :type value: typing.Any
         """
         self._parameter = parameter
-        self._value = value if value is not None else parameter.default
+        self._value = value if value is not parameter.empty else parameter.default
 
     @property
     def parameter(self) -> inspect.Parameter:
@@ -113,30 +115,30 @@ class ReprParameter:
 
 
 # pylint: disable=no-member
-def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> typing.Iterator[ReprParameter]:
+def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> typing.List[ReprParameter]:
     """Get arguments lists with defaults.
 
     :param func: Callable object to process
     :type func: typing.Union[types.FunctionType, types.MethodType]
     :return: repr of callable parameter from signature
-    :rtype: typing.Iterator[ReprParameter]
+    :rtype: typing.List[ReprParameter]
     """
-    isfunction = isinstance(func, types.FunctionType)
-    if isfunction:
+    ismethod = isinstance(func, types.MethodType)
+    self_processed = False
+    result = []
+    if not ismethod:
         real_func = func
     else:
         real_func = func.__func__  # type: ignore
 
-    parameters = list(inspect.signature(real_func).parameters.values())
+    for param in inspect.signature(real_func).parameters.values():
+        if not self_processed and ismethod and func.__self__ is not None:  # type: ignore
+            result.append(ReprParameter(param, value=func.__self__))  # type: ignore
+            self_processed = True
+        else:
+            result.append(ReprParameter(param))
 
-    params = iter(parameters)
-    if not isfunction and func.__self__ is not None:  # type: ignore
-        try:
-            yield ReprParameter(next(params), value=func.__self__)  # type: ignore
-        except StopIteration:  # pragma: no cover
-            return
-    for arg in params:
-        yield ReprParameter(arg)
+    return result
 
 
 # pylint: enable=no-member

@@ -111,9 +111,10 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :rtype: typing.Union[typing.Callable, typing.Awaitable]
 
 
-.. py:class:: BoundParameter(object)
+.. py:class:: BoundParameter(inspect.Parameter)
 
     Parameter-like object store BOUND with value parameter.
+    .. versionchanged:: 4.9.5 subclass inspect.Parameter
 
     .. versionadded:: 3.3.0
 
@@ -127,65 +128,11 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type value: typing.Any
         :raises ValueError: No default value and no value
 
-    .. py:attribute:: POSITIONAL_ONLY
-
-        ``enum.IntEnum``
-        Parameter.POSITIONAL_ONLY
-
-    .. py:attribute:: POSITIONAL_OR_KEYWORD
-
-        ``enum.IntEnum``
-        Parameter.POSITIONAL_OR_KEYWORD
-
-    .. py:attribute:: VAR_POSITIONAL
-
-        ``enum.IntEnum``
-        Parameter.VAR_POSITIONAL
-
-    .. py:attribute:: KEYWORD_ONLY
-
-        ``enum.IntEnum``
-        Parameter.KEYWORD_ONLY
-
-    .. py:attribute:: VAR_KEYWORD
-
-        ``enum.IntEnum``
-        Parameter.VAR_KEYWORD
-
-    .. py:attribute:: empty
-
-        ``typing.Type``
-        Parameter.empty
-
     .. py:attribute:: parameter
 
         Parameter object.
 
-        :rtype: inspect.Parameter
-
-    .. py:attribute:: name
-
-        Parameter name.
-
-        :rtype: typing.Union[None, str]
-
-    .. py:attribute:: default
-
-        Parameter default value.
-
-        :rtype: typing.Any
-
-    .. py:attribute:: annotation
-
-        Parameter annotation.
-
-        :rtype: typing.Union[Parameter.empty, str]
-
-    .. py:attribute:: kind
-
-        Parameter kind.
-
-        :rtype: enum.IntEnum
+        :rtype: BoundParameter
 
     .. py:attribute:: value
 
@@ -193,11 +140,11 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
         :rtype: typing.Any
 
-    .. py:method:: __hash__(self)
+    .. py:method:: __str__(self)
 
-        Block hashing.
+        String representation.
 
-        :raises TypeError: Not hashable.
+        :rtype: ``str``
 
 
 .. py:function:: bind_args_kwargs(sig, *args, **kwargs)
@@ -207,6 +154,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :param sig: source signature
     :type sig: inspect.Signature
     :return: Iterator for bound parameters with all information about it
-    :rtype: typing.Iterator[BoundParameter]
+    :rtype: typing.List[BoundParameter]
 
     .. versionadded:: 3.3.0
+    .. versionchanged:: 4.9.5 return list
