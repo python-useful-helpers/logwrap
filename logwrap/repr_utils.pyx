@@ -37,106 +37,73 @@ cdef:
         return not isinstance(item, (list, set, tuple, dict, frozenset))
 
 
-class ReprParameter:
-    """Parameter wrapper wor repr and str operations over signature."""
+    class ReprParameter:
+        """Parameter wrapper wor repr and str operations over signature."""
 
-    __slots__ = ("_value", "_parameter")
+        def __cinit__(self, parameter: inspect.Parameter, value: typing.Any = inspect.Parameter.empty) -> None:
+            """Parameter-like object store BOUND with value parameter.
 
-    POSITIONAL_ONLY = inspect.Parameter.POSITIONAL_ONLY
-    POSITIONAL_OR_KEYWORD = inspect.Parameter.POSITIONAL_OR_KEYWORD
-    VAR_POSITIONAL = inspect.Parameter.VAR_POSITIONAL
-    KEYWORD_ONLY = inspect.Parameter.KEYWORD_ONLY
-    VAR_KEYWORD = inspect.Parameter.VAR_KEYWORD
+            :param parameter: parameter from signature
+            :type parameter: inspect.Parameter
+            :param value: parameter real value
+            :type value: typing.Any
+            :raises ValueError: No default value and no value
+            """
+            # Fill enum
+            self.POSITIONAL_ONLY = inspect.Parameter.POSITIONAL_ONLY
+            self.POSITIONAL_OR_KEYWORD = inspect.Parameter.POSITIONAL_OR_KEYWORD
+            self.VAR_POSITIONAL = inspect.Parameter.VAR_POSITIONAL
+            self.KEYWORD_ONLY = inspect.Parameter.KEYWORD_ONLY
+            self.VAR_KEYWORD = inspect.Parameter.VAR_KEYWORD
+            self.empty = inspect.Parameter.empty
 
-    empty = inspect.Parameter.empty
+            # Real data
+            self.parameter = parameter
+            self.name = self.parameter.name
+            self.annotation = self.parameter.annotation
+            self.kind = self.parameter.kind
 
-    def __init__(self, parameter: inspect.Parameter, value: typing.Optional[typing.Any] = None) -> None:
-        """Parameter-like object store for repr and str tasks.
+            self.value = value if value is not None else parameter.default
 
-        :param parameter: parameter from signature
-        :type parameter: inspect.Parameter
-        :param value: default value override
-        :type value: typing.Any
-        """
-        self._parameter = parameter
-        self._value = value if value is not None else parameter.default
+        # noinspection PyTypeChecker
+        def __hash__(self) -> int:
+            """Block hashing.
 
-    @property
-    def parameter(self) -> inspect.Parameter:
-        """Parameter object."""
-        return self._parameter
+            :raises TypeError: Not hashable.
+            """
+            cdef str msg = "unhashable type: '{0}'".format(self.__class__.__name__)
+            raise TypeError(msg)
 
-    @property
-    def name(self) -> typing.Union[None, str]:
-        """Parameter name.
-
-        For `*args` and `**kwargs` add prefixes
-        """
-        if self.kind == inspect.Parameter.VAR_POSITIONAL:
-            return "*" + self.parameter.name
-        if self.kind == inspect.Parameter.VAR_KEYWORD:
-            return "**" + self.parameter.name
-        return self.parameter.name
-
-    @property
-    def value(self) -> typing.Any:
-        """Parameter value to log.
-
-        If function is bound to class -> value is class instance else default value.
-        """
-        return self._value
-
-    @property
-    def annotation(self) -> typing.Union[inspect.Parameter.empty, str]:
-        """Parameter annotation."""
-        return self.parameter.annotation
-
-    @property
-    def kind(self) -> int:
-        """Parameter kind."""
-        return self.parameter.kind  # type: ignore
-
-    # noinspection PyTypeChecker
-    def __hash__(self) -> int:
-        """Block hashing.
-
-        :raises TypeError: Not hashable.
-        """
-        msg = "unhashable type: '{0}'".format(self.__class__.__name__)
-        raise TypeError(msg)
-
-    def __repr__(self) -> str:
-        """Debug purposes."""
-        return '<{} "{}">'.format(self.__class__.__name__, self)
+        def __repr__(self) -> str:
+            """Debug purposes."""
+            return '<{} "{}">'.format(self.__class__.__name__, self)
 
 
-# pylint: disable=no-member
-def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> typing.Iterator[ReprParameter]:
-    """Get arguments lists with defaults.
+    list _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]):
+        """Get arguments lists with defaults.
+    
+        :param func: Callable object to process
+        :type func: typing.Union[types.FunctionType, types.MethodType]
+        :return: repr of callable parameter from signature
+        :rtype: typing.List[ReprParameter]"""
+        cdef:
+            bint ismethod = isinstance(func, types.MethodType)
+            bint self_processed = False
+            list result = []
 
-    :param func: Callable object to process
-    :type func: typing.Union[types.FunctionType, types.MethodType]
-    :return: repr of callable parameter from signature
-    :rtype: typing.Iterator[ReprParameter]"""
-    cdef bint ismethod = isinstance(func, types.MethodType)
-    if not ismethod:
-        real_func = func
-    else:
-        real_func = func.__func__  # type: ignore
+        if not ismethod:
+            real_func = func
+        else:
+            real_func = func.__func__  # type: ignore
 
-    parameters = list(inspect.signature(real_func).parameters.values())
+        for param in inspect.signature(real_func).parameters.values():
+            if not self_processed and ismethod and func.__self__ is not None:
+                result.append(ReprParameter(param, value=func.__self__))
+                self_processed = True
+            else:
+                result.append(ReprParameter(param))
 
-    params = iter(parameters)
-    if ismethod and func.__self__ is not None:  # type: ignore
-        try:
-            yield ReprParameter(next(params), value=func.__self__)  # type: ignore
-        except StopIteration:
-            return
-    for arg in params:
-        yield ReprParameter(arg)
-
-
-# pylint: enable=no-member
+        return result
 
 
 cdef class PrettyFormat:
@@ -356,6 +323,7 @@ cdef class PrettyRepr(PrettyFormat):
             cdef:
                 str param_str = ""
                 str annotation
+                ReprParameter param
 
             for param in _prepare_repr(src):
                 param_str += "\n{spc:<{indent}}{param.name}".format(spc="", indent=self.next_indent(indent), param=param)
@@ -482,6 +450,7 @@ cdef class PrettyStr(PrettyFormat):
             cdef:
                 str param_str = ""
                 str annotation
+                ReprParameter param
 
             for param in _prepare_repr(src):
                 param_str += "\n{spc:<{indent}}{param.name}".format(spc="", indent=self.next_indent(indent), param=param)
