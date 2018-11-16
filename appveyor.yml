@@ -1,8 +1,4 @@
 environment:
-  TWINE_USERNAME: penguinolog
-  TWINE_PASSWORD:
-    secure: TCKGf77kkVeo2Pbd+lQY5Q==
-
   matrix:
     - PYTHON: "C:\\Python35"
       PYTHON_VERSION: "3.5.x" # currently 3.5.1
@@ -18,6 +14,14 @@ environment:
 
     - PYTHON: "C:\\Python36-x64"
       PYTHON_VERSION: "3.6.x" # currently 3.6.0
+      PYTHON_ARCH: "64"
+
+    - PYTHON: "C:\\Python37"
+      PYTHON_VERSION: "3.7.x" # currently 3.6.0
+      PYTHON_ARCH: "32"
+
+    - PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: "3.7.x" # currently 3.6.0
       PYTHON_ARCH: "64"
 
 install:
@@ -56,6 +60,3 @@ test_script:
 artifacts:
   - path: dist\*
     name: Python built code
-
-on_success:
-  - if "%APPVEYOR_REPO_TAG%"=="true" ( pip install -U twine && twine upload dist/*.whl )

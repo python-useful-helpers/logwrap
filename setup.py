@@ -22,9 +22,9 @@ import ast
 import collections
 from distutils.command import build_ext
 import distutils.errors
+import glob
 import os.path
 import shutil
-import sys
 
 try:
     # noinspection PyPackageRequirements
@@ -44,19 +44,7 @@ with open("README.rst") as f:
     long_description = f.read()
 
 
-def _extension(modpath):
-    """Make setuptools.Extension."""
-    return setuptools.Extension(modpath, [modpath.replace(".", "/") + ".py"])
-
-
-requires_optimization = [
-    setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
-    setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
-    setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-]
-
-if "win32" != sys.platform:
-    requires_optimization.append(_extension("logwrap.__init__"))
+requires_optimization = [setuptools.Extension("logwrap", glob.glob("logwrap/*.pyx"))]
 
 # noinspection PyCallingNonCallable
 ext_modules = (
@@ -90,9 +78,7 @@ class AllowFailRepair(build_ext.build_ext):
             root_dir = os.path.abspath(os.path.join(__file__, ".."))
             target_dir = build_dir if not self.inplace else root_dir
 
-            src_files = (
-                os.path.join("logwrap", "__init__.py"),
-            )
+            src_files = (os.path.join("logwrap", "__init__.py"),)
 
             for src_file in src_files:
                 src = os.path.join(root_dir, src_file)
@@ -233,7 +219,7 @@ setup_args = dict(
         "setuptools >= 21.0.0,!=24.0.0,"
         "!=34.0.0,!=34.0.1,!=34.0.2,!=34.0.3,!=34.1.0,!=34.1.1,!=34.2.0,!=34.3.0,!=34.3.1,!=34.3.2,"
         "!=36.2.0",
-        "setuptools_scm"
+        "setuptools_scm",
     ],
     use_scm_version=True,
     install_requires=required,
