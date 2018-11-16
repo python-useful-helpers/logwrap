@@ -25,7 +25,6 @@ import distutils.errors
 import glob
 import os.path
 import shutil
-import sys
 
 try:
     # noinspection PyPackageRequirements
