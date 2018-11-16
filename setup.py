@@ -22,6 +22,7 @@ import ast
 import collections
 from distutils.command import build_ext
 import distutils.errors
+import glob
 import os.path
 import shutil
 import sys
@@ -44,19 +45,12 @@ with open("README.rst") as f:
     long_description = f.read()
 
 
-def _extension(modpath):
-    """Make setuptools.Extension."""
-    return setuptools.Extension(modpath, [modpath.replace(".", "/") + ".py"])
-
-
 requires_optimization = [
-    setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
-    setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
-    setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
+    setuptools.Extension(
+        "logwrap",
+        glob.glob("logwrap/*.pyx")
+    )
 ]
-
-if "win32" != sys.platform:
-    requires_optimization.append(_extension("logwrap.__init__"))
 
 # noinspection PyCallingNonCallable
 ext_modules = (
