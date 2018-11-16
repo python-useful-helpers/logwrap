@@ -22,7 +22,29 @@ import types
 import typing
 
 
+cpdef tuple __all__
+
 cdef:
+    bint _known_callable(item: typing.Any)
+    bint _simple(item: typing.Any)
+
+    class ReprParameter:
+        cdef:
+            readonly object POSITIONAL_ONLY
+            readonly object POSITIONAL_OR_KEYWORD
+            readonly object VAR_POSITIONAL
+            readonly object KEYWORD_ONLY
+            readonly object VAR_KEYWORD
+            readonly object empty
+
+            readonly object parameter
+            readonly object name
+            readonly object annotation
+            readonly object kind
+            readonly object value
+
+    list _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType])
+
     class PrettyFormat:
         cdef:
             readonly unsigned int max_indent

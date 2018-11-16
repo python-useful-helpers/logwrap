@@ -207,6 +207,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :param sig: source signature
     :type sig: inspect.Signature
     :return: Iterator for bound parameters with all information about it
-    :rtype: typing.Iterator[BoundParameter]
+    :rtype: typing.List[BoundParameter]
 
     .. versionadded:: 3.3.0
+    .. versionchanged:: 5.3.1 return list

@@ -20,6 +20,9 @@ import typing
 from logwrap cimport class_decorator
 
 
+cpdef list bind_args_kwargs(sig: inspect.Signature, tuple args, dict kwargs)
+
+
 cdef:
     unsigned int indent
 

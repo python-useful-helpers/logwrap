@@ -147,9 +147,7 @@ class BoundParameter:
         return '<{} "{}">'.format(self.__class__.__name__, self)
 
 
-def bind_args_kwargs(
-    sig: inspect.Signature, *args: typing.Any, **kwargs: typing.Any
-) -> typing.Iterator[BoundParameter]:
+def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing.Any) -> typing.List[BoundParameter]:
     """Bind *args and **kwargs to signature and get Bound Parameters.
 
     :param sig: source signature
@@ -159,14 +157,16 @@ def bind_args_kwargs(
     :param kwargs: keyworded arguments
     :type kwargs: typing.Any
     :return: Iterator for bound parameters with all information about it
-    :rtype: typing.Iterator[BoundParameter]
+    :rtype: typing.List[BoundParameter]
 
     .. versionadded:: 3.3.0
+    .. versionchanged:: 5.3.1 return list
     """
+    result = []
     bound = sig.bind(*args, **kwargs).arguments
-    parameters = list(sig.parameters.values())
-    for param in parameters:
-        yield BoundParameter(parameter=param, value=bound.get(param.name, param.default))
+    for param in sig.parameters.values():
+        result.append(BoundParameter(parameter=param, value=bound.get(param.name, param.default)))
+    return result
 
 
 # pylint: disable=assigning-non-slot,abstract-method
