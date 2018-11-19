@@ -3,7 +3,7 @@ logwrap
 
 .. image:: https://travis-ci.org/python-useful-helpers/logwrap.svg?branch=master
     :target: https://travis-ci.org/python-useful-helpers/logwrap
-.. image:: https://img.shields.io/azure-devops/build/:penguinolog/:logwrap/:1.svg
+.. image:: https://dev.azure.com/penguinolog/logwrap/_apis/build/status/python-useful-helpers.logwrap?branchName=master
     :alt: Azure DevOps builds
     :target: https://dev.azure.com/penguinolog/logwrap/_build?definitionId=1
 .. image:: https://coveralls.io/repos/github/python-useful-helpers/logwrap/badge.svg?branch=master
