@@ -23,6 +23,7 @@ import logging
 import sys
 import traceback
 import typing
+import warnings
 
 import logwrap as core
 from . import class_decorator
@@ -38,21 +39,14 @@ fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc="", indent=
 comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc="", indent=indent).format
 
 
-class BoundParameter:
+class BoundParameter(inspect.Parameter):
     """Parameter-like object store BOUND with value parameter.
 
     .. versionadded:: 3.3.0
+    .. versionchanged:: 5.3.1 subclass inspect.Parameter
     """
 
-    __slots__ = ("_parameter", "_value")
-
-    POSITIONAL_ONLY = inspect.Parameter.POSITIONAL_ONLY
-    POSITIONAL_OR_KEYWORD = inspect.Parameter.POSITIONAL_OR_KEYWORD
-    VAR_POSITIONAL = inspect.Parameter.VAR_POSITIONAL
-    KEYWORD_ONLY = inspect.Parameter.KEYWORD_ONLY
-    VAR_KEYWORD = inspect.Parameter.VAR_KEYWORD
-
-    empty = inspect.Parameter.empty
+    __slots__ = ("_value",)
 
     def __init__(self, parameter: inspect.Parameter, value: typing.Any = inspect.Parameter.empty) -> None:
         """Parameter-like object store BOUND with value parameter.
@@ -63,7 +57,9 @@ class BoundParameter:
         :type value: typing.Any
         :raises ValueError: No default value and no value
         """
-        self._parameter = parameter
+        super(BoundParameter, self).__init__(
+            name=parameter.name, kind=parameter.kind, default=parameter.default, annotation=parameter.annotation
+        )
 
         if value is self.empty:
             if parameter.default is self.empty and parameter.kind not in (self.VAR_POSITIONAL, self.VAR_KEYWORD):
@@ -75,41 +71,13 @@ class BoundParameter:
     @property
     def parameter(self) -> inspect.Parameter:
         """Parameter object."""
-        return self._parameter
-
-    @property
-    def name(self) -> typing.Union[None, str]:
-        """Parameter name."""
-        return self.parameter.name
-
-    @property
-    def default(self) -> typing.Any:
-        """Parameter default value."""
-        return self.parameter.default
-
-    @property
-    def annotation(self) -> typing.Union[inspect.Parameter.empty, str]:
-        """Parameter annotation."""
-        return self.parameter.annotation
-
-    @property
-    def kind(self) -> int:
-        """Parameter kind."""
-        return self.parameter.kind  # type: ignore
+        warnings.warn("BoundParameter is subclass of `inspect.Parameter`", DeprecationWarning)
+        return self
 
     @property
     def value(self) -> typing.Any:
         """Parameter value."""
         return self._value
-
-    # noinspection PyTypeChecker
-    def __hash__(self) -> int:  # pragma: no cover
-        """Block hashing.
-
-        :raises TypeError: Not hashable.
-        """
-        msg = "unhashable type: '{0}'".format(self.__class__.__name__)
-        raise TypeError(msg)
 
     def __str__(self) -> str:
         """Debug purposes."""

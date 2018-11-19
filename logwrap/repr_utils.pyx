@@ -192,7 +192,7 @@ cdef class PrettyFormat:
         """
         raise NotImplementedError()
 
-    def _repr_iterable_items(self, src: typing.Iterable, unsigned int indent=0) -> typing.Iterator[str]:
+    cdef str _repr_iterable_items(self, src: typing.Iterable, unsigned int indent=0):
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
@@ -202,8 +202,10 @@ cdef class PrettyFormat:
         :return: repr of element in iterable item
         :rtype: typing.Iterator[str]
         """
+        cdef str result = ""
         for elem in src:
-            yield "\n" + self.process_element(src=elem, indent=self.next_indent(indent)) + ","
+            result += "\n" + self.process_element(src=elem, indent=self.next_indent(indent)) + ","
+        return result
 
     cpdef str process_element(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False):
         """Make human readable representation of object.
@@ -242,7 +244,7 @@ cdef class PrettyFormat:
                 prefix, suffix = "(", ")"
             else:
                 prefix, suffix = "{", "}"
-            result = "".join(self._repr_iterable_items(src=src, indent=indent))
+            result = self._repr_iterable_items(src=src, indent=indent)
         return self._repr_iterable_item(
             nl=no_indent_start,
             obj_type=src.__class__.__name__,
