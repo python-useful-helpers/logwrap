@@ -129,5 +129,5 @@ jobs:
 
   - script: |
       pip install -U twine
-      twine -r {PyPI/logwrap} --config-file $(PYPIRC_PATH) dist/logwrap-*
+      twine upload --config-file $(PYPIRC_PATH) dist/logwrap-*
     displayName: 'Deploy'
