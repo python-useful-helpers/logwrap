@@ -123,8 +123,9 @@ jobs:
     displayName: 'Build'
 
   - task: TwineAuthenticate@0
+    displayName: 'Twine Authenticate '
     inputs:
-      externalFeeds: 'PyPI'
+      externalFeeds: PyPI
 
   - script: "twine -r {PyPI/logwrap} --config-file $(PYPIRC_PATH) dist/logwrap-*"
     displayName: 'Deploy'
