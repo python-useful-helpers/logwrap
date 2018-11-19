@@ -89,6 +89,34 @@ jobs:
     condition: succeededOrFailed()
 
 
+
+- job: 'Debug'
+  pool:
+    vmIMage: 'VS2017-Win2016'
+  strategy:
+    maxParallel: 6
+    matrix:
+      Python37:
+        python.version: '3.7'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      architecture: 'x64'
+
+  - task: TwineAuthenticate@0
+    displayName: 'Twine Authenticate '
+    inputs:
+      externalFeeds: PyPI
+
+  - script: |
+      pip install -U twine
+      cat $(PYPIRC_PATH)
+    displayName: 'Echo'
+
+
+
 - job: 'Build_and_deploy'
   dependsOn:
   - Test_pure_python
