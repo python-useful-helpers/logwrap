@@ -117,7 +117,7 @@ class BoundParameter(inspect.Parameter):
         return '<{} "{}">'.format(self.__class__.__name__, self)
 
 
-cpdef list bind_args_kwargs(sig: inspect.Signature, tuple args, dict kwargs):
+def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing.Any) ->typing.List[BoundParameter]:
     """Bind *args and **kwargs to signature and get Bound Parameters.
 
     :param sig: source signature

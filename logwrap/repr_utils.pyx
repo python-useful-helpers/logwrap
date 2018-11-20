@@ -59,11 +59,17 @@ cdef:
 
             # Real data
             self.parameter = parameter
-            self.name = self.parameter.name
-            self.annotation = self.parameter.annotation
             self.kind = self.parameter.kind
 
-            self.value = value if value is not None else parameter.default
+            if parameter.kind == inspect.Parameter.VAR_POSITIONAL:
+                self.name = "*" + self.parameter.name
+            elif self.kind == inspect.Parameter.VAR_KEYWORD:
+                self.name = "**" + self.parameter.name
+            else:
+                self.name = self.parameter.name
+
+            self.annotation = self.parameter.annotation
+            self.value = value if value is not parameter.empty else parameter.default
 
         # noinspection PyTypeChecker
         def __hash__(self) -> int:

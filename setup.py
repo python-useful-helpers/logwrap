@@ -22,9 +22,9 @@ import ast
 import collections
 from distutils.command import build_ext
 import distutils.errors
-import glob
 import os.path
 import shutil
+import sys
 
 try:
     # noinspection PyPackageRequirements
@@ -44,17 +44,22 @@ with open("README.rst") as f:
     long_description = f.read()
 
 
-requires_optimization = [setuptools.Extension("logwrap", glob.glob("logwrap/*.pyx"))]
+requires_optimization = [
+    setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
+    setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
+    setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
+    setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),
+]
 
 # noinspection PyCallingNonCallable
 ext_modules = (
     cythonize(
-        requires_optimization,
+        module_list=requires_optimization,
         compiler_directives=dict(
             always_allow_keywords=True, binding=True, embedsignature=True, overflowcheck=True, language_level=3
         ),
     )
-    if cythonize is not None
+    if cythonize is not None and "win32" != sys.platform
     else []
 )
 
