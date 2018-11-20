@@ -4,6 +4,27 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 jobs:
+- job: 'PyLint'
+  pool:
+    vmIMage: 'VS2017-Win2016'
+  strategy:
+    maxParallel: 1
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.7'
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install -U setuptools
+      pip install -r requirements.txt
+    displayName: 'Install dependencies'
+
+  - script: |
+      pip install -U pylint
+      pylint -f msvs logwrap
+    displayName: 'PyLint'
+
 - template: .azure_pipelines/run_tests.yml
   parameters: {name: 'Python_35', python: '3.5', architecture: 'x64', kind: 'native'}
 - template: .azure_pipelines/run_tests.yml
