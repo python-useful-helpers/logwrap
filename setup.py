@@ -24,6 +24,7 @@ from distutils.command import build_ext
 import distutils.errors
 import os.path
 import shutil
+import sys
 
 try:
     # noinspection PyPackageRequirements
@@ -47,8 +48,9 @@ requires_optimization = [
     setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
     setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
     setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-    setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),
 ]
+if "win32" != sys.platform:
+    requires_optimization.append(setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]))
 
 
 # noinspection PyCallingNonCallable
