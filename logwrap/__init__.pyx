@@ -14,10 +14,10 @@
 
 import pkg_resources
 
-from .repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, pretty_str
+from logwrap.repr_utils cimport PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, pretty_str
 
-from .log_wrap import LogWrap
-from .log_wrap import logwrap, BoundParameter, bind_args_kwargs
+from logwrap.log_wrap cimport LogWrap
+from logwrap.log_wrap import logwrap, BoundParameter, bind_args_kwargs
 
 cpdef tuple __all__ = (
     "LogWrap",
