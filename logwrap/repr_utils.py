@@ -52,7 +52,9 @@ class ReprParameter:
 
     empty = inspect.Parameter.empty
 
-    def __init__(self, parameter: inspect.Parameter, value: typing.Optional[typing.Any] = None) -> None:
+    def __init__(
+        self, parameter: inspect.Parameter, value: typing.Optional[typing.Any] = inspect.Parameter.empty
+    ) -> None:
         """Parameter-like object store for repr and str tasks.
 
         :param parameter: parameter from signature
@@ -113,13 +115,13 @@ class ReprParameter:
 
 
 # pylint: disable=no-member
-def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> typing.Iterator[ReprParameter]:
+def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> typing.List[ReprParameter]:
     """Get arguments lists with defaults.
 
     :param func: Callable object to process
     :type func: typing.Union[types.FunctionType, types.MethodType]
     :return: repr of callable parameter from signature
-    :rtype: typing.Iterator[ReprParameter]
+    :rtype: typing.List[ReprParameter]
     """
     ismethod = isinstance(func, types.MethodType)
     self_processed = False
@@ -130,8 +132,8 @@ def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> t
         real_func = func.__func__  # type: ignore
 
     for param in inspect.signature(real_func).parameters.values():
-        if not self_processed and ismethod and func.__self__ is not None:
-            result.append(ReprParameter(param, value=func.__self__))
+        if not self_processed and ismethod and func.__self__ is not None:  # type: ignore
+            result.append(ReprParameter(param, value=func.__self__))  # type: ignore
             self_processed = True
         else:
             result.append(ReprParameter(param))
