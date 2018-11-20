@@ -24,7 +24,7 @@ from distutils.command import build_ext
 import distutils.errors
 import os.path
 import shutil
-# import sys
+import sys
 
 try:
     # noinspection PyPackageRequirements
@@ -59,7 +59,7 @@ ext_modules = (
             always_allow_keywords=True, binding=True, embedsignature=True, overflowcheck=True, language_level=3
         ),
     )
-    if cythonize is not None
+    if cythonize is not None and "win32" != sys.platform
     else []
 )
 

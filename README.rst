@@ -311,5 +311,3 @@ For code checking several CI systems is used in parallel:
 CD systems
 ==========
 1. `Travis CI: <https://travis-ci.org/python-useful-helpers/logwrap>`_ is used for linux and SDIST package delivery on PyPI.
-
-2. `Azure CI: <https://dev.azure.com/python-useful-helpers/logwrap/_build?definitionId=1>`_ is used for Windows package delivery on PyPI.
