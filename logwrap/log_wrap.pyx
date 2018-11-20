@@ -301,7 +301,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 str annotation
 
             last_kind = None
-            for param in bind_args_kwargs(sig, *args, **kwargs):  # type: BoundParameter
+            for param in bind_args_kwargs(sig, args, kwargs):  # type: BoundParameter
                 if param.name in self.blacklisted_names:
                     continue
 
