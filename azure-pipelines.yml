@@ -4,107 +4,61 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 jobs:
-- job: 'Test_pure_python'
-  pool:
-    vmIMage: 'VS2017-Win2016'
-  strategy:
-    maxParallel: 6
-    matrix:
-      Python35:
-        python.version: '3.5'
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
+- template: .azure_pipelines/run_tests.yml
+  parameters: {python: '3.5', architecture: 'x64', kind: 'native'}
+- template: .azure_pipelines/run_tests.yml
+  parameters: {python: '3.6', architecture: 'x64', kind: 'native'}
+- template: .azure_pipelines/run_tests.yml
+  parameters: {python: '3.7', architecture: 'x64', kind: 'native'}
 
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-      architecture: 'x64'
-
-  - script: |
-      python -m pip install --upgrade pip
-      pip install -U setuptools
-      pip install -r requirements.txt
-    displayName: 'Install dependencies'
-
-  - script: |
-      pip install -Ue .
-    displayName: 'Install'
-
-  - script: |
-      pip install pytest pytest-sugar
-
-      pytest -vvv --junitxml=unit_result.xml test
-    displayName: 'pytest'
-
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFiles: '**/unit_result.xml'
-      testRunTitle: 'Python $(python.version)'
-    condition: succeededOrFailed()
-
-
-- job: 'Test_Cythonized'
-  pool:
-    vmIMage: 'VS2017-Win2016'
-  strategy:
-    maxParallel: 6
-    matrix:
-      Python35:
-        python.version: '3.5'
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-
-  steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-      architecture: 'x64'
-
-  - script: |
-      python -m pip install --upgrade pip
-      pip install -U setuptools
-      pip install -r build_requirements.txt
-    displayName: 'Install dependencies'
-
-  - script: |
-      python setup.py bdist_wheel
-      pip install --pre --no-index -f dist logwrap
-    displayName: 'Build and install'
-
-  - script: |
-      pip install pytest pytest-sugar
-
-      pytest -vvv --junitxml=unit_result.xml test
-    displayName: 'pytest'
-
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFiles: '**/unit_result.xml'
-      testRunTitle: 'Python $(python.version)'
-    condition: succeededOrFailed()
+- template: .azure_pipelines/run_tests.yml
+  parameters: {python: '3.5', architecture: 'x64', kind: 'cython'}
+- template: .azure_pipelines/run_tests.yml
+  parameters: {python: '3.5', architecture: 'x86', kind: 'cython'}
+- template: .azure_pipelines/run_tests.yml
+  parameters: {python: '3.6', architecture: 'x64', kind: 'cython'}
+- template: .azure_pipelines/run_tests.yml
+  parameters: {python: '3.6', architecture: 'x86', kind: 'cython'}
+- template: .azure_pipelines/run_tests.yml
+  parameters: {python: '3.7', architecture: 'x64', kind: 'cython'}
+- template: .azure_pipelines/run_tests.yml
+  parameters: {python: '3.7', architecture: 'x86', kind: 'cython'}
 
 
 - job: 'Build_and_deploy'
   dependsOn:
-  - Test_pure_python
-  - Test_Cythonized
+  - 3.5_x64-native
+  - 3.6_x64-native
+  - 3.7_x64-native
+
+  - 3.5_x64-cython
+  - 3.5_x86-cython
+  - 3.6_x64-cython
+  - 3.6_x86-cython
+  - 3.7_x64-cython
+  - 3.7_x86-cython
+
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
   pool:
     vmIMage: 'VS2017-Win2016'
   strategy:
     maxParallel: 6
     matrix:
-      Python35:
+      Python35_x64:
         python.version: '3.5'
-      Python36:
+      Python35_x86:
+        python.version: '3.5'
+        architecture: 'x86'
+      Python36_x64:
         python.version: '3.6'
-      Python37:
+      Python36_x86:
+        python.version: '3.6'
+        architecture: 'x86'
+      Python37_x64:
         python.version: '3.7'
+      Python37_x86:
+        python.version: '3.7'
+        architecture: 'x86'
 
   steps:
   - task: UsePythonVersion@0
