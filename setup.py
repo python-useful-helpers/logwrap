@@ -48,7 +48,7 @@ requires_optimization = [
     setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
     setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
     setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-    setuptools.Extension("logwrap", ["logwrap/__init__.pyx"]),
+    setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),
 ]
 
 # noinspection PyCallingNonCallable
