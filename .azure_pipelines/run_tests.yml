@@ -35,6 +35,7 @@ jobs:
       displayName: Install build requirements
 
   - script: |
+      pip install -U wheel
       python setup.py bdist_wheel
       pip install --pre --no-index -f dist logwrap
     displayName: Build and install
