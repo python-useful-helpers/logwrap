@@ -61,7 +61,7 @@ class ReprParameter:
         :type value: typing.Any
         """
         self._parameter = parameter
-        self._value = value if value is not None else parameter.default
+        self._value = value if value is not parameter.empty else parameter.default
 
     @property
     def parameter(self) -> inspect.Parameter:
@@ -121,22 +121,22 @@ def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> t
     :return: repr of callable parameter from signature
     :rtype: typing.Iterator[ReprParameter]
     """
-    isfunction = isinstance(func, types.FunctionType)
-    if isfunction:
+    ismethod = isinstance(func, types.MethodType)
+    self_processed = False
+    result = []
+    if not ismethod:
         real_func = func
     else:
         real_func = func.__func__  # type: ignore
 
-    parameters = list(inspect.signature(real_func).parameters.values())
+    for param in inspect.signature(real_func).parameters.values():
+        if not self_processed and ismethod and func.__self__ is not None:
+            result.append(ReprParameter(param, value=func.__self__))
+            self_processed = True
+        else:
+            result.append(ReprParameter(param))
 
-    params = iter(parameters)
-    if not isfunction and func.__self__ is not None:  # type: ignore
-        try:
-            yield ReprParameter(next(params), value=func.__self__)  # type: ignore
-        except StopIteration:  # pragma: no cover
-            return
-    for arg in params:
-        yield ReprParameter(arg)
+    return result
 
 
 # pylint: enable=no-member

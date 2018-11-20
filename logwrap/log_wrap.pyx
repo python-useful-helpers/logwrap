@@ -117,7 +117,7 @@ class BoundParameter(inspect.Parameter):
         return '<{} "{}">'.format(self.__class__.__name__, self)
 
 
-cpdef list bind_args_kwargs(sig: inspect.Signature, tuple args, dict kwargs):
+def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing.Any) ->typing.List[BoundParameter]:
     """Bind *args and **kwargs to signature and get Bound Parameters.
 
     :param sig: source signature
@@ -301,7 +301,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 str annotation
 
             last_kind = None
-            for param in bind_args_kwargs(sig, args, kwargs):  # type: BoundParameter
+            for param in bind_args_kwargs(sig, *args, **kwargs):  # type: BoundParameter
                 if param.name in self.blacklisted_names:
                     continue
 
