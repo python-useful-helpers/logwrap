@@ -4,7 +4,7 @@ parameters:
   kind: "native"
 
 jobs:
-- job: ${{ format('{0}_{1}-{2}', parameters.python, parameters.architecture, parameters.kind) }}
+- job: ${{ format('py{0}_{1}_{2}', parameters.python, parameters.architecture, parameters.kind) }}
   dependsOn: notify_build_start
   pool:
     vmImage: "vs2017-win2016"
@@ -52,4 +52,4 @@ jobs:
     inputs:
       testResultsFormat: "JUnit"
       testResultsFiles: ${{ format('$(System.DefaultWorkingDirectory)/unit_result.xml') }}
-      testRunTitle: ${{ format('{0}_{1}-{2}', parameters.python, parameters.architecture, parameters.kind) }}
+      testRunTitle: ${{ format('py{0}_{1}_{2}', parameters.python, parameters.architecture, parameters.kind) }}

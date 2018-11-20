@@ -27,16 +27,16 @@ jobs:
 
 - job: 'Build_and_deploy'
   dependsOn:
-  - 3.5_x64-native
-  - 3.6_x64-native
-  - 3.7_x64-native
+  - py3.5_x64_native
+  - py3.6_x64_native
+  - py3.7_x64_native
 
-  - 3.5_x64-cython
-  - 3.5_x86-cython
-  - 3.6_x64-cython
-  - 3.6_x86-cython
-  - 3.7_x64-cython
-  - 3.7_x86-cython
+  - py3.5_x64_cython
+  - py3.5_x86_cython
+  - py3.6_x64_cython
+  - py3.6_x86_cython
+  - py3.7_x64_cython
+  - py3.7_x86_cython
 
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
   pool:
