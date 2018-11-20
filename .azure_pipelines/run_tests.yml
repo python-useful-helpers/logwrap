@@ -17,7 +17,7 @@ jobs:
       versionSpec: ${{ parameters.python }}
       architecture: ${{ parameters.architecture }}
 
-  - script: "$(python) -c \"import sys; print(sys.version); print(sys.executable)\""
+  - script: "python -c \"import sys; print(sys.version); print(sys.executable)\""
     displayName: show python information
 
   - script: |
