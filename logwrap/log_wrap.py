@@ -25,7 +25,7 @@ import traceback
 import typing
 import warnings
 
-import logwrap as core
+from logwrap import repr_utils
 from . import class_decorator
 
 
@@ -498,7 +498,7 @@ class LogWrap(class_decorator.BaseDecorator):
                 elif param.VAR_KEYWORD == param.kind:
                     value = {}
 
-            val = core.pretty_repr(src=value, indent=indent + 4, no_indent_start=True, max_indent=self.max_indent)
+            val = repr_utils.pretty_repr(src=value, indent=indent + 4, no_indent_start=True, max_indent=self.max_indent)
 
             val = self.post_process_param(param, val)
 
@@ -525,7 +525,7 @@ class LogWrap(class_decorator.BaseDecorator):
         msg = "Done: {name!r}".format(name=func_name)
 
         if self.log_result_obj:
-            msg += " with result:\n{result}".format(result=core.pretty_repr(result, max_indent=self.max_indent))
+            msg += " with result:\n{result}".format(result=repr_utils.pretty_repr(result, max_indent=self.max_indent))
         self._logger.log(level=self.log_level, msg=msg)  # type: ignore
 
     def _make_calling_record(self, name: str, arguments: str, method: str = "Calling") -> None:
@@ -641,7 +641,6 @@ def logwrap(
     log_result_obj: bool = True
 ) -> LogWrap:
     """Overload: with no func."""
-    pass  # pragma: no cover
 
 
 @typing.overload  # noqa: F811
@@ -661,7 +660,6 @@ def logwrap(
     log_result_obj: bool = True
 ) -> typing.Callable:
     """Overload: func provided."""
-    pass  # pragma: no cover
 
 
 # pylint: enable=unused-argument

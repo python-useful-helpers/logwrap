@@ -38,9 +38,9 @@ __all__ = (
     "bind_args_kwargs",
 )
 
-try:
+try:  # pragma: no cover
     __version__ = pkg_resources.get_distribution(__name__).version
-except pkg_resources.DistributionNotFound:
+except pkg_resources.DistributionNotFound:  # pragma: no cover
     # package is not installed, try to get from SCM
     try:
         import setuptools_scm  # type: ignore
