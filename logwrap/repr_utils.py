@@ -257,10 +257,8 @@ class PrettyFormat(object):
 
     @abc.abstractmethod
     def _repr_dict_items(
-        self,
-        src,  # type: typing.Dict
-        indent=0  # type: int
-    ):  # type: (...) -> typing.Iterator[typing.Text]
+        self, src, indent=0
+    ):  # type: (typing.Dict[typing.Any, typing.Any], int) -> typing.Iterator[typing.Text]
         """Repr dict items.
 
         :param src: object to process
@@ -299,10 +297,8 @@ class PrettyFormat(object):
         raise NotImplementedError()  # pragma: no cover
 
     def _repr_iterable_items(
-        self,
-        src,  # type: typing.Iterable
-        indent=0  # type: int
-    ):  # type: (...) -> typing.Iterator[typing.Text]
+        self, src, indent=0
+    ):  # type: (typing.Iterable[typing.Any], int) -> typing.Iterator[typing.Text]
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
@@ -490,10 +486,8 @@ class PrettyRepr(PrettyFormat):
         )
 
     def _repr_dict_items(
-        self,
-        src,  # type: typing.Dict
-        indent=0  # type: int
-    ):  # type: (...) -> typing.Iterator[typing.Text]
+        self, src, indent=0
+    ):  # type: (typing.Dict[typing.Any, typing.Any], int) -> typing.Iterator[typing.Text]
         """Repr dict items.
 
         :param src: object to process
@@ -669,10 +663,8 @@ class PrettyStr(PrettyFormat):
         )
 
     def _repr_dict_items(
-        self,
-        src,  # type: typing.Dict
-        indent=0  # type: int
-    ):  # type: (...) -> typing.Iterator[typing.Text]
+        self, src, indent=0
+    ):  # type: (typing.Dict[typing.Any, typing.Any], int) -> typing.Iterator[typing.Text]
         """Repr dict items.
 
         :param src: object to process

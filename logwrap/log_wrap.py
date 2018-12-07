@@ -217,12 +217,12 @@ class LogWrap(class_decorator.BaseDecorator):
 
     def __init__(
         self,
-        func=None,  # type: typing.Optional[typing.Callable]
+        func=None,  # type: typing.Optional[typing.Callable[..., typing.Any]]
         log=logger,  # type: logging.Logger
         log_level=logging.DEBUG,  # type: int
         exc_level=logging.ERROR,  # type: int
         max_indent=20,  # type: int
-        spec=None,  # type: typing.Optional[typing.Callable]
+        spec=None,  # type: typing.Optional[typing.Callable[..., typing.Any]]
         blacklisted_names=None,  # type: typing.Optional[typing.Iterable[str]]
         blacklisted_exceptions=None,  # type: typing.Optional[typing.Iterable[typing.Type[Exception]]]
         log_call_args=True,  # type: bool
@@ -461,7 +461,7 @@ class LogWrap(class_decorator.BaseDecorator):
         return self.__logger
 
     @property
-    def _spec(self):  # type: () -> typing.Optional[typing.Callable]
+    def _spec(self):  # type: () -> typing.Optional[typing.Callable[..., typing.Any]]
         """Spec for function arguments.
 
         :rtype: typing.Callable
@@ -530,7 +530,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def _get_func_args_repr(
         self,
         sig,  # type: Signature
-        args,  # type: typing.Tuple
+        args,  # type: typing.Tuple[typing.Any, ...]
         kwargs  # type: typing.Dict[str, typing.Any]
     ):  # type: (...) -> typing.Text
         """Internal helper for reducing complexity of decorator code.
@@ -664,9 +664,8 @@ class LogWrap(class_decorator.BaseDecorator):
         )
 
     def _get_function_wrapper(
-        self,
-        func  # type: typing.Callable
-    ):  # type: (...) -> typing.Callable
+        self, func
+    ):  # type: (typing.Callable[..., typing.Any]) -> typing.Callable[..., typing.Any]
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -702,7 +701,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
     def __call__(  # pylint: disable=useless-super-delegation
         self,
-        *args,  # type: typing.Union[typing.Callable, typing.Any]
+        *args,  # type: typing.Union[typing.Callable[..., typing.Any], typing.Any]
         **kwargs  # type: typing.Any
     ):  # type: (...) -> typing.Union[typing.Callable[..., typing.Any], typing.Any]
         """Callable instance."""
@@ -711,18 +710,18 @@ class LogWrap(class_decorator.BaseDecorator):
 
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 def logwrap(
-    func=None,  # type: typing.Optional[typing.Callable]
+    func=None,  # type: typing.Optional[typing.Callable[..., typing.Any]]
     log=logger,  # type: logging.Logger
     log_level=logging.DEBUG,  # type: int
     exc_level=logging.ERROR,  # type: int
     max_indent=20,  # type: int
-    spec=None,  # type: typing.Optional[typing.Callable]
+    spec=None,  # type: typing.Optional[typing.Callable[..., typing.Any]]
     blacklisted_names=None,  # type: typing.Optional[typing.Iterable[str]]
     blacklisted_exceptions=None,  # type: typing.Optional[typing.Iterable[typing.Type[Exception]]]
     log_call_args=True,  # type: bool
     log_call_args_on_exc=True,  # type: bool
     log_result_obj=True,  # type: bool
-):  # type: (...) -> typing.Union[LogWrap, typing.Callable]
+):  # type: (...) -> typing.Union[LogWrap, typing.Callable[..., typing.Any]]
     """Log function calls and return values.
 
     :param func: function to wrap

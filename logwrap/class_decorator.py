@@ -69,10 +69,7 @@ class BaseDecorator(six.with_metaclass(abc.ABCMeta, object)):
     False
     """
 
-    def __init__(
-        self,
-        func=None  # type: typing.Optional[typing.Callable]
-    ):  # type: (...) -> None
+    def __init__(self, func=None):  # type: (typing.Optional[typing.Callable[..., typing.Any]]) -> None
         """Decorator.
 
         :param func: function to wrap
@@ -81,16 +78,14 @@ class BaseDecorator(six.with_metaclass(abc.ABCMeta, object)):
         # noinspection PyArgumentList
         super(BaseDecorator, self).__init__()
         # pylint: disable=assigning-non-slot
-        self.__func = func  # type: typing.Optional[typing.Callable]
+        self.__func = func
         if self.__func is not None:
             functools.update_wrapper(self, self.__func)
             self.__wrapped__ = self.__func  # type: typing.Callable
         # pylint: enable=assigning-non-slot
 
     @property
-    def _func(
-        self
-    ):  # type: () -> typing.Optional[typing.Callable]
+    def _func(self):  # type: () -> typing.Optional[typing.Callable[..., typing.Any]]
         """Get wrapped function.
 
         :rtype: typing.Optional[typing.Callable]
@@ -99,9 +94,8 @@ class BaseDecorator(six.with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def _get_function_wrapper(
-        self,
-        func  # type: typing.Callable
-    ):  # type: (...) -> typing.Callable
+        self, func
+    ):  # type: (typing.Callable[..., typing.Any]) -> typing.Callable[..., typing.Any]
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -112,14 +106,13 @@ class BaseDecorator(six.with_metaclass(abc.ABCMeta, object)):
 
     def __call__(
         self,
-        *args,  # type: typing.Union[typing.Callable, typing.Any]
-        **kwargs  # type: typing.Any
-    ):  # type: (...) -> typing.Any
+        *args, **kwargs
+    ):  # type: (typing.Union[typing.Callable[..., typing.Any], typing.Any], typing.Any) -> typing.Any
         """Main decorator getter."""
         l_args = list(args)
 
         if self._func:
-            wrapped = self._func  # type: typing.Callable
+            wrapped = self._func
         else:
             wrapped = l_args.pop(0)
 
