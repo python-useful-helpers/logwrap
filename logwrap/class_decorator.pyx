@@ -26,7 +26,7 @@ cdef class BaseDecorator:
     .. note:: wrapper getter is called only on function call, if decorator used without braces.
     """
 
-    def __init__(self, func: typing.Optional[typing.Callable] = None) -> None:
+    def __init__(self, func: typing.Optional[typing.Callable[..., typing.Any]] = None) -> None:
         """Decorator.
 
         :param func: function to wrap
@@ -35,12 +35,12 @@ cdef class BaseDecorator:
         # noinspection PyArgumentList
         super(BaseDecorator, self).__init__()
         # pylint: disable=assigning-non-slot
-        self._func = func  # type: typing.Optional[typing.Callable]
+        self._func = func
         if self._func is not None:
             functools.update_wrapper(self, self._func)
         # pylint: enable=assigning-non-slot
 
-    def _get_function_wrapper(self, func: typing.Callable) -> typing.Callable:
+    def _get_function_wrapper(self, func: typing.Callable[..., typing.Any]) -> typing.Callable[..., typing.Any]:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -49,12 +49,12 @@ cdef class BaseDecorator:
         """
         raise NotImplementedError()  # pragma: no cover
 
-    def __call__(self, *args: typing.Union[typing.Callable, typing.Any], **kwargs: typing.Any) -> typing.Any:
+    def __call__(self, *args: typing.Union[typing.Callable[..., typing.Any], typing.Any], **kwargs: typing.Any) -> typing.Any:
         """Main decorator getter."""
         cdef list l_args = list(args)
 
         if self._func:
-            wrapped = self._func  # type: typing.Callable
+            wrapped = self._func
         else:
             wrapped = l_args.pop(0)
 
