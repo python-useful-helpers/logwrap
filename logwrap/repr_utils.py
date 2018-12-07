@@ -220,7 +220,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         raise NotImplementedError()  # pragma: no cover
 
     @abc.abstractmethod
-    def _repr_dict_items(self, src: typing.Dict, indent: int = 0) -> typing.Iterator[str]:  # type
+    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
         """Repr dict items.
 
         :param src: object to process
@@ -251,7 +251,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError()  # pragma: no cover
 
-    def _repr_iterable_items(self, src: typing.Iterable, indent: int = 0) -> typing.Iterator[str]:
+    def _repr_iterable_items(self, src: typing.Iterable[typing.Any], indent: int = 0) -> typing.Iterator[str]:
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
@@ -376,7 +376,7 @@ class PrettyRepr(PrettyFormat):
             return self._strings_repr(indent=indent, val=src)
         return "{spc:<{indent}}{val!r}".format(spc="", indent=indent, val=src)
 
-    def _repr_dict_items(self, src: typing.Dict, indent: int = 0) -> typing.Iterator[str]:
+    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
         """Repr dict items.
 
         :param src: object to process
@@ -507,7 +507,7 @@ class PrettyStr(PrettyFormat):
             return self._strings_str(indent=indent, val=src)
         return "{spc:<{indent}}{val!s}".format(spc="", indent=indent, val=src)
 
-    def _repr_dict_items(self, src: typing.Dict, indent: int = 0) -> typing.Iterator[str]:
+    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
         """Repr dict items.
 
         :param src: object to process
