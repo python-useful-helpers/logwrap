@@ -83,7 +83,7 @@ Argumented usage with arguments from signature:
         blacklisted_exceptions=None,  # Exceptions to skip in log
         log_call_args=True,  # Log call arguments before call
         log_call_args_on_exc=True,  # Log call arguments if exception happens
-        log_traceback: bool = True,  # Log traceback if exception happens
+        log_traceback = True,  # Log traceback if exception happens
         log_result_obj=True,  # Log result object
     )
 
