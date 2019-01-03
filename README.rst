@@ -47,7 +47,7 @@ Pros:
     Python 3.6
     Python 3.7
 
-.. note:: Python 3.4 and 2.7 is supported in versions < 5.0.0
+.. note:: Python 3.4 and 2.7 is supported in versions < 5.0.0, python 3.5 in versions < 6 due to syntax changes.
 
 This package includes helpers:
 
@@ -85,7 +85,7 @@ Argumented usage with arguments from signature:
         blacklisted_exceptions=None,  # Exceptions to skip in log
         log_call_args=True,  # Log call arguments before call
         log_call_args_on_exc=True,  # Log call arguments if exception happens
-        log_traceback: bool = True,  # Log traceback if exception happens
+        log_traceback = True,  # Log traceback if exception happens
         log_result_obj=True,  # Log result object
     )
 
