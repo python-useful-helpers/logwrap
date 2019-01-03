@@ -47,39 +47,39 @@ cdef:
 
     class PrettyFormat:
         cdef:
-            readonly unsigned int max_indent
-            readonly unsigned int indent_step
+            readonly unsigned long max_indent
+            readonly unsigned long indent_step
             readonly str _magic_method_name
 
-        cpdef int next_indent(self, unsigned int indent, unsigned int multiplier=?)
+        cpdef long next_indent(self, unsigned long indent, unsigned long multiplier=?)
 
         cdef:
-            str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=?)
-            str _repr_simple(self, src: typing.Any, unsigned int indent=?, bint no_indent_start=?)
-            str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix)
-            str _repr_iterable_items(self, src: typing.Iterable, unsigned int indent=?)
+            str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned long indent=?)
+            str _repr_simple(self, src: typing.Any, unsigned long indent=?, bint no_indent_start=?)
+            str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned long indent, str result, str suffix)
+            str _repr_iterable_items(self, src: typing.Iterable, unsigned long indent=?)
 
-        cpdef str process_element(self, src: typing.Any, unsigned int indent=?, bint no_indent_start=?)
+        cpdef str process_element(self, src: typing.Any, unsigned long indent=?, bint no_indent_start=?)
 
     class PrettyRepr(PrettyFormat):
-        cdef str _strings_repr(self, unsigned int indent, val: typing.Union[bytes, str])
+        cdef str _strings_repr(self, unsigned long indent, val: typing.Union[bytes, str])
 
     class PrettyStr(PrettyFormat):
-        cdef str _strings_str(self, unsigned int indent, val: typing.Union[bytes, str])
+        cdef str _strings_str(self, unsigned long indent, val: typing.Union[bytes, str])
 
 
 cpdef str pretty_repr(
     src: typing.Any,
-    unsigned int indent=?,
+    unsigned long indent=?,
     bint no_indent_start=?,
-    unsigned int max_indent=?,
-    unsigned int indent_step=?
+    unsigned long max_indent=?,
+    unsigned long indent_step=?
 )
 
 cpdef  str pretty_str(
     src: typing.Any,
-    unsigned int indent=?,
+    unsigned long indent=?,
     bint no_indent_start=?,
-    unsigned int max_indent=?,
-    unsigned int indent_step=?
+    unsigned long max_indent=?,
+    unsigned long indent_step=?
 )

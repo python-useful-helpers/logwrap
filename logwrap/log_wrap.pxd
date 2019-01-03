@@ -21,16 +21,16 @@ from logwrap cimport class_decorator
 
 
 cdef:
-    unsigned int indent
+    unsigned long indent
 
 
     class LogWrap(class_decorator.BaseDecorator):
         """Base class for LogWrap implementation."""
 
         cdef:
-            public unsigned int log_level
-            public unsigned int exc_level
-            public unsigned int max_indent
+            public unsigned long log_level
+            public unsigned long exc_level
+            public unsigned long max_indent
 
             public bint log_call_args
             public bint log_call_args_on_exc

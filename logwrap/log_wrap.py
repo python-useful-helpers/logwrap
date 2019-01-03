@@ -1,4 +1,4 @@
-#    Copyright 2016-2018 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2019 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -16,6 +16,8 @@
 
 """log_wrap shared code module."""
 
+__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+
 import asyncio
 import functools
 import inspect
@@ -29,14 +31,12 @@ from logwrap import repr_utils
 from . import class_decorator
 
 
-__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
-
-logger = logging.getLogger("logwrap")  # type: logging.Logger
+logger: logging.Logger = logging.getLogger("logwrap")
 
 
 indent = 4
-fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc="", indent=indent).format
-comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc="", indent=indent).format
+fmt = f"\n{'':<{indent}}{{key!r}}={{val}},{{annotation}}".format
+comment = f"\n{'':<{indent}}# {{kind!s}}:".format
 
 
 class BoundParameter(inspect.Parameter):
@@ -64,7 +64,7 @@ class BoundParameter(inspect.Parameter):
         if value is self.empty:
             if parameter.default is self.empty and parameter.kind not in (self.VAR_POSITIONAL, self.VAR_KEYWORD):
                 raise ValueError("Value is not set and no default value")
-            self._value = parameter.default
+            self._value: typing.Any = parameter.default
         else:
             self._value = value
 
@@ -83,13 +83,13 @@ class BoundParameter(inspect.Parameter):
         """Debug purposes."""
         # POSITIONAL_ONLY is only in precompiled functions
         if self.kind == self.POSITIONAL_ONLY:  # pragma: no cover
-            as_str = "" if self.name is None else "<{as_str}>".format(as_str=self.name)
+            as_str: str = "" if self.name is None else f"<{self.name}>"
         else:
             as_str = self.name or ""
 
         # Add annotation if applicable (python 3 only)
         if self.annotation is not self.empty:  # pragma: no cover
-            as_str += ": {annotation!s}".format(annotation=inspect.formatannotation(self.annotation))
+            as_str += f": {inspect.formatannotation(self.annotation)!s}"
 
         value = self.value
         if self.empty is value:
@@ -98,10 +98,10 @@ class BoundParameter(inspect.Parameter):
             elif self.VAR_KEYWORD == self.kind:
                 value = {}
 
-        as_str += "={value!r}".format(value=value)
+        as_str += f"={value!r}"
 
         if self.default is not self.empty:
-            as_str += "  # {self.default!r}".format(self=self)
+            as_str += f"  # {self.default!r}"
 
         if self.kind == self.VAR_POSITIONAL:
             as_str = "*" + as_str
@@ -112,7 +112,7 @@ class BoundParameter(inspect.Parameter):
 
     def __repr__(self) -> str:
         """Debug purposes."""
-        return '<{} "{}">'.format(self.__class__.__name__, self)
+        return f'<{self.__class__.__name__} "{self}">'
 
 
 def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing.Any) -> typing.List[BoundParameter]:
@@ -130,8 +130,8 @@ def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing
     .. versionadded:: 3.3.0
     .. versionchanged:: 5.3.1 return list
     """
-    result = []
-    bound = sig.bind(*args, **kwargs).arguments
+    result: typing.List[BoundParameter] = []
+    bound: typing.MutableMapping[str, inspect.Parameter] = sig.bind(*args, **kwargs).arguments
     for param in sig.parameters.values():
         result.append(BoundParameter(parameter=param, value=bound.get(param.name, param.default)))
     return result
@@ -158,7 +158,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
     def __init__(
         self,
-        func: typing.Optional[typing.Callable[..., typing.Any]] = None,
+        func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
         *,
         log: logging.Logger = logger,
         log_level: int = logging.DEBUG,
@@ -170,7 +170,7 @@ class LogWrap(class_decorator.BaseDecorator):
         log_call_args: bool = True,
         log_call_args_on_exc: bool = True,
         log_traceback: bool = True,
-        log_result_obj: bool = True
+        log_result_obj: bool = True,
     ) -> None:
         """Log function calls and return values.
 
@@ -212,24 +212,24 @@ class LogWrap(class_decorator.BaseDecorator):
 
         # Typing fix:
         if blacklisted_names is None:
-            self.__blacklisted_names = []  # type: typing.List[str]
+            self.__blacklisted_names: typing.List[str] = []
         else:
             self.__blacklisted_names = list(blacklisted_names)
         if blacklisted_exceptions is None:
-            self.__blacklisted_exceptions = []  # type: typing.List[typing.Type[Exception]]
+            self.__blacklisted_exceptions: typing.List[typing.Type[Exception]] = []
         else:
             self.__blacklisted_exceptions = list(blacklisted_exceptions)
 
-        self.__logger = log
+        self.__logger: logging.Logger = log
 
-        self.__log_level = log_level
-        self.__exc_level = exc_level
-        self.__max_indent = max_indent
-        self.__spec = spec or self._func
-        self.__log_call_args = log_call_args
-        self.__log_call_args_on_exc = log_call_args_on_exc
-        self.__log_traceback = log_traceback
-        self.__log_result_obj = log_result_obj
+        self.__log_level: int = log_level
+        self.__exc_level: int = exc_level
+        self.__max_indent: int = max_indent
+        self.__spec: typing.Optional[typing.Callable[..., typing.Any]] = spec or self._func
+        self.__log_call_args: bool = log_call_args
+        self.__log_call_args_on_exc: bool = log_call_args_on_exc
+        self.__log_traceback: bool = log_traceback
+        self.__log_result_obj: bool = log_result_obj
 
         # We are not interested to pass any arguments to object
 
@@ -250,7 +250,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
-            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, int.__name__))
+            raise TypeError(f"Unexpected type: {val.__class__.__name__}. Should be {int.__name__}.")
         self.__log_level = val
 
     @property
@@ -270,7 +270,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
-            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, int.__name__))
+            raise TypeError(f"Unexpected type: {val.__class__.__name__}. Should be {int.__name__}.")
         self.__exc_level = val
 
     @property
@@ -290,7 +290,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: indent is not integer
         """
         if not isinstance(val, int):
-            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, int.__name__))
+            raise TypeError(f"Unexpected type: {val.__class__.__name__}. Should be {int.__name__}.")
         self.__max_indent = val
 
     @property
@@ -326,7 +326,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
+            raise TypeError(f"Unexpected type: {val.__class__.__name__}. Should be {bool.__name__}.")
         self.__log_call_args = val
 
     @property
@@ -346,7 +346,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
+            raise TypeError(f"Unexpected type: {val.__class__.__name__}. Should be {bool.__name__}.")
         self.__log_call_args_on_exc = val
 
     @property
@@ -366,7 +366,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
+            raise TypeError(f"Unexpected type: {val.__class__.__name__}. Should be {bool.__name__}.")
         self.__log_traceback = val
 
     @property
@@ -386,7 +386,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
+            raise TypeError(f"Unexpected type: {val.__class__.__name__}. Should be {bool.__name__}.")
         self.__log_result_obj = val
 
     @property
@@ -408,17 +408,17 @@ class LogWrap(class_decorator.BaseDecorator):
     def __repr__(self) -> str:
         """Repr for debug purposes."""
         return (
-            "{cls}("
-            "log={self._logger}, "
-            "log_level={self.log_level}, "
-            "exc_level={self.exc_level}, "
-            "max_indent={self.max_indent}, "
-            "spec={spec}, "
-            "blacklisted_names={self.blacklisted_names}, "
-            "blacklisted_exceptions={self.blacklisted_exceptions}, "
-            "log_call_args={self.log_call_args}, "
-            "log_call_args_on_exc={self.log_call_args_on_exc}, "
-            "log_result_obj={self.log_result_obj}, )".format(cls=self.__class__.__name__, self=self, spec=self._spec)
+            f"{self.__class__.__name__}("
+            f"log={self._logger}, "
+            f"log_level={self.log_level}, "
+            f"exc_level={self.exc_level}, "
+            f"max_indent={self.max_indent}, "
+            f"spec={self._spec}, "
+            f"blacklisted_names={self.blacklisted_names}, "
+            f"blacklisted_exceptions={self.blacklisted_exceptions}, "
+            f"log_call_args={self.log_call_args}, "
+            f"log_call_args_on_exc={self.log_call_args_on_exc}, "
+            f"log_result_obj={self.log_result_obj}, )"
         )
 
     # noinspection PyMethodMayBeStatic
@@ -476,14 +476,16 @@ class LogWrap(class_decorator.BaseDecorator):
         if not (self.log_call_args or self.log_call_args_on_exc):
             return ""
 
-        param_str = ""
+        param_str: str = ""
 
         last_kind = None
         for param in bind_args_kwargs(sig, *args, **kwargs):
             if param.name in self.blacklisted_names:
                 continue
 
-            preprocessed = self.pre_process_param(param)
+            preprocessed: typing.Union[
+                BoundParameter, typing.Tuple[BoundParameter, typing.Any], None
+            ] = self.pre_process_param(param)
             if preprocessed is None:
                 continue
 
@@ -498,7 +500,9 @@ class LogWrap(class_decorator.BaseDecorator):
                 elif param.VAR_KEYWORD == param.kind:
                     value = {}
 
-            val = repr_utils.pretty_repr(src=value, indent=indent + 4, no_indent_start=True, max_indent=self.max_indent)
+            val: str = repr_utils.pretty_repr(
+                src=value, indent=indent + 4, no_indent_start=True, max_indent=self.max_indent
+            )
 
             val = self.post_process_param(param, val)
 
@@ -507,9 +511,9 @@ class LogWrap(class_decorator.BaseDecorator):
                 last_kind = param.kind
 
             if param.empty is param.annotation:
-                annotation = ""
+                annotation: str = ""
             else:
-                annotation = "  # type: {param.annotation!s}".format(param=param)
+                annotation = f"  # type: {param.annotation!s}"
 
             param_str += fmt(key=param.name, annotation=annotation, val=val)
         if param_str:
@@ -522,10 +526,10 @@ class LogWrap(class_decorator.BaseDecorator):
         :type func_name: str
         :type result: typing.Any
         """
-        msg = "Done: {name!r}".format(name=func_name)
+        msg: str = f"Done: {func_name!r}"
 
         if self.log_result_obj:
-            msg += " with result:\n{result}".format(result=repr_utils.pretty_repr(result, max_indent=self.max_indent))
+            msg += f" with result:\n{repr_utils.pretty_repr(result, max_indent=self.max_indent)}"
         self._logger.log(level=self.log_level, msg=msg)  # type: ignore
 
     def _make_calling_record(self, name: str, arguments: str, method: str = "Calling") -> None:
@@ -549,24 +553,28 @@ class LogWrap(class_decorator.BaseDecorator):
         :type arguments: str
         """
         exc_info = sys.exc_info()
-        stack = traceback.extract_stack()
-        tb = traceback.extract_tb(exc_info[2])
+        stack: traceback.StackSummary = traceback.extract_stack()
+        tb: traceback.StackSummary = traceback.extract_tb(exc_info[2])
         full_tb = stack[:2] + tb  # cut decorator and build full traceback
-        exc_line = traceback.format_exception_only(*exc_info[:2])
+        exc_line: typing.List[str] = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
-        tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
+        tb_text: str = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(
+            exc_line
+        )
 
         self._logger.log(  # type: ignore
             level=self.exc_level,
-            msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
-                name=name,
-                arguments=arguments if self.log_call_args_on_exc else "",
-                tb_text=tb_text if self.log_traceback else "",
+            msg=(
+                f"Failed: \n"
+                f"{name!r}({arguments if self.log_call_args_on_exc else ''})\n"
+                f"{tb_text if self.log_traceback else ''}"
             ),
             exc_info=False,
         )
 
-    def _get_function_wrapper(self, func: typing.Callable[..., typing.Any]) -> typing.Callable[..., typing.Any]:
+    def _get_function_wrapper(
+        self, func: typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]
+    ) -> typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -574,13 +582,13 @@ class LogWrap(class_decorator.BaseDecorator):
         :return: wrapped coroutine or function
         :rtype: typing.Callable
         """
-        sig = inspect.signature(self._spec or func)
+        sig: inspect.Signature = inspect.signature(self._spec or func)
 
         # pylint: disable=missing-docstring
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
-            args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
+            args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
                 self._make_calling_record(name=func.__name__, arguments=args_repr, method="Awaiting")
@@ -596,7 +604,7 @@ class LogWrap(class_decorator.BaseDecorator):
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         def wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
-            args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
+            args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
                 self._make_calling_record(name=func.__name__, arguments=args_repr)
@@ -613,8 +621,10 @@ class LogWrap(class_decorator.BaseDecorator):
         return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper
 
     def __call__(  # pylint: disable=useless-super-delegation
-        self, *args: typing.Union[typing.Callable[..., typing.Any], typing.Any], **kwargs: typing.Any
-    ) -> typing.Union[typing.Callable[..., typing.Any], typing.Any]:
+        self,
+        *args: typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any],
+        **kwargs: typing.Any,
+    ) -> typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any]:
         """Callable instance."""
         return super(LogWrap, self).__call__(*args, **kwargs)
 
@@ -637,9 +647,28 @@ def logwrap(
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
-    log_result_obj: bool = True
+    log_result_obj: bool = True,
 ) -> LogWrap:
     """Overload: with no func."""
+
+
+@typing.overload  # noqa: F811
+def logwrap(
+    func: typing.Callable[..., typing.Awaitable[typing.Any]],
+    *,
+    log: logging.Logger = logger,
+    log_level: int = logging.DEBUG,
+    exc_level: int = logging.ERROR,
+    max_indent: int = 20,
+    spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
+    blacklisted_names: typing.Optional[typing.List[str]] = None,
+    blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]] = None,
+    log_call_args: bool = True,
+    log_call_args_on_exc: bool = True,
+    log_traceback: bool = True,
+    log_result_obj: bool = True,
+) -> typing.Callable[..., typing.Awaitable[typing.Any]]:
+    """Overload: func provided."""
 
 
 @typing.overload  # noqa: F811
@@ -656,14 +685,14 @@ def logwrap(
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
-    log_result_obj: bool = True
+    log_result_obj: bool = True,
 ) -> typing.Callable[..., typing.Any]:
     """Overload: func provided."""
 
 
 # pylint: enable=unused-argument
 def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
-    func: typing.Optional[typing.Callable[..., typing.Any]] = None,
+    func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
     *,
     log: logging.Logger = logger,
     log_level: int = logging.DEBUG,
@@ -675,8 +704,8 @@ def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-f
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
-    log_result_obj: bool = True
-) -> typing.Union[LogWrap, typing.Callable[..., typing.Any]]:
+    log_result_obj: bool = True,
+) -> typing.Union[LogWrap, typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]]:
     """Log function calls and return values.
 
     :param func: function to wrap

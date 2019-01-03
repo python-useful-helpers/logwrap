@@ -16,6 +16,8 @@
 
 """Base class for decorators."""
 
+__all__ = ("BaseDecorator",)
+
 import abc
 import functools
 import typing
@@ -69,7 +71,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         # noinspection PyArgumentList
         super(BaseDecorator, self).__init__()
         # pylint: disable=assigning-non-slot
-        self.__func = func
+        self.__func: typing.Optional[typing.Callable[..., typing.Any]] = func
         if self.__func is not None:
             functools.update_wrapper(self, self.__func)
         # pylint: enable=assigning-non-slot
@@ -99,20 +101,18 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         l_args = list(args)
 
         if self._func:
-            wrapped = self._func
+            wrapped: typing.Callable[..., typing.Any] = self._func
         else:
             wrapped = l_args.pop(0)
 
-        wrapper = self._get_function_wrapper(wrapped)
+        wrapper: typing.Any[..., typing.Any] = self._get_function_wrapper(wrapped)
         if self.__func:
             return wrapper(*l_args, **kwargs)
         return wrapper
 
     def __repr__(self) -> str:
         """For debug purposes."""
-        return "<{cls}({func!r}) at 0x{id:X}>".format(
-            cls=self.__class__.__name__, func=self.__func, id=id(self)
-        )  # pragma: no cover
+        return f"<{self.__class__.__name__}({self.__func!r}) at 0x{id(self):X}>"  # pragma: no cover
 
 
 # 8<----------------------------------------------------------------------------
