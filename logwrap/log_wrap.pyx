@@ -14,6 +14,8 @@
 
 """log_wrap shared code module."""
 
+cpdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+
 import asyncio
 import functools
 import inspect
@@ -27,14 +29,12 @@ from logwrap cimport repr_utils
 from logwrap cimport class_decorator
 
 
-cpdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
-
 logger = logging.getLogger("logwrap")  # type: logging.Logger
 
 
-cdef unsigned int indent = 4
-fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc="", indent=indent).format
-comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc="", indent=indent).format
+cdef unsigned long indent = 4
+fmt = f"\n{'':<{indent}}{{key!r}}={{val}},{{annotation}}".format
+comment = f"\n{'':<{indent}}# {{kind!s}}:".format
 
 
 class BoundParameter(inspect.Parameter):
@@ -85,13 +85,13 @@ class BoundParameter(inspect.Parameter):
 
         # POSITIONAL_ONLY is only in precompiled functions
         if self.kind == self.POSITIONAL_ONLY:
-            as_str = "" if self.name is None else "<{as_str}>".format(as_str=self.name)
+            as_str = "" if self.name is None else f"<{self.name}>"
         else:
             as_str = self.name or ""
 
         # Add annotation if applicable (python 3 only)
         if self.annotation is not self.empty:
-            as_str += ": {annotation!s}".format(annotation=inspect.formatannotation(self.annotation))
+            as_str += f": {inspect.formatannotation(self.annotation)!s}"
 
         value = self.value
         if self.empty is value:
@@ -100,10 +100,10 @@ class BoundParameter(inspect.Parameter):
             elif self.VAR_KEYWORD == self.kind:
                 value = {}
 
-        as_str += "={value!r}".format(value=value)
+        as_str += f"={value!r}"
 
         if self.default is not self.empty:
-            as_str += "  # {self.default!r}".format(self=self)
+            as_str += f"  # {self.default!r}"
 
         if self.kind == self.VAR_POSITIONAL:
             as_str = "*" + as_str
@@ -114,7 +114,7 @@ class BoundParameter(inspect.Parameter):
 
     def __repr__(self) -> str:
         """Debug purposes."""
-        return '<{} "{}">'.format(self.__class__.__name__, self)
+        return f'<{self.__class__.__name__} "{self}">'
 
 
 def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing.Any) ->typing.List[BoundParameter]:
@@ -145,12 +145,12 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
     def __init__(
         self,
-        func: typing.Optional[typing.Callable[..., typing.Any]] = None,
+        func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
         *,
         log: logging.Logger = logger,
-        unsigned int log_level=logging.DEBUG,
-        unsigned int exc_level=logging.ERROR,
-        unsigned int max_indent=20,
+        unsigned long log_level=logging.DEBUG,
+        unsigned long exc_level=logging.ERROR,
+        unsigned long max_indent=20,
         spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
         blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
         blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
@@ -234,17 +234,17 @@ cdef class LogWrap(class_decorator.BaseDecorator):
     def __repr__(self) -> str:
         """Repr for debug purposes."""
         return (
-            "{cls}("
-            "log={self._logger}, "
-            "log_level={self.log_level}, "
-            "exc_level={self.exc_level}, "
-            "max_indent={self.max_indent}, "
-            "spec={spec}, "
-            "blacklisted_names={self.blacklisted_names}, "
-            "blacklisted_exceptions={self.blacklisted_exceptions}, "
-            "log_call_args={self.log_call_args}, "
-            "log_call_args_on_exc={self.log_call_args_on_exc}, "
-            "log_result_obj={self.log_result_obj}, )".format(cls=self.__class__.__name__, self=self, spec=self._spec)
+            f"{self.__class__.__name__}("
+            f"log={self._logger}, "
+            f"log_level={self.log_level}, "
+            f"exc_level={self.exc_level}, "
+            f"max_indent={self.max_indent}, "
+            f"spec={self._spec}, "
+            f"blacklisted_names={self.blacklisted_names}, "
+            f"blacklisted_exceptions={self.blacklisted_exceptions}, "
+            f"log_call_args={self.log_call_args}, "
+            f"log_call_args_on_exc={self.log_call_args_on_exc}, "
+            f"log_result_obj={self.log_result_obj}, )"
         )
 
     cpdef object pre_process_param(self, object arg: BoundParameter):
@@ -278,7 +278,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         return arg_repr
 
     cdef:
-        str _get_func_args_repr(self, sig: inspect.Signature, tuple args, dict kwargs):
+        str _get_func_args_repr(self, sig: inspect.Signature, tuple args: typing.Tuple[typing.Any, ...], dict kwargs: typing.Dict[str, typing.Any]):
             """Internal helper for reducing complexity of decorator code.
     
             :param sig: function signature
@@ -331,7 +331,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 if param.empty is param.annotation:
                     annotation = ""
                 else:
-                    annotation = "  # type: {param.annotation!s}".format(param=param)
+                    annotation = f"  # type: {param.annotation!s}"
 
                 param_str += fmt(key=param.name, annotation=annotation, val=val)
             if param_str:
@@ -344,19 +344,20 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             :type func_name: str
             :type result: typing.Any
             """
-            cdef str msg = "Done: {name!r}".format(name=func_name)
+            cdef:
+                str msg = f"Done: {func_name!r}"
+                str result_repr
 
             if self.log_result_obj:
-                msg += " with result:\n{result}".format(
-                    result=repr_utils.pretty_repr(
-                        result,
-                        indent=0,
-                        no_indent_start=False,
-                        max_indent=self.max_indent,
-                        indent_step=4
+                result_repr = repr_utils.pretty_repr(
+                    result,
+                    indent=0,
+                    no_indent_start=False,
+                    max_indent=self.max_indent,
+                    indent_step=4
 
-                    )
                 )
+                msg += f" with result:\n{result_repr}"
             self._logger.log(level=self.log_level, msg=msg)  # type: ignore
 
         void _make_calling_record(self, str name, str arguments, str method="Calling") except *:
@@ -389,15 +390,17 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
             self._logger.log(  # type: ignore
                 level=self.exc_level,
-                msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
-                    name=name,
-                    arguments=arguments if self.log_call_args_on_exc else "",
-                    tb_text=tb_text if self.log_traceback else "",
+                msg=(
+                    f"Failed: \n"
+                    f"{name!r}({arguments if self.log_call_args_on_exc else ''})\n"
+                    f"{tb_text if self.log_traceback else ''}"
                 ),
                 exc_info=False,
             )
 
-    def _get_function_wrapper(self, func: typing.Callable[..., typing.Any]) -> typing.Callable[..., typing.Any]:
+    def _get_function_wrapper(
+        self, func: typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]
+    ) -> typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -440,19 +443,21 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper
 
     def __call__(
-        self, *args: typing.Union[typing.Callable[..., typing.Any], typing.Any], **kwargs: typing.Any
-    ) -> typing.Union[typing.Callable[..., typing.Any], typing.Any]:
+        self,
+        *args: typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any],
+        **kwargs: typing.Any,
+    ) -> typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any]:
         """Callable instance."""
         return super(LogWrap, self).__call__(*args, **kwargs)
 
 
 def logwrap(
-    func: typing.Optional[typing.Callable[..., typing.Any]] = None,
+    func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
     *,
     log: logging.Logger = logger,
-    unsigned int log_level=logging.DEBUG,
-    unsigned int exc_level=logging.ERROR,
-    unsigned int max_indent=20,
+    unsigned long log_level=logging.DEBUG,
+    unsigned long exc_level=logging.ERROR,
+    unsigned long max_indent=20,
     spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
     blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
     blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
@@ -460,7 +465,7 @@ def logwrap(
     bint log_call_args_on_exc=True,
     bint log_traceback=True,
     bint log_result_obj=True
-) -> typing.Union[LogWrap, typing.Callable[..., typing.Any]]:
+) -> typing.Union[LogWrap, typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]]:
     """Log function calls and return values.
 
     :param func: function to wrap

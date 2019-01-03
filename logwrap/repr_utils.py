@@ -1,4 +1,4 @@
-#    Copyright 2018 Alexey Stepanov aka penguinolog
+#    Copyright 2018 - 2019 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -20,13 +20,12 @@ This is no reason to import this submodule directly, all required methods is
 available from the main module.
 """
 
+__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+
 import abc
 import inspect
 import types
 import typing
-
-
-__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
 
 def _known_callable(item: typing.Any) -> bool:
@@ -62,8 +61,8 @@ class ReprParameter:
         :param value: default value override
         :type value: typing.Any
         """
-        self._parameter = parameter
-        self._value = value if value is not parameter.empty else parameter.default
+        self._parameter: inspect.Parameter = parameter
+        self._value: typing.Any = value if value is not parameter.empty else parameter.default
 
     @property
     def parameter(self) -> inspect.Parameter:
@@ -106,12 +105,12 @@ class ReprParameter:
 
         :raises TypeError: Not hashable.
         """
-        msg = "unhashable type: '{0}'".format(self.__class__.__name__)
+        msg = f"unhashable type: '{self.__class__.__name__}'"
         raise TypeError(msg)
 
     def __repr__(self) -> str:
         """Debug purposes."""
-        return '<{} "{}">'.format(self.__class__.__name__, self)
+        return f'<{self.__class__.__name__} "{self}">'
 
 
 # pylint: disable=no-member
@@ -123,11 +122,11 @@ def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> t
     :return: repr of callable parameter from signature
     :rtype: typing.List[ReprParameter]
     """
-    ismethod = isinstance(func, types.MethodType)
-    self_processed = False
-    result = []
+    ismethod: bool = isinstance(func, types.MethodType)
+    self_processed: bool = False
+    result: typing.List[ReprParameter] = []
     if not ismethod:
-        real_func = func
+        real_func: typing.Callable[..., typing.Any] = func
     else:
         real_func = func.__func__  # type: ignore
 
@@ -160,8 +159,8 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :param indent_step: step for the next indentation level
         :type indent_step: int
         """
-        self.__max_indent = max_indent
-        self.__indent_step = indent_step
+        self.__max_indent: int = max_indent
+        self.__indent_step: int = indent_step
 
     @property
     def max_indent(self) -> int:
@@ -351,11 +350,12 @@ class PrettyRepr(PrettyFormat):
     def _strings_repr(indent: int, val: typing.Union[bytes, str]) -> str:
         """Custom repr for strings and binary strings."""
         if isinstance(val, bytes):
-            val = val.decode(encoding="utf-8", errors="backslashreplace")
-            prefix = "b"
+            string: str = val.decode(encoding="utf-8", errors="backslashreplace")
+            prefix: str = "b"
         else:
             prefix = "u"
-        return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=val)
+            string = val
+        return f"{'':<{indent}}{prefix}'''{string}'''"
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Repr object without iteration.
@@ -371,10 +371,10 @@ class PrettyRepr(PrettyFormat):
         """
         indent = 0 if no_indent_start else indent
         if isinstance(src, set):
-            return "{spc:<{indent}}{val}".format(spc="", indent=indent, val="set(" + " ,".join(map(repr, src)) + ")")
+            return f"{'':<{indent}}set({' ,'.join(map(repr, src))})"
         if isinstance(src, (bytes, str)):
             return self._strings_repr(indent=indent, val=src)
-        return "{spc:<{indent}}{val!r}".format(spc="", indent=indent, val=src)
+        return f"{'':<{indent}}{src!r}"
 
     def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
         """Repr dict items.
@@ -386,15 +386,10 @@ class PrettyRepr(PrettyFormat):
         :return: repr of key/value pair from dict
         :rtype: typing.Iterator[str]
         """
-        max_len = max((len(repr(key)) for key in src)) if src else 0
+        max_len: int = max((len(repr(key)) for key in src)) if src else 0
         for key, val in src.items():
-            yield "\n{spc:<{indent}}{key!r:{size}}: {val},".format(
-                spc="",
-                indent=self.next_indent(indent),
-                size=max_len,
-                key=key,
-                val=self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True),
-            )
+            line: str = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
+            yield f"\n{'':<{self.next_indent(indent)}}{key!r:{max_len}}: {line},"
 
     def _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], indent: int = 0) -> str:
         """Repr callable object (function or method).
@@ -406,30 +401,26 @@ class PrettyRepr(PrettyFormat):
         :return: Repr of function or method with signature.
         :rtype: str
         """
-        param_str = ""
+        param_str: str = ""
 
         for param in _prepare_repr(src):
-            param_str += "\n{spc:<{indent}}{param.name}".format(spc="", indent=self.next_indent(indent), param=param)
+            param_str += f"\n{'':<{self.next_indent(indent)}}{param.name}"
             if param.annotation is not param.empty:
-                param_str += ": {param.annotation}".format(param=param)
+                param_str += f": {param.annotation}"
             if param.value is not param.empty:
-                param_str += "={val}".format(
-                    val=self.process_element(src=param.value, indent=indent, no_indent_start=True)
-                )
+                param_str += f"={self.process_element(src=param.value, indent=indent, no_indent_start=True)}"
             param_str += ","
 
         if param_str:
             param_str += "\n" + " " * indent
 
-        sig = inspect.signature(src)
+        sig: inspect.Signature = inspect.signature(src)
         if sig.return_annotation is inspect.Parameter.empty:
-            annotation = ""
+            annotation: str = ""
         else:
-            annotation = " -> {sig.return_annotation!r}".format(sig=sig)
+            annotation = f" -> {sig.return_annotation!r}"
 
-        return "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format(
-            spc="", indent=indent, obj=src, args=param_str, annotation=annotation
-        )
+        return f"\n{'':<{indent}}<{src!r} with interface ({param_str}){annotation}>"
 
     @staticmethod
     def _repr_iterable_item(nl: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
@@ -450,19 +441,8 @@ class PrettyRepr(PrettyFormat):
         :return: formatted repr of "result" with prefix and suffix to explain type.
         :rtype: str
         """
-        return (
-            "{nl}"
-            "{spc:<{indent}}{obj_type:}({prefix}{result}\n"
-            "{spc:<{indent}}{suffix})".format(
-                nl="\n" if nl else "",
-                spc="",
-                indent=indent,
-                obj_type=obj_type,
-                prefix=prefix,
-                result=result,
-                suffix=suffix,
-            )
-        )
+        newline: str = "\n" if nl else ""
+        return f"{newline}" f"{'':<{indent}}{obj_type:}({prefix}{result}\n" f"{'':<{indent}}{suffix})"
 
 
 class PrettyStr(PrettyFormat):
@@ -485,8 +465,10 @@ class PrettyStr(PrettyFormat):
     def _strings_str(indent: int, val: typing.Union[bytes, str]) -> str:
         """Custom repr for strings and binary strings."""
         if isinstance(val, bytes):
-            val = val.decode(encoding="utf-8", errors="backslashreplace")
-        return "{spc:<{indent}}{string}".format(spc="", indent=indent, string=val)
+            string: str = val.decode(encoding="utf-8", errors="backslashreplace")
+        else:
+            string = val
+        return f"{'':<{indent}}{string}"
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Repr object without iteration.
@@ -502,10 +484,10 @@ class PrettyStr(PrettyFormat):
         """
         indent = 0 if no_indent_start else indent
         if isinstance(src, set):
-            return "{spc:<{indent}}{val}".format(spc="", indent=indent, val="set(" + " ,".join(map(str, src)) + ")")
+            return f"{'':<{indent}}set({' ,'.join(map(str, src))})"
         if isinstance(src, (bytes, str)):
             return self._strings_str(indent=indent, val=src)
-        return "{spc:<{indent}}{val!s}".format(spc="", indent=indent, val=src)
+        return f"{'':<{indent}}{src!s}"
 
     def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
         """Repr dict items.
@@ -519,13 +501,8 @@ class PrettyStr(PrettyFormat):
         """
         max_len = max((len(str(key)) for key in src)) if src else 0
         for key, val in src.items():
-            yield "\n{spc:<{indent}}{key!s:{size}}: {val},".format(
-                spc="",
-                indent=self.next_indent(indent),
-                size=max_len,
-                key=key,
-                val=self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True),
-            )
+            line: str = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
+            yield f"\n{'':<{self.next_indent(indent)}}{key!s:{max_len}}: {line},"
 
     def _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], indent: int = 0) -> str:
         """Repr callable object (function or method).
@@ -537,30 +514,26 @@ class PrettyStr(PrettyFormat):
         :return: Repr of function or method with signature.
         :rtype: str
         """
-        param_str = ""
+        param_str: str = ""
 
         for param in _prepare_repr(src):
-            param_str += "\n{spc:<{indent}}{param.name}".format(spc="", indent=self.next_indent(indent), param=param)
+            param_str += f"\n{'':<{self.next_indent(indent)}}{param.name}"
             if param.annotation is not param.empty:
-                param_str += ": {param.annotation}".format(param=param)
+                param_str += f": {param.annotation}"
             if param.value is not param.empty:
-                param_str += "={val}".format(
-                    val=self.process_element(src=param.value, indent=indent, no_indent_start=True)
-                )
+                param_str += f"={self.process_element(src=param.value, indent=indent, no_indent_start=True)}"
             param_str += ","
 
         if param_str:
             param_str += "\n" + " " * indent
 
-        sig = inspect.signature(src)
+        sig: inspect.Signature = inspect.signature(src)
         if sig.return_annotation is inspect.Parameter.empty:
-            annotation = ""
+            annotation: str = ""
         else:
-            annotation = " -> {sig.return_annotation!r}".format(sig=sig)
+            annotation = f" -> {sig.return_annotation!r}"
 
-        return "\n{spc:<{indent}}<{obj!s} with interface ({args}){annotation}>".format(
-            spc="", indent=indent, obj=src, args=param_str, annotation=annotation
-        )
+        return f"\n{'':<{indent}}<{src!s} with interface ({param_str}){annotation}>"
 
     @staticmethod
     def _repr_iterable_item(nl: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
@@ -581,13 +554,8 @@ class PrettyStr(PrettyFormat):
         :return: formatted repr of "result" with prefix and suffix to explain type.
         :rtype: str
         """
-        return (
-            "{nl}"
-            "{spc:<{indent}}{prefix}{result}\n"
-            "{spc:<{indent}}{suffix}".format(
-                nl="\n" if nl else "", spc="", indent=indent, prefix=prefix, result=result, suffix=suffix
-            )
-        )
+        newline: str = "\n" if nl else ""
+        return f"{newline}" f"{'':<{indent}}{prefix}{result}\n" f"{'':<{indent}}{suffix}"
 
 
 def pretty_repr(
