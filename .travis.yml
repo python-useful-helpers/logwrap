@@ -77,21 +77,21 @@ jobs:
     - pip install --upgrade "mypy >= 0.660"
     script:
     - mypy --strict logwrap
-
-  - <<: *code_style_check
+  - <<: *static_analisys
     name: "PEP8"
     install:
     - *upgrade_python_toolset
     - pip install --upgrade flake8
     script:
     - flake8
-  - <<: *code_style_check
-    name: "PEP257"
-    install:
-    - *upgrade_python_toolset
-    - pip install --upgrade pydocstyle
-    script:
-    - pydocstyle logwrap
+ 
+#  - <<: *code_style_check
+#    name: "PEP257"
+#    install:
+#    - *upgrade_python_toolset
+#    - pip install --upgrade pydocstyle
+#    script:
+#    - pydocstyle logwrap
   - <<: *code_style_check
     name: "Black formatting"
     install:
