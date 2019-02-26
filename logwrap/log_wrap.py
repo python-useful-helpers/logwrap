@@ -1,4 +1,4 @@
-#    Copyright 2016-2018 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2019 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -16,6 +16,9 @@
 
 """log_wrap shared code module."""
 
+__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+
+# Standard Library
 import asyncio
 import functools
 import inspect
@@ -25,11 +28,11 @@ import traceback
 import typing
 import warnings
 
+# LogWrap Implementation
 from logwrap import repr_utils
+
+# Local Implementation
 from . import class_decorator
-
-
-__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
 logger = logging.getLogger("logwrap")  # type: logging.Logger
 

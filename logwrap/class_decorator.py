@@ -16,6 +16,9 @@
 
 """Base class for decorators."""
 
+__all__ = ("BaseDecorator",)
+
+# Standard Library
 import abc
 import functools
 import typing
