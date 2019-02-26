@@ -14,6 +14,8 @@
 
 """log_wrap shared code module."""
 
+cpdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+
 import asyncio
 import functools
 import inspect
@@ -27,12 +29,10 @@ from logwrap cimport repr_utils
 from logwrap cimport class_decorator
 
 
-cpdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
-
 logger = logging.getLogger("logwrap")  # type: logging.Logger
 
 
-cdef unsigned int indent = 4
+cdef unsigned long indent = 4
 fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc="", indent=indent).format
 comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc="", indent=indent).format
 
@@ -145,12 +145,12 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
     def __init__(
         self,
-        func: typing.Optional[typing.Callable[..., typing.Any]] = None,
+        func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
         *,
         log: logging.Logger = logger,
-        unsigned int log_level=logging.DEBUG,
-        unsigned int exc_level=logging.ERROR,
-        unsigned int max_indent=20,
+        unsigned long log_level=logging.DEBUG,
+        unsigned long exc_level=logging.ERROR,
+        unsigned long max_indent=20,
         spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
         blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
         blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
@@ -278,7 +278,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         return arg_repr
 
     cdef:
-        str _get_func_args_repr(self, sig: inspect.Signature, tuple args, dict kwargs):
+        str _get_func_args_repr(self, sig: inspect.Signature, tuple args: typing.Tuple[typing.Any, ...], dict kwargs: typing.Dict[str, typing.Any]):
             """Internal helper for reducing complexity of decorator code.
     
             :param sig: function signature
@@ -397,7 +397,9 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 exc_info=False,
             )
 
-    def _get_function_wrapper(self, func: typing.Callable[..., typing.Any]) -> typing.Callable[..., typing.Any]:
+    def _get_function_wrapper(
+        self, func: typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]
+    ) -> typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -441,19 +443,21 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper
 
     def __call__(
-        self, *args: typing.Union[typing.Callable[..., typing.Any], typing.Any], **kwargs: typing.Any
-    ) -> typing.Union[typing.Callable[..., typing.Any], typing.Any]:
+        self,
+        *args: typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any],
+        **kwargs: typing.Any,
+    ) -> typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any]:
         """Callable instance."""
         return super(LogWrap, self).__call__(*args, **kwargs)
 
 
 def logwrap(
-    func: typing.Optional[typing.Callable[..., typing.Any]] = None,
+    func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
     *,
     log: logging.Logger = logger,
-    unsigned int log_level=logging.DEBUG,
-    unsigned int exc_level=logging.ERROR,
-    unsigned int max_indent=20,
+    unsigned long log_level=logging.DEBUG,
+    unsigned long exc_level=logging.ERROR,
+    unsigned long max_indent=20,
     spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
     blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
     blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
@@ -461,7 +465,7 @@ def logwrap(
     bint log_call_args_on_exc=True,
     bint log_traceback=True,
     bint log_result_obj=True
-) -> typing.Union[LogWrap, typing.Callable[..., typing.Any]]:
+) -> typing.Union[LogWrap, typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]]:
     """Log function calls and return values.
 
     :param func: function to wrap

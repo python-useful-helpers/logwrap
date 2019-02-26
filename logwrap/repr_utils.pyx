@@ -18,12 +18,11 @@ This is no reason to import this submodule directly, all required methods is
 available from the main module.
 """
 
+cpdef tuple __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+
 import inspect
 import types
 import typing
-
-
-cpdef tuple __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
 
 cdef:
@@ -118,7 +117,7 @@ cdef class PrettyFormat:
     Designed for usage as __repr__ and __str__ replacement on complex objects
     """
 
-    def __cinit__(self, unsigned int max_indent=20, unsigned int indent_step=4):
+    def __cinit__(self, unsigned long max_indent=20, unsigned long indent_step=4):
         """Pretty Formatter.
 
         :param max_indent: maximal indent before classic repr() call
@@ -129,7 +128,7 @@ cdef class PrettyFormat:
         self.max_indent = max_indent
         self.indent_step = indent_step
 
-    cpdef int next_indent(self, unsigned int indent, unsigned int multiplier=1):
+    cpdef long next_indent(self, unsigned long indent, unsigned long multiplier=1):
         """Next indentation value.
 
         :param indent: current indentation value
@@ -142,7 +141,7 @@ cdef class PrettyFormat:
         return indent + multiplier * self.indent_step
 
     cdef:
-        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0):
+        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned long indent=0):
             """Repr callable object (function or method).
     
             :param src: Callable to process
@@ -154,7 +153,7 @@ cdef class PrettyFormat:
             """
             raise NotImplementedError()
 
-        str _repr_simple(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False):
+        str _repr_simple(self, src: typing.Any, unsigned long indent=0, bint no_indent_start=False):
             """Repr object without iteration.
     
             :param src: Source object
@@ -168,7 +167,7 @@ cdef class PrettyFormat:
             """
             raise NotImplementedError()
 
-        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix):
+        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned long indent, str result, str suffix):
             """Repr iterable item.
     
             :param nl: newline before item
@@ -187,7 +186,7 @@ cdef class PrettyFormat:
             """
             raise NotImplementedError()
 
-    def _repr_dict_items(self, dict src, unsigned int indent=0) -> typing.Iterator[str]:  # type
+    def _repr_dict_items(self, dict src: typing.Dict[typing.Any, typing.Any], unsigned long indent=0) -> typing.Iterator[str]:
         """Repr dict items.
 
         :param src: object to process
@@ -198,7 +197,7 @@ cdef class PrettyFormat:
         """
         raise NotImplementedError()
 
-    cdef str _repr_iterable_items(self, src: typing.Iterable, unsigned int indent=0):
+    cdef str _repr_iterable_items(self, src: typing.Iterable[typing.Any], unsigned long indent=0):
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
@@ -213,7 +212,7 @@ cdef class PrettyFormat:
             result += "\n" + self.process_element(src=elem, indent=self.next_indent(indent)) + ","
         return result
 
-    cpdef str process_element(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False):
+    cpdef str process_element(self, src: typing.Any, unsigned long indent=0, bint no_indent_start=False):
         """Make human readable representation of object.
 
         :param src: object to process
@@ -260,7 +259,7 @@ cdef class PrettyFormat:
             suffix=suffix,
         )
 
-    def __call__(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False) -> str:
+    def __call__(self, src: typing.Any, unsigned long indent=0, bint no_indent_start=False) -> str:
         """Make human readable representation of object. The main entry point.
 
         :param src: object to process
@@ -284,22 +283,25 @@ cdef class PrettyRepr(PrettyFormat):
 
     __slots__ = ()
 
-    def __cinit__(self, unsigned int max_indent=20, unsigned int indent_step=4):
+    def __cinit__(self, unsigned long max_indent=20, unsigned long indent_step=4):
         self._magic_method_name = "__pretty_repr__"
 
     cdef:
-        str _strings_repr(self, unsigned int indent, val: typing.Union[bytes, str]):
+        str _strings_repr(self, unsigned long indent, val: typing.Union[bytes, str]):
             """Custom repr for strings and binary strings."""
-            cdef str prefix
+            cdef:
+                str prefix
+                str string
 
             if isinstance(val, bytes):
-                val = val.decode(encoding="utf-8", errors="backslashreplace")
+                string = val.decode(encoding="utf-8", errors="backslashreplace")
                 prefix = "b"
             else:
                 prefix = "u"
-            return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=val)
+                string = val
+            return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=string)
 
-        str _repr_simple(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False):
+        str _repr_simple(self, src: typing.Any, unsigned long indent=0, bint no_indent_start=False):
             """Repr object without iteration.
     
             :param src: Source object
@@ -311,14 +313,14 @@ cdef class PrettyRepr(PrettyFormat):
             :return: simple repr() over object, except strings (add prefix) and set (uniform py2/py3)
             :rtype: str
             """
-            indent = 0 if no_indent_start else indent
+            cdef unsigned long real_indent = 0 if no_indent_start else indent
             if isinstance(src, set):
-                return "{spc:<{indent}}{val}".format(spc="", indent=indent, val="set(" + " ,".join(map(repr, src)) + ")")
+                return "{spc:<{real_indent}}{val}".format(spc="", real_indent=real_indent, val="set(" + " ,".join(map(repr, src)) + ")")
             if isinstance(src, (bytes, str)):
-                return self._strings_repr(indent=indent, val=src)
-            return "{spc:<{indent}}{val!r}".format(spc="", indent=indent, val=src)
+                return self._strings_repr(indent=real_indent, val=src)
+            return "{spc:<{real_indent}}{val!r}".format(spc="", real_indent=real_indent, val=src)
 
-        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0):
+        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned long indent=0):
             """Repr callable object (function or method).
     
             :param src: Callable to process
@@ -356,7 +358,7 @@ cdef class PrettyRepr(PrettyFormat):
                 spc="", indent=indent, obj=src, args=param_str, annotation=annotation
             )
 
-        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix):
+        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned long indent, str result, str suffix):
             """Repr iterable item.
     
             :param nl: newline before item
@@ -388,7 +390,7 @@ cdef class PrettyRepr(PrettyFormat):
                 )
             )
 
-    def _repr_dict_items(self, dict src, unsigned int indent=0) -> typing.Iterator[str]:
+    def _repr_dict_items(self, dict src, unsigned long indent=0) -> typing.Iterator[str]:
         """Repr dict items.
 
         :param src: object to process
@@ -398,15 +400,18 @@ cdef class PrettyRepr(PrettyFormat):
         :return: repr of key/value pair from dict
         :rtype: typing.Iterator[str]
         """
-        cdef unsigned int max_len = max((len(repr(key)) for key in src)) if src else 0
+        cdef:
+            unsigned long max_len = max((len(repr(key)) for key in src)) if src else 0
+            str line
 
         for key, val in src.items():
-            yield "\n{spc:<{indent}}{key!r:{size}}: {val},".format(
+            line = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
+            yield "\n{spc:<{indent}}{key!r:{size}}: {line},".format(
                 spc="",
                 indent=self.next_indent(indent),
                 size=max_len,
                 key=key,
-                val=self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True),
+                line=line,
             )
 
 
@@ -416,17 +421,20 @@ cdef class PrettyStr(PrettyFormat):
     Designed for usage as __str__ replacement on complex objects
     """
 
-    def __cinit__(self, unsigned int max_indent=20, unsigned int indent_step=4):
+    def __cinit__(self, unsigned long max_indent=20, unsigned long indent_step=4):
         self._magic_method_name = "__pretty_str__"
 
     cdef:
-        str _strings_str(self, unsigned int indent, val: typing.Union[bytes, str]):
+        str _strings_str(self, unsigned long indent, val: typing.Union[bytes, str]):
             """Custom repr for strings and binary strings."""
+            cdef str string
             if isinstance(val, bytes):
-                val = val.decode(encoding="utf-8", errors="backslashreplace")
-            return "{spc:<{indent}}{string}".format(spc="", indent=indent, string=val)
+                string = val.decode(encoding="utf-8", errors="backslashreplace")
+            else:
+                string = val
+            return "{spc:<{indent}}{string}".format(spc="", indent=indent, string=string)
 
-        str _repr_simple(self, src: typing.Any, unsigned int indent=0, bint no_indent_start=False):
+        str _repr_simple(self, src: typing.Any, unsigned long indent=0, bint no_indent_start=False):
             """Repr object without iteration.
     
             :param src: Source object
@@ -438,14 +446,14 @@ cdef class PrettyStr(PrettyFormat):
             :return: simple repr() over object, except strings (decode) and set (uniform py2/py3)
             :rtype: str
             """
-            indent = 0 if no_indent_start else indent
+            cdef unsigned long real_indent = 0 if no_indent_start else indent
             if isinstance(src, set):
-                return "{spc:<{indent}}{val}".format(spc="", indent=indent, val="set(" + " ,".join(map(str, src)) + ")")
+                return "{spc:<{real_indent}}{val}".format(spc="", real_indent=real_indent, val="set(" + " ,".join(map(str, src)) + ")")
             if isinstance(src, (bytes, str)):
-                return self._strings_str(indent=indent, val=src)
-            return "{spc:<{indent}}{val!s}".format(spc="", indent=indent, val=src)
+                return self._strings_str(indent=real_indent, val=src)
+            return "{spc:<{real_indent}}{val!s}".format(spc="", real_indent=real_indent, val=src)
 
-        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned int indent=0):
+        str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned long indent=0):
             """Repr callable object (function or method).
     
             :param src: Callable to process
@@ -483,7 +491,7 @@ cdef class PrettyStr(PrettyFormat):
                 spc="", indent=indent, obj=src, args=param_str, annotation=annotation
             )
 
-        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned int indent, str result, str suffix):
+        str _repr_iterable_item(self, bint nl, str obj_type, str prefix, unsigned long indent, str result, str suffix):
             """Repr iterable item.
     
             :param nl: newline before item
@@ -509,7 +517,7 @@ cdef class PrettyStr(PrettyFormat):
                 )
             )
 
-    def _repr_dict_items(self, dict src, unsigned int indent=0) -> typing.Iterator[str]:
+    def _repr_dict_items(self, dict src: typing.Dict[typing.Any, typing.Any], unsigned long indent=0) -> typing.Iterator[str]:
         """Repr dict items.
 
         :param src: object to process
@@ -519,23 +527,26 @@ cdef class PrettyStr(PrettyFormat):
         :return: repr of key/value pair from dict
         :rtype: typing.Iterator[str]
         """
-        cdef unsigned int max_len = max((len(str(key)) for key in src)) if src else 0
+        cdef:
+            unsigned long max_len = max((len(str(key)) for key in src)) if src else 0
+            str line
         for key, val in src.items():
-            yield "\n{spc:<{indent}}{key!s:{size}}: {val},".format(
+            line = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
+            yield "\n{spc:<{indent}}{key!s:{size}}: {line},".format(
                 spc="",
                 indent=self.next_indent(indent),
                 size=max_len,
                 key=key,
-                val=self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True),
+                line=line,
             )
 
 
 cpdef str pretty_repr(
     src: typing.Any,
-    unsigned int indent=0,
+    unsigned long indent=0,
     bint no_indent_start=False,
-    unsigned int max_indent=20,
-    unsigned int indent_step=4
+    unsigned long max_indent=20,
+    unsigned long indent_step=4
 ):
     """Make human readable repr of object.
 
@@ -557,12 +568,12 @@ cpdef str pretty_repr(
     )
 
 
-cpdef  str pretty_str(
+cpdef str pretty_str(
     src: typing.Any,
-    unsigned int indent=0,
+    unsigned long indent=0,
     bint no_indent_start=False,
-    unsigned int max_indent=20,
-    unsigned int indent_step=4
+    unsigned long max_indent=20,
+    unsigned long indent_step=4
 ):
     """Make human readable str of object.
 
