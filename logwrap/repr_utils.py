@@ -22,6 +22,7 @@ available from the main module.
 
 __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
+# Standard Library
 import abc
 import inspect
 import types

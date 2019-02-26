@@ -18,6 +18,7 @@
 
 __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
+# Standard Library
 import asyncio
 import functools
 import inspect
@@ -27,9 +28,11 @@ import traceback
 import typing
 import warnings
 
+# LogWrap Implementation
 from logwrap import repr_utils
-from . import class_decorator
 
+# Local Implementation
+from . import class_decorator
 
 logger: logging.Logger = logging.getLogger("logwrap")
 
