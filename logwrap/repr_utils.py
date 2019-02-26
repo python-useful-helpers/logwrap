@@ -1,4 +1,4 @@
-#    Copyright 2018 Alexey Stepanov aka penguinolog
+#    Copyright 2018 - 2019 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -20,13 +20,13 @@ This is no reason to import this submodule directly, all required methods is
 available from the main module.
 """
 
+__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+
+# Standard Library
 import abc
 import inspect
 import types
 import typing
-
-
-__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
 
 def _known_callable(item: typing.Any) -> bool:
