@@ -2,80 +2,80 @@ sudo: false
 language: python
 os: linux
 install:
-- &upgrade_python_toolset pip install --upgrade pip setuptools wheel
-- &install_test_deps pip install --upgrade pytest pytest-sugar
-- &install_deps pip install -r CI_REQUIREMENTS.txt
-- pip install --upgrade pytest-cov coveralls
+  - &upgrade_python_toolset pip install --upgrade pip setuptools wheel
+  - &install_test_deps pip install --upgrade pytest pytest-sugar
+  - &install_deps pip install -r CI_REQUIREMENTS.txt
+  - pip install --upgrade pytest-cov coveralls
 
 _python:
-- &python34
-  name: "Python 3.4"
-  python: "3.4"
-- &python37
-  name: "Python 3.7"
-  python: "3.7"
-  dist: xenial
-  sudo: true
+  - &python34
+    name: "Python 3.4"
+    python: "3.4"
+  - &python37
+    name: "Python 3.7"
+    python: "3.7"
+    dist: xenial
+    sudo: true
 
 _helpers:
-- &install_cython pip install --upgrade Cython
-- &build_package python setup.py bdist_wheel
-- &install_built pip install logwrap --no-index -f dist
-- &test_no_cov  py.test -vv test
-- &test_cythonized
-  stage: Test cythonized
-  install:
-  - *upgrade_python_toolset
-  - *install_test_deps
-  - *install_deps
-  - *install_cython
-  script:
-  - *build_package
-  - *install_built
-  - *test_no_cov
-  after_success: skip
+  - &install_cython pip install --upgrade Cython
+  - &build_package python setup.py bdist_wheel
+  - &install_built pip install logwrap --no-index -f dist
+  - &test_no_cov  py.test -vv test
+  - &test_cythonized
+    stage: Test cythonized
+    install:
+      - *upgrade_python_toolset
+      - *install_test_deps
+      - *install_deps
+      - *install_cython
+    script:
+      - *build_package
+      - *install_built
+      - *test_no_cov
+    after_success: skip
 
-- &static_analysis
-  stage: Static analysis
-  <<: *python34
-  after_success: skip
+  - &static_analysis
+    stage: Static analysis
+    <<: *python34
+    after_success: skip
 
-- &code_style_check
-  stage: Code style check
-  <<: *python34
-  after_success: skip
+  - &code_style_check
+    stage: Code style check
+    <<: *python34
+    after_success: skip
 
 script:
-- pip install -e .
-- py.test -vv --cov-config .coveragerc --cov-report= --cov=logwrap test
-- coverage report -m --fail-under 87
+  - python setup.py develop -v
+  - py.test -vvv --cov-config .coveragerc --cov-report= --cov=logwrap test
+  - coverage report -m --fail-under 87
 after_success:
-- coveralls
+  - coveralls
 
 jobs:
   include:
-  - <<: *static_analysis
-    name: "PyLint"
-    install:
-    - *upgrade_python_toolset
-    - *install_deps
-    - pip install --upgrade "pylint >= 2.2" isort[pyproject,requirements]
-    script:
-    - pylint logwrap
-  - <<: *static_analysis
-    name: "Bandit"
-    install:
-    - *upgrade_python_toolset
-    - pip install --upgrade bandit
-    script:
-    - bandit -r logwrap
-  - <<: *static_analysis
-    <<: *python37
-    name: "MyPy"
-    install:
-    - *upgrade_python_toolset
-    - *install_deps
-    - pip install --upgrade "mypy >= 0.670"
+    - <<: *static_analysis
+      name: "PyLint"
+      install:
+        - *upgrade_python_toolset
+        - *install_deps
+        - pip install --upgrade "pylint >= 2.2" isort[pyproject,requirements]
+      script:
+        - pylint logwrap
+    - <<: *static_analysis
+      name: "Bandit"
+      install:
+        - *upgrade_python_toolset
+        - pip install --upgrade bandit
+      script:
+        - bandit -r logwrap
+    - <<: *static_analysis
+      <<: *python37
+      name: "MyPy"
+      install:
+        - *upgrade_python_toolset
+        - *install_deps
+        - pip install --upgrade "mypy >= 0.700"
     script:
     - mypy --strict logwrap
   - <<: *static_analysis
@@ -94,40 +94,41 @@ jobs:
 #    script:
 #    - pydocstyle logwrap
 
-  - stage: test
-    <<: *python34
+    - stage: test
+      <<: *python34
 
-  - <<: *test_cythonized
-    <<: *python34
+    - <<: *test_cythonized
+      <<: *python34
 
-  - stage: deploy
-    # This prevents job from appearing in test plan unless commit is tagged:
-    if: tag IS present
-    # Run on pypy to build not cythonized wheel
-    <<: *python34
-    name: Build universal and cythonized bdist_wheel. Deploy bdist and sdist.
-    services:
-    - docker
-    install:
-    - *upgrade_python_toolset
-    script:
-    - ./tools/run_docker.sh "logwrap"
-    before_deploy:
-    - pip install -r requirements.txt
-    - *build_package
-    deploy:
-    - provider: pypi
-      # `skip_cleanup: true` is required to preserve binary wheels, built
-      # inside of manylinux1 docker container during `script` step above.
-      skip_cleanup: true
-      user: penguinolog
-      password:
-        secure: QNBIAaqj682K95G2jVBFLgKmzscDz8sYLrJOmRVa+TmwV/n19Nar1fTdt86V2FRgl5SBbuGwAz6s9RD+X1j+OAEUKQ/wUmkP8hLriKcTaP5dH5+WWvwH9TD5A3SSvYOI9G9Qq+0rG71F/OMEBtTI5lrIaiPt39YUwhejLsUYy2vcvT/yxEnrMFc3gGFEvIRA6pnZWY+t3cK/uDdhDXutNSvLKTEuPILswqiGQZ/79Aio5HzQasCjvmWKr2c9nwZB1SoSfbhvNWitOzJZ5+7wc0ewFcRHBMeiLmGjI/z6FRVp/QTHtwhAwzRQQ955MiqcX2fLnVlfE68qT47RpX9ueqhFXMgIDqJ/3O/ln5619xZ1ykuUT8i/gUm2/lXGV9Wz0IwDxz4RpL8ul24qLdECXhVlBBDA3VjJT8YbErvY3EB+YKHiJCywAcOa8boHTMDxmP/BLUh24PrsKs4eYW5MVRR3V6Un8ajCCk2ZhDlyQXSxPsRA7/dHQS5a6d1neCCapdwR+VKHjjBmW0MppxQmsxjg6poOtWR/d1bT9XuHdu6/vAmTAosZN56MnR0KD4ZVJxM5OoMqE3Fgw6jusJnyWyxJ5XRkG/NuDITTC7aS5MQuPOGUSw3GzzAwZOgSRCDmgLMxRaZcv8a8r8GqpzVHpB9D+zfOhvh8+1BOhNFXMMc=
-      on:
-        tags: true
-        distributions: sdist
-      skip_upload_docs: true
+    - stage: deploy
+      # This prevents job from appearing in test plan unless commit is tagged:
+      if: tag IS present
+      # Run on pypy to build not cythonized wheel
+      <<: *python34
+      name: Build universal and cythonized bdist_wheel. Deploy bdist and sdist.
+      services:
+        - docker
+      install:
+        - *upgrade_python_toolset
+      script:
+        - ./tools/run_docker.sh "logwrap"
+      after_success: skip
+      before_deploy:
+        - pip install -r requirements.txt
+        - *build_package
+      deploy:
+        - provider: pypi
+          # `skip_cleanup: true` is required to preserve binary wheels, built
+          # inside of manylinux1 docker container during `script` step above.
+          skip_cleanup: true
+          user: penguinolog
+          password:
+            secure: QNBIAaqj682K95G2jVBFLgKmzscDz8sYLrJOmRVa+TmwV/n19Nar1fTdt86V2FRgl5SBbuGwAz6s9RD+X1j+OAEUKQ/wUmkP8hLriKcTaP5dH5+WWvwH9TD5A3SSvYOI9G9Qq+0rG71F/OMEBtTI5lrIaiPt39YUwhejLsUYy2vcvT/yxEnrMFc3gGFEvIRA6pnZWY+t3cK/uDdhDXutNSvLKTEuPILswqiGQZ/79Aio5HzQasCjvmWKr2c9nwZB1SoSfbhvNWitOzJZ5+7wc0ewFcRHBMeiLmGjI/z6FRVp/QTHtwhAwzRQQ955MiqcX2fLnVlfE68qT47RpX9ueqhFXMgIDqJ/3O/ln5619xZ1ykuUT8i/gUm2/lXGV9Wz0IwDxz4RpL8ul24qLdECXhVlBBDA3VjJT8YbErvY3EB+YKHiJCywAcOa8boHTMDxmP/BLUh24PrsKs4eYW5MVRR3V6Un8ajCCk2ZhDlyQXSxPsRA7/dHQS5a6d1neCCapdwR+VKHjjBmW0MppxQmsxjg6poOtWR/d1bT9XuHdu6/vAmTAosZN56MnR0KD4ZVJxM5OoMqE3Fgw6jusJnyWyxJ5XRkG/NuDITTC7aS5MQuPOGUSw3GzzAwZOgSRCDmgLMxRaZcv8a8r8GqpzVHpB9D+zfOhvh8+1BOhNFXMMc=
+          on:
+            tags: true
+            distributions: sdist
+          skip_upload_docs: true
 
 cache: pip
 before_cache:
-- rm -f $HOME/.cache/pip/log/debug.log
+  - rm -f $HOME/.cache/pip/log/debug.log

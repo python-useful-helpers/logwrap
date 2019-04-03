@@ -25,6 +25,7 @@ later it has been reworked and extended for support of special cases.
 import pkg_resources
 
 # Local Implementation
+from .log_on_access import LogOnAccess
 from .log_wrap import BoundParameter
 from .log_wrap import LogWrap
 from .log_wrap import bind_args_kwargs
@@ -45,6 +46,7 @@ __all__ = (
     "pretty_str",
     "BoundParameter",
     "bind_args_kwargs",
+    "LogOnAccess",
 )
 
 try:  # pragma: no cover
@@ -56,7 +58,7 @@ except pkg_resources.DistributionNotFound:  # pragma: no cover
 
         __version__ = setuptools_scm.get_version()
     except ImportError:
-        pass
+        setuptools_scm = None
 
 __author__ = "Alexey Stepanov"
 __author_email__ = "penguinolog@gmail.com"

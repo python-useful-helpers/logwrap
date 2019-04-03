@@ -34,12 +34,10 @@ from logwrap import repr_utils
 # Local Implementation
 from . import class_decorator
 
-logger = logging.getLogger("logwrap")  # type: logging.Logger
+LOGGER = logging.getLogger("logwrap")  # type: logging.Logger
 
 
-indent = 4
-fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc="", indent=indent).format
-comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc="", indent=indent).format
+INDENT = 4
 
 
 class BoundParameter(inspect.Parameter):
@@ -163,7 +161,7 @@ class LogWrap(class_decorator.BaseDecorator):
         self,
         func: typing.Optional[typing.Callable[..., typing.Any]] = None,
         *,
-        log: logging.Logger = logger,
+        log: logging.Logger = LOGGER,
         log_level: int = logging.DEBUG,
         exc_level: int = logging.ERROR,
         max_indent: int = 20,
@@ -501,12 +499,12 @@ class LogWrap(class_decorator.BaseDecorator):
                 elif param.VAR_KEYWORD == param.kind:
                     value = {}
 
-            val = repr_utils.pretty_repr(src=value, indent=indent + 4, no_indent_start=True, max_indent=self.max_indent)
+            val = repr_utils.pretty_repr(src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent)
 
             val = self.post_process_param(param, val)
 
             if last_kind != param.kind:
-                param_str += comment(kind=param.kind)
+                param_str += "\n{spc:<{indent}}# {kind!s}:".format(spc="", indent=INDENT, kind=param.kind)
                 last_kind = param.kind
 
             if param.empty is param.annotation:
@@ -514,7 +512,9 @@ class LogWrap(class_decorator.BaseDecorator):
             else:
                 annotation = "  # type: {param.annotation!s}".format(param=param)
 
-            param_str += fmt(key=param.name, annotation=annotation, val=val)
+            param_str += "\n{spc:<{indent}}{key!r}={val},{annotation}".format(
+                spc="", indent=INDENT, key=param.name, annotation=annotation, val=val
+            )
         if param_str:
             param_str += "\n"
         return param_str
@@ -529,7 +529,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
         if self.log_result_obj:
             msg += " with result:\n{result}".format(result=repr_utils.pretty_repr(result, max_indent=self.max_indent))
-        self._logger.log(level=self.log_level, msg=msg)  # type: ignore
+        self._logger.log(level=self.log_level, msg=msg)
 
     def _make_calling_record(self, name: str, arguments: str, method: str = "Calling") -> None:
         """Make log record before execution.
@@ -538,7 +538,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :type arguments: str
         :type method: str
         """
-        self._logger.log(  # type: ignore
+        self._logger.log(
             level=self.log_level,
             msg="{method}: \n{name!r}({arguments})".format(
                 method=method, name=name, arguments=arguments if self.log_call_args else ""
@@ -553,13 +553,13 @@ class LogWrap(class_decorator.BaseDecorator):
         """
         exc_info = sys.exc_info()
         stack = traceback.extract_stack()
-        tb = traceback.extract_tb(exc_info[2])
-        full_tb = stack[:2] + tb  # cut decorator and build full traceback
+        exc_tb = traceback.extract_tb(exc_info[2])
+        full_tb = stack[:2] + exc_tb  # cut decorator and build full traceback
         exc_line = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
         tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
 
-        self._logger.log(  # type: ignore
+        self._logger.log(
             level=self.exc_level,
             msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
                 name=name,
@@ -577,13 +577,13 @@ class LogWrap(class_decorator.BaseDecorator):
         :return: wrapped coroutine or function
         :rtype: typing.Callable
         """
-        sig = inspect.signature(self._spec or func)
 
         # pylint: disable=missing-docstring
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         @asyncio.coroutine
         def async_wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
+            sig = inspect.signature(self._spec or func)  # type: inspect.Signature
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
@@ -600,6 +600,7 @@ class LogWrap(class_decorator.BaseDecorator):
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         def wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
+            sig = inspect.signature(self._spec or func)  # type: inspect.Signature
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
@@ -631,7 +632,7 @@ class LogWrap(class_decorator.BaseDecorator):
 def logwrap(
     func: None = None,
     *,
-    log: logging.Logger = logger,
+    log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -650,7 +651,7 @@ def logwrap(
 def logwrap(
     func: typing.Callable[..., typing.Any],
     *,
-    log: logging.Logger = logger,
+    log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -669,7 +670,7 @@ def logwrap(
 def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
     func: typing.Optional[typing.Callable[..., typing.Any]] = None,
     *,
-    log: logging.Logger = logger,
+    log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,

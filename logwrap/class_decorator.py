@@ -93,7 +93,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         :type func: typing.Callable
         :rtype: typing.Callable
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     def __call__(
         self, *args: typing.Union[typing.Callable[..., typing.Any], typing.Any], **kwargs: typing.Any

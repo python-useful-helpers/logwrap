@@ -12,6 +12,7 @@ Contents:
 
     logwrap
     PrettyFormat
+    LogOnAccess
 
 Indices and tables
 ==================

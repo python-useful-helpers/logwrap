@@ -1,8 +1,8 @@
 logwrap
 =======
 
-.. image:: https://travis-ci.org/python-useful-helpers/logwrap.svg?branch=master
-    :target: https://travis-ci.org/python-useful-helpers/logwrap
+.. image:: https://travis-ci.com/python-useful-helpers/logwrap.svg?branch=master
+    :target: https://travis-ci.com/python-useful-helpers/logwrap
 .. image:: https://dev.azure.com/python-useful-helpers/logwrap/_apis/build/status/python-useful-helpers.logwrap?branchName=master
     :alt: Azure DevOps builds
     :target: https://dev.azure.com/python-useful-helpers/logwrap/_build?definitionId=1
@@ -58,6 +58,8 @@ This package includes helpers:
 * `pretty_str`
 
 * `PrettyFormat`
+
+* `LogOnAccess` - property with logging on successful get/set/delete or failure.
 
 Usage
 =====
@@ -166,10 +168,6 @@ This code during execution will produce log records:
             'kwarg3': u'''kwarg3''',
          }),
      ))
-
-Limitations:
-
-* nested wrapping (`@logwrap @deco2 ...`) is not parsed under python 2.7: `functools.wraps` limitation. Please set `logwrap` as the first level decorator.
 
 LogWrap
 -------
@@ -289,6 +287,76 @@ This method will be executed instead of __repr__ on your object.
 
 This method will be executed instead of __str__ on your object.
 
+LogOnAccess
+-----------
+
+This special case of property is useful in cases, where a lot of properties should be logged by similar way without writing a lot of code.
+
+Basic API is conform with `property`, but in addition it is possible to customize logger, log levels and log conditions.
+
+Usage examples:
+
+1. Simple usage. All by default.
+   logger is re-used from instance if available with names `logger` or `log` else used internal `logwrap.log_on_access` logger:
+
+  .. code-block:: python
+
+    import logging
+
+    class Target(object):
+
+        def init(self, val='ok')
+            self.val = val
+            self.logger = logging.get_logger(self.__class__.__name__)  # Single for class, follow subclassing
+
+        def __repr__(self):
+            return "{cls}(val={self.val})".format(cls=self.__class__.__name__, self=self)
+
+        @logwrap.LogOnAccess
+        def ok(self):
+            return self.val
+
+        @ok.setter
+        def ok(self, val):
+            self.val = val
+
+        @ok.deleter
+        def ok(self):
+            self.val = ""
+
+2. Use with global logger for class:
+
+  .. code-block:: python
+
+    class Target(object):
+
+      def init(self, val='ok')
+          self.val = val
+
+      def __repr__(self):
+          return "{cls}(val={self.val})".format(cls=self.__class__.__name__, self=self)
+
+      @logwrap.LogOnAccess
+      def ok(self):
+          return self.val
+
+      @ok.setter
+      def ok(self, val):
+          self.val = val
+
+      @ok.deleter
+      def ok(self):
+          self.val = ""
+
+      ok.logger = 'test_logger'
+      ok.log_level = logging.INFO
+      ok.exc_level = logging.ERROR
+      ok.log_object_repr = True  # As by default
+      ok.log_success = True  # As by default
+      ok.log_failure = True  # As by default
+      ok.log_traceback = True  # As by default
+      ok.override_name = None  # As by default: use original name
+
 Testing
 =======
 The main test mechanism for the package `logwrap` is using `tox`.
@@ -298,7 +366,7 @@ CI systems
 ==========
 For code checking several CI systems is used in parallel:
 
-1. `Travis CI: <https://travis-ci.org/python-useful-helpers/logwrap>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests. Also it's publishes coverage on coveralls.
+1. `Travis CI: <https://travis-ci.com/python-useful-helpers/logwrap>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests. Also it's publishes coverage on coveralls.
 
 2. `coveralls: <https://coveralls.io/github/python-useful-helpers/logwrap>`_ is used for coverage display.
 
@@ -306,4 +374,4 @@ For code checking several CI systems is used in parallel:
 
 CD systems
 ==========
-1. `Travis CI: <https://travis-ci.org/python-useful-helpers/logwrap>`_ is used for linux and SDIST package delivery on PyPI.
+1. `Travis CI: <https://travis-ci.com/python-useful-helpers/logwrap>`_ is used for linux and SDIST package delivery on PyPI.

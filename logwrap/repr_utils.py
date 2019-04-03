@@ -202,7 +202,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :return: Repr of function or method with signature.
         :rtype: str
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
@@ -217,7 +217,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :return: simple repr() over object
         :rtype: str
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
@@ -229,14 +229,14 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :type indent: int
         :rtype: typing.Iterator[str]
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     @staticmethod
-    def _repr_iterable_item(nl: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
+    def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
         """Repr iterable item.
 
-        :param nl: newline before item
-        :type nl: bool
+        :param newline: newline before item
+        :type newline: bool
         :param obj_type: Object type
         :type obj_type: str
         :param prefix: prefix
@@ -249,7 +249,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :type suffix: str
         :rtype: str
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     def _repr_iterable_items(self, src: typing.Iterable[typing.Any], indent: int = 0) -> typing.Iterator[str]:
         """Repr iterable items (not designed for dicts).
@@ -271,7 +271,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
         :rtype: str
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     def process_element(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Make human readable representation of object.
@@ -307,7 +307,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
                 prefix, suffix = "{", "}"
             result = "".join(self._repr_iterable_items(src=src, indent=indent))
         return self._repr_iterable_item(
-            nl=no_indent_start,
+            newline=no_indent_start,
             obj_type=src.__class__.__name__,
             prefix=prefix,
             indent=indent,
@@ -432,11 +432,11 @@ class PrettyRepr(PrettyFormat):
         )
 
     @staticmethod
-    def _repr_iterable_item(nl: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
+    def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
         """Repr iterable item.
 
-        :param nl: newline before item
-        :type nl: bool
+        :param newline: newline before item
+        :type newline: bool
         :param obj_type: Object type
         :type obj_type: str
         :param prefix: prefix
@@ -454,7 +454,7 @@ class PrettyRepr(PrettyFormat):
             "{nl}"
             "{spc:<{indent}}{obj_type:}({prefix}{result}\n"
             "{spc:<{indent}}{suffix})".format(
-                nl="\n" if nl else "",
+                nl="\n" if newline else "",
                 spc="",
                 indent=indent,
                 obj_type=obj_type,
@@ -563,11 +563,11 @@ class PrettyStr(PrettyFormat):
         )
 
     @staticmethod
-    def _repr_iterable_item(nl: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
+    def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
         """Repr iterable item.
 
-        :param nl: newline before item
-        :type nl: bool
+        :param newline: newline before item
+        :type newline: bool
         :param obj_type: Object type
         :type obj_type: str
         :param prefix: prefix
@@ -585,7 +585,7 @@ class PrettyStr(PrettyFormat):
             "{nl}"
             "{spc:<{indent}}{prefix}{result}\n"
             "{spc:<{indent}}{suffix}".format(
-                nl="\n" if nl else "", spc="", indent=indent, prefix=prefix, result=result, suffix=suffix
+                nl="\n" if newline else "", spc="", indent=indent, prefix=prefix, result=result, suffix=suffix
             )
         )
 
