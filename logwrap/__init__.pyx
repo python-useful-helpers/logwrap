@@ -19,6 +19,8 @@ from logwrap.repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr,
 from logwrap.log_wrap import LogWrap
 from logwrap.log_wrap import logwrap, BoundParameter, bind_args_kwargs
 
+from logwrap.log_on_access import LogOnAccess
+
 cpdef tuple __all__ = (
     "LogWrap",
     "logwrap",
@@ -29,6 +31,7 @@ cpdef tuple __all__ = (
     "pretty_str",
     "BoundParameter",
     "bind_args_kwargs",
+    "LogOnAccess",
 )
 
 cpdef str __version__
@@ -42,7 +45,7 @@ except pkg_resources.DistributionNotFound:
 
         __version__ = setuptools_scm.get_version()
     except ImportError:
-        pass
+        setuptools_scm = None
 
 cpdef str __author__ = "Alexey Stepanov"
 cpdef str __author_email__ = "penguinolog@gmail.com"
