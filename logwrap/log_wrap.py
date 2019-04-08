@@ -533,7 +533,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
         if self.log_result_obj:
             msg += f" with result:\n{repr_utils.pretty_repr(result, max_indent=self.max_indent)}"
-        self._logger.log(level=self.log_level, msg=msg)  # type: ignore
+        self._logger.log(level=self.log_level, msg=msg)
 
     def _make_calling_record(self, name: str, arguments: str, method: str = "Calling") -> None:
         """Make log record before execution.
@@ -542,7 +542,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :type arguments: str
         :type method: str
         """
-        self._logger.log(  # type: ignore
+        self._logger.log(
             level=self.log_level,
             msg="{method}: \n{name!r}({arguments})".format(
                 method=method, name=name, arguments=arguments if self.log_call_args else ""
@@ -565,7 +565,7 @@ class LogWrap(class_decorator.BaseDecorator):
             exc_line
         )
 
-        self._logger.log(  # type: ignore
+        self._logger.log(
             level=self.exc_level,
             msg=(
                 f"Failed: \n"
