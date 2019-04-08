@@ -616,7 +616,7 @@ class LogWrap(class_decorator.BaseDecorator):
                     max_indent=self.max_indent,
                 )
             )
-        self._logger.log(level=self.log_level, msg=msg)  # type: ignore
+        self._logger.log(level=self.log_level, msg=msg)
 
     def _make_calling_record(
         self,
@@ -655,7 +655,7 @@ class LogWrap(class_decorator.BaseDecorator):
         # Make standard traceback string
         tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
 
-        self._logger.log(  # type: ignore
+        self._logger.log(
             level=self.exc_level,
             msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
                 name=name, arguments=arguments if self.log_call_args_on_exc else "", tb_text=tb_text

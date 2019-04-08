@@ -35,7 +35,7 @@ import six
 # noinspection PyUnresolvedReferences
 from funcsigs import Parameter  # type: ignore
 # noinspection PyUnresolvedReferences
-from funcsigs import signature  # type: ignore
+from funcsigs import signature
 
 # pylint: enable=ungrouped-imports, no-name-in-module
 

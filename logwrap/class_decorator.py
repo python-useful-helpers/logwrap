@@ -81,7 +81,7 @@ class BaseDecorator(six.with_metaclass(abc.ABCMeta, object)):
         self.__func = func
         if self.__func is not None:
             functools.update_wrapper(self, self.__func)
-            self.__wrapped__ = self.__func  # type: typing.Callable
+            self.__wrapped__ = self.__func
         # pylint: enable=assigning-non-slot
 
     @property
