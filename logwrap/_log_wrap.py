@@ -1,4 +1,4 @@
-#    Copyright 2016-2018 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2019 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -52,9 +52,7 @@ __all__ = (
 logger = logging.getLogger('logwrap')  # type: logging.Logger
 
 
-indent = 4
-fmt = "\n{spc:<{indent}}{{key!r}}={{val}},{{annotation}}".format(spc='', indent=indent, ).format
-comment = "\n{spc:<{indent}}# {{kind!s}}:".format(spc='', indent=indent).format
+INDENT = 4
 
 
 class BoundParameter(object):
@@ -569,7 +567,7 @@ class LogWrap(_class_decorator.BaseDecorator):
 
             val = core.pretty_repr(
                 src=value,
-                indent=indent + 4,
+                indent=INDENT + 4,
                 no_indent_start=True,
                 max_indent=self.max_indent,
             )
@@ -577,15 +575,17 @@ class LogWrap(_class_decorator.BaseDecorator):
             val = self.post_process_param(param, val)  # type: ignore
 
             if last_kind != param.kind:
-                param_str += comment(kind=param.kind)
+                param_str += "\n{spc:<{INDENT}}# {param.kind!s}:".format(spc='', INDENT=INDENT, param=param)
                 last_kind = param.kind
 
             annotation = ""
 
-            param_str += fmt(
-                key=param.name,
-                annotation=annotation,
+            param_str += "\n{spc:<{INDENT}}{param.name!r}={val},{annotation}".format(
+                spc='',
+                INDENT=INDENT,
+                param=param,
                 val=val,
+                annotation=annotation
             )
         if param_str:
             param_str += "\n"
@@ -624,13 +624,11 @@ class LogWrap(_class_decorator.BaseDecorator):
         :type arguments: str
         :type method: str
         """
-        self._logger.log(  # type: ignore
+        self._logger.log(
             level=self.log_level,
             msg="{method}: \n{name!r}({arguments})".format(
-                method=method,
-                name=name,
-                arguments=arguments if self.log_call_args else ''
-            )
+                method=method, name=name, arguments=arguments if self.log_call_args else ""
+            ),
         )
 
     def _make_exc_record(
@@ -645,8 +643,8 @@ class LogWrap(_class_decorator.BaseDecorator):
         """
         exc_info = sys.exc_info()
         stack = traceback.extract_stack()
-        tb = traceback.extract_tb(exc_info[2])
-        full_tb = stack[:2] + tb  # cut decorator and build full traceback
+        exc_tb = traceback.extract_tb(exc_info[2])
+        full_tb = stack[:2] + exc_tb  # cut decorator and build full traceback
         exc_line = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
         tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
