@@ -360,7 +360,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
         void _make_calling_record(self, str name, str arguments, str method="Calling") except *:
             """Make log record before execution.
-    
+
             :type name: str
             :type arguments: str
             :type method: str
@@ -372,7 +372,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
         void _make_exc_record(self, str name, str arguments) except *:
             """Make log record if exception raised.
-    
+
             :type name: str
             :type arguments: str
             """
