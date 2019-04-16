@@ -37,9 +37,7 @@ from . import class_decorator
 logger: logging.Logger = logging.getLogger("logwrap")
 
 
-indent = 4
-fmt = f"\n{'':<{indent}}{{key!r}}={{val}},{{annotation}}".format
-comment = f"\n{'':<{indent}}# {{kind!s}}:".format
+INDENT = 4
 
 
 class BoundParameter(inspect.Parameter):
@@ -504,13 +502,13 @@ class LogWrap(class_decorator.BaseDecorator):
                     value = {}
 
             val: str = repr_utils.pretty_repr(
-                src=value, indent=indent + 4, no_indent_start=True, max_indent=self.max_indent
+                src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent
             )
 
             val = self.post_process_param(param, val)
 
             if last_kind != param.kind:
-                param_str += comment(kind=param.kind)
+                param_str += f"\n{'':<{INDENT}}# {param.kind!s}:"
                 last_kind = param.kind
 
             if param.empty is param.annotation:
@@ -518,7 +516,7 @@ class LogWrap(class_decorator.BaseDecorator):
             else:
                 annotation = f"  # type: {param.annotation!s}"
 
-            param_str += fmt(key=param.name, annotation=annotation, val=val)
+            param_str += f"\n{'':<{INDENT}}{param.name!r}={val},{annotation}"
         if param_str:
             param_str += "\n"
         return param_str
@@ -542,12 +540,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :type arguments: str
         :type method: str
         """
-        self._logger.log(
-            level=self.log_level,
-            msg="{method}: \n{name!r}({arguments})".format(
-                method=method, name=name, arguments=arguments if self.log_call_args else ""
-            ),
-        )
+        self._logger.log(level=self.log_level, msg=f"{method}: \n{name!r}({arguments if self.log_call_args else ''})")
 
     def _make_exc_record(self, name: str, arguments: str) -> None:
         """Make log record if exception raised.
@@ -557,8 +550,8 @@ class LogWrap(class_decorator.BaseDecorator):
         """
         exc_info = sys.exc_info()
         stack: traceback.StackSummary = traceback.extract_stack()
-        tb: traceback.StackSummary = traceback.extract_tb(exc_info[2])
-        full_tb = stack[:2] + tb  # cut decorator and build full traceback
+        exc_tb: traceback.StackSummary = traceback.extract_tb(exc_info[2])
+        full_tb = stack[:2] + exc_tb  # cut decorator and build full traceback
         exc_line: typing.List[str] = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
         tb_text: str = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(

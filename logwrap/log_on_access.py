@@ -191,9 +191,9 @@ class LogOnAccess(property):
         if not self.log_traceback:
             return ""
         exc_info = sys.exc_info()
-        stack = traceback.extract_stack()
-        tb = traceback.extract_tb(exc_info[2])
-        full_tb = stack[:1] + tb  # cut decorator and build full traceback
+        stack: traceback.StackSummary = traceback.extract_stack()
+        exc_tb: traceback.StackSummary = traceback.extract_tb(exc_info[2])
+        full_tb = stack[:1] + exc_tb  # cut decorator and build full traceback
         exc_line: typing.List[str] = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
         tb_text = "\nTraceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
@@ -241,11 +241,11 @@ class LogOnAccess(property):
         try:
             result = super(LogOnAccess, self).__get__(instance, owner)
             if self.log_success:
-                logger.log(self.log_level, "%s.%s -> %s", source, self.__name__, repr_utils.pretty_repr(result))
+                logger.log(self.log_level, f"{source}.{self.__name__} -> {repr_utils.pretty_repr(result)}")
             return result
         except Exception:
             if self.log_failure:
-                logger.log(self.exc_level, "Failed: %s.%s%s", source, self.__name__, self.__traceback, exc_info=False)
+                logger.log(self.exc_level, f"Failed: {source}.{self.__name__}{self.__traceback}", exc_info=False)
             raise
 
     def __set__(self, instance: typing.Any, value: typing.Any) -> None:
@@ -266,16 +266,12 @@ class LogOnAccess(property):
         try:
             super(LogOnAccess, self).__set__(instance, value)
             if self.log_success:
-                logger.log(self.log_level, "%s.%s = %s", source, self.__name__, repr_utils.pretty_repr(value))
+                logger.log(self.log_level, f"{source}.{self.__name__} = {repr_utils.pretty_repr(value)}")
         except Exception:
             if self.log_failure:
                 logger.log(
                     self.exc_level,
-                    "Failed: %s.%s = %s%s",
-                    source,
-                    self.__name__,
-                    repr_utils.pretty_repr(value),
-                    self.__traceback,
+                    f"Failed: {source}.{self.__name__} = {repr_utils.pretty_repr(value)}{self.__traceback}",
                     exc_info=False,
                 )
             raise
@@ -297,12 +293,10 @@ class LogOnAccess(property):
         try:
             super(LogOnAccess, self).__delete__(instance)
             if self.log_success:
-                logger.log(self.log_level, "del %s.%s", source, self.__name__)
+                logger.log(self.log_level, f"del {source}.{self.__name__}")
         except Exception:
             if self.log_failure:
-                logger.log(
-                    self.exc_level, "%s: Failed: del %s%s", source, self.__name__, self.__traceback, exc_info=False
-                )
+                logger.log(self.exc_level, f"{source}: Failed: del {self.__name__}{self.__traceback}", exc_info=False)
             raise
 
     @property

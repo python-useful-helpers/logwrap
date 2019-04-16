@@ -32,9 +32,7 @@ from logwrap cimport class_decorator
 logger = logging.getLogger("logwrap")  # type: logging.Logger
 
 
-cdef unsigned long indent = 4
-fmt = f"\n{'':<{indent}}{{key!r}}={{val}},{{annotation}}".format
-comment = f"\n{'':<{indent}}# {{kind!s}}:".format
+cdef unsigned long INDENT = 4
 
 
 class BoundParameter(inspect.Parameter):
@@ -280,7 +278,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
     cdef:
         str _get_func_args_repr(self, sig: inspect.Signature, tuple args: typing.Tuple[typing.Any, ...], dict kwargs: typing.Dict[str, typing.Any]):
             """Internal helper for reducing complexity of decorator code.
-    
+
             :param sig: function signature
             :type sig: inspect.Signature
             :param args: not keyworded arguments
@@ -289,7 +287,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             :type kwargs: typing.Dict[str, typing.Any]
             :return: repr over function arguments
             :rtype: str
-    
+
             .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
             """
             if not (self.log_call_args or self.log_call_args_on_exc):
@@ -320,12 +318,12 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                     elif param.VAR_KEYWORD == param.kind:
                         value = {}
 
-                val = repr_utils.pretty_repr(src=value, indent=indent + 4, no_indent_start=True, max_indent=self.max_indent)
+                val = repr_utils.pretty_repr(src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent)
 
                 val = self.post_process_param(param, val)
 
                 if last_kind != param.kind:
-                    param_str += comment(kind=param.kind)
+                    param_str += f"\n{'':<{INDENT}}# {param.kind!s}:"
                     last_kind = param.kind
 
                 if param.empty is param.annotation:
@@ -333,14 +331,14 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 else:
                     annotation = f"  # type: {param.annotation!s}"
 
-                param_str += fmt(key=param.name, annotation=annotation, val=val)
+                param_str += f"\n{'':<{INDENT}}{param.name!r}={val},{annotation}"
             if param_str:
                 param_str += "\n"
             return param_str
 
         void _make_done_record(self, str func_name, result: typing.Any) except *:
             """Construct success record.
-    
+
             :type func_name: str
             :type result: typing.Any
             """
@@ -358,7 +356,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
                 )
                 msg += f" with result:\n{result_repr}"
-            self._logger.log(level=self.log_level, msg=msg)  # type: ignore
+            self._logger.log(level=self.log_level, msg=msg)
 
         void _make_calling_record(self, str name, str arguments, str method="Calling") except *:
             """Make log record before execution.
@@ -367,11 +365,9 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             :type arguments: str
             :type method: str
             """
-            self._logger.log(  # type: ignore
+            self._logger.log(
                 level=self.log_level,
-                msg="{method}: \n{name!r}({arguments})".format(
-                    method=method, name=name, arguments=arguments if self.log_call_args else ""
-                ),
+                msg=f"{method}: \n{name!r}({arguments if self.log_call_args else ''})",
             )
 
         void _make_exc_record(self, str name, str arguments) except *:
@@ -388,7 +384,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             # Make standard traceback string
             cdef str tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
 
-            self._logger.log(  # type: ignore
+            self._logger.log(
                 level=self.exc_level,
                 msg=(
                     f"Failed: \n"

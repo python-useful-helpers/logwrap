@@ -38,16 +38,16 @@ except ImportError:
 
 
 with open(os.path.join(os.path.dirname(__file__), "logwrap", "__init__.py")) as f:
-    source = f.read()
+    SOURCE = f.read()
 
 with open("requirements.txt") as f:
-    required = f.read().splitlines()
+    REQUIRED = f.read().splitlines()
 
 with open("README.rst") as f:
-    long_description = f.read()
+    LONG_DESCRIPTION = f.read()
 
 
-requires_optimization = [
+REQUIRES_OPTIMIZATION = [
     setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
     setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
     setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
@@ -55,9 +55,9 @@ requires_optimization = [
 ]
 
 # noinspection PyCallingNonCallable
-ext_modules = (
+EXT_MODULES = (
     cythonize(
-        module_list=requires_optimization,
+        module_list=REQUIRES_OPTIMIZATION,
         compiler_directives=dict(
             always_allow_keywords=True, binding=True, embedsignature=True, overflowcheck=True, language_level=3
         ),
@@ -70,14 +70,15 @@ ext_modules = (
 class BuildFailed(Exception):
     """For install clear scripts."""
 
-    pass
-
 
 class AllowFailRepair(build_ext.build_ext):
     """This class allows C extension building to fail and repairs init."""
 
     def run(self):
-        """Run."""
+        """Run.
+
+        :raises BuildFailed: Build is failed and clean python code should be used.
+        """
         try:
             build_ext.build_ext.run(self)
 
@@ -101,7 +102,10 @@ class AllowFailRepair(build_ext.build_ext):
             raise BuildFailed()
 
     def build_extension(self, ext):
-        """build_extension."""
+        """build_extension.
+
+        :raises BuildFailed: Build is failed and clean python code should be used.
+        """
         try:
             build_ext.build_ext.build_extension(self, ext)
         except (
@@ -182,9 +186,9 @@ def get_simple_vars_from_src(src):
     return result
 
 
-variables = get_simple_vars_from_src(source)
+VARIABLES = get_simple_vars_from_src(SOURCE)
 
-classifiers = [
+CLASSIFIERS = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -197,21 +201,21 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-keywords = ["logging", "debugging", "development"]
+KEYWORDS = ["logging", "debugging", "development"]
 
 setup_args = dict(
     name="logwrap",
-    author=variables["__author__"],
-    author_email=variables["__author_email__"],
+    author=VARIABLES["__author__"],
+    author_email=VARIABLES["__author_email__"],
     maintainer=", ".join(
-        "{name} <{email}>".format(name=name, email=email) for name, email in variables["__maintainers__"].items()
+        "{name} <{email}>".format(name=name, email=email) for name, email in VARIABLES["__maintainers__"].items()
     ),
-    url=variables["__url__"],
-    license=variables["__license__"],
-    description=variables["__description__"],
-    long_description=long_description,
-    classifiers=classifiers,
-    keywords=keywords,
+    url=VARIABLES["__url__"],
+    license=VARIABLES["__license__"],
+    description=VARIABLES["__description__"],
+    long_description=LONG_DESCRIPTION,
+    classifiers=CLASSIFIERS,
+    keywords=KEYWORDS,
     python_requires=">=3.5.0",
     # While setuptools cannot deal with pre-installed incompatible versions,
     # setting a lower bound is not harmful - it makes error messages cleaner. DO
@@ -226,11 +230,11 @@ setup_args = dict(
         "setuptools_scm",
     ],
     use_scm_version=True,
-    install_requires=required,
+    install_requires=REQUIRED,
     package_data={"logwrap": ["py.typed"]},
 )
 if cythonize is not None:
-    setup_args["ext_modules"] = ext_modules
+    setup_args["ext_modules"] = EXT_MODULES
     setup_args["cmdclass"] = dict(build_ext=AllowFailRepair)
 
 try:
