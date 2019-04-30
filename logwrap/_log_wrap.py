@@ -668,12 +668,12 @@ class LogWrap(_class_decorator.BaseDecorator):
         :return: wrapped function
         :rtype: typing.Callable
         """
-        sig = funcsigs.signature(obj=self._spec or func)
 
         # pylint: disable=missing-docstring
         # noinspection PyMissingOrEmptyDocstring
         @six.wraps(func)
         def wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
+            sig = funcsigs.signature(obj=self._spec or func)
             args_repr = self._get_func_args_repr(
                 sig=sig,
                 args=args,
