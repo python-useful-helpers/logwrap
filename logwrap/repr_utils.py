@@ -202,7 +202,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :return: Repr of function or method with signature.
         :rtype: str
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
@@ -217,7 +217,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :return: simple repr() over object
         :rtype: str
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
@@ -229,7 +229,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :type indent: int
         :rtype: typing.Iterator[str]
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     @staticmethod
     def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
@@ -249,7 +249,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :type suffix: str
         :rtype: str
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     def _repr_iterable_items(self, src: typing.Iterable[typing.Any], indent: int = 0) -> typing.Iterator[str]:
         """Repr iterable items (not designed for dicts).
@@ -271,7 +271,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
         :rtype: str
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     def process_element(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Make human readable representation of object.
