@@ -578,12 +578,12 @@ class LogWrap(class_decorator.BaseDecorator):
         :return: wrapped coroutine or function
         :rtype: typing.Callable
         """
-        sig: inspect.Signature = inspect.signature(self._spec or func)
 
         # pylint: disable=missing-docstring
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
+            sig: inspect.Signature = inspect.signature(self._spec or func)
             args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
@@ -600,6 +600,7 @@ class LogWrap(class_decorator.BaseDecorator):
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         def wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
+            sig: inspect.Signature = inspect.signature(self._spec or func)
             args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:

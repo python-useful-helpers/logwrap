@@ -404,10 +404,10 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         :return: wrapped coroutine or function
         :rtype: typing.Callable
         """
-        sig = inspect.signature(self._spec or func)
 
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
+            sig = inspect.signature(self._spec or func)
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
@@ -423,6 +423,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
+            sig = inspect.signature(self._spec or func)
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
