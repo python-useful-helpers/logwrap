@@ -47,33 +47,34 @@ with open("README.rst") as f:
     LONG_DESCRIPTION = f.read()
 
 
-if "win32" != sys.platform:
-    REQUIRES_OPTIMIZATION = [
-        setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
-        setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
-        setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-        setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),
-        setuptools.Extension("logwrap.log_on_access", ["logwrap/log_on_access.py"]),
-    ]
-else:
-    REQUIRES_OPTIMIZATION = [
-        setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
-        setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-        setuptools.Extension("logwrap.log_on_access", ["logwrap/log_on_access.py"]),
-    ]
-
-
 # noinspection PyCallingNonCallable
-EXT_MODULES = (
-    cythonize(
+if cythonize is not None:
+    if "win32" != sys.platform:
+        REQUIRES_OPTIMIZATION = [
+            setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
+            setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
+            setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
+            setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),
+            setuptools.Extension("logwrap.log_on_access", ["logwrap/log_on_access.py"]),
+        ]
+        INTERFACES = ["class_decorator.pxd", "log_wrap.pxd", "repr_utils.pxd"]
+    else:
+        REQUIRES_OPTIMIZATION = [
+            setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
+            setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
+            setuptools.Extension("logwrap.log_on_access", ["logwrap/log_on_access.py"]),
+        ]
+        INTERFACES = ["class_decorator.pxd", "repr_utils.pxd"]
+
+    EXT_MODULES = cythonize(
         module_list=REQUIRES_OPTIMIZATION,
         compiler_directives=dict(
             always_allow_keywords=True, binding=True, embedsignature=True, overflowcheck=True, language_level=3
         ),
     )
-    if cythonize is not None
-    else []
-)
+else:
+    INTERFACES = []
+    EXT_MODULES = []
 
 
 class BuildFailed(Exception):
@@ -240,7 +241,7 @@ SETUP_ARGS = dict(
     ],
     use_scm_version=True,
     install_requires=REQUIRED,
-    package_data={"logwrap": ["py.typed"]},
+    package_data={"logwrap": INTERFACES + ["py.typed"]},
 )
 if cythonize is not None:
     SETUP_ARGS["ext_modules"] = EXT_MODULES
@@ -252,4 +253,5 @@ except BuildFailed:
     print("*" * 80 + "\n" "* Build Failed!\n" "* Use clear scripts version.\n" "*" * 80 + "\n")
     del SETUP_ARGS["ext_modules"]
     del SETUP_ARGS["cmdclass"]
+    SETUP_ARGS["package_data"]["logwrap"] = ["py.typed"]
     setuptools.setup(**SETUP_ARGS)
