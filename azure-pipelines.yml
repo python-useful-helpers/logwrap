@@ -109,7 +109,6 @@ jobs:
       - Python_36_x86_cython
       - Python_37_x64_cython
       - Python_37_x86_cython
-
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     pool:
       vmIMage: 'VS2017-Win2016'
@@ -118,16 +117,16 @@ jobs:
       matrix:
         Python36_x64:
           python.version: '3.6'
-          architecture: 'x64'
+          python.architecture: 'x64'
         Python36_x86:
           python.version: '3.6'
-          architecture: 'x86'
+          python.architecture: 'x86'
         Python37_x64:
           python.version: '3.7'
-          architecture: 'x64'
+          python.architecture: 'x64'
         Python37_x86:
           python.version: '3.7'
-          architecture: 'x86'
+          python.architecture: 'x86'
 
     steps:
       - task: UsePythonVersion@0
