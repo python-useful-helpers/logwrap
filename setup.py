@@ -73,6 +73,7 @@ if cythonize is not None:
         ),
     )
 else:
+    REQUIRES_OPTIMIZATION = []
     INTERFACES = []
     EXT_MODULES = []
 
