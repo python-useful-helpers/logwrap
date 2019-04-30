@@ -1,4 +1,4 @@
-#    Copyright 2016-2017 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2019 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -51,8 +51,9 @@ REQUIRES_OPTIMIZATION = [
     setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
     setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
     setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-    setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),
 ]
+if "win32" == sys.platform:
+    REQUIRES_OPTIMIZATION.append(setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),)
 
 # noinspection PyCallingNonCallable
 EXT_MODULES = (
@@ -62,7 +63,7 @@ EXT_MODULES = (
             always_allow_keywords=True, binding=True, embedsignature=True, overflowcheck=True, language_level=3
         ),
     )
-    if cythonize is not None and "win32" != sys.platform
+    if cythonize is not None
     else []
 )
 
