@@ -57,9 +57,9 @@ jobs:
       testResultsFiles: ${{ format('$(System.DefaultWorkingDirectory)/unit_result.xml') }}
       testRunTitle: ${{ format('{0}_{1}_{2}', parameters.name, parameters.architecture, parameters.kind) }}
 
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: Cobertura
-      summaryFileLocation: ${{ format('$(System.DefaultWorkingDirectory)/coverage.xml') }}
-      reportDirectory: ${{ format('$(System.DefaultWorkingDirectory)/htmlcov') }}
-
+  - ${{ if not eq(parameters.kind, 'cython') }}:
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: ${{ format('$(System.DefaultWorkingDirectory)/coverage.xml') }}
+        reportDirectory: ${{ format('$(System.DefaultWorkingDirectory)/htmlcov') }}
