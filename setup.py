@@ -144,7 +144,7 @@ KEYWORDS = [
     'development',
 ]
 
-setup_args = dict(
+SETUP_ARGS = dict(
     name='logwrap',
     author=VARIABLES['__author__'],
     author_email=VARIABLES['__author_email__'],
@@ -175,4 +175,4 @@ setup_args = dict(
     },
 )
 
-setuptools.setup(**setup_args)
+setuptools.setup(**SETUP_ARGS)
