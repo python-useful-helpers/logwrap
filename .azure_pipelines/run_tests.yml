@@ -57,7 +57,7 @@ jobs:
       testResultsFiles: ${{ format('$(System.DefaultWorkingDirectory)/unit_result.xml') }}
       testRunTitle: ${{ format('{0}_{1}_{2}', parameters.name, parameters.architecture, parameters.kind) }}
 
-  - ${{ if not eq(parameters.kind, 'cython') }}:
+  - ${{ if ne(parameters.kind, 'cython') }}:
     - task: PublishCodeCoverageResults@1
       inputs:
         codeCoverageTool: Cobertura
