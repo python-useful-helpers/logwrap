@@ -106,7 +106,7 @@ class BaseDecorator(six.with_metaclass(abc.ABCMeta, object)):
         :type func: typing.Callable
         :rtype: typing.Callable
         """
-        raise NotImplementedError()  # pragma: no cover
+        raise NotImplementedError()
 
     def __call__(
         self,
