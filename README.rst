@@ -171,10 +171,6 @@ This code during execution will produce log records:
          }),
      ))
 
-Limitations:
-
-* nested wrapping (`@logwrap @deco2 ...`) is not parsed under python 2.7: `functools.wraps` limitation. Please set `logwrap` as the first level decorator.
-
 LogWrap
 -------
 Example construction and read from test:
@@ -302,7 +298,8 @@ Basic API is conform with `property`, but in addition it is possible to customiz
 
 Usage examples:
 
-1. Simple usage. All by default, logger is re-used from instance if available with names `logger` or `log` else used internal `logwrap.log_on_access` logger:
+1. Simple usage. All by default.
+   logger is re-used from instance if available with names `logger` or `log` else used internal `logwrap.log_on_access` logger:
 
   .. code-block:: python
 

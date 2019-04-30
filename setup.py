@@ -194,16 +194,16 @@ CLASSIFIERS = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
 KEYWORDS = ["logging", "debugging", "development"]
 
-setup_args = dict(
+SETUP_ARGS = dict(
     name="logwrap",
     author=VARIABLES["__author__"],
     author_email=VARIABLES["__author_email__"],
@@ -234,13 +234,13 @@ setup_args = dict(
     package_data={"logwrap": ["py.typed"]},
 )
 if cythonize is not None:
-    setup_args["ext_modules"] = EXT_MODULES
-    setup_args["cmdclass"] = dict(build_ext=AllowFailRepair)
+    SETUP_ARGS["ext_modules"] = EXT_MODULES
+    SETUP_ARGS["cmdclass"] = dict(build_ext=AllowFailRepair)
 
 try:
-    setuptools.setup(**setup_args)
+    setuptools.setup(**SETUP_ARGS)
 except BuildFailed:
     print("*" * 80 + "\n" "* Build Failed!\n" "* Use clear scripts version.\n" "*" * 80 + "\n")
-    del setup_args["ext_modules"]
-    del setup_args["cmdclass"]
-    setuptools.setup(**setup_args)
+    del SETUP_ARGS["ext_modules"]
+    del SETUP_ARGS["cmdclass"]
+    setuptools.setup(**SETUP_ARGS)
