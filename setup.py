@@ -52,7 +52,7 @@ REQUIRES_OPTIMIZATION = [
     setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
     setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
 ]
-if "win32" == sys.platform:
+if "win32" != sys.platform:
     REQUIRES_OPTIMIZATION.append(setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),)
 
 # noinspection PyCallingNonCallable
