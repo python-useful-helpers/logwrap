@@ -47,13 +47,21 @@ with open("README.rst") as f:
     LONG_DESCRIPTION = f.read()
 
 
-REQUIRES_OPTIMIZATION = [
-    setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
-    setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
-    setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-    setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),
-    setuptools.Extension("logwrap.log_on_access", ["logwrap/log_on_access.py"]),
-]
+if "win32" != sys.platform:
+    REQUIRES_OPTIMIZATION = [
+        setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
+        setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
+        setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
+        setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),
+        setuptools.Extension("logwrap.log_on_access", ["logwrap/log_on_access.py"]),
+    ]
+else:
+    REQUIRES_OPTIMIZATION = [
+        setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
+        setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
+        setuptools.Extension("logwrap.log_on_access", ["logwrap/log_on_access.py"]),
+    ]
+
 
 # noinspection PyCallingNonCallable
 EXT_MODULES = (
@@ -63,7 +71,7 @@ EXT_MODULES = (
             always_allow_keywords=True, binding=True, embedsignature=True, overflowcheck=True, language_level=3
         ),
     )
-    if cythonize is not None and "win32" != sys.platform
+    if cythonize is not None
     else []
 )
 
