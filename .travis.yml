@@ -82,7 +82,7 @@ jobs:
     name: "PEP8"
     install:
     - *upgrade_python_toolset
-    - pip install --upgrade flake8 flake8-bugbear
+    - pip install --upgrade flake8
     script:
     - flake8
 
