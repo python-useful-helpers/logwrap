@@ -23,18 +23,20 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+# Standard Library
 import abc
 import types
 import typing  # noqa # pylint: disable=unused-import
 
+# External Dependencies
 import six
 
 # pylint: disable=ungrouped-imports, no-name-in-module
 # noinspection PyUnresolvedReferences
-from funcsigs import (  # type: ignore
-    Parameter,
-    signature,
-)
+from funcsigs import Parameter  # type: ignore
+# noinspection PyUnresolvedReferences
+from funcsigs import signature  # type: ignore
+
 # pylint: enable=ungrouped-imports, no-name-in-module
 
 

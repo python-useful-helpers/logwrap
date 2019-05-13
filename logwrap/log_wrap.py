@@ -23,12 +23,15 @@ available from the main module.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+# Standard Library
 import logging
 import sys
 import traceback
 import typing  # noqa # pylint: disable=unused-import
 
+# External Dependencies
 import six
+
 # pylint: disable=no-name-in-module
 # noinspection PyUnresolvedReferences
 import funcsigs  # type: ignore
@@ -36,10 +39,13 @@ import funcsigs  # type: ignore
 from funcsigs import Parameter
 # noinspection PyUnresolvedReferences,PyPackageRequirements
 from funcsigs import Signature  # noqa # pylint: disable=unused-import
-# pylint: enable=no-name-in-module
 
-import logwrap as core
-from . import _class_decorator
+# LogWrap Implementation
+from logwrap import repr_utils
+# Local Implementation
+from . import class_decorator
+
+# pylint: enable=no-name-in-module
 
 
 __all__ = (
@@ -193,7 +199,7 @@ def bind_args_kwargs(
         )
 
 
-class LogWrap(_class_decorator.BaseDecorator):
+class LogWrap(class_decorator.BaseDecorator):
     """LogWrap."""
 
     __slots__ = (
@@ -565,7 +571,7 @@ class LogWrap(_class_decorator.BaseDecorator):
                 elif param.VAR_KEYWORD == param.kind:
                     value = {}
 
-            val = core.pretty_repr(
+            val = repr_utils.pretty_repr(
                 src=value,
                 indent=INDENT + 4,
                 no_indent_start=True,
@@ -605,7 +611,7 @@ class LogWrap(_class_decorator.BaseDecorator):
 
         if self.log_result_obj:
             msg += " with result:\n{result}".format(
-                result=core.pretty_repr(
+                result=repr_utils.pretty_repr(
                     result,
                     max_indent=self.max_indent,
                 )

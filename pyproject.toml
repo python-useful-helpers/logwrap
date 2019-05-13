@@ -7,3 +7,13 @@ requires = [
   "setuptools_scm"
 ]
 build-backend="setuptools.build_meta"
+
+[tool.isort]
+line_length = 120
+multi_line_output = 3
+force_single_line = true
+
+import_heading_stdlib = "Standard Library"
+import_heading_thirdparty = "External Dependencies"
+import_heading_firstparty = "LogWrap Implementation"
+import_heading_localfolder = "Local Implementation"

@@ -24,21 +24,16 @@ later it has been reworked and extended for support of special cases.
 
 from __future__ import absolute_import
 
-from ._repr_utils import (
-    PrettyFormat,
-    PrettyRepr,
-    PrettyStr,
-    pretty_repr,
-    pretty_str
-)
-
-
-from ._log_wrap import (
-    logwrap,
-    LogWrap,
-    BoundParameter,
-    bind_args_kwargs
-)
+# Local Implementation
+from .log_wrap import BoundParameter
+from .log_wrap import LogWrap
+from .log_wrap import bind_args_kwargs
+from .log_wrap import logwrap
+from .repr_utils import PrettyFormat
+from .repr_utils import PrettyRepr
+from .repr_utils import PrettyStr
+from .repr_utils import pretty_repr
+from .repr_utils import pretty_str
 
 __all__ = (
     'LogWrap',
