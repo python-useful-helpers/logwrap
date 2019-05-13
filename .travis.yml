@@ -76,23 +76,23 @@ jobs:
         - *upgrade_python_toolset
         - *install_deps
         - pip install --upgrade "mypy >= 0.700"
-    script:
-    - mypy --strict logwrap
-  - <<: *static_analysis
-    name: "PEP8"
-    install:
-    - *upgrade_python_toolset
-    - pip install --upgrade flake8
-    script:
-    - flake8
+      script:
+        - mypy --strict logwrap
+    - <<: *static_analysis
+      name: "PEP8"
+      install:
+        - *upgrade_python_toolset
+        - pip install --upgrade flake8
+      script:
+        - flake8
 
-#  - <<: *code_style_check
-#    name: "PEP257"
-#    install:
-#    - *upgrade_python_toolset
-#    - pip install --upgrade pydocstyle
-#    script:
-#    - pydocstyle logwrap
+    #  - <<: *code_style_check
+    #    name: "PEP257"
+    #    install:
+    #    - *upgrade_python_toolset
+    #    - pip install --upgrade pydocstyle
+    #    script:
+    #    - pydocstyle logwrap
 
     - stage: test
       <<: *python34
