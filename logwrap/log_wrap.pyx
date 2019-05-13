@@ -143,7 +143,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
     def __init__(
         self,
-        func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
+        func: typing.Optional[typing.Callable[..., typing.Any]] = None,
         *,
         log: logging.Logger = logger,
         unsigned long log_level=logging.DEBUG,
@@ -398,8 +398,8 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             )
 
     def _get_function_wrapper(
-        self, func: typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]
-    ) -> typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]:
+        self, func: typing.Callable[..., typing.Any]
+    ) -> typing.Callable[..., typing.Any]:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -445,15 +445,15 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
     def __call__(
         self,
-        *args: typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any],
+        *args: typing.Union[typing.Callable[..., typing.Any], typing.Any],
         **kwargs: typing.Any,
-    ) -> typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any]:
+    ) -> typing.Union[typing.Callable[..., typing.Any], typing.Any]:
         """Callable instance."""
         return super(LogWrap, self).__call__(*args, **kwargs)
 
 
 def logwrap(
-    func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
+    func: typing.Optional[typing.Callable[..., typing.Any]] = None,
     *,
     log: logging.Logger = logger,
     unsigned long log_level=logging.DEBUG,
@@ -466,7 +466,7 @@ def logwrap(
     bint log_call_args_on_exc=True,
     bint log_traceback=True,
     bint log_result_obj=True
-) -> typing.Union[LogWrap, typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]]:
+) -> typing.Union[LogWrap, typing.Callable[..., typing.Any]]:
     """Log function calls and return values.
 
     :param func: function to wrap
