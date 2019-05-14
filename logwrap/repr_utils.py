@@ -1,4 +1,4 @@
-#    Copyright 2018 Alexey Stepanov aka penguinolog
+#    Copyright 2018 - 2019 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -382,11 +382,12 @@ class PrettyRepr(PrettyFormat):
     def _strings_repr(indent, val):  # type: (int, typing.Union[six.text_type, six.binary_type]) -> typing.Text
         """Custom repr for strings and binary strings."""
         if isinstance(val, six.binary_type):
-            val = val.decode(encoding="utf-8", errors="backslashreplace")
+            string = val.decode(encoding="utf-8", errors="backslashreplace")
             prefix = "b"
         else:
             prefix = "u"
-        return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=val)
+            string = val
+        return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=string)
 
     def _repr_simple(self, src, indent=0, no_indent_start=False):  # type: (typing.Any, int, bool) -> typing.Text
         """Repr object without iteration.
@@ -519,8 +520,10 @@ class PrettyStr(PrettyFormat):
     def _strings_str(indent, val):  # type: (int, typing.Union[six.text_type, six.binary_type]) -> typing.Text
         """Custom repr for strings and binary strings."""
         if isinstance(val, six.binary_type):
-            val = val.decode(encoding="utf-8", errors="backslashreplace")
-        return "{spc:<{indent}}{string}".format(spc="", indent=indent, string=val)
+            string = val.decode(encoding="utf-8", errors="backslashreplace")
+        else:
+            string = val
+        return "{spc:<{indent}}{string}".format(spc="", indent=indent, string=string)
 
     def _repr_simple(self, src, indent=0, no_indent_start=False):  # type: (typing.Any, int, bool) -> typing.Text
         """Repr object without iteration.

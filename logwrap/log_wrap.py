@@ -31,18 +31,13 @@ import typing  # noqa # pylint: disable=unused-import
 import warnings
 
 # External Dependencies
+# noinspection PyUnresolvedReferences
+import funcsigs  # type: ignore
 import six
 
 # LogWrap Implementation
-# noinspection PyUnresolvedReferences
-import funcsigs  # type: ignore
+from logwrap import class_decorator
 from logwrap import repr_utils
-
-# Local Implementation
-from . import class_decorator
-
-# pylint: enable=no-name-in-module
-
 
 __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
