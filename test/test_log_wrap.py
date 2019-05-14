@@ -633,7 +633,7 @@ class TestLogWrap(unittest.TestCase):
             log.mock_calls,
         )
 
-    def test_empty_args_kwargs(self):
+    def test_021_empty_args_kwargs(self):
         @logwrap.logwrap
         def func(*args, **kwargs):
             return 'No args'

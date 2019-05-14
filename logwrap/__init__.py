@@ -23,6 +23,7 @@ later it has been reworked and extended for support of special cases.
 """
 from __future__ import absolute_import
 
+# External Dependencies
 import pkg_resources
 
 # Local Implementation
@@ -37,15 +38,15 @@ from .repr_utils import pretty_repr
 from .repr_utils import pretty_str
 
 __all__ = (
-    'LogWrap',
-    'logwrap',
-    'PrettyFormat',
-    'PrettyRepr',
-    'PrettyStr',
-    'pretty_repr',
-    'pretty_str',
-    'BoundParameter',
-    'bind_args_kwargs'
+    "LogWrap",
+    "logwrap",
+    "PrettyFormat",
+    "PrettyRepr",
+    "PrettyStr",
+    "pretty_repr",
+    "pretty_str",
+    "BoundParameter",
+    "bind_args_kwargs",
 )
 
 try:
@@ -57,15 +58,15 @@ except pkg_resources.DistributionNotFound:
 
         __version__ = setuptools_scm.get_version()
     except ImportError:
-        pass
+        setuptools_scm = None
 
 __author__ = "Alexey Stepanov"
-__author_email__ = 'penguinolog@gmail.com'
+__author_email__ = "penguinolog@gmail.com"
 __maintainers__ = {
-    'Alexey Stepanov': 'penguinolog@gmail.com',
-    'Antonio Esposito': 'esposito.cloud@gmail.com',
-    'Dennis Dmitriev': 'dis-xcom@gmail.com',
+    "Alexey Stepanov": "penguinolog@gmail.com",
+    "Antonio Esposito": "esposito.cloud@gmail.com",
+    "Dennis Dmitriev": "dis-xcom@gmail.com",
 }
-__url__ = 'https://github.com/python-useful-helpers/logwrap'
+__url__ = "https://github.com/python-useful-helpers/logwrap"
 __description__ = "Decorator for logging function arguments and return value by human-readable way"
 __license__ = "Apache License, Version 2.0"

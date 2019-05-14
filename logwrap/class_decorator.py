@@ -33,9 +33,7 @@ class BaseDecorator(six.with_metaclass(abc.ABCMeta, object)):
 
     Implements wrapping and __call__, wrapper getter is abstract.
 
-    Note:
-        wrapper getter is called only on function call,
-        if decorator used without braces.
+    .. note:: wrapper getter is called only on function call, if decorator used without braces.
 
     Usage example:
 
@@ -105,8 +103,7 @@ class BaseDecorator(six.with_metaclass(abc.ABCMeta, object)):
         raise NotImplementedError()
 
     def __call__(
-        self,
-        *args, **kwargs
+        self, *args, **kwargs
     ):  # type: (typing.Union[typing.Callable[..., typing.Any], typing.Any], typing.Any) -> typing.Any
         """Main decorator getter."""
         l_args = list(args)
@@ -124,14 +121,13 @@ class BaseDecorator(six.with_metaclass(abc.ABCMeta, object)):
     def __repr__(self):  # type: () -> str
         """For debug purposes."""
         return "<{cls}({func!r}) at 0x{id:X}>".format(
-            cls=self.__class__.__name__,
-            func=self.__func,
-            id=id(self)
+            cls=self.__class__.__name__, func=self.__func, id=id(self)
         )  # pragma: no cover
 
 
 # 8<----------------------------------------------------------------------------
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest  # pragma: no cover
+
     doctest.testmod(verbose=True)  # pragma: no cover

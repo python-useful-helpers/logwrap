@@ -28,125 +28,75 @@ import logging
 import sys
 import traceback
 import typing  # noqa # pylint: disable=unused-import
+import warnings
 
 # External Dependencies
 import six
 
-# pylint: disable=no-name-in-module
+# LogWrap Implementation
 # noinspection PyUnresolvedReferences
 import funcsigs  # type: ignore
-# noinspection PyUnresolvedReferences,PyPackageRequirements
-from funcsigs import Parameter
-# noinspection PyUnresolvedReferences,PyPackageRequirements
-from funcsigs import Signature  # noqa # pylint: disable=unused-import
-
-# LogWrap Implementation
 from logwrap import repr_utils
+
 # Local Implementation
 from . import class_decorator
 
 # pylint: enable=no-name-in-module
 
 
-__all__ = (
-    'LogWrap',
-    'logwrap',
-    'BoundParameter',
-    'bind_args_kwargs',
-)
+__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
-logger = logging.getLogger('logwrap')  # type: logging.Logger
-
-
+LOGGER = logging.getLogger('logwrap')  # type: logging.Logger
 INDENT = 4
 
 
-class BoundParameter(object):
+class BoundParameter(funcsigs.Parameter):  # type: ignore
     """Parameter-like object store BOUND with value parameter.
 
     .. versionadded:: 3.3.0
+    .. versionchanged:: 4.9.5 subclass inspect.Parameter
     """
 
-    __slots__ = (
-        '_parameter',
-        '_value'
-    )
+    __slots__ = ("_value",)
 
-    POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY
-    POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD
-    VAR_POSITIONAL = Parameter.VAR_POSITIONAL
-    KEYWORD_ONLY = Parameter.KEYWORD_ONLY
-    VAR_KEYWORD = Parameter.VAR_KEYWORD
-
-    empty = Parameter.empty
-
-    def __init__(
-        self,
-        parameter,  # type: Parameter
-        value=Parameter.empty  # type: typing.Any
-    ):  # type: (...) -> None
+    def __init__(self, parameter, value=funcsigs.Parameter.empty):  # type: (funcsigs.Parameter, typing.Any) -> None
         """Parameter-like object store BOUND with value parameter.
 
         :param parameter: parameter from signature
-        :type parameter: inspect.Parameter
+        :type parameter: funcsigs.Parameter
         :param value: parameter real value
         :type value: typing.Any
         :raises ValueError: No default value and no value
         """
-        self._parameter = parameter
+        super(BoundParameter, self).__init__(
+            name=parameter.name, kind=parameter.kind, default=parameter.default, annotation=parameter.annotation
+        )
 
         if value is self.empty:
             if parameter.default is self.empty and parameter.kind not in (self.VAR_POSITIONAL, self.VAR_KEYWORD):
-                raise ValueError('Value is not set and no default value')
+                raise ValueError("Value is not set and no default value")
             self._value = parameter.default
         else:
             self._value = value
 
     @property
-    def parameter(self):  # type: () -> Parameter
+    def parameter(self):  # type: () -> funcsigs.Parameter
         """Parameter object."""
-        return self._parameter
-
-    @property
-    def name(self):  # type: () -> typing.Union[None, str]
-        """Parameter name."""
-        return self.parameter.name  # type: ignore
-
-    @property
-    def default(self):  # type: () -> typing.Any
-        """Parameter default value."""
-        return self.parameter.default
-
-    @property
-    def annotation(self):  # type: () -> typing.Union[Parameter.empty, str]
-        """Parameter annotation."""
-        return self.parameter.annotation
-
-    @property
-    def kind(self):  # type: () -> int
-        """Parameter kind."""
-        return self.parameter.kind  # type: ignore
+        warnings.warn("BoundParameter is subclass of `funcsigs.Parameter`", DeprecationWarning)
+        return self
 
     @property
     def value(self):  # type: () -> typing.Any
         """Parameter value."""
         return self._value
 
-    def __hash__(self):  # type: () -> int  # pragma: no cover
-        """Block hashing.
-
-        :raises TypeError: Not hashable.
-        """
-        msg = "unhashable type: '{0}'".format(self.__class__.__name__)
-        raise TypeError(msg)
-
     def __str__(self):  # type: () -> str
         """Debug purposes."""
         # POSITIONAL_ONLY is only in precompiled functions
         if self.kind == self.POSITIONAL_ONLY:  # pragma: no cover
-            as_str = '' if self.name is None else '<{as_str}>'.format(as_str=self.name)
+            as_str = "" if self.name is None else "<{as_str}>".format(as_str=self.name)
         else:
-            as_str = self.name or ''
+            as_str = self.name or ""
 
         value = self.value
         if self.empty is value:
@@ -155,15 +105,15 @@ class BoundParameter(object):
             elif self.VAR_KEYWORD == self.kind:
                 value = {}
 
-        as_str += '={value!r}'.format(value=value)
+        as_str += "={value!r}".format(value=value)
 
         if self.default is not self.empty:
-            as_str += '  # {self.default!r}'.format(self=self)
+            as_str += "  # {self.default!r}".format(self=self)
 
         if self.kind == self.VAR_POSITIONAL:
-            as_str = '*' + as_str
+            as_str = "*" + as_str
         elif self.kind == self.VAR_KEYWORD:
-            as_str = '**' + as_str
+            as_str = "**" + as_str
 
         return as_str
 
@@ -173,52 +123,49 @@ class BoundParameter(object):
 
 
 def bind_args_kwargs(
-    sig,  # type: Signature
-    *args,  # type: typing.Any
-    **kwargs  # type: typing.Any
-):  # type: (...) -> typing.Iterator[BoundParameter]
+    sig, *args, **kwargs
+):  # type: (funcsigs.Signature, typing.Any,typing.Any) -> typing.List[BoundParameter]
     """Bind *args and **kwargs to signature and get Bound Parameters.
 
     :param sig: source signature
-    :type sig: inspect.Signature
+    :type sig: funcsigs.Signature
     :param args: not keyworded arguments
     :type args: typing.Any
     :param kwargs: keyworded arguments
     :type kwargs: typing.Any
     :return: Iterator for bound parameters with all information about it
-    :rtype: typing.Iterator[BoundParameter]
+    :rtype: typing.List[BoundParameter]
 
     .. versionadded:: 3.3.0
+    .. versionchanged:: 4.9.5 return list
     """
+    result = []
     bound = sig.bind(*args, **kwargs).arguments
-    parameters = list(sig.parameters.values())
-    for param in parameters:
-        yield BoundParameter(
-            parameter=param,
-            value=bound.get(param.name, param.default)
-        )
+    for param in sig.parameters.values():
+        result.append(BoundParameter(parameter=param, value=bound.get(param.name, param.default)))
+    return result
 
 
 class LogWrap(class_decorator.BaseDecorator):
-    """LogWrap."""
+    """Base class for LogWrap implementation."""
 
     __slots__ = (
-        '__blacklisted_names',
-        '__blacklisted_exceptions',
-        '__logger',
-        '__log_level',
-        '__exc_level',
-        '__max_indent',
-        '__spec',
-        '__log_call_args',
-        '__log_call_args_on_exc',
-        '__log_result_obj',
+        "__blacklisted_names",
+        "__blacklisted_exceptions",
+        "__logger",
+        "__log_level",
+        "__exc_level",
+        "__max_indent",
+        "__spec",
+        "__log_call_args",
+        "__log_call_args_on_exc",
+        "__log_result_obj",
     )
 
     def __init__(
         self,
         func=None,  # type: typing.Optional[typing.Callable[..., typing.Any]]
-        log=logger,  # type: logging.Logger
+        log=LOGGER,  # type: logging.Logger
         log_level=logging.DEBUG,  # type: int
         exc_level=logging.ERROR,  # type: int
         max_indent=20,  # type: int
@@ -303,12 +250,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
-            raise TypeError(
-                'Unexpected type: {}. Should be {}.'.format(
-                    val.__class__.__name__,
-                    int.__name__,
-                )
-            )
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, int.__name__))
         self.__log_level = val
 
     @property
@@ -328,12 +270,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
-            raise TypeError(
-                'Unexpected type: {}. Should be {}.'.format(
-                    val.__class__.__name__,
-                    int.__name__,
-                )
-            )
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, int.__name__))
         self.__exc_level = val
 
     @property
@@ -353,12 +290,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: indent is not integer
         """
         if not isinstance(val, int):
-            raise TypeError(
-                'Unexpected type: {}. Should be {}.'.format(
-                    val.__class__.__name__,
-                    int.__name__,
-                )
-            )
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, int.__name__))
         self.__max_indent = val
 
     @property
@@ -394,12 +326,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError(
-                'Unexpected type: {}. Should be {}.'.format(
-                    val.__class__.__name__,
-                    bool.__name__,
-                )
-            )
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
         self.__log_call_args = val
 
     @property
@@ -419,12 +346,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError(
-                'Unexpected type: {}. Should be {}.'.format(
-                    val.__class__.__name__,
-                    bool.__name__,
-                )
-            )
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
         self.__log_call_args_on_exc = val
 
     @property
@@ -444,12 +366,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
-            raise TypeError(
-                'Unexpected type: {}. Should be {}.'.format(
-                    val.__class__.__name__,
-                    bool.__name__,
-                )
-            )
+            raise TypeError("Unexpected type: {}. Should be {}.".format(val.__class__.__name__, bool.__name__))
         self.__log_result_obj = val
 
     @property
@@ -481,18 +398,13 @@ class LogWrap(class_decorator.BaseDecorator):
             "blacklisted_exceptions={self.blacklisted_exceptions}, "
             "log_call_args={self.log_call_args}, "
             "log_call_args_on_exc={self.log_call_args_on_exc}, "
-            "log_result_obj={self.log_result_obj}, )".format(
-                cls=self.__class__.__name__,
-                self=self,
-                spec=self._spec
-            )
+            "log_result_obj={self.log_result_obj}, )".format(cls=self.__class__.__name__, self=self, spec=self._spec)
         )
 
     # noinspection PyMethodMayBeStatic
     def pre_process_param(  # pylint: disable=no-self-use
-        self,
-        arg,  # type: BoundParameter
-    ):  # type: (...) -> typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]
+        self, arg
+    ):  # type: (BoundParameter) -> typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]
         """Process parameter for the future logging.
 
         :param arg: bound parameter
@@ -508,10 +420,8 @@ class LogWrap(class_decorator.BaseDecorator):
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def post_process_param(  # pylint: disable=no-self-use,unused-argument
-        self,
-        arg,  # type: BoundParameter
-        arg_repr  # type: typing.Text
-    ):  # type: (...) -> typing.Text
+        self, arg,  arg_repr
+    ):  # type: (BoundParameter, typing.Text) -> typing.Text
         """Process parameter for the future logging.
 
         :param arg: bound parameter
@@ -528,15 +438,12 @@ class LogWrap(class_decorator.BaseDecorator):
         return arg_repr
 
     def _get_func_args_repr(
-        self,
-        sig,  # type: Signature
-        args,  # type: typing.Tuple[typing.Any, ...]
-        kwargs  # type: typing.Dict[str, typing.Any]
-    ):  # type: (...) -> typing.Text
+        self, sig, args, kwargs
+    ):  # type: (funcsigs.Signature, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]) -> typing.Text
         """Internal helper for reducing complexity of decorator code.
 
         :param sig: function signature
-        :type sig: inspect.Signature
+        :type sig: funcsigs.Signature
         :param args: not keyworded arguments
         :type args: typing.Tuple
         :param kwargs: keyworded arguments
@@ -547,7 +454,7 @@ class LogWrap(class_decorator.BaseDecorator):
         .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
         """
         if not (self.log_call_args or self.log_call_args_on_exc):
-            return ''
+            return ""
 
         param_str = ""
 
@@ -571,27 +478,16 @@ class LogWrap(class_decorator.BaseDecorator):
                 elif param.VAR_KEYWORD == param.kind:
                     value = {}
 
-            val = repr_utils.pretty_repr(
-                src=value,
-                indent=INDENT + 4,
-                no_indent_start=True,
-                max_indent=self.max_indent,
-            )
+            val = repr_utils.pretty_repr(src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent)
 
-            val = self.post_process_param(param, val)  # type: ignore
+            val = self.post_process_param(param, val)
 
             if last_kind != param.kind:
-                param_str += "\n{spc:<{INDENT}}# {param.kind!s}:".format(spc='', INDENT=INDENT, param=param)
+                param_str += "\n{spc:<{indent}}# {kind!s}:".format(spc="", indent=INDENT, kind=param.kind)
                 last_kind = param.kind
 
-            annotation = ""
-
-            param_str += "\n{spc:<{INDENT}}{param.name!r}={val},{annotation}".format(
-                spc='',
-                INDENT=INDENT,
-                param=param,
-                val=val,
-                annotation=annotation
+            param_str += "\n{spc:<{indent}}{key!r}={val},".format(
+                spc="", indent=INDENT, key=param.name, val=val
             )
         if param_str:
             param_str += "\n"
@@ -610,20 +506,10 @@ class LogWrap(class_decorator.BaseDecorator):
         msg = "Done: {name!r}".format(name=func_name)
 
         if self.log_result_obj:
-            msg += " with result:\n{result}".format(
-                result=repr_utils.pretty_repr(
-                    result,
-                    max_indent=self.max_indent,
-                )
-            )
+            msg += " with result:\n{result}".format(result=repr_utils.pretty_repr(result, max_indent=self.max_indent))
         self._logger.log(level=self.log_level, msg=msg)
 
-    def _make_calling_record(
-        self,
-        name,  # type: str
-        arguments,  # type: str
-        method='Calling'  # type: str
-    ):  # type: (...) -> None
+    def _make_calling_record(self, name, arguments, method="Calling"):  # type: (str, str, str) -> None
         """Make log record before execution.
 
         :type name: str
@@ -637,11 +523,7 @@ class LogWrap(class_decorator.BaseDecorator):
             ),
         )
 
-    def _make_exc_record(
-        self,
-        name,  # type: str
-        arguments  # type: str
-    ):  # type: (...) -> None
+    def _make_exc_record(self, name, arguments):  # type: (str, str) -> None
         """Make log record if exception raised.
 
         :type name: str
@@ -658,7 +540,9 @@ class LogWrap(class_decorator.BaseDecorator):
         self._logger.log(
             level=self.exc_level,
             msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
-                name=name, arguments=arguments if self.log_call_args_on_exc else "", tb_text=tb_text
+                name=name,
+                arguments=arguments if self.log_call_args_on_exc else "",
+                tb_text=tb_text,
             ),
             exc_info=False,
         )
@@ -678,15 +562,11 @@ class LogWrap(class_decorator.BaseDecorator):
         # noinspection PyMissingOrEmptyDocstring
         @six.wraps(func)
         def wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
-            sig = funcsigs.signature(obj=self._spec or func)
-            args_repr = self._get_func_args_repr(
-                sig=sig,
-                args=args,
-                kwargs=kwargs,
-            )
+            sig = funcsigs.signature(obj=self._spec or func)  # type: funcsigs.Signature
+            args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
-            self._make_calling_record(name=func.__name__, arguments=args_repr)
             try:
+                self._make_calling_record(name=func.__name__, arguments=args_repr)
                 result = func(*args, **kwargs)
                 self._make_done_record(func.__name__, result)
             except BaseException as e:
@@ -711,7 +591,7 @@ class LogWrap(class_decorator.BaseDecorator):
 # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
 def logwrap(
     func=None,  # type: typing.Optional[typing.Callable[..., typing.Any]]
-    log=logger,  # type: logging.Logger
+    log=LOGGER,  # type: logging.Logger
     log_level=logging.DEBUG,  # type: int
     exc_level=logging.ERROR,  # type: int
     max_indent=20,  # type: int

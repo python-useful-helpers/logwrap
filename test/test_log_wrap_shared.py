@@ -21,8 +21,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-import logwrap
-
+from logwrap import log_wrap
 # pylint: disable=ungrouped-imports, no-name-in-module
 # noinspection PyUnresolvedReferences
 from funcsigs import signature
@@ -41,7 +40,7 @@ sig = signature(example_function)
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestBind(unittest.TestCase):
     def test_001_positive(self):
-        params = list(logwrap.bind_args_kwargs(sig, 1, arg3=33))
+        params = list(log_wrap.bind_args_kwargs(sig, 1, arg3=33))
         arg_1_bound = params[0]
         self.assertEqual(arg_1_bound.name, 'arg1')
         self.assertEqual(arg_1_bound.value, 1)
@@ -83,7 +82,7 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(kwargs_bound), "**kwargs={}")
 
     def test_002_args_kwargs(self):
-        params = list(logwrap.bind_args_kwargs(sig, 1, 2, 3, 4, arg5=5))
+        params = list(log_wrap.bind_args_kwargs(sig, 1, 2, 3, 4, arg5=5))
 
         args_bound = params[3]
         self.assertEqual(args_bound.name, 'args')
@@ -102,8 +101,8 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(kwargs_bound), "**kwargs={'arg5': 5}")
 
     def test_003_no_value(self):
-        params = list(logwrap.bind_args_kwargs(sig, 1, arg3=33))
+        params = list(log_wrap.bind_args_kwargs(sig, 1, arg3=33))
         arg_1_bound = params[0]
         arg1_parameter = arg_1_bound.parameter
         with self.assertRaises(ValueError):
-            logwrap.BoundParameter(arg1_parameter, arg1_parameter.empty)
+            log_wrap.BoundParameter(arg1_parameter, arg1_parameter.empty)
