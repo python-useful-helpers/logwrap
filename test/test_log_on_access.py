@@ -44,17 +44,30 @@ class TestLogOnAccess(unittest.TestCase):
 
         target = Target()
         self.assertEqual(target.ok, VALUE)
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue(), f"DEBUG:logwrap.log_on_access:Target(val=ok).ok -> {logwrap.pretty_repr(VALUE)}\n"
+            f"DEBUG:logwrap.log_on_access:Request: Target(val=ok).ok",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:logwrap\.log_on_access:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(val=ok\)\.ok -> {logwrap.pretty_repr(VALUE)}"
         )
 
         self.stream.seek(0)
         self.stream.truncate()
 
         target.ok = VALUE.upper()
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue(),
-            f"DEBUG:logwrap.log_on_access:Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}\n",
+            f"DEBUG:logwrap.log_on_access:Request: Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:logwrap\.log_on_access:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(val=ok\)\.ok = {logwrap.pretty_repr(VALUE.upper())}"
         )
 
         self.assertEqual(target.ok, VALUE.upper())
@@ -63,7 +76,15 @@ class TestLogOnAccess(unittest.TestCase):
         self.stream.truncate()
 
         del target.ok
-        self.assertEqual(self.stream.getvalue(), "DEBUG:logwrap.log_on_access:del Target(val=OK).ok\n")
+        logged = self.stream.getvalue().splitlines()
+        self.assertEqual(
+            f"DEBUG:logwrap.log_on_access:Request: del Target(val=OK).ok",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:logwrap\.log_on_access:Done at (?:\d+\.\d{{3}})s: del Target\(val=OK\)\.ok"
+        )
 
     def test_02_positive_properties(self):
         class Target:
@@ -84,9 +105,15 @@ class TestLogOnAccess(unittest.TestCase):
         target = Target()
 
         self.assertEqual(target.ok, VALUE)
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue(),
-            f"INFO:logwrap.log_on_access:<Target() at 0x{id(target):X}>.override -> {logwrap.pretty_repr(VALUE)}\n",
+            f"INFO:logwrap.log_on_access:Request: <Target() at 0x{id(target):X}>.override",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"INFO:logwrap\.log_on_access:Done at (?:\d+\.\d{{3}})s: "
+            rf"<Target\(\) at 0x{id(target):X}>\.override -> {logwrap.pretty_repr(VALUE)}"
         )
 
     def test_03_positive_no_log(self):
@@ -102,6 +129,7 @@ class TestLogOnAccess(unittest.TestCase):
                 return tself.val
 
             ok.log_success = False
+            ok.log_before = False
 
         target = Target()
 
@@ -130,8 +158,16 @@ class TestLogOnAccess(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.assertIsNone(target.ok)
 
-        self.assertEqual(self.stream.getvalue().splitlines()[0], "DEBUG:logwrap.log_on_access:Failed: Target().ok")
-        self.assertEqual(self.stream.getvalue().splitlines()[1], "Traceback (most recent call last):")
+        logged = self.stream.getvalue().splitlines()
+        self.assertEqual(
+            f"DEBUG:logwrap.log_on_access:Request: Target().ok",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{{3}})s: Target\(\)\.ok"
+        )
+        self.assertEqual("Traceback (most recent call last):", logged[2])
 
         self.stream.seek(0)
         self.stream.truncate()
@@ -139,10 +175,17 @@ class TestLogOnAccess(unittest.TestCase):
         with self.assertRaises(ValueError):
             target.ok = VALUE
 
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue().splitlines()[0],
-            f"DEBUG:logwrap.log_on_access:Failed: Target().ok = {logwrap.pretty_repr(VALUE)}",
+            f"DEBUG:logwrap.log_on_access:Request: Target().ok = {logwrap.pretty_repr(VALUE)}",
+            logged[0]
         )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{{3}})s: "
+            rf"Target\(\)\.ok = {logwrap.pretty_repr(VALUE)}"
+        )
+        self.assertEqual("Traceback (most recent call last):", logged[2])
 
         self.stream.seek(0)
         self.stream.truncate()
@@ -150,7 +193,16 @@ class TestLogOnAccess(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             del target.ok
 
-        self.assertEqual(self.stream.getvalue().splitlines()[0], "DEBUG:logwrap.log_on_access:Target(): Failed: del ok")
+        logged = self.stream.getvalue().splitlines()
+        self.assertEqual(
+            f"DEBUG:logwrap.log_on_access:Request: del Target().ok",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{{3}})s: del Target\(\)\.ok"
+        )
+        self.assertEqual("Traceback (most recent call last):", logged[2])
 
     def test_05_negative_properties(self):
         class Target:
@@ -174,11 +226,17 @@ class TestLogOnAccess(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.assertIsNone(target.ok)
 
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue().splitlines()[0],
-            "ERROR:logwrap.log_on_access:Failed: <Target() at 0x{id:X}>.override".format(id=id(target)),
+            f"DEBUG:logwrap.log_on_access:Request: <Target() at 0x{id(target):X}>.override",
+            logged[0]
         )
-        self.assertEqual(len(self.stream.getvalue().splitlines()), 1)
+        self.assertRegex(
+            logged[1],
+            rf"ERROR:logwrap\.log_on_access:Failed after (?:\d+\.\d{{3}})s: <Target\(\) at 0x{id(target):X}>\.override"
+        )
+
+        self.assertEqual(len(logged), 2)
 
     def test_06_negative_no_log(self):
         class Target:
@@ -193,6 +251,7 @@ class TestLogOnAccess(unittest.TestCase):
                 raise AttributeError()
 
             ok.log_failure = False
+            ok.log_before = False
 
         target = Target()
 
@@ -249,32 +308,60 @@ class TestLogOnAccess(unittest.TestCase):
         target = Target()
 
         getattr(target, "on_init_set")  # noqa: B009
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue(), f"DEBUG:on_init_set:Target().<lambda> -> {logwrap.pretty_repr(v_on_init_set)}\n"
+            f"DEBUG:on_init_set:Request: Target().<lambda>",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:on_init_set:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(\)\.<lambda> -> {logwrap.pretty_repr(v_on_init_set)}"
         )
 
         self.stream.seek(0)
         self.stream.truncate()
 
         getattr(target, "on_init_name")  # noqa: B009
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue(), f"DEBUG:on_init_name:Target().<lambda> -> {logwrap.pretty_repr(v_on_init_name)}\n"
+            f"DEBUG:on_init_name:Request: Target().<lambda>",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:on_init_name:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(\)\.<lambda> -> {logwrap.pretty_repr(v_on_init_name)}"
         )
 
         self.stream.seek(0)
         self.stream.truncate()
 
         getattr(target, "prop_set")  # noqa: B009
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue(), f"DEBUG:prop_set:Target().prop_set -> {logwrap.pretty_repr(v_prop_set)}\n"
+            f"DEBUG:prop_set:Request: Target().prop_set",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:prop_set:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(\)\.prop_set -> {logwrap.pretty_repr(v_prop_set)}"
         )
 
         self.stream.seek(0)
         self.stream.truncate()
 
         getattr(target, "prop_name")  # noqa: B009
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue(), f"DEBUG:prop_name:Target().prop_name -> {logwrap.pretty_repr(v_prop_name)}\n"
+            f"DEBUG:prop_name:Request: Target().prop_name",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:prop_name:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(\)\.prop_name -> {logwrap.pretty_repr(v_prop_name)}"
         )
 
     def test_09_logger_implemented(self):
@@ -300,14 +387,30 @@ class TestLogOnAccess(unittest.TestCase):
 
         target = Target()
         self.assertEqual(target.ok, VALUE)
-        self.assertEqual(self.stream.getvalue(), f"DEBUG:Target:Target(val=ok).ok -> {logwrap.pretty_repr(VALUE)}\n")
+        logged = self.stream.getvalue().splitlines()
+        self.assertEqual(
+            f"DEBUG:Target:Request: Target(val=ok).ok",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(val=ok\)\.ok -> {logwrap.pretty_repr(VALUE)}"
+        )
 
         self.stream.seek(0)
         self.stream.truncate()
 
         target.ok = VALUE.upper()
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue(), f"DEBUG:Target:Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}\n"
+            f"DEBUG:Target:Request: Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(val=ok\)\.ok = {logwrap.pretty_repr(VALUE.upper())}"
         )
 
         self.assertEqual(target.ok, VALUE.upper())
@@ -316,7 +419,15 @@ class TestLogOnAccess(unittest.TestCase):
         self.stream.truncate()
 
         del target.ok
-        self.assertEqual(self.stream.getvalue(), "DEBUG:Target:del Target(val=OK).ok\n")
+        logged = self.stream.getvalue().splitlines()
+        self.assertEqual(
+            f"DEBUG:Target:Request: del Target(val=OK).ok",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: del Target\(val=OK\)\.ok"
+        )
 
     def test_10_log_implemented(self):
         class Target:
@@ -341,14 +452,30 @@ class TestLogOnAccess(unittest.TestCase):
 
         target = Target()
         self.assertEqual(target.ok, VALUE)
-        self.assertEqual(self.stream.getvalue(), f"DEBUG:Target:Target(val=ok).ok -> {logwrap.pretty_repr(VALUE)}\n")
+        logged = self.stream.getvalue().splitlines()
+        self.assertEqual(
+            f"DEBUG:Target:Request: Target(val=ok).ok",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(val=ok\)\.ok -> {logwrap.pretty_repr(VALUE)}"
+        )
 
         self.stream.seek(0)
         self.stream.truncate()
 
         target.ok = VALUE.upper()
+        logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            self.stream.getvalue(), f"DEBUG:Target:Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}\n"
+            f"DEBUG:Target:Request: Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: "
+            rf"Target\(val=ok\)\.ok = {logwrap.pretty_repr(VALUE.upper())}"
         )
 
         self.assertEqual(target.ok, VALUE.upper())
@@ -357,4 +484,12 @@ class TestLogOnAccess(unittest.TestCase):
         self.stream.truncate()
 
         del target.ok
-        self.assertEqual(self.stream.getvalue(), "DEBUG:Target:del Target(val=OK).ok\n")
+        logged = self.stream.getvalue().splitlines()
+        self.assertEqual(
+            f"DEBUG:Target:Request: del Target(val=OK).ok",
+            logged[0]
+        )
+        self.assertRegex(
+            logged[1],
+            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: del Target\(val=OK\)\.ok"
+        )

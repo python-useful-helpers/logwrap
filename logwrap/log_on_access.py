@@ -18,8 +18,10 @@
 __all__ = ("LogOnAccess",)
 
 # Standard Library
+import inspect
 import logging
 import sys
+import time
 import traceback
 import typing
 
@@ -48,6 +50,7 @@ class LogOnAccess(property):
         log_object_repr: bool = True,
         log_level: int = logging.DEBUG,
         exc_level: int = logging.DEBUG,
+        log_before: bool = True,
         log_success: bool = True,
         log_failure: bool = True,
         log_traceback: bool = True,
@@ -72,6 +75,8 @@ class LogOnAccess(property):
         :type log_level: int
         :param exc_level: log level for exceptions
         :type exc_level: int
+        :param log_before: log before operation
+        :type log_before: bool
         :param log_success: log successful operations
         :type log_success: bool
         :param log_failure: log exceptions
@@ -179,6 +184,7 @@ class LogOnAccess(property):
         self.__log_object_repr: bool = log_object_repr
         self.__log_level: int = log_level
         self.__exc_level: int = exc_level
+        self.__log_before: bool = log_before
         self.__log_success: bool = log_success
         self.__log_failure: bool = log_failure
         self.__log_traceback: bool = log_traceback
@@ -215,10 +221,14 @@ class LogOnAccess(property):
         """
         if self.logger is not None:  # pylint: disable=no-else-return
             return self.logger
-        elif hasattr(instance, "logger") and isinstance(instance.logger, logging.Logger):
-            return instance.logger
-        elif hasattr(instance, "log") and isinstance(instance.log, logging.Logger):
-            return instance.log
+        valid_logger_names = ("logger", "log")
+        for logger_name in valid_logger_names:
+            if isinstance(getattr(instance, logger_name, None), logging.Logger):
+                return getattr(instance, logger_name)
+        instance_module = inspect.getmodule(instance)
+        for logger_name in valid_logger_names:
+            if isinstance(getattr(instance_module, logger_name.upper(), None), logging.Logger):
+                return getattr(instance_module, logger_name.upper())
         return _logger
 
     def __get__(self, instance: typing.Any, owner: typing.Optional[type] = None) -> typing.Any:
@@ -238,14 +248,25 @@ class LogOnAccess(property):
         source: str = self.__get_obj_source(instance, owner)
         logger: logging.Logger = self._get_logger_for_instance(instance)
 
+        timestamp: float = time.time()
         try:
+            if self.log_before:
+                logger.log(self.log_level, f"Request: {source}.{self.__name__}")
             result = super(LogOnAccess, self).__get__(instance, owner)
             if self.log_success:
-                logger.log(self.log_level, f"{source}.{self.__name__} -> {repr_utils.pretty_repr(result)}")
+                logger.log(
+                    self.log_level,
+                    f"Done at {time.time() - timestamp:.03f}s: "
+                    f"{source}.{self.__name__} -> {repr_utils.pretty_repr(result)}",
+                )
             return result
         except Exception:
             if self.log_failure:
-                logger.log(self.exc_level, f"Failed: {source}.{self.__name__}{self.__traceback}", exc_info=False)
+                logger.log(
+                    self.exc_level,
+                    f"Failed after {time.time() - timestamp:.03f}s: {source}.{self.__name__}{self.__traceback}",
+                    exc_info=False,
+                )
             raise
 
     def __set__(self, instance: typing.Any, value: typing.Any) -> None:
@@ -263,15 +284,23 @@ class LogOnAccess(property):
         source: str = self.__get_obj_source(instance)
         logger: logging.Logger = self._get_logger_for_instance(instance)
 
+        timestamp: float = time.time()
         try:
+            if self.log_before:
+                logger.log(self.log_level, f"Request: {source}.{self.__name__} = {repr_utils.pretty_repr(value)}")
             super(LogOnAccess, self).__set__(instance, value)
             if self.log_success:
-                logger.log(self.log_level, f"{source}.{self.__name__} = {repr_utils.pretty_repr(value)}")
+                logger.log(
+                    self.log_level,
+                    f"Done at {time.time() - timestamp:.03f}s: "
+                    f"{source}.{self.__name__} = {repr_utils.pretty_repr(value)}",
+                )
         except Exception:
             if self.log_failure:
                 logger.log(
                     self.exc_level,
-                    f"Failed: {source}.{self.__name__} = {repr_utils.pretty_repr(value)}{self.__traceback}",
+                    f"Failed after {time.time() - timestamp:.03f}s: "
+                    f"{source}.{self.__name__} = {repr_utils.pretty_repr(value)}{self.__traceback}",
                     exc_info=False,
                 )
             raise
@@ -290,13 +319,20 @@ class LogOnAccess(property):
         source: str = self.__get_obj_source(instance)
         logger: logging.Logger = self._get_logger_for_instance(instance)
 
+        timestamp: float = time.time()
         try:
+            if self.log_before:
+                logger.log(self.log_level, f"Request: del {source}.{self.__name__}")
             super(LogOnAccess, self).__delete__(instance)
             if self.log_success:
-                logger.log(self.log_level, f"del {source}.{self.__name__}")
+                logger.log(self.log_level, f"Done at {time.time() - timestamp:.03f}s: del {source}.{self.__name__}")
         except Exception:
             if self.log_failure:
-                logger.log(self.exc_level, f"{source}: Failed: del {self.__name__}{self.__traceback}", exc_info=False)
+                logger.log(
+                    self.exc_level,
+                    f"Failed after {time.time() - timestamp:.03f}s: del {source}.{self.__name__}{self.__traceback}",
+                    exc_info=False,
+                )
             raise
 
     @property
@@ -341,6 +377,16 @@ class LogOnAccess(property):
     def exc_level(self, value: int) -> None:
         """Log level for exceptions."""
         self.__exc_level = value
+
+    @property
+    def log_before(self) -> bool:
+        """Log successful operations."""
+        return self.__log_before
+
+    @log_before.setter
+    def log_before(self, value: bool) -> None:
+        """Log successful operations."""
+        self.__log_before = value
 
     @property
     def log_success(self) -> bool:
