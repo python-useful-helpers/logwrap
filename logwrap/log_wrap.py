@@ -46,7 +46,7 @@ from . import class_decorator
 
 __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
-LOGGER = logging.getLogger('logwrap')  # type: logging.Logger
+LOGGER = logging.getLogger("logwrap")  # type: logging.Logger
 INDENT = 4
 
 
@@ -420,7 +420,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def post_process_param(  # pylint: disable=no-self-use,unused-argument
-        self, arg,  arg_repr
+        self, arg, arg_repr
     ):  # type: (BoundParameter, typing.Text) -> typing.Text
         """Process parameter for the future logging.
 
@@ -480,24 +480,18 @@ class LogWrap(class_decorator.BaseDecorator):
 
             val = repr_utils.pretty_repr(src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent)
 
-            val = self.post_process_param(param, val)
+            val = self.post_process_param(param, val)  # type: ignore
 
             if last_kind != param.kind:
                 param_str += "\n{spc:<{indent}}# {kind!s}:".format(spc="", indent=INDENT, kind=param.kind)
                 last_kind = param.kind
 
-            param_str += "\n{spc:<{indent}}{key!r}={val},".format(
-                spc="", indent=INDENT, key=param.name, val=val
-            )
+            param_str += "\n{spc:<{indent}}{key!r}={val},".format(spc="", indent=INDENT, key=param.name, val=val)
         if param_str:
             param_str += "\n"
         return param_str
 
-    def _make_done_record(
-        self,
-        func_name,  # type: str
-        result  # type: typing.Any
-    ):  # type: (...) -> None
+    def _make_done_record(self, func_name, result):  # type: (str, typing.Any) -> None
         """Construct success record.
 
         :type func_name: str
@@ -540,9 +534,7 @@ class LogWrap(class_decorator.BaseDecorator):
         self._logger.log(
             level=self.exc_level,
             msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
-                name=name,
-                arguments=arguments if self.log_call_args_on_exc else "",
-                tb_text=tb_text,
+                name=name, arguments=arguments if self.log_call_args_on_exc else "", tb_text=tb_text
             ),
             exc_info=False,
         )
@@ -646,9 +638,11 @@ def logwrap(
         blacklisted_exceptions=blacklisted_exceptions,
         log_call_args=log_call_args,
         log_call_args_on_exc=log_call_args_on_exc,
-        log_result_obj=log_result_obj
+        log_result_obj=log_result_obj,
     )
     if func is not None:
         return wrapper(func)
     return wrapper
+
+
 # pylint: enable=unexpected-keyword-arg, no-value-for-parameter

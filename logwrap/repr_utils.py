@@ -61,9 +61,7 @@ class ReprParameter(object):
 
     empty = funcsigs.Parameter.empty
 
-    def __init__(
-        self, parameter, value=funcsigs.Parameter.empty
-    ):  # type: (funcsigs.Parameter, typing.Any) -> None
+    def __init__(self, parameter, value=funcsigs.Parameter.empty):  # type: (funcsigs.Parameter, typing.Any) -> None
         """Parameter-like object store for repr and str tasks.
 
         :param parameter: parameter from signature
@@ -123,9 +121,7 @@ class ReprParameter(object):
 
 
 # pylint: disable=no-member
-def _prepare_repr(
-    func
-):  # type: (typing.Union[types.FunctionType, types.MethodType]) -> typing.List[ReprParameter]
+def _prepare_repr(func):  # type: (typing.Union[types.FunctionType, types.MethodType]) -> typing.List[ReprParameter]
     """Get arguments lists with defaults.
 
     :param func: Callable object to process
@@ -362,10 +358,7 @@ class PrettyFormat(object):
         """
         result = self.process_element(src, indent=indent, no_indent_start=no_indent_start)
         if self.__py2_str:  # pragma: no cover
-            return result.encode(
-                encoding='utf-8',
-                errors='backslashreplace',
-            )
+            return result.encode(encoding="utf-8", errors="backslashreplace")
         return result
 
 
@@ -501,7 +494,7 @@ class PrettyRepr(PrettyFormat):
                 obj_type=obj_type,
                 prefix=prefix,
                 result=result,
-                suffix=suffix
+                suffix=suffix,
             )
         )
 
@@ -659,14 +652,8 @@ def pretty_repr(
     :return: formatted string
     :rtype: str
     """
-    return PrettyRepr(
-        max_indent=max_indent,
-        indent_step=indent_step,
-        py2_str=py2_str
-    )(
-        src=src,
-        indent=indent,
-        no_indent_start=no_indent_start,
+    return PrettyRepr(max_indent=max_indent, indent_step=indent_step, py2_str=py2_str)(
+        src=src, indent=indent, no_indent_start=no_indent_start
     )
 
 
@@ -694,12 +681,6 @@ def pretty_str(
     :type py2_str: bool
     :return: formatted string
     """
-    return PrettyStr(
-        max_indent=max_indent,
-        indent_step=indent_step,
-        py2_str=py2_str
-    )(
-        src=src,
-        indent=indent,
-        no_indent_start=no_indent_start,
+    return PrettyStr(max_indent=max_indent, indent_step=indent_step, py2_str=py2_str)(
+        src=src, indent=indent, no_indent_start=no_indent_start
     )
