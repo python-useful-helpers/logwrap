@@ -25,13 +25,10 @@ import traceback
 import typing
 import warnings
 
-from logwrap cimport repr_utils
 from logwrap cimport class_decorator
+from logwrap cimport repr_utils
 
-
-logger = logging.getLogger("logwrap")  # type: logging.Logger
-
-
+LOGGER = logging.getLogger("logwrap")  # type: logging.Logger
 cdef unsigned long INDENT = 4
 
 
@@ -145,7 +142,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         self,
         func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
         *,
-        log: logging.Logger = logger,
+        log: logging.Logger = LOGGER,
         unsigned long log_level=logging.DEBUG,
         unsigned long exc_level=logging.ERROR,
         unsigned long max_indent=20,
@@ -454,7 +451,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 def logwrap(
     func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
     *,
-    log: logging.Logger = logger,
+    log: logging.Logger = LOGGER,
     unsigned long log_level=logging.DEBUG,
     unsigned long exc_level=logging.ERROR,
     unsigned long max_indent=20,
