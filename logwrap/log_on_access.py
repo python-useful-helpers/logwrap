@@ -29,7 +29,7 @@ import typing
 from logwrap import repr_utils
 
 
-_logger: logging.Logger = logging.getLogger(__name__)
+_LOGGER: logging.Logger = logging.getLogger(__name__)
 
 
 class LogOnAccess(property):
@@ -229,7 +229,7 @@ class LogOnAccess(property):
         for logger_name in valid_logger_names:
             if isinstance(getattr(instance_module, logger_name.upper(), None), logging.Logger):
                 return getattr(instance_module, logger_name.upper())
-        return _logger
+        return _LOGGER
 
     def __get__(self, instance: typing.Any, owner: typing.Optional[type] = None) -> typing.Any:
         """Get descriptor.
