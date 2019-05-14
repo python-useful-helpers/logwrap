@@ -255,12 +255,7 @@ class LogOnAccess(property):
         timestamp = time.time()  # type: float
         try:
             if self.log_before:
-                logger.log(
-                    self.log_level,
-                    "Request: {source}.{name}".format(
-                        source=source, name=self.__name__
-                    )
-                )
+                logger.log(self.log_level, "Request: {source}.{name}".format(source=source, name=self.__name__))
             result = super(LogOnAccess, self).__get__(instance, owner)
             if self.log_success:
                 logger.log(
@@ -270,7 +265,7 @@ class LogOnAccess(property):
                         duration=time.time() - timestamp,
                         source=source,
                         name=self.__name__,
-                        repr_val=repr_utils.pretty_repr(result)
+                        repr_val=repr_utils.pretty_repr(result),
                     ),
                 )
             return result
@@ -279,10 +274,7 @@ class LogOnAccess(property):
                 logger.log(
                     self.exc_level,
                     "Failed after {duration:.03f}s: {source}.{name}{exc_tb}".format(
-                        duration=time.time() - timestamp,
-                        source=source,
-                        name=self.__name__,
-                        exc_tb=self.__traceback
+                        duration=time.time() - timestamp, source=source, name=self.__name__, exc_tb=self.__traceback
                     ),
                     exc_info=False,
                 )
@@ -310,7 +302,7 @@ class LogOnAccess(property):
                     self.log_level,
                     "Request: {source}.{name} = {repr_val}".format(
                         source=source, name=self.__name__, repr_val=repr_utils.pretty_repr(value)
-                    )
+                    ),
                 )
             super(LogOnAccess, self).__set__(instance, value)
             if self.log_success:
@@ -321,7 +313,7 @@ class LogOnAccess(property):
                         duration=time.time() - timestamp,
                         source=source,
                         name=self.__name__,
-                        repr_val=repr_utils.pretty_repr(value)
+                        repr_val=repr_utils.pretty_repr(value),
                     ),
                 )
         except Exception:
@@ -364,17 +356,14 @@ class LogOnAccess(property):
                     self.log_level,
                     "Done at {duration:.03f}s: del {source}.{name}".format(
                         duration=time.time() - timestamp, source=source, name=self.__name__
-                    )
+                    ),
                 )
         except Exception:
             if self.log_failure:
                 logger.log(
                     self.exc_level,
                     "Failed after {duration:.03f}s: del {source}.{name}{exc_tb}".format(
-                        duration=time.time() - timestamp,
-                        source=source,
-                        name=self.__name__,
-                        exc_tb=self.__traceback
+                        duration=time.time() - timestamp, source=source, name=self.__name__, exc_tb=self.__traceback
                     ),
                     exc_info=False,
                 )
