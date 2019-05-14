@@ -548,7 +548,7 @@ class LogWrap(class_decorator.BaseDecorator):
         """
         exc_info = sys.exc_info()
         stack: traceback.StackSummary = traceback.extract_stack()
-        full_tb = [elem for elem in stack if elem.filename != _CURRENT_FILE]
+        full_tb: typing.List[traceback.FrameSummary] = [elem for elem in stack if elem.filename != _CURRENT_FILE]
         exc_line: typing.List[str] = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
         tb_text: str = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(
