@@ -20,6 +20,7 @@ __all__ = ("LogOnAccess",)
 # Standard Library
 import inspect
 import logging
+import os
 import sys
 import time
 import traceback
@@ -30,6 +31,7 @@ from logwrap import repr_utils
 
 
 _LOGGER: logging.Logger = logging.getLogger(__name__)
+_CURRENT_FILE = os.path.abspath(__file__)
 
 
 class LogOnAccess(property):
@@ -198,8 +200,7 @@ class LogOnAccess(property):
             return ""
         exc_info = sys.exc_info()
         stack: traceback.StackSummary = traceback.extract_stack()
-        exc_tb: traceback.StackSummary = traceback.extract_tb(exc_info[2])
-        full_tb = stack[:1] + exc_tb  # cut decorator and build full traceback
+        full_tb = [elem for elem in stack if elem.filename != _CURRENT_FILE]
         exc_line: typing.List[str] = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
         tb_text = "\nTraceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
