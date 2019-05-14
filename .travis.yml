@@ -112,7 +112,6 @@ jobs:
         - *upgrade_python_toolset
       script:
         - ./tools/run_docker.sh "logwrap"
-      after_success: skip
       before_deploy:
         - pip install -r requirements.txt
         - *build_package
