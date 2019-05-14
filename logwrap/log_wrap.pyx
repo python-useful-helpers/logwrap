@@ -20,6 +20,7 @@ import asyncio
 import functools
 import inspect
 import logging
+import os
 import sys
 import traceback
 import typing
@@ -30,6 +31,7 @@ from logwrap cimport repr_utils
 
 LOGGER = logging.getLogger("logwrap")  # type: logging.Logger
 cdef unsigned long INDENT = 4
+cdef str _CURRENT_FILE = os.path.abspath(__file__)
 
 
 class BoundParameter(inspect.Parameter):
@@ -378,8 +380,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             """
             exc_info = sys.exc_info()
             stack = traceback.extract_stack()
-            tb = traceback.extract_tb(exc_info[2])
-            full_tb = stack[:2] + tb  # cut decorator and build full traceback
+            full_tb = [elem for elem in stack if elem.filename != _CURRENT_FILE]  # type: typing.List[traceback.FrameSummary]
             exc_line = traceback.format_exception_only(*exc_info[:2])
             # Make standard traceback string
             cdef str tb_text = "Traceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
