@@ -99,7 +99,6 @@ jobs:
     - *install_deps
     script:
     - *build_package
-    after_success: skip
     before_deploy: []
     deploy:
     - provider: pypi
