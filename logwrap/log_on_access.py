@@ -223,12 +223,14 @@ class LogOnAccess(property):
             return self.logger
         valid_logger_names = ("logger", "log")
         for logger_name in valid_logger_names:
-            if isinstance(getattr(instance, logger_name, None), logging.Logger):
-                return getattr(instance, logger_name)
+            logger_candidate = getattr(instance, logger_name, None)
+            if isinstance(logger_candidate, logging.Logger):
+                return logger_candidate
         instance_module = inspect.getmodule(instance)
         for logger_name in valid_logger_names:
-            if isinstance(getattr(instance_module, logger_name.upper(), None), logging.Logger):
-                return getattr(instance_module, logger_name.upper())
+            logger_candidate = getattr(instance_module, logger_name.upper(), None)
+            if isinstance(logger_candidate, logging.Logger):
+                return logger_candidate
         return _LOGGER
 
     def __get__(self, instance: typing.Any, owner: typing.Optional[type] = None) -> typing.Any:
