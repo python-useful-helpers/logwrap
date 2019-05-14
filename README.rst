@@ -298,9 +298,10 @@ Usage examples:
 
 1. Simple usage. All by default.
    logger is re-used:
-    from instance if available with names `logger` or `log`,
-    from instance module if available with names `LOGGER`, `log`,
-    else used internal `logwrap.log_on_access` logger.
+
+    * from instance if available with names `logger` or `log`,
+    * from instance module if available with names `LOGGER`, `log`,
+    * else used internal `logwrap.log_on_access` logger.
 
   .. code-block:: python
 
