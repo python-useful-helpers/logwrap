@@ -29,14 +29,10 @@ import typing
 import warnings
 
 # LogWrap Implementation
+from logwrap import class_decorator
 from logwrap import repr_utils
 
-# Local Implementation
-from . import class_decorator
-
 LOGGER = logging.getLogger("logwrap")  # type: logging.Logger
-
-
 INDENT = 4
 
 
