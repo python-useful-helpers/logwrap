@@ -52,9 +52,7 @@ class ReprParameter:
 
     empty = inspect.Parameter.empty
 
-    def __init__(
-        self, parameter: inspect.Parameter, value: typing.Optional[typing.Any] = inspect.Parameter.empty
-    ) -> None:
+    def __init__(self, parameter: inspect.Parameter, value: typing.Any = inspect.Parameter.empty) -> None:
         """Parameter-like object store for repr and str tasks.
 
         :param parameter: parameter from signature
@@ -351,11 +349,12 @@ class PrettyRepr(PrettyFormat):
     def _strings_repr(indent: int, val: typing.Union[bytes, str]) -> str:
         """Custom repr for strings and binary strings."""
         if isinstance(val, bytes):
-            val = val.decode(encoding="utf-8", errors="backslashreplace")
+            string = val.decode(encoding="utf-8", errors="backslashreplace")
             prefix = "b"
         else:
             prefix = "u"
-        return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=val)
+            string = val
+        return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=string)
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Repr object without iteration.
@@ -485,8 +484,10 @@ class PrettyStr(PrettyFormat):
     def _strings_str(indent: int, val: typing.Union[bytes, str]) -> str:
         """Custom repr for strings and binary strings."""
         if isinstance(val, bytes):
-            val = val.decode(encoding="utf-8", errors="backslashreplace")
-        return "{spc:<{indent}}{string}".format(spc="", indent=indent, string=val)
+            string = val.decode(encoding="utf-8", errors="backslashreplace")
+        else:
+            string = val
+        return "{spc:<{indent}}{string}".format(spc="", indent=indent, string=string)
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Repr object without iteration.
