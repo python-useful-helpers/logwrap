@@ -123,7 +123,6 @@ jobs:
         - *install_deps
       script:
         - ./tools/run_docker.sh "logwrap"
-      after_success: skip
       before_deploy:
         - *build_package
       deploy:
