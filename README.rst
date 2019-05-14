@@ -301,7 +301,10 @@ Basic API is conform with `property`, but in addition it is possible to customiz
 Usage examples:
 
 1. Simple usage. All by default.
-   logger is re-used from instance if available with names `logger` or `log` else used internal `logwrap.log_on_access` logger:
+   logger is re-used:
+    from instance if available with names `logger` or `log`,
+    from instance module if available with names `LOGGER`, `log`,
+    else used internal `logwrap.log_on_access` logger.
 
   .. code-block:: python
 
@@ -356,6 +359,7 @@ Usage examples:
       ok.log_level = logging.INFO
       ok.exc_level = logging.ERROR
       ok.log_object_repr = True  # As by default
+      ok.log_before = True  # As by default
       ok.log_success = True  # As by default
       ok.log_failure = True  # As by default
       ok.log_traceback = True  # As by default

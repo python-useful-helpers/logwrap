@@ -13,7 +13,7 @@ API: LogOnAccess
 
     .. versionadded:: 6.1.0
 
-    .. py:method:: __init__(fget=None, fset=None, fdel=None, doc=None, *, logger=None, log_object_repr=True, log_level=logging.DEBUG, exc_level=logging.DEBUG, log_success=True, log_failure=True, log_traceback=True, override_name=None)
+    .. py:method:: __init__(fget=None, fset=None, fdel=None, doc=None, *, logger=None, log_object_repr=True, log_level=logging.DEBUG, exc_level=logging.DEBUG, log_before=True, log_success=True, log_failure=True, log_traceback=True, override_name=None)
 
         :param fget: normal getter.
         :type fget: typing.Optional[typing.Callable[[typing.Any, ], typing.Any]]
@@ -31,6 +31,8 @@ API: LogOnAccess
         :type log_level: int
         :param exc_level: log level for exceptions
         :type exc_level: int
+        :param log_before: log before operation
+        :type log_before: bool
         :param log_success: log successful operations
         :type log_success: bool
         :param log_failure: log exceptions
@@ -98,6 +100,11 @@ API: LogOnAccess
 
         ``int``
         Log level for exceptions.
+
+    .. py:attribute:: log_before
+
+        ``bool``
+        Log before operation
 
     .. py:attribute:: log_success
 
