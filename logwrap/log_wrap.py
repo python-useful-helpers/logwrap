@@ -29,14 +29,10 @@ import typing
 import warnings
 
 # LogWrap Implementation
+from logwrap import class_decorator
 from logwrap import repr_utils
 
-# Local Implementation
-from . import class_decorator
-
-logger: logging.Logger = logging.getLogger("logwrap")
-
-
+LOGGER: logging.Logger = logging.getLogger("logwrap")
 INDENT = 4
 
 
@@ -161,7 +157,7 @@ class LogWrap(class_decorator.BaseDecorator):
         self,
         func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
         *,
-        log: logging.Logger = logger,
+        log: logging.Logger = LOGGER,
         log_level: int = logging.DEBUG,
         exc_level: int = logging.ERROR,
         max_indent: int = 20,
@@ -634,7 +630,7 @@ class LogWrap(class_decorator.BaseDecorator):
 def logwrap(
     func: None = None,
     *,
-    log: logging.Logger = logger,
+    log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -653,7 +649,7 @@ def logwrap(
 def logwrap(
     func: typing.Callable[..., typing.Awaitable[typing.Any]],
     *,
-    log: logging.Logger = logger,
+    log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -672,7 +668,7 @@ def logwrap(
 def logwrap(
     func: typing.Callable[..., typing.Any],
     *,
-    log: logging.Logger = logger,
+    log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -691,7 +687,7 @@ def logwrap(
 def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
     func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
     *,
-    log: logging.Logger = logger,
+    log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,

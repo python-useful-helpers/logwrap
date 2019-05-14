@@ -52,9 +52,7 @@ class ReprParameter:
 
     empty = inspect.Parameter.empty
 
-    def __init__(
-        self, parameter: inspect.Parameter, value: typing.Optional[typing.Any] = inspect.Parameter.empty
-    ) -> None:
+    def __init__(self, parameter: inspect.Parameter, value: typing.Any = inspect.Parameter.empty) -> None:
         """Parameter-like object store for repr and str tasks.
 
         :param parameter: parameter from signature
