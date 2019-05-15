@@ -71,7 +71,7 @@ cdef:
             self.value = value if value is not parameter.empty else parameter.default
 
         # noinspection PyTypeChecker
-        def __hash__(self) -> int:
+        def __hash__(self) -> typing.NoReturn:
             """Block hashing.
 
             :raises TypeError: Not hashable.

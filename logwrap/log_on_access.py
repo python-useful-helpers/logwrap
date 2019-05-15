@@ -236,7 +236,37 @@ class LogOnAccess(property):
                 return logger_candidate
         return _LOGGER
 
-    def __get__(self, instance: typing.Any, owner: typing.Optional[type] = None) -> typing.Any:
+    @typing.overload
+    def __get__(self, instance: None, owner: typing.Optional[type] = None) -> typing.NoReturn:
+        """Get descriptor.
+
+        :param instance: Owner class instance. Filled only if instance created, else None.
+        :type instance: typing.Optional[owner]
+        :param owner: Owner class for property.
+        :return: getter call result if getter presents
+        :rtype: typing.Any
+        :raises AttributeError: Getter is not available
+        :raises Exception: Something goes wrong
+        """
+
+    @typing.overload
+    def __get__(  # noqa: F811  # pylint: disable=function-redefined
+        self, instance: typing.Any, owner: typing.Optional[type] = None
+    ) -> typing.Any:
+        """Get descriptor.
+
+        :param instance: Owner class instance. Filled only if instance created, else None.
+        :type instance: typing.Optional[owner]
+        :param owner: Owner class for property.
+        :return: getter call result if getter presents
+        :rtype: typing.Any
+        :raises AttributeError: Getter is not available
+        :raises Exception: Something goes wrong
+        """
+
+    def __get__(  # noqa: F811  # pylint: disable=function-redefined
+        self, instance: typing.Any, owner: typing.Optional[type] = None
+    ) -> typing.Any:
         """Get descriptor.
 
         :param instance: Owner class instance. Filled only if instance created, else None.
