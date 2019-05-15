@@ -99,7 +99,7 @@ class ReprParameter:
         return self.parameter.kind  # type: ignore
 
     # noinspection PyTypeChecker
-    def __hash__(self) -> int:  # pragma: no cover
+    def __hash__(self) -> typing.NoReturn:  # pragma: no cover
         """Block hashing.
 
         :raises TypeError: Not hashable.

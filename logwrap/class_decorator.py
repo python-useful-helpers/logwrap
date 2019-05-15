@@ -95,7 +95,19 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError()
 
+    @typing.overload
     def __call__(
+        self, *args: typing.Callable[..., typing.Any], **kwargs: typing.Any
+    ) -> typing.Union[typing.Callable[..., typing.Any], typing.Any]:
+        """Main decorator getter."""
+
+    @typing.overload
+    def __call__(  # noqa: F811  # pylint: disable=function-redefined
+        self, *args: typing.Any, **kwargs: typing.Any
+    ) -> typing.Any:
+        """Main decorator getter."""
+
+    def __call__(  # noqa: F811  # pylint: disable=function-redefined
         self, *args: typing.Union[typing.Callable[..., typing.Any], typing.Any], **kwargs: typing.Any
     ) -> typing.Any:
         """Main decorator getter."""
