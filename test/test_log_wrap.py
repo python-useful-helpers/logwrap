@@ -67,7 +67,7 @@ class TestLogWrap(unittest.TestCase):
             "DEBUG>Calling: \n"
             "'func'()\n"
             "DEBUG>Done: 'func' with result:\n"
-            "u'''No args'''\n",
+            "{repr_result}\n".format(repr_result=logwrap.pretty_repr(result)),
             self.stream.getvalue(),
         )
 
@@ -84,10 +84,13 @@ class TestLogWrap(unittest.TestCase):
             "DEBUG>Calling: \n"
             "'func'(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
-            "    'tst'=u'''test arg''',\n"
+            "    'tst'={repr_tst},\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
-            "u'''test arg'''\n",
+            "{repr_result}\n".format(
+                repr_tst=logwrap.pretty_repr(arg, indent=8, no_indent_start=True),
+                repr_result=logwrap.pretty_repr(result)
+            ),
             self.stream.getvalue(),
         )
 
@@ -105,41 +108,40 @@ class TestLogWrap(unittest.TestCase):
             "DEBUG>Calling: \n"
             "'func'(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
-            "    'tst'=u'''test arg''',\n"
+            "    'tst'={repr_tst},\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
-            "u'''test arg'''\n",
+            "{repr_result}\n".format(
+                repr_tst=logwrap.pretty_repr(arg, indent=8, no_indent_start=True),
+                repr_result=logwrap.pretty_repr(result)
+            ),
             self.stream.getvalue(),
         )
 
     def test_004_args_complex(self):
-        string = 'string'
-        dictionary = {'key': 'dictionary'}
+        arg1 = 'arg1'
+        arg2 = 'arg2'
 
         @logwrap.logwrap
-        def func(param_string, param_dictionary):
-            return param_string, param_dictionary
+        def func(arg_1, arg_2):
+            return arg_1, arg_2
 
-        result = func(string, dictionary)
-        self.assertEqual(result, (string, dictionary))
+        result = func(arg1, arg2)
+        self.assertEqual(result, (arg1, arg2))
 
         self.assertEqual(
             "DEBUG>Calling: \n"
             "'func'(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
-            "    'param_string'=u'''string''',\n"
-            "    'param_dictionary'=\n"
-            "        dict({\n"
-            "            'key': u'''dictionary''',\n"
-            "        }),\n"
+            "    'arg_1'={repr_arg_1},\n"
+            "    'arg_2'={repr_arg_2},\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
-            "tuple((\n"
-            "    u'''string''',\n"
-            "    dict({\n"
-            "        'key': u'''dictionary''',\n"
-            "    }),\n"
-            "))\n",
+            "{repr_result}\n".format(
+                repr_arg_1=logwrap.pretty_repr(arg1, indent=8, no_indent_start=True),
+                repr_arg_2=logwrap.pretty_repr(arg2, indent=8, no_indent_start=True),
+                repr_result=logwrap.pretty_repr(result)
+            ),
             self.stream.getvalue(),
         )
 
@@ -158,27 +160,16 @@ class TestLogWrap(unittest.TestCase):
             "DEBUG>Calling: \n"
             "'func'(\n"
             "    # VAR_POSITIONAL:\n"
-            "    'args'=\n"
-            "        tuple((\n"
-            "            u'''string1''',\n"
-            "            u'''string2''',\n"
-            "        )),\n"
+            "    'args'={repr_args},\n"
             "    # VAR_KEYWORD:\n"
-            "    'kwargs'=\n"
-            "        dict({\n"
-            "            'key': u'''tkwargs''',\n"
-            "        }),\n"
+            "    'kwargs'={repr_kwargs},\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
-            "tuple((\n"
-            "    tuple((\n"
-            "        u'''string1''',\n"
-            "        u'''string2''',\n"
-            "    )),\n"
-            "    dict({\n"
-            "        'key': u'''tkwargs''',\n"
-            "    }),\n"
-            "))\n",
+            "{repr_result}\n".format(
+                repr_args=logwrap.pretty_repr(tuple(targs), indent=8, no_indent_start=True),
+                repr_kwargs=logwrap.pretty_repr(tkwargs, indent=8, no_indent_start=True),
+                repr_result=logwrap.pretty_repr(result)
+            ),
             self.stream.getvalue(),
         )
 
@@ -198,30 +189,19 @@ class TestLogWrap(unittest.TestCase):
             "DEBUG>Calling: \n"
             "'func'(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
-            "    'arg'=u'''arg''',\n"
+            "    'arg'={repr_arg},\n"
             "    # VAR_POSITIONAL:\n"
-            "    'positional'=\n"
-            "        tuple((\n"
-            "            u'''string1''',\n"
-            "            u'''string2''',\n"
-            "        )),\n"
+            "    'positional'={repr_positional},\n"
             "    # VAR_KEYWORD:\n"
-            "    'named'=\n"
-            "        dict({\n"
-            "            'key': u'''tkwargs''',\n"
-            "        }),\n"
+            "    'named'={repr_named},\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
-            "tuple((\n"
-            "    u'''arg''',\n"
-            "    tuple((\n"
-            "        u'''string1''',\n"
-            "        u'''string2''',\n"
-            "    )),\n"
-            "    dict({\n"
-            "        'key': u'''tkwargs''',\n"
-            "    }),\n"
-            "))\n",
+            "{repr_result}\n".format(
+                repr_arg=logwrap.pretty_repr(arg, indent=8, no_indent_start=True),
+                repr_positional=logwrap.pretty_repr(tuple(targs), indent=8, no_indent_start=True),
+                repr_named=logwrap.pretty_repr(tkwargs, indent=8, no_indent_start=True),
+                repr_result=logwrap.pretty_repr(result)
+            ),
             self.stream.getvalue(),
         )
 
@@ -297,15 +277,20 @@ class TestLogWrap(unittest.TestCase):
             [
                 mock.call(
                     level=logging.DEBUG,
-                    msg="Calling: \n"
+                    msg=(
+                        "Calling: \n"
                         "'func'(\n"
                         "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'arg'=u'''test arg''',\n"
-                        ")"),
+                        "    'arg'={repr_arg},\n"
+                        ")".format(
+                            repr_arg=logwrap.pretty_repr(arg, indent=8, no_indent_start=True)
+                        )
+                    )
+                ),
                 mock.call(
                     level=logging.DEBUG,
                     msg="Done: 'func' with result:\n"
-                        "u'''test arg'''"),
+                        "{repr_result}".format(repr_result=logwrap.pretty_repr(result))),
             ],
             log.mock_calls,
         )
@@ -319,7 +304,7 @@ class TestLogWrap(unittest.TestCase):
         def func():
             return [[[[[[[[[[123]]]]]]]]]]
 
-        func()
+        result = func()
 
         self.assertEqual(
             [
@@ -330,13 +315,7 @@ class TestLogWrap(unittest.TestCase):
                 mock.call(
                     level=logging.DEBUG,
                     msg="Done: 'func' with result:\n"
-                        "list([\n"
-                        "    list([\n"
-                        "        list([\n"
-                        "            [[[[[[[123]]]]]]],\n"
-                        "        ]),\n"
-                        "    ]),\n"
-                        "])"),
+                        "{repr_result}".format(repr_result=logwrap.pretty_repr(result, max_indent=10))),
             ],
             log.mock_calls,
         )
@@ -357,10 +336,13 @@ class TestLogWrap(unittest.TestCase):
             "DEBUG>Calling: \n"
             "'func'(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
-            "    'tst_self'=<Tst_instance>,\n"
+            "    'tst_self'={repr_self},\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
-            "u'''No args'''\n",
+            "{repr_result}\n".format(
+                repr_self=logwrap.pretty_repr(tst),
+                repr_result=logwrap.pretty_repr(result)
+            ),
             self.stream.getvalue(),
         )
 
@@ -375,7 +357,9 @@ class TestLogWrap(unittest.TestCase):
             "DEBUG>Calling: \n"
             "'func'()\n"
             "DEBUG>Done: 'func' with result:\n"
-            "u'''No args'''\n",
+            "{repr_result}\n".format(
+                repr_result=logwrap.pretty_repr(result)
+            ),
             self.stream.getvalue(),
         )
 
@@ -397,25 +381,25 @@ class TestLogWrap(unittest.TestCase):
             [
                 mock.call(
                     level=logging.DEBUG,
-                    msg="Calling: \n"
+                    msg=(
+                        "Calling: \n"
                         "'tst'(\n"
                         "    # POSITIONAL_OR_KEYWORD:\n"
                         "    'arg'=0,\n"
                         "    'darg'=1,\n"
                         "    # VAR_POSITIONAL:\n"
-                        "    'args'=\n"
-                        "        tuple((\n"
-                        "            2,\n"
-                        "        )),\n"
+                        "    'args'={repr_args},\n"
                         "    # KEYWORD_ONLY:\n"
                         "    'kwarg'=3,\n"
                         "    'dkwarg'=4,\n"
                         "    # VAR_KEYWORD:\n"
-                        "    'kwargs'=\n"
-                        "        dict({\n"
-                        "            'somekwarg': 5,\n"
-                        "        }),\n"
-                        ")"),
+                        "    'kwargs'={repr_kwargs},\n"
+                        ")".format(
+                            repr_args=logwrap.pretty_repr((2,), indent=8, no_indent_start=True),
+                            repr_kwargs=logwrap.pretty_repr(dict(somekwarg=5), indent=8, no_indent_start=True)
+                        )
+                    )
+                ),
                 mock.call(
                     level=logging.DEBUG,
                     msg="Done: 'tst' with result:\n"
@@ -448,27 +432,16 @@ class TestLogWrap(unittest.TestCase):
             "    'arg'=0,\n"
             "    'darg'=1,\n"
             "    # VAR_POSITIONAL:\n"
-            "    'args'=\n"
-            "        tuple((\n"
-            "            2,\n"
-            "        )),\n"
+            "    'args'={repr_args},\n"
             "    # VAR_KEYWORD:\n"
-            "    'kwargs'=\n"
-            "        dict({\n"
-            "            'arg3': 3,\n"
-            "        }),\n"
+            "    'kwargs'={repr_kwargs},\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
-            "tuple((\n"
-            "    0,\n"
-            "    1,\n"
-            "    tuple((\n"
-            "        2,\n"
-            "    )),\n"
-            "    dict({\n"
-            "        'arg3': 3,\n"
-            "    }),\n"
-            "))\n",
+            "{repr_result}\n".format(
+                repr_args=logwrap.pretty_repr((2, ), indent=8, no_indent_start=True),
+                repr_kwargs=logwrap.pretty_repr(dict(arg3=3), indent=8, no_indent_start=True),
+                repr_result=logwrap.pretty_repr(result)
+            ),
             self.stream.getvalue(),
         )
 
@@ -495,14 +468,8 @@ class TestLogWrap(unittest.TestCase):
                         "Calling: \n"
                         "'func'(\n"
                         "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'test_arg1'={},\n"
-                        ")".format(
-                            logwrap.pretty_repr(
-                                arg1,
-                                indent=8,
-                                no_indent_start=True
-                            )
-                        )
+                        "    'test_arg1'={repr_test_arg1},\n"
+                        ")".format(repr_test_arg1=logwrap.pretty_repr(arg1, indent=8, no_indent_start=True))
                     )
                 ),
                 mock.call(
@@ -588,19 +555,11 @@ class TestLogWrap(unittest.TestCase):
                         "Calling: \n"
                         "'func'(\n"
                         "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'test_arg1'={},\n"
-                        "    'test_arg2'={},\n"
+                        "    'test_arg1'={repr_test_arg1},\n"
+                        "    'test_arg2'={repr_test_arg2},\n"
                         ")".format(
-                            logwrap.pretty_repr(
-                                arg1,
-                                indent=8,
-                                no_indent_start=True
-                            ),
-                            logwrap.pretty_repr(
-                                arg2,
-                                indent=8,
-                                no_indent_start=True
-                            ),
+                            repr_test_arg1=logwrap.pretty_repr(arg1, indent=8, no_indent_start=True),
+                            repr_test_arg2=logwrap.pretty_repr(arg2, indent=8, no_indent_start=True)
                         )
                     )
                 ),
@@ -686,10 +645,12 @@ class TestLogWrap(unittest.TestCase):
             "    # VAR_POSITIONAL:\n"
             "    'args'=(),\n"
             "    # VAR_KEYWORD:\n"
-            "    'kwargs'={},\n"
+            "    'kwargs'={{}},\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
-            "u'''No args'''\n",
+            "{repr_result}\n".format(
+                repr_result=logwrap.pretty_repr(result)
+            ),
             self.stream.getvalue(),
         )
 
