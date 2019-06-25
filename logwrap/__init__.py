@@ -21,8 +21,6 @@ Contents: 'logwrap', 'pretty_repr', 'pretty_str'
 Original code was made for Mirantis Inc by Alexey Stepanov,
 later it has been reworked and extended for support of special cases.
 """
-# External Dependencies
-import pkg_resources
 
 # Local Implementation
 from .log_on_access import LogOnAccess
@@ -49,16 +47,10 @@ __all__ = (
     "LogOnAccess",
 )
 
-try:  # pragma: no cover
-    __version__ = pkg_resources.get_distribution(__name__).version
-except pkg_resources.DistributionNotFound:  # pragma: no cover
-    # package is not installed, try to get from SCM
-    try:
-        import setuptools_scm  # type: ignore
-
-        __version__ = setuptools_scm.get_version()
-    except ImportError:
-        setuptools_scm = None
+try:
+    from ._version import version as __version__
+except ImportError:
+    pass
 
 __author__ = "Alexey Stepanov"
 __author_email__ = "penguinolog@gmail.com"
