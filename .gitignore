@@ -5,6 +5,9 @@
 .cache/*
 .pytest_cache/*
 
+### Generated version
+/logwrap/_version.py
+
 ### Generated code
 /logwrap/*.c
 /pip-wheel-metadata/

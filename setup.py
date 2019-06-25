@@ -241,7 +241,7 @@ SETUP_ARGS = dict(
         "!=36.2.0",
         "setuptools_scm",
     ],
-    use_scm_version=True,
+    use_scm_version={'write_to': 'logwrap/_version.py'},
     install_requires=REQUIRED,
     package_data={"logwrap": INTERFACES + ["py.typed"]},
 )
