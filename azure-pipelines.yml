@@ -43,7 +43,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -U setuptools
           pip install -r requirements.txt
-          pip install -U pytest pylint pytest-pylint pytest-sugar isort[pyproject,requirements]
+          pip install -U pytest pylint pylint_junit isort[pyproject,requirements]
         displayName: 'Install dependencies'
 
       - script: |
@@ -51,7 +51,7 @@ jobs:
         displayName: 'Generate version file'
 
       - script: |
-          pytest -vvv --pylint -m pylint --junitxml=pylint_result.xml logwrap
+          pylint --output-format=pylint_junit.JUnitReporter logwrap > pylint_result.xml
         displayName: 'PyLint'
 
       - task: PublishTestResults@2
