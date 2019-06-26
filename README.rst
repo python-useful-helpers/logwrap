@@ -121,7 +121,7 @@ Get decorator for use without parameters:
     def foo():
         pass
 
-Call example:
+Call example (python 3.8):
 
 .. code-block:: python
 
@@ -129,6 +129,8 @@ Call example:
 
    @logwrap.logwrap
    def example_function1(
+           arg0: str,
+           /,
            arg1: str,
            arg2: str='arg2',
            *args,
@@ -136,9 +138,9 @@ Call example:
            kwarg2: str='kwarg2',
            **kwargs
    ) -> tuple():
-       return (arg1, arg2, args, kwarg1, kwarg2, kwargs)
+       return (arg0, arg1, arg2, args, kwarg1, kwarg2, kwargs)
 
-   example_function1('arg1', kwarg1='kwarg1', kwarg3='kwarg3')
+   example_function1('arg0', 'arg1', kwarg1='kwarg1', kwarg3='kwarg3')
 
 This code during execution will produce log records:
 
@@ -146,6 +148,8 @@ This code during execution will produce log records:
 
     Calling:
     'example_function1'(
+        # POSITIONAL_ONLY:
+        'arg0'=u'''arg0''',  # type: <class 'str'>
         # POSITIONAL_OR_KEYWORD:
         'arg1'=u'''arg1''',  # type: <class 'str'>
         'arg2'=u'''arg2''',  # type: <class 'str'>
@@ -163,6 +167,7 @@ This code during execution will produce log records:
     Done: 'example_function1' with result:
 
      tuple((
+        u'''arg0''',
         u'''arg1''',
         u'''arg2''',
         (),
