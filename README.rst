@@ -46,6 +46,7 @@ Pros:
 
     Python 3.6
     Python 3.7
+    Python 3.8
 
 .. note:: 2.7 is supported in versions < 5.0.0, python 3.5 in versions < 6 due to syntax changes.
 
