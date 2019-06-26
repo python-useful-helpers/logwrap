@@ -47,9 +47,10 @@ Pros:
     Python 3.5
     Python 3.6
     Python 3.7
+    Python 3.8
     PyPy3 3.5+
 
-.. note:: Python 3.4 and 2.7 is supported in versions < 5.0.0
+.. note:: 2.7 is supported in versions < 5.0.0
 
 This package includes helpers:
 
