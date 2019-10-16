@@ -476,11 +476,11 @@ class LogOnAccess(property):
         """Name getter."""
         return (
             self.override_name or self.fget.__name__
-            if self.fget
+            if self.fget is not None
             else self.fset.__name__
-            if self.fset
+            if self.fset is not None
             else self.fdel.__name__
-            if self.fdel
+            if self.fdel is not None
             else ""
         )
 
