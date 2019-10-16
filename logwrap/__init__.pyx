@@ -12,8 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import pkg_resources
-
 from logwrap.repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, pretty_str
 
 from logwrap.log_wrap import LogWrap
