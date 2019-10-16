@@ -136,7 +136,6 @@ def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing
     return result
 
 
-# pylint: disable=assigning-non-slot,abstract-method
 # noinspection PyAbstractClass
 class LogWrap(class_decorator.BaseDecorator):
     """Base class for LogWrap implementation."""
@@ -508,7 +507,9 @@ class LogWrap(class_decorator.BaseDecorator):
             if param.empty is param.annotation:
                 annotation = ""
             else:
-                annotation = "  # type: {param.annotation!s}".format(param=param)
+                annotation = "  # type: {annotation!s}".format(
+                    annotation=getattr(param.annotation, '__name__', param.annotation)
+                )
 
             param_str += "\n{spc:<{indent}}{key!r}={val},{annotation}".format(
                 spc="", indent=INDENT, key=param.name, annotation=annotation, val=val
@@ -575,7 +576,6 @@ class LogWrap(class_decorator.BaseDecorator):
         :rtype: typing.Callable
         """
 
-        # pylint: disable=missing-docstring
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
@@ -610,7 +610,6 @@ class LogWrap(class_decorator.BaseDecorator):
                 raise
             return result
 
-        # pylint: enable=missing-docstring
         return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper
 
     def __call__(  # pylint: disable=useless-super-delegation
@@ -620,10 +619,6 @@ class LogWrap(class_decorator.BaseDecorator):
         return super(LogWrap, self).__call__(*args, **kwargs)
 
 
-# pylint: enable=assigning-non-slot, abstract-method
-
-
-# pylint: disable=function-redefined, unused-argument
 @typing.overload
 def logwrap(
     func: None = None,
@@ -662,8 +657,7 @@ def logwrap(
     """Overload: func provided."""
 
 
-# pylint: enable=unused-argument
-def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-for-parameter
+def logwrap(  # noqa: F811
     func: typing.Optional[typing.Callable[..., typing.Any]] = None,
     *,
     log: logging.Logger = LOGGER,
@@ -733,6 +727,3 @@ def logwrap(  # noqa: F811  # pylint: disable=unexpected-keyword-arg, no-value-f
     if func is not None:
         return wrapper(func)
     return wrapper
-
-
-# pylint: enable=function-redefined

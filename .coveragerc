@@ -1,8 +1,8 @@
 [run]
 source =
-    logwrap
+  logwrap
 omit =
-    test/*
+  test/*
 branch = True
 [report]
 exclude_lines =

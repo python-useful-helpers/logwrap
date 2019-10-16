@@ -19,6 +19,11 @@ _python:
     python: "3.7"
     dist: xenial
     sudo: true
+  - &python38
+    name: "Python 3.8"
+    python: "3.8"
+    dist: xenial
+    sudo: true
   - &pypy3
     name: "PyPy3"
     python: pypy3.5
@@ -27,7 +32,7 @@ _helpers:
   - &install_cython pip install --upgrade Cython
   - &build_package python setup.py bdist_wheel
   - &install_built pip install logwrap --no-index -f dist
-  - &test_no_cov  py.test -vv test
+  - &test_no_cov  py.test -vvv test
   - &test_cythonized
     stage: Test cythonized
     install:
@@ -53,7 +58,7 @@ _helpers:
 
 script:
   - python setup.py develop -v
-  - py.test -vvv --cov-config .coveragerc --cov-report= --cov=logwrap test
+  - py.test --cov-config .coveragerc --cov-report= --cov=logwrap test
   - coverage report -m --fail-under 87
 after_success:
   - coveralls
@@ -65,7 +70,7 @@ jobs:
       install:
         - *upgrade_python_toolset
         - *install_deps
-        - pip install --upgrade "pylint >= 2.2" isort[pyproject,requirements]
+        - pip install --upgrade "pylint >= 2.3" isort[pyproject,requirements]
       script:
         - python setup.py --version
         - pylint logwrap
@@ -82,7 +87,7 @@ jobs:
       install:
         - *upgrade_python_toolset
         - *install_deps
-        - pip install --upgrade "mypy >= 0.700"
+        - pip install --upgrade "mypy >= 0.720"
       script:
         - python setup.py --version
         - mypy --strict logwrap
@@ -100,7 +105,7 @@ jobs:
     #    - *upgrade_python_toolset
     #    - pip install --upgrade pydocstyle
     #    script:
-    #    - pydocstyle logwrap
+    #    - pydocstyle -v logwrap
     - <<: *code_style_check
       name: "Black formatting"
       install:
@@ -116,6 +121,8 @@ jobs:
     - stage: test
       <<: *python37
     - stage: test
+      <<: *python38
+    - stage: test
       <<: *pypy3
 
     - <<: *test_cythonized
@@ -124,6 +131,8 @@ jobs:
       <<: *python36
     - <<: *test_cythonized
       <<: *python37
+    - <<: *test_cythonized
+      <<: *python38
 
     - stage: deploy
       # This prevents job from appearing in test plan unless commit is tagged:
@@ -152,6 +161,7 @@ jobs:
             tags: true
             distributions: sdist
           skip_upload_docs: true
+          skip_existing: true
 
 cache: pip
 before_cache:

@@ -34,11 +34,9 @@ cdef class BaseDecorator:
         """
         # noinspection PyArgumentList
         super(BaseDecorator, self).__init__()
-        # pylint: disable=assigning-non-slot
         self._func = func
         if self._func is not None:
             functools.update_wrapper(self, self._func)
-        # pylint: enable=assigning-non-slot
 
     def _get_function_wrapper(self, func: typing.Callable[..., typing.Any]) -> typing.Callable[..., typing.Any]:
         """Here should be constructed and returned real decorator.

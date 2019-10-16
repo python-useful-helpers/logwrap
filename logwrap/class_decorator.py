@@ -71,11 +71,9 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         """
         # noinspection PyArgumentList
         super(BaseDecorator, self).__init__()
-        # pylint: disable=assigning-non-slot
         self.__func = func
         if self.__func is not None:
             functools.update_wrapper(self, self.__func)
-        # pylint: enable=assigning-non-slot
 
     @property
     def _func(self) -> typing.Optional[typing.Callable[..., typing.Any]]:
@@ -102,12 +100,10 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         """Main decorator getter."""
 
     @typing.overload
-    def __call__(  # noqa: F811  # pylint: disable=function-redefined
-        self, *args: typing.Any, **kwargs: typing.Any
-    ) -> typing.Any:
+    def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
         """Main decorator getter."""
 
-    def __call__(  # noqa: F811  # pylint: disable=function-redefined
+    def __call__(
         self, *args: typing.Union[typing.Callable[..., typing.Any], typing.Any], **kwargs: typing.Any
     ) -> typing.Any:
         """Main decorator getter."""

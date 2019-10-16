@@ -102,7 +102,7 @@ class LogOnAccess(property):
         ...     def __init__(self, val = 'ok'):
         ...         self.val = val
         ...     def __repr__(self):
-        ...         return f'{self.__class__.__name__}(val={self.val})'
+        ...         return '{cls}(val={self.val})'.format(cls=self.__class__.__name__, self=self)
         ...     @LogOnAccess
         ...     def ok(self):
         ...         return self.val
@@ -222,7 +222,7 @@ class LogOnAccess(property):
         :return: logger instance
         :rtype: logging.Logger
         """
-        if self.logger is not None:  # pylint: disable=no-else-return
+        if self.logger is not None:
             return self.logger
         valid_logger_names = ("logger", "log")
         for logger_name in valid_logger_names:
@@ -250,9 +250,7 @@ class LogOnAccess(property):
         """
 
     @typing.overload
-    def __get__(  # noqa: F811  # pylint: disable=function-redefined
-        self, instance: typing.Any, owner: typing.Optional[type] = None
-    ) -> typing.Any:
+    def __get__(self, instance: typing.Any, owner: typing.Optional[type] = None) -> typing.Any:  # noqa: F811
         """Get descriptor.
 
         :param instance: Owner class instance. Filled only if instance created, else None.
@@ -264,9 +262,7 @@ class LogOnAccess(property):
         :raises Exception: Something goes wrong
         """
 
-    def __get__(  # noqa: F811  # pylint: disable=function-redefined
-        self, instance: typing.Any, owner: typing.Optional[type] = None
-    ) -> typing.Any:
+    def __get__(self, instance: typing.Any, owner: typing.Optional[type] = None) -> typing.Any:  # noqa: F811
         """Get descriptor.
 
         :param instance: Owner class instance. Filled only if instance created, else None.
@@ -508,11 +504,11 @@ class LogOnAccess(property):
         """Name getter."""
         return (
             self.override_name or self.fget.__name__
-            if self.fget
+            if self.fget is not None
             else self.fset.__name__
-            if self.fset
+            if self.fset is not None
             else self.fdel.__name__
-            if self.fdel
+            if self.fdel is not None
             else ""
         )
 

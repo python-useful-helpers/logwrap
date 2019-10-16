@@ -35,6 +35,17 @@ cdef:
         """Check for nested iterations: True, if not."""
         return not isinstance(item, (list, set, tuple, dict, frozenset))
 
+    dict SPECIAL_SYMBOLS_ESCAPE = {
+        "\\": "\\\\",
+        "\n": "\\n",
+        "\r": "\\r",
+        "\f": "\\f",
+        "\v": "\\v",
+        "\b": "\\b",
+        "\t": "\\t",
+        "\a": "\\a"
+    }
+
 
     class ReprParameter:
         """Parameter wrapper wor repr and str operations over signature."""
@@ -205,7 +216,7 @@ cdef class PrettyFormat:
 
     def _repr_dict_items(
         self,
-        dict src: typing.Dict[typing.Any, typing.Any],
+        object src: typing.Dict[typing.Any, typing.Any],
         unsigned long indent=0
     ) -> typing.Iterator[str]:
         """Repr dict items.
@@ -331,6 +342,7 @@ cdef class PrettyRepr(PrettyFormat):
             cdef:
                 str prefix
                 str string
+                str escaped
 
             if isinstance(val, bytes):
                 string = val.decode(encoding="utf-8", errors="backslashreplace")
@@ -338,7 +350,8 @@ cdef class PrettyRepr(PrettyFormat):
             else:
                 prefix = "u"
                 string = val
-            return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=string)
+            escaped = "".join(SPECIAL_SYMBOLS_ESCAPE.get(sym, sym) for sym in string)
+            return "{spc:<{indent}}{prefix}'''{escaped}'''".format(spc="", indent=indent, prefix=prefix, escaped=escaped)
 
         str _repr_simple(
             self,
@@ -448,7 +461,7 @@ cdef class PrettyRepr(PrettyFormat):
 
     def _repr_dict_items(
         self,
-        dict src,
+        object src,
         unsigned long indent=0
     ) -> typing.Iterator[str]:
         """Repr dict items.
@@ -600,7 +613,7 @@ cdef class PrettyStr(PrettyFormat):
 
     def _repr_dict_items(
         self,
-        dict src: typing.Dict[typing.Any, typing.Any],
+        object src: typing.Dict[typing.Any, typing.Any],
         unsigned long indent=0
     ) -> typing.Iterator[str]:
         """Repr dict items.

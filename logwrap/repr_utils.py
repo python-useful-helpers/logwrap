@@ -39,6 +39,18 @@ def _simple(item: typing.Any) -> bool:
     return not isinstance(item, (list, set, tuple, dict, frozenset))
 
 
+SPECIAL_SYMBOLS_ESCAPE = {
+    "\\": "\\\\",
+    "\n": "\\n",
+    "\r": "\\r",
+    "\f": "\\f",
+    "\v": "\\v",
+    "\b": "\\b",
+    "\t": "\\t",
+    "\a": "\\a",
+}
+
+
 class ReprParameter:
     """Parameter wrapper wor repr and str operations over signature."""
 
@@ -112,7 +124,6 @@ class ReprParameter:
         return '<{} "{}">'.format(self.__class__.__name__, self)
 
 
-# pylint: disable=no-member
 def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> typing.List[ReprParameter]:
     """Get arguments lists with defaults.
 
@@ -137,9 +148,6 @@ def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> t
             result.append(ReprParameter(param))
 
     return result
-
-
-# pylint: enable=no-member
 
 
 class PrettyFormat(metaclass=abc.ABCMeta):
@@ -354,7 +362,8 @@ class PrettyRepr(PrettyFormat):
         else:
             prefix = "u"
             string = val
-        return "{spc:<{indent}}{prefix}'''{string}'''".format(spc="", indent=indent, prefix=prefix, string=string)
+        escaped = "".join(SPECIAL_SYMBOLS_ESCAPE.get(sym, sym) for sym in string)
+        return "{spc:<{indent}}{prefix}'''{escaped}'''".format(spc="", indent=indent, prefix=prefix, escaped=escaped)
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Repr object without iteration.

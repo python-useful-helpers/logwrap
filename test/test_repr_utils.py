@@ -283,6 +283,10 @@ class TestPrettyRepr(unittest.TestCase):
             "u'''<Test Class at 0x{:X}>'''".format(id(Tst))
         )
 
+    def test_string_escape(self):
+        src = "n\n b\b r\r f\f v\v t\t \\ a\a"
+        self.assertEqual("u'''n\\n b\\b r\\r f\\f v\\v t\\t \\\\ a\\a'''", logwrap.pretty_repr(src))
+
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestAnnotated(unittest.TestCase):

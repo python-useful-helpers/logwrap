@@ -14,13 +14,13 @@ jobs:
 
       - script: |
           python -m pip install --upgrade pip
-          pip install -U setuptools
+          pip install -U setuptools virtualenv
           pip install -r requirements.txt
           pip install -U pytest pytest-sugar pytest-flake8 flake8-bugbear flake8-docstrings
         displayName: 'Install dependencies'
 
       - script: |
-          pytest -vvv --flake8 -m flake8 --junitxml=flake8_result.xml logwrap
+          pytest --flake8 -m flake8 --junitxml=flake8_result.xml logwrap
         displayName: 'PEP8'
 
       - task: PublishTestResults@2
@@ -41,7 +41,7 @@ jobs:
 
       - script: |
           python -m pip install --upgrade pip
-          pip install -U setuptools
+          pip install -U setuptools virtualenv
           pip install -r requirements.txt
           pip install -U pytest pylint pylint_junit isort[pyproject,requirements]
         displayName: 'Install dependencies'
@@ -72,9 +72,9 @@ jobs:
 
       - script: |
           python -m pip install --upgrade pip
-          pip install -U setuptools
+          pip install -U setuptools virtualenv
           pip install -r requirements.txt
-          pip install -U "mypy>=0.700"
+          pip install -U "mypy>=0.720"
         displayName: 'Install dependencies'
 
       - script: |
@@ -99,6 +99,8 @@ jobs:
     parameters: {name: 'Python_36', python: '3.6', architecture: 'x64', kind: 'native'}
   - template: .azure_pipelines/run_tests.yml
     parameters: {name: 'Python_37', python: '3.7', architecture: 'x64', kind: 'native'}
+  - template: .azure_pipelines/run_tests.yml
+    parameters: {name: 'Python_38', python: '3.8', architecture: 'x64', kind: 'native'}
 
   - template: .azure_pipelines/run_tests.yml
     parameters: {name: 'Python_35', python: '3.5', architecture: 'x64', kind: 'cython'}
@@ -112,13 +114,17 @@ jobs:
     parameters: {name: 'Python_37', python: '3.7', architecture: 'x64', kind: 'cython'}
   - template: .azure_pipelines/run_tests.yml
     parameters: {name: 'Python_37', python: '3.7', architecture: 'x86', kind: 'cython'}
-
+  - template: .azure_pipelines/run_tests.yml
+    parameters: {name: 'Python_38', python: '3.8', architecture: 'x64', kind: 'cython'}
+  - template: .azure_pipelines/run_tests.yml
+    parameters: {name: 'Python_38', python: '3.8', architecture: 'x86', kind: 'cython'}
 
   - job: 'Build_and_deploy'
     dependsOn:
       - Python_35_x64_native
       - Python_36_x64_native
       - Python_37_x64_native
+      - Python_38_x64_native
 
       - Python_35_x64_cython
       - Python_35_x86_cython
@@ -126,6 +132,8 @@ jobs:
       - Python_36_x86_cython
       - Python_37_x64_cython
       - Python_37_x86_cython
+      - Python_38_x64_cython
+      - Python_38_x86_cython
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     pool:
       vmIMage: 'VS2017-Win2016'
@@ -137,6 +145,12 @@ jobs:
           python.architecture: 'x64'
         Python35_x86:
           python.version: '3.5'
+          python.architecture: 'x86'
+        Python38_x64:
+          python.version: '3.8'
+          python.architecture: 'x64'
+        Python38_x86:
+          python.version: '3.8'
           python.architecture: 'x86'
 
     steps:
