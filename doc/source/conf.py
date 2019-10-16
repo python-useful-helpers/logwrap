@@ -60,7 +60,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'logwrap'
-copyright = '2016-2018, Alexey Stepanov'
+copyright = '2016-2019, Alexey Stepanov'
 author = 'Alexey Stepanov'
 
 # The version info for the project you're documenting, acts as replacement for

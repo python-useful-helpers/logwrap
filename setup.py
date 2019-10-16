@@ -1,4 +1,4 @@
-#    Copyright 2016-2017 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2019 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -16,8 +16,6 @@
 
 """logwrap decorator for human-readable logging of command arguments."""
 
-from __future__ import print_function
-
 # Standard Library
 import ast
 import collections
@@ -31,13 +29,21 @@ from distutils.command import build_ext
 import setuptools
 
 try:
+    import typing
+except ImportError:
+    typing = None
+
+
+try:
     # noinspection PyPackageRequirements
     from Cython.Build import cythonize
 except ImportError:
     cythonize = None
 
 
-with open(os.path.join(os.path.dirname(__file__), "logwrap", "__init__.py")) as f:
+PACKAGE_NAME = "logwrap"
+
+with open(os.path.join(os.path.dirname(__file__), PACKAGE_NAME, "__init__.py")) as f:
     SOURCE = f.read()
 
 with open("requirements.txt") as f:
@@ -98,14 +104,13 @@ class AllowFailRepair(build_ext.build_ext):
             root_dir = os.path.abspath(os.path.join(__file__, ".."))
             target_dir = build_dir if not self.inplace else root_dir
 
-            src_files = (os.path.join("logwrap", "__init__.py"),)
+            src_file = os.path.join(PACKAGE_NAME, "__init__.py")
 
-            for src_file in src_files:
-                src = os.path.join(root_dir, src_file)
-                dst = os.path.join(target_dir, src_file)
+            src = os.path.join(root_dir, src_file)
+            dst = os.path.join(target_dir, src_file)
 
-                if src != dst:
-                    shutil.copyfile(src, dst)
+            if src != dst:
+                shutil.copyfile(src, dst)
         except (
             distutils.errors.DistutilsPlatformError,
             getattr(globals()["__builtins__"], "FileNotFoundError", OSError),
@@ -129,7 +134,9 @@ class AllowFailRepair(build_ext.build_ext):
 
 
 # noinspection PyUnresolvedReferences
-def get_simple_vars_from_src(src):
+def get_simple_vars_from_src(
+    src: str
+) -> "typing.Dict[str, typing.Union[str, bytes, int, float, complex, list, set, dict, tuple, None]]":
     """Get simple (string/number/boolean and None) assigned values from source.
 
     :param src: Source code
@@ -215,7 +222,7 @@ CLASSIFIERS = [
 KEYWORDS = ["logging", "debugging", "development"]
 
 SETUP_ARGS = dict(
-    name="logwrap",
+    name=PACKAGE_NAME,
     author=VARIABLES["__author__"],
     author_email=VARIABLES["__author_email__"],
     maintainer=", ".join(
@@ -242,7 +249,7 @@ SETUP_ARGS = dict(
     ],
     use_scm_version={'write_to': 'logwrap/_version.py'},
     install_requires=REQUIRED,
-    package_data={"logwrap": INTERFACES + ["py.typed"]},
+    package_data={PACKAGE_NAME: INTERFACES + ["py.typed"]},
 )
 if cythonize is not None:
     SETUP_ARGS["ext_modules"] = EXT_MODULES
@@ -254,5 +261,5 @@ except BuildFailed:
     print("*" * 80 + "\n" "* Build Failed!\n" "* Use clear scripts version.\n" "*" * 80 + "\n")
     del SETUP_ARGS["ext_modules"]
     del SETUP_ARGS["cmdclass"]
-    SETUP_ARGS["package_data"]["logwrap"] = ["py.typed"]
+    SETUP_ARGS["package_data"][PACKAGE_NAME] = ["py.typed"]
     setuptools.setup(**SETUP_ARGS)
