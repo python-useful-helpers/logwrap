@@ -37,15 +37,9 @@ cpdef tuple __all__ = (
 cpdef str __version__
 
 try:
-    __version__ = pkg_resources.get_distribution(__name__).version
-except pkg_resources.DistributionNotFound:
-    # package is not installed, try to get from SCM
-    try:
-        import setuptools_scm  # type: ignore
-
-        __version__ = setuptools_scm.get_version()
-    except ImportError:
-        setuptools_scm = None
+    from ._version import version as __version__
+except ImportError:
+    pass
 
 cpdef str __author__ = "Alexey Stepanov"
 cpdef str __author_email__ = "penguinolog@gmail.com"
