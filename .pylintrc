@@ -62,19 +62,16 @@ confidence=
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
-disable=import-star-module-level,
-        non-ascii-bytes-literal,
+enable=all
+
+disable=non-ascii-bytes-literal,
         raw-checker-failed,
         bad-inline-option,
         locally-disabled,
         file-ignored,
         suppressed-message,
-        useless-suppression,
-        use-symbolic-message-instead,
         no-absolute-import,
         old-division,
-        invalid-str-codec,
-        next-method-defined,
         comprehension-escape,
         similarities,
         too-many-ancestors,
@@ -96,7 +93,7 @@ disable=import-star-module-level,
 # either give multiple identifier separated by comma (,) or put this option
 # multiple time (only on the command line, not in the configuration file where
 # it should appear only once). See also the "--disable" option for examples.
-enable=c-extension-no-member
+# enable=c-extension-no-member
 
 
 [REPORTS]

@@ -112,7 +112,6 @@ class ReprParameter:
         return f'<{self.__class__.__name__} "{self}">'
 
 
-# pylint: disable=no-member
 def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> typing.List[ReprParameter]:
     """Get arguments lists with defaults.
 
@@ -137,9 +136,6 @@ def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> t
             result.append(ReprParameter(param))
 
     return result
-
-
-# pylint: enable=no-member
 
 
 class PrettyFormat(metaclass=abc.ABCMeta):

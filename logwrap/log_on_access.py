@@ -220,7 +220,7 @@ class LogOnAccess(property):
         :return: logger instance
         :rtype: logging.Logger
         """
-        if self.logger is not None:  # pylint: disable=no-else-return
+        if self.logger is not None:
             return self.logger
         valid_logger_names = ("logger", "log")
         for logger_name in valid_logger_names:
@@ -248,9 +248,7 @@ class LogOnAccess(property):
         """
 
     @typing.overload
-    def __get__(  # noqa: F811  # pylint: disable=function-redefined
-        self, instance: typing.Any, owner: typing.Optional[type] = None
-    ) -> typing.Any:
+    def __get__(self, instance: typing.Any, owner: typing.Optional[type] = None) -> typing.Any:  # noqa: F811
         """Get descriptor.
 
         :param instance: Owner class instance. Filled only if instance created, else None.
@@ -262,9 +260,7 @@ class LogOnAccess(property):
         :raises Exception: Something goes wrong
         """
 
-    def __get__(  # noqa: F811  # pylint: disable=function-redefined
-        self, instance: typing.Any, owner: typing.Optional[type] = None
-    ) -> typing.Any:
+    def __get__(self, instance: typing.Any, owner: typing.Optional[type] = None) -> typing.Any:  # noqa: F811
         """Get descriptor.
 
         :param instance: Owner class instance. Filled only if instance created, else None.
