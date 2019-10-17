@@ -21,7 +21,7 @@ _helpers:
   - &install_cython pip install --upgrade Cython
   - &build_package python setup.py bdist_wheel
   - &install_built pip install logwrap --no-index -f dist
-  - &test_no_cov  py.test -vv test
+  - &test_no_cov  py.test -vvv test
   - &test_cythonized
     stage: Test cythonized
     install:
@@ -75,7 +75,7 @@ jobs:
       install:
         - *upgrade_python_toolset
         - *install_deps
-        - pip install --upgrade "mypy >= 0.700"
+        - pip install --upgrade "mypy >= 0.720"
       script:
         - python setup.py --version
         - mypy --strict logwrap
@@ -93,7 +93,7 @@ jobs:
     #    - *upgrade_python_toolset
     #    - pip install --upgrade pydocstyle
     #    script:
-    #    - pydocstyle logwrap
+    #    - pydocstyle -v logwrap
     - <<: *code_style_check
       name: "Black formatting"
       install:

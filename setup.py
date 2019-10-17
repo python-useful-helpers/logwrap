@@ -18,7 +18,6 @@
 
 # Standard Library
 import ast
-import collections
 import distutils.errors
 import os.path
 import shutil
@@ -136,7 +135,7 @@ class AllowFailRepair(build_ext.build_ext):
 # noinspection PyUnresolvedReferences
 def get_simple_vars_from_src(
     src: str
-) -> "typing.Dict[str, typing.Union[str, bytes, int, float, complex, list, set, dict, tuple, None]]":
+) -> "typing.Dict[str, typing.Union[str, bytes, int, float, complex, list, set, dict, tuple, None, bool, Ellipsis]]":
     """Get simple (string/number/boolean and None) assigned values from source.
 
     :param src: Source code
@@ -148,7 +147,7 @@ def get_simple_vars_from_src(
                     str, bytes,
                     int, float, complex,
                     list, set, dict, tuple,
-                    None,
+                    None, bool, Ellipsis
                 ]
             ]
 
@@ -161,32 +160,33 @@ def get_simple_vars_from_src(
 
     >>> string_sample = "a = '1'"
     >>> get_simple_vars_from_src(string_sample)
-    OrderedDict([('a', '1')])
+    {'a': '1'}
 
     >>> int_sample = "b = 1"
     >>> get_simple_vars_from_src(int_sample)
-    OrderedDict([('b', 1)])
+    {'b': 1}
 
     >>> list_sample = "c = [u'1', b'1', 1, 1.0, 1j, None]"
     >>> result = get_simple_vars_from_src(list_sample)
-    >>> result == collections.OrderedDict(
-    ...     [('c', [u'1', b'1', 1, 1.0, 1j, None])]
-    ... )
+    >>> result == {'c': [u'1', b'1', 1, 1.0, 1j, None]}
     True
 
     >>> iterable_sample = "d = ([1], {1: 1}, {1})"
     >>> get_simple_vars_from_src(iterable_sample)
-    OrderedDict([('d', ([1], {1: 1}, {1}))])
+    {'d': ([1], {1: 1}, {1})}
 
     >>> multiple_assign = "e = f = g = 1"
     >>> get_simple_vars_from_src(multiple_assign)
-    OrderedDict([('e', 1), ('f', 1), ('g', 1)])
+    {'e': 1, 'f': 1, 'g': 1}
     """
-    ast_data = (ast.Str, ast.Num, ast.List, ast.Set, ast.Dict, ast.Tuple, ast.Bytes, ast.NameConstant)
+    if sys.version_info[:2] < (3, 8):
+        ast_data = (ast.Str, ast.Num, ast.List, ast.Set, ast.Dict, ast.Tuple, ast.Bytes, ast.NameConstant, ast.Ellipsis)
+    else:
+        ast_data = ast.Constant
 
     tree = ast.parse(src)
 
-    result = collections.OrderedDict()
+    result = {}
 
     for node in ast.iter_child_nodes(tree):
         if not isinstance(node, ast.Assign):  # We parse assigns only
