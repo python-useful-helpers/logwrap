@@ -39,7 +39,6 @@ try:
 except ImportError:
     cythonize = None
 
-
 PACKAGE_NAME = "logwrap"
 
 with open(os.path.join(os.path.dirname(__file__), PACKAGE_NAME, "__init__.py")) as f:
@@ -112,7 +111,7 @@ class AllowFailRepair(build_ext.build_ext):
                 shutil.copyfile(src, dst)
         except (
             distutils.errors.DistutilsPlatformError,
-            getattr(globals()["__builtins__"], "FileNotFoundError", OSError),
+            FileNotFoundError,
         ):
             raise BuildFailed()
 

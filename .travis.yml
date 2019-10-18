@@ -47,7 +47,7 @@ _helpers:
 
 script:
   - python setup.py develop -v
-  - py.test -vvv --cov-config .coveragerc --cov-report= --cov=logwrap test
+  - py.test --cov-config .coveragerc --cov-report= --cov=logwrap test
   - coverage report -m --fail-under 87
 after_success:
   - coveralls

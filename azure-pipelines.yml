@@ -20,7 +20,7 @@ jobs:
         displayName: 'Install dependencies'
 
       - script: |
-          pytest -vvv --flake8 -m flake8 --junitxml=flake8_result.xml logwrap
+          pytest --flake8 -m flake8 --junitxml=flake8_result.xml logwrap
         displayName: 'PEP8'
 
       - task: PublishTestResults@2
@@ -106,7 +106,6 @@ jobs:
     parameters: {name: 'Python_37', python: '3.7', architecture: 'x64', kind: 'cython'}
   - template: .azure_pipelines/run_tests.yml
     parameters: {name: 'Python_37', python: '3.7', architecture: 'x86', kind: 'cython'}
-
 
   - job: 'Build_and_deploy'
     dependsOn:
