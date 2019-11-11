@@ -8,6 +8,7 @@ export PYTHONDONTWRITEBYTECODE=1
 package_name="$1"
 if [[ -z "$package_name" ]]
 then
+    # shellcheck disable=SC2210
     &>2 echo "Please pass package name as a first argument of this script ($0)"
     exit 1
 fi
