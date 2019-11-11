@@ -331,6 +331,7 @@ cdef class PrettyRepr(PrettyFormat):
             cdef:
                 str prefix
                 str string
+                str escaped
 
             if isinstance(val, bytes):
                 string = val.decode(encoding="utf-8", errors="backslashreplace")
@@ -338,7 +339,15 @@ cdef class PrettyRepr(PrettyFormat):
             else:
                 prefix = "u"
                 string = val
-            return f"{'':<{indent}}{prefix}'''{string}'''"
+            escaped = (
+                string.replace('\n', '\\n')
+                .replace('\r', '\\r')
+                .replace('\f', '\\f')
+                .replace('\v', '\\v')
+                .replace('\b', '\\b')
+                .replace('\t', '\\t')
+            )
+            return f"{'':<{indent}}{prefix}'''{escaped}'''"
 
         str _repr_simple(
             self,

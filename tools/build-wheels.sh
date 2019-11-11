@@ -18,7 +18,7 @@ arch=$(uname -m)
 rm -rf /io/.tox
 rm -rf /io/*.egg-info
 rm -rf /io/.pytest_cache
-find /io/ -noleaf -name *.py[co] -delete
+find /io/ -noleaf -name "*.py[co]" -delete
 
 echo
 echo
@@ -66,8 +66,8 @@ rm -rf /io/.pytest_cache
 rm -rf /io/.tox
 rm -f /io/.coverage
 # Clean caches and cythonized
-find /io/ -noleaf -name *.py[co] -delete
-find /io/ -noleaf -name *.c -delete
+find /io/ -noleaf -name "*.py[co]" -delete
+find /io/ -noleaf -name "*.c" -delete
 # Reset permissions
 chmod -v a+rwx /io/dist
 chmod -v a+rw /io/dist/*

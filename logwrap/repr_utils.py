@@ -350,7 +350,10 @@ class PrettyRepr(PrettyFormat):
         else:
             prefix = "u"
             string = val
-        return f"{'':<{indent}}{prefix}'''{string}'''"
+        escaped: str = string.replace("\n", "\\n").replace("\r", "\\r").replace("\f", "\\f").replace(
+            "\v", "\\v"
+        ).replace("\b", "\\b").replace("\t", "\\t")
+        return f"{'':<{indent}}{prefix}'''{escaped}'''"
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Repr object without iteration.
