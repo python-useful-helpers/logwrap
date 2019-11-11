@@ -340,12 +340,14 @@ cdef class PrettyRepr(PrettyFormat):
                 prefix = "u"
                 string = val
             escaped = (
-                string.replace('\n', '\\n')
-                .replace('\r', '\\r')
-                .replace('\f', '\\f')
-                .replace('\v', '\\v')
-                .replace('\b', '\\b')
-                .replace('\t', '\\t')
+                string.replace("\\", "\\\\")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\f", "\\f")
+                .replace("\v", "\\v")
+                .replace("\b", "\\b")
+                .replace("\t", "\\t")
+                .replace("\a", "\\a")
             )
             return f"{'':<{indent}}{prefix}'''{escaped}'''"
 

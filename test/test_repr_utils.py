@@ -284,8 +284,8 @@ class TestPrettyRepr(unittest.TestCase):
         )
 
     def test_string_escape(self):
-        src = "n\n b\b r\r f\f v\v t\t"
-        self.assertEqual("u'''n\\n b\\b r\\r f\\f v\\v t\\t'''", logwrap.pretty_repr(src))
+        src = "n\n b\b r\r f\f v\v t\t \\ a\a"
+        self.assertEqual("u'''n\\n b\\b r\\r f\\f v\\v t\\t \\\\ a\\a'''", logwrap.pretty_repr(src))
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring

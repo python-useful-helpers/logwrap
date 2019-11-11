@@ -350,9 +350,9 @@ class PrettyRepr(PrettyFormat):
         else:
             prefix = "u"
             string = val
-        escaped: str = string.replace("\n", "\\n").replace("\r", "\\r").replace("\f", "\\f").replace(
-            "\v", "\\v"
-        ).replace("\b", "\\b").replace("\t", "\\t")
+        escaped: str = string.replace("\\", "\\\\").replace("\n", "\\n").replace("\r", "\\r").replace(
+            "\f", "\\f"
+        ).replace("\v", "\\v").replace("\b", "\\b").replace("\t", "\\t").replace("\a", "\\a")
         return f"{'':<{indent}}{prefix}'''{escaped}'''"
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
