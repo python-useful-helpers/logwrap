@@ -38,7 +38,7 @@ cdef:
             readonly object empty
 
             readonly object parameter
-            readonly object name
+            readonly str name
             readonly object annotation
             readonly object kind
             readonly object value
