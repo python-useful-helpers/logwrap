@@ -35,6 +35,17 @@ cdef:
         """Check for nested iterations: True, if not."""
         return not isinstance(item, (list, set, tuple, dict, frozenset))
 
+    dict SPECIAL_SYMBOLS_ESCAPE = {
+        "\\": "\\\\",
+        "\n": "\\n",
+        "\r": "\\r",
+        "\f": "\\f",
+        "\v": "\\v",
+        "\b": "\\b",
+        "\t": "\\t",
+        "\a": "\\a"
+    }
+
 
     class ReprParameter:
         """Parameter wrapper wor repr and str operations over signature."""
@@ -339,16 +350,7 @@ cdef class PrettyRepr(PrettyFormat):
             else:
                 prefix = "u"
                 string = val
-            escaped = (
-                string.replace("\\", "\\\\")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\f", "\\f")
-                .replace("\v", "\\v")
-                .replace("\b", "\\b")
-                .replace("\t", "\\t")
-                .replace("\a", "\\a")
-            )
+            escaped = "".join(SPECIAL_SYMBOLS_ESCAPE.get(sym, sym) for sym in string)
             return f"{'':<{indent}}{prefix}'''{escaped}'''"
 
         str _repr_simple(

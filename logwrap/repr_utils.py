@@ -39,6 +39,18 @@ def _simple(item: typing.Any) -> bool:
     return not isinstance(item, (list, set, tuple, dict, frozenset))
 
 
+SPECIAL_SYMBOLS_ESCAPE: typing.Dict[str, str] = {
+    "\\": "\\\\",
+    "\n": "\\n",
+    "\r": "\\r",
+    "\f": "\\f",
+    "\v": "\\v",
+    "\b": "\\b",
+    "\t": "\\t",
+    "\a": "\\a",
+}
+
+
 class ReprParameter:
     """Parameter wrapper wor repr and str operations over signature."""
 
@@ -350,9 +362,7 @@ class PrettyRepr(PrettyFormat):
         else:
             prefix = "u"
             string = val
-        escaped: str = string.replace("\\", "\\\\").replace("\n", "\\n").replace("\r", "\\r").replace(
-            "\f", "\\f"
-        ).replace("\v", "\\v").replace("\b", "\\b").replace("\t", "\\t").replace("\a", "\\a")
+        escaped: str = "".join(SPECIAL_SYMBOLS_ESCAPE.get(sym, sym) for sym in string)
         return f"{'':<{indent}}{prefix}'''{escaped}'''"
 
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
