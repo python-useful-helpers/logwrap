@@ -511,7 +511,7 @@ class LogWrap(class_decorator.BaseDecorator):
             if param.empty is param.annotation:
                 annotation: str = ""
             else:
-                annotation = f"  # type: {param.annotation!s}"
+                annotation = f"  # type: {getattr(param.annotation, '__name__', param.annotation)!s}"
 
             param_str += f"\n{'':<{INDENT}}{param.name!r}={val},{annotation}"
         if param_str:

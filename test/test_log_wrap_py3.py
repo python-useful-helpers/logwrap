@@ -160,7 +160,7 @@ class TestAnnotated(unittest.TestCase):
         """Revert modifications."""
         self.logger.handlers.clear()
 
-    def test_annotation_args(self):
+    def test_01_annotation_args(self):
         @logwrap.logwrap
         def func(a: typing.Optional[int] = None):
             pass
@@ -171,6 +171,23 @@ class TestAnnotated(unittest.TestCase):
             "'func'(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
             "    'a'=None,  # type: typing.Union[int, NoneType]\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "None\n",
+            self.stream.getvalue(),
+        )
+
+    def test_02_annotation_args(self):
+        @logwrap.logwrap
+        def func(a: int = 0):
+            pass
+
+        func()
+        self.assertEqual(
+            "DEBUG>Calling: \n"
+            "'func'(\n"
+            "    # POSITIONAL_OR_KEYWORD:\n"
+            "    'a'=0,  # type: int\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
             "None\n",
