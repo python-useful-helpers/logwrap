@@ -10,7 +10,7 @@ jobs:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: [3.6, 3.7]
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v1
@@ -29,4 +29,4 @@ jobs:
     - name: Test with pytest
       run: |
         py.test --cov-config .coveragerc --cov-report= --cov=logwrap test
-        coverage report -m --fail-under 87
+        coverage report -m --fail-under 85
