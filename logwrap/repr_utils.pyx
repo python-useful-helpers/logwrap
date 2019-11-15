@@ -216,7 +216,7 @@ cdef class PrettyFormat:
 
     def _repr_dict_items(
         self,
-        dict src: typing.Dict[typing.Any, typing.Any],
+        object src: typing.Dict[typing.Any, typing.Any],
         unsigned long indent=0
     ) -> typing.Iterator[str]:
         """Repr dict items.
@@ -446,7 +446,7 @@ cdef class PrettyRepr(PrettyFormat):
 
     def _repr_dict_items(
         self,
-        dict src,
+        object src,
         unsigned long indent=0
     ) -> typing.Iterator[str]:
         """Repr dict items.
@@ -583,7 +583,7 @@ cdef class PrettyStr(PrettyFormat):
 
     def _repr_dict_items(
         self,
-        dict src: typing.Dict[typing.Any, typing.Any],
+        object src: typing.Dict[typing.Any, typing.Any],
         unsigned long indent=0
     ) -> typing.Iterator[str]:
         """Repr dict items.
