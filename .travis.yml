@@ -26,7 +26,7 @@ _python:
     sudo: true
   - &pypy3
     name: "PyPy3"
-    python: pypy3.5
+    python: pypy3
 
 _helpers:
   - &install_cython pip install --upgrade Cython
