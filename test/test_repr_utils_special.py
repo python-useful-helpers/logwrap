@@ -19,7 +19,7 @@
 """_repr_utils (internal helpers) specific tests."""
 
 # Standard Library
-import sys
+# import sys
 import typing
 import unittest
 
