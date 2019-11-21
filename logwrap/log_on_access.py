@@ -237,7 +237,7 @@ class LogOnAccess(property):
         return _LOGGER
 
     @typing.overload
-    def __get__(self, instance: None, owner: typing.Optional[type] = None) -> typing.NoReturn:
+    def __get__(self, instance: None, owner: typing.Optional[type] = None) -> "typing.NoReturn":
         """Get descriptor.
 
         :param instance: Owner class instance. Filled only if instance created, else None.
