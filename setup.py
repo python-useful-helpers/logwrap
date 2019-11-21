@@ -139,7 +139,7 @@ def get_simple_vars_from_src(
 
     :param src: Source code
     :type src: str
-    :returns: OrderedDict with keys, values = variable names, values
+    :return: OrderedDict with keys, values = variable names, values
     :rtype: typing.Dict[
                 str,
                 typing.Union[
@@ -220,7 +220,7 @@ CLASSIFIERS = [
 
 KEYWORDS = ["logging", "debugging", "development"]
 
-SETUP_ARGS = dict(
+SETUP_ARGS: typing.Dict[str, typing.Union[str, typing.List[str], typing.Dict[str, typing.List[str]]]] = dict(
     name=PACKAGE_NAME,
     author=VARIABLES["__author__"],
     author_email=VARIABLES["__author_email__"],

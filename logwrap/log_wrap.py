@@ -27,7 +27,6 @@ import os
 import sys
 import traceback
 import typing
-import warnings
 
 # LogWrap Implementation
 from logwrap import class_decorator
@@ -36,6 +35,9 @@ from logwrap import repr_utils
 LOGGER: logging.Logger = logging.getLogger("logwrap")
 INDENT = 4
 _CURRENT_FILE = os.path.abspath(__file__)
+
+FuncFinalResult = typing.TypeVar("FuncFinalResult")
+FuncResultType = typing.TypeVar("FuncResultType", typing.Awaitable[typing.Any], typing.Any)
 
 
 class BoundParameter(inspect.Parameter):
@@ -56,7 +58,7 @@ class BoundParameter(inspect.Parameter):
         :type value: typing.Any
         :raises ValueError: No default value and no value
         """
-        super(BoundParameter, self).__init__(
+        super().__init__(
             name=parameter.name, kind=parameter.kind, default=parameter.default, annotation=parameter.annotation
         )
 
@@ -66,12 +68,6 @@ class BoundParameter(inspect.Parameter):
             self._value: typing.Any = parameter.default
         else:
             self._value = value
-
-    @property
-    def parameter(self) -> inspect.Parameter:
-        """Parameter object."""
-        warnings.warn("BoundParameter is subclass of `inspect.Parameter`", DeprecationWarning)
-        return self
 
     @property
     def value(self) -> typing.Any:
@@ -156,7 +152,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
     def __init__(
         self,
-        func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
+        func: typing.Optional[typing.Callable[..., FuncResultType]] = None,
         *,
         log: logging.Logger = LOGGER,
         log_level: int = logging.DEBUG,
@@ -206,7 +202,7 @@ class LogWrap(class_decorator.BaseDecorator):
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
         .. versionchanged:: 5.1.0 log_traceback parameter
         """
-        super(LogWrap, self).__init__(func=func)
+        super().__init__(func=func)
 
         # Typing fix:
         if blacklisted_names is None:
@@ -223,7 +219,7 @@ class LogWrap(class_decorator.BaseDecorator):
         self.__log_level: int = log_level
         self.__exc_level: int = exc_level
         self.__max_indent: int = max_indent
-        self.__spec: typing.Optional[typing.Callable[..., typing.Any]] = spec or self._func
+        self.__spec: typing.Optional[typing.Callable[..., FuncResultType]] = spec or self._func
         self.__log_call_args: bool = log_call_args
         self.__log_call_args_on_exc: bool = log_call_args_on_exc
         self.__log_traceback: bool = log_traceback
@@ -396,7 +392,7 @@ class LogWrap(class_decorator.BaseDecorator):
         return self.__logger
 
     @property
-    def _spec(self) -> typing.Optional[typing.Callable[..., typing.Any]]:
+    def _spec(self) -> typing.Optional[typing.Callable[..., FuncResultType]]:
         """Spec for function arguments.
 
         :rtype: typing.Callable
@@ -564,9 +560,7 @@ class LogWrap(class_decorator.BaseDecorator):
             exc_info=False,
         )
 
-    def _get_function_wrapper(
-        self, func: typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]
-    ) -> typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]:
+    def _get_function_wrapper(self, func: typing.Callable[..., FuncResultType]) -> typing.Callable[..., FuncResultType]:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -577,7 +571,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
+        async def async_wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
             sig: inspect.Signature = inspect.signature(self._spec or func)
             args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
@@ -590,11 +584,11 @@ class LogWrap(class_decorator.BaseDecorator):
                     raise
                 self._make_exc_record(name=func.__name__, arguments=args_repr)
                 raise
-            return result
+            return result  # type: ignore
 
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):  # type: (typing.Any, typing.Any) -> typing.Any
+        def wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
             sig: inspect.Signature = inspect.signature(self._spec or func)
             args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
@@ -611,13 +605,21 @@ class LogWrap(class_decorator.BaseDecorator):
 
         return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper
 
+    @typing.overload
+    def __call__(
+        self, *args: typing.Callable[..., FuncResultType], **kwargs: typing.Any
+    ) -> typing.Callable[..., FuncResultType]:
+        """Main decorator getter."""
+
+    @typing.overload
+    def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> FuncResultType:
+        """Main decorator getter."""
+
     def __call__(  # pylint: disable=useless-super-delegation
-        self,
-        *args: typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any],
-        **kwargs: typing.Any,
-    ) -> typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any]:
+        self, *args: typing.Union[typing.Callable[..., FuncResultType], typing.Any], **kwargs: typing.Any,
+    ) -> typing.Union[typing.Callable[..., FuncResultType], FuncResultType]:
         """Callable instance."""
-        return super(LogWrap, self).__call__(*args, **kwargs)
+        return super().__call__(*args, **kwargs)  # type: ignore
 
 
 @typing.overload
@@ -628,7 +630,7 @@ def logwrap(
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
-    spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
+    spec: typing.Optional[typing.Callable[..., FuncResultType]] = None,
     blacklisted_names: typing.Optional[typing.List[str]] = None,
     blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]] = None,
     log_call_args: bool = True,
@@ -641,57 +643,57 @@ def logwrap(
 
 @typing.overload  # noqa: F811
 def logwrap(
-    func: typing.Callable[..., typing.Awaitable[typing.Any]],
+    func: typing.Callable[..., typing.Awaitable[FuncFinalResult]],
     *,
     log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
-    spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
+    spec: typing.Optional[typing.Callable[..., typing.Awaitable[FuncFinalResult]]] = None,
     blacklisted_names: typing.Optional[typing.List[str]] = None,
     blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]] = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
     log_result_obj: bool = True,
-) -> typing.Callable[..., typing.Awaitable[typing.Any]]:
+) -> typing.Callable[..., typing.Awaitable[FuncFinalResult]]:
     """Overload: func provided."""
 
 
 @typing.overload  # noqa: F811
 def logwrap(
-    func: typing.Callable[..., typing.Any],
+    func: typing.Callable[..., FuncFinalResult],
     *,
     log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
-    spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
+    spec: typing.Optional[typing.Callable[..., FuncFinalResult]] = None,
     blacklisted_names: typing.Optional[typing.List[str]] = None,
     blacklisted_exceptions: typing.Optional[typing.List[typing.Type[Exception]]] = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
     log_result_obj: bool = True,
-) -> typing.Callable[..., typing.Any]:
+) -> typing.Callable[..., FuncFinalResult]:
     """Overload: func provided."""
 
 
 def logwrap(  # noqa: F811
-    func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
+    func: typing.Optional[typing.Callable[..., FuncResultType]] = None,
     *,
     log: logging.Logger = LOGGER,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
-    spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
+    spec: typing.Optional[typing.Callable[..., FuncResultType]] = None,
     blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
     blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
     log_result_obj: bool = True,
-) -> typing.Union[LogWrap, typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]]:
+) -> typing.Union[LogWrap, typing.Callable[..., FuncResultType]]:
     """Log function calls and return values.
 
     :param func: function to wrap
@@ -745,5 +747,5 @@ def logwrap(  # noqa: F811
         log_result_obj=log_result_obj,
     )
     if func is not None:
-        return wrapper(func)
+        return wrapper(func)  # type: ignore
     return wrapper

@@ -176,7 +176,7 @@ class LogOnAccess(property):
         >>> logs[27] == 'Traceback (most recent call last):'
         True
         """
-        super(LogOnAccess, self).__init__(fget=fget, fset=fset, fdel=fdel, doc=doc)
+        super().__init__(fget=fget, fset=fset, fdel=fdel, doc=doc)
 
         if logger is None or isinstance(logger, logging.Logger):
             self.__logger: typing.Optional[logging.Logger] = logger
@@ -281,7 +281,7 @@ class LogOnAccess(property):
         try:
             if self.log_before:
                 logger.log(self.log_level, f"Request: {source}.{self.__name__}")
-            result = super(LogOnAccess, self).__get__(instance, owner)
+            result = super().__get__(instance, owner)
             if self.log_success:
                 logger.log(
                     self.log_level,
@@ -317,7 +317,7 @@ class LogOnAccess(property):
         try:
             if self.log_before:
                 logger.log(self.log_level, f"Request: {source}.{self.__name__} = {repr_utils.pretty_repr(value)}")
-            super(LogOnAccess, self).__set__(instance, value)
+            super().__set__(instance, value)
             if self.log_success:
                 logger.log(
                     self.log_level,
@@ -352,7 +352,7 @@ class LogOnAccess(property):
         try:
             if self.log_before:
                 logger.log(self.log_level, f"Request: del {source}.{self.__name__}")
-            super(LogOnAccess, self).__delete__(instance)
+            super().__delete__(instance)
             if self.log_success:
                 logger.log(self.log_level, f"Done at {time.time() - timestamp:.03f}s: del {source}.{self.__name__}")
         except Exception:
