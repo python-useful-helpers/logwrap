@@ -23,6 +23,8 @@ import abc
 import functools
 import typing
 
+ReturnType = typing.TypeVar("ReturnType")
+
 
 class BaseDecorator(metaclass=abc.ABCMeta):
     """Base class for decorators.
@@ -63,20 +65,20 @@ class BaseDecorator(metaclass=abc.ABCMeta):
     False
     """
 
-    def __init__(self, func: typing.Optional[typing.Callable[..., typing.Any]] = None) -> None:
+    def __init__(self, func: typing.Optional[typing.Callable[..., ReturnType]] = None) -> None:
         """Decorator.
 
         :param func: function to wrap
         :type func: typing.Optional[typing.Callable]
         """
         # noinspection PyArgumentList
-        super(BaseDecorator, self).__init__()
+        super().__init__()
         self.__func = func
         if self.__func is not None:
             functools.update_wrapper(self, self.__func)
 
     @property
-    def _func(self) -> typing.Optional[typing.Callable[..., typing.Any]]:
+    def _func(self) -> typing.Optional[typing.Callable[..., ReturnType]]:
         """Get wrapped function.
 
         :rtype: typing.Optional[typing.Callable]
@@ -84,7 +86,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         return self.__func  # pragma: no cover
 
     @abc.abstractmethod
-    def _get_function_wrapper(self, func: typing.Callable[..., typing.Any]) -> typing.Callable[..., typing.Any]:
+    def _get_function_wrapper(self, func: typing.Callable[..., ReturnType]) -> typing.Callable[..., ReturnType]:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -95,17 +97,17 @@ class BaseDecorator(metaclass=abc.ABCMeta):
 
     @typing.overload
     def __call__(
-        self, *args: typing.Callable[..., typing.Any], **kwargs: typing.Any
-    ) -> typing.Union[typing.Callable[..., typing.Any], typing.Any]:
+        self, *args: typing.Callable[..., ReturnType], **kwargs: typing.Any
+    ) -> typing.Callable[..., ReturnType]:
         """Main decorator getter."""
 
     @typing.overload
-    def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+    def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> ReturnType:
         """Main decorator getter."""
 
-    def __call__(
-        self, *args: typing.Union[typing.Callable[..., typing.Any], typing.Any], **kwargs: typing.Any
-    ) -> typing.Any:
+    def __call__(  # type: ignore
+        self, *args: typing.Union[typing.Callable[..., ReturnType], typing.Any], **kwargs: typing.Any
+    ) -> typing.Union[typing.Callable[..., ReturnType], ReturnType]:
         """Main decorator getter."""
         l_args = list(args)
 

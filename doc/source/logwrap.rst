@@ -107,7 +107,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
         Decorator entry-point. Logic is stored separately and load depends on python version.
 
-        :returns: Decorated function. On python 3.3+ awaitable is supported.
+        :return: Decorated function. On python 3.3+ awaitable is supported.
         :rtype: typing.Union[typing.Callable, typing.Awaitable]
 
 
