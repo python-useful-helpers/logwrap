@@ -29,14 +29,14 @@ import logwrap
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestPrettyRepr(unittest.TestCase):
-    def test_dict_subclass(self):
+    def test_001_dict_subclass(self):
         class MyDict(dict):
             """Dict subclass."""
 
         val = MyDict(key='value')
         self.assertEqual(
             "MyDict({\n"
-            "    'key': u'''value''',\n"
+            "    'key': 'value',\n"
             "})",
             logwrap.pretty_repr(val)
         )
@@ -48,14 +48,14 @@ class TestPrettyRepr(unittest.TestCase):
             logwrap.pretty_str(val)
         )
 
-    def test_typing_specific_dict(self):
+    def test_002_typing_specific_dict(self):
         class MyDict(typing.Dict[str, str]):
             """Dict subclass."""
 
         val = MyDict(key='value')
         self.assertEqual(
             "MyDict({\n"
-            "    'key': u'''value''',\n"
+            "    'key': 'value',\n"
             "})",
             logwrap.pretty_repr(val)
         )
@@ -68,14 +68,14 @@ class TestPrettyRepr(unittest.TestCase):
         )
 
     # @unittest.skipIf(sys.version_info[:2] < (3, 8), 'pep-0589 is implemented in python 3.8')
-    # def test_typed_dict(self):
+    # def test_003_typed_dict(self):
     #     class MyDict(typing.TypedDict):
     #         key: str
     #
     #     val = MyDict(key='value')
     #     self.assertEqual(
     #         "dict({\n"
-    #         "    'key': u'''value''',\n"
+    #         "    'key': 'value',\n"
     #         "})",
     #         logwrap.pretty_repr(val)
     #     )

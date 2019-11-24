@@ -811,16 +811,16 @@ class TestObject(unittest.TestCase):
                     msg="Calling: \n"
                         "'func'(\n"
                         "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'arg'=u'''data''',\n"
+                        "    'arg'='data',\n"
                         "    'arg_secret'=None,\n"
-                        "    'arg2'=u'''public''',\n"
+                        "    'arg2'='public',\n"
                         "    'secret_arg'=None,\n"
                         ")"),
                 mock.call.log(level=logging.DEBUG, msg="Done: 'func'")
             ]
         )
 
-    def test_003_override_change_repr(self):
+    def test_004_override_change_repr(self):
         class ChangeRepr(logwrap.LogWrap):
             def post_process_param(
                 self,
@@ -848,9 +848,9 @@ class TestObject(unittest.TestCase):
                     msg="Calling: \n"
                         "'func'(\n"
                         "    # POSITIONAL_OR_KEYWORD:\n"
-                        "    'arg'=u'''data''',\n"
+                        "    'arg'='data',\n"
                         "    'arg_secret'=<*hidden*>,\n"
-                        "    'arg2'=u'''public''',\n"
+                        "    'arg2'='public',\n"
                         "    'secret_arg'=<*hidden*>,\n"
                         ")"),
                 mock.call.log(level=logging.DEBUG, msg="Done: 'func'")

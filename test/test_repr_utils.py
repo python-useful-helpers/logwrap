@@ -28,20 +28,22 @@ import logwrap
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestPrettyRepr(unittest.TestCase):
-    def test_simple(self):
+    def test_001_simple(self):
         self.assertEqual(
             logwrap.pretty_repr(True), repr(True)
         )
 
-    def test_text(self):
+    def test_002_text(self):
+        txt = 'Unicode text'
+        b_txt = b'bytes text\x01'
         self.assertEqual(
-            logwrap.pretty_repr('Unicode text'), "u'''Unicode text'''"
+            repr(txt), logwrap.pretty_repr(txt)
         )
         self.assertEqual(
-            logwrap.pretty_repr(b'bytes text\x01'), "b'''bytes text\x01'''"
+            repr(b_txt), logwrap.pretty_repr(b_txt)
         )
 
-    def test_iterable(self):
+    def test_003_iterable(self):
         self.assertEqual(
             'list([{nl:<5}1,{nl:<5}2,{nl:<5}3,\n'
             '])'.format(nl='\n'),
@@ -61,7 +63,7 @@ class TestPrettyRepr(unittest.TestCase):
             res.startswith('frozenset({') and res.endswith('\n})')
         )
 
-    def test_dict(self):
+    def test_004_dict(self):
         self.assertEqual(
             'dict({\n'
             '    1 : 1,\n'
@@ -71,7 +73,7 @@ class TestPrettyRepr(unittest.TestCase):
             logwrap.pretty_repr({1: 1, 2: 2, 33: 33}),
         )
 
-    def test_nested_obj(self):
+    def test_005_nested_obj(self):
         test_obj = [
             {1: 2},
             {3: {4}},
@@ -111,7 +113,7 @@ class TestPrettyRepr(unittest.TestCase):
         )
         self.assertEqual(exp_repr, logwrap.pretty_repr(test_obj))
 
-    def test_callable(self):
+    def test_006_callable(self):
         fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args})>".format
 
         def empty_func():
@@ -218,7 +220,7 @@ class TestPrettyRepr(unittest.TestCase):
             )
         )
 
-    def test_indent(self):
+    def test_007_indent(self):
         obj = [[[[[[[[[[123]]]]]]]]]]
         self.assertEqual(
             "list([\n"
@@ -255,7 +257,7 @@ class TestPrettyRepr(unittest.TestCase):
             logwrap.pretty_repr(obj, max_indent=10),
         )
 
-    def test_magic_override(self):
+    def test_008_magic_override(self):
         # noinspection PyMissingOrEmptyDocstring
         class Tst(object):
             def __repr__(self):
@@ -280,12 +282,8 @@ class TestPrettyRepr(unittest.TestCase):
         )
         self.assertEqual(
             result,
-            "u'''<Test Class at 0x{:X}>'''".format(id(Tst))
+            "'<Test Class at 0x{:X}>'".format(id(Tst))
         )
-
-    def test_string_escape(self):
-        src = "n\n b\b r\r f\f v\v t\t \\ a\a"
-        self.assertEqual("u'''n\\n b\\b r\\r f\\f v\\v t\\t \\\\ a\\a'''", logwrap.pretty_repr(src))
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
