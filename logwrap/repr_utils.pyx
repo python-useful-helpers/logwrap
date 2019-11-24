@@ -35,17 +35,6 @@ cdef:
         """Check for nested iterations: True, if not."""
         return not isinstance(item, (list, set, tuple, dict, frozenset))
 
-    dict SPECIAL_SYMBOLS_ESCAPE = {
-        "\\": "\\\\",
-        "\n": "\\n",
-        "\r": "\\r",
-        "\f": "\\f",
-        "\v": "\\v",
-        "\b": "\\b",
-        "\t": "\\t",
-        "\a": "\\a"
-    }
-
 
     class ReprParameter:
         """Parameter wrapper wor repr and str operations over signature."""
@@ -333,26 +322,6 @@ cdef class PrettyRepr(PrettyFormat):
         self._magic_method_name = "__pretty_repr__"
 
     cdef:
-        str _strings_repr(
-            self,
-            unsigned long indent,
-            val: typing.Union[bytes, str]
-        ):
-            """Custom repr for strings and binary strings."""
-            cdef:
-                str prefix
-                str string
-                str escaped
-
-            if isinstance(val, bytes):
-                string = val.decode(encoding="utf-8", errors="backslashreplace")
-                prefix = "b"
-            else:
-                prefix = "u"
-                string = val
-            escaped = "".join(SPECIAL_SYMBOLS_ESCAPE.get(sym, sym) for sym in string)
-            return f"{'':<{indent}}{prefix}'''{escaped}'''"
-
         str _repr_simple(
             self,
             src: typing.Any,
@@ -373,8 +342,6 @@ cdef class PrettyRepr(PrettyFormat):
             cdef unsigned long real_indent = 0 if no_indent_start else indent
             if isinstance(src, set):
                 return f"{'':<{real_indent}}set({' ,'.join(map(repr, src))})"
-            if isinstance(src, (bytes, str)):
-                return self._strings_repr(indent=real_indent, val=src)
             return f"{'':<{real_indent}}{src!r}"
 
         str _repr_callable(

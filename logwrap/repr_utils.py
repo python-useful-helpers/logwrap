@@ -39,18 +39,6 @@ def _simple(item: typing.Any) -> bool:
     return not isinstance(item, (list, set, tuple, dict, frozenset))
 
 
-SPECIAL_SYMBOLS_ESCAPE: typing.Dict[str, str] = {
-    "\\": "\\\\",
-    "\n": "\\n",
-    "\r": "\\r",
-    "\f": "\\f",
-    "\v": "\\v",
-    "\b": "\\b",
-    "\t": "\\t",
-    "\a": "\\a",
-}
-
-
 class ReprParameter:
     """Parameter wrapper wor repr and str operations over signature."""
 
@@ -353,18 +341,6 @@ class PrettyRepr(PrettyFormat):
         """
         return "__pretty_repr__"
 
-    @staticmethod
-    def _strings_repr(indent: int, val: typing.Union[bytes, str]) -> str:
-        """Custom repr for strings and binary strings."""
-        if isinstance(val, bytes):
-            string: str = val.decode(encoding="utf-8", errors="backslashreplace")
-            prefix: str = "b"
-        else:
-            prefix = "u"
-            string = val
-        escaped: str = "".join(SPECIAL_SYMBOLS_ESCAPE.get(sym, sym) for sym in string)
-        return f"{'':<{indent}}{prefix}'''{escaped}'''"
-
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Repr object without iteration.
 
@@ -380,8 +356,6 @@ class PrettyRepr(PrettyFormat):
         indent = 0 if no_indent_start else indent
         if isinstance(src, set):
             return f"{'':<{indent}}set({' ,'.join(map(repr, src))})"
-        if isinstance(src, (bytes, str)):
-            return self._strings_repr(indent=indent, val=src)
         return f"{'':<{indent}}{src!r}"
 
     def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:

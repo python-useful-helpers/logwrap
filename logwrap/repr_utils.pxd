@@ -63,9 +63,6 @@ cdef:
 
         cpdef str process_element(self, src: typing.Any, unsigned long indent=?, bint no_indent_start=?)
 
-    class PrettyRepr(PrettyFormat):
-        cdef str _strings_repr(self, unsigned long indent, val: typing.Union[bytes, str])
-
     class PrettyStr(PrettyFormat):
         cdef str _strings_str(self, unsigned long indent, val: typing.Union[bytes, str])
 
