@@ -339,10 +339,7 @@ cdef class PrettyRepr(PrettyFormat):
             :return: simple repr() over object, except strings (add prefix) and set (uniform py2/py3)
             :rtype: str
             """
-            cdef unsigned long real_indent = 0 if no_indent_start else indent
-            if isinstance(src, set):
-                return "{spc:<{real_indent}}{val}".format(spc="", real_indent=real_indent, val="set(" + " ,".join(map(repr, src)) + ")")
-            return "{spc:<{real_indent}}{val!r}".format(spc="", real_indent=real_indent, val=src)
+            return "{spc:<{real_indent}}{val!r}".format(spc="", real_indent=0 if no_indent_start else indent, val=src)
 
         str _repr_callable(
             self,
@@ -496,8 +493,6 @@ cdef class PrettyStr(PrettyFormat):
             :rtype: str
             """
             cdef unsigned long real_indent = 0 if no_indent_start else indent
-            if isinstance(src, set):
-                return "{spc:<{real_indent}}{val}".format(spc="", real_indent=real_indent, val="set(" + " ,".join(map(str, src)) + ")")
             if isinstance(src, (bytes, str)):
                 return self._strings_str(indent=real_indent, val=src)
             return "{spc:<{real_indent}}{val!s}".format(spc="", real_indent=real_indent, val=src)
