@@ -353,10 +353,7 @@ class PrettyRepr(PrettyFormat):
         :return: simple repr() over object, except strings (add prefix) and set (uniform py2/py3)
         :rtype: str
         """
-        indent = 0 if no_indent_start else indent
-        if isinstance(src, set):
-            return f"{'':<{indent}}set({' ,'.join(map(repr, src))})"
-        return f"{'':<{indent}}{src!r}"
+        return f"{'':<{0 if no_indent_start else indent}}{src!r}"
 
     def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
         """Repr dict items.
@@ -465,8 +462,6 @@ class PrettyStr(PrettyFormat):
         :rtype: str
         """
         indent = 0 if no_indent_start else indent
-        if isinstance(src, set):
-            return f"{'':<{indent}}set({' ,'.join(map(str, src))})"
         if isinstance(src, (bytes, str)):
             return self._strings_str(indent=indent, val=src)
         return f"{'':<{indent}}{src!s}"
