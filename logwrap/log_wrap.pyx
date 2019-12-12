@@ -325,7 +325,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 else:
                     annotation = f"  # type: {getattr(param.annotation, '__name__', param.annotation)!s}"
 
-                param_str += f"\n{'':<{INDENT}}{param.name!r}={val},{annotation}"
+                param_str += f"\n{'':<{INDENT}}{param.name}={val},{annotation}"
             if param_str:
                 param_str += "\n"
             return param_str

@@ -509,7 +509,7 @@ class LogWrap(class_decorator.BaseDecorator):
             else:
                 annotation = f"  # type: {getattr(param.annotation, '__name__', param.annotation)!s}"
 
-            param_str += f"\n{'':<{INDENT}}{param.name!r}={val},{annotation}"
+            param_str += f"\n{'':<{INDENT}}{param.name}={val},{annotation}"
         if param_str:
             param_str += "\n"
         return param_str
@@ -533,7 +533,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :type arguments: str
         :type method: str
         """
-        self._logger.log(level=self.log_level, msg=f"{method}: \n{name!r}({arguments if self.log_call_args else ''})")
+        self._logger.log(level=self.log_level, msg=f"{method}: \n{name}({arguments if self.log_call_args else ''})")
 
     def _make_exc_record(self, name: str, arguments: str) -> None:
         """Make log record if exception raised.
@@ -554,7 +554,7 @@ class LogWrap(class_decorator.BaseDecorator):
             level=self.exc_level,
             msg=(
                 f"Failed: \n"
-                f"{name!r}({arguments if self.log_call_args_on_exc else ''})\n"
+                f"{name}({arguments if self.log_call_args_on_exc else ''})\n"
                 f"{tb_text if self.log_traceback else ''}"
             ),
             exc_info=False,
