@@ -507,7 +507,7 @@ class LogWrap(class_decorator.BaseDecorator):
                     annotation=getattr(param.annotation, "__name__", param.annotation)
                 )
 
-            param_str += "\n{spc:<{indent}}{key!r}={val},{annotation}".format(
+            param_str += "\n{spc:<{indent}}{key}={val},{annotation}".format(
                 spc="", indent=INDENT, key=param.name, annotation=annotation, val=val
             )
         if param_str:
@@ -535,7 +535,7 @@ class LogWrap(class_decorator.BaseDecorator):
         """
         self._logger.log(
             level=self.log_level,
-            msg="{method}: \n{name!r}({arguments})".format(
+            msg="{method}: \n{name}({arguments})".format(
                 method=method, name=name, arguments=arguments if self.log_call_args else ""
             ),
         )
@@ -555,7 +555,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
         self._logger.log(
             level=self.exc_level,
-            msg="Failed: \n{name!r}({arguments})\n{tb_text}".format(
+            msg="Failed: \n{name}({arguments})\n{tb_text}".format(
                 name=name,
                 arguments=arguments if self.log_call_args_on_exc else "",
                 tb_text=tb_text if self.log_traceback else "",

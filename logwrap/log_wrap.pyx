@@ -325,7 +325,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 else:
                     annotation = "  # type: {annotation!s}".format(annotation=getattr(param.annotation, '__name__', param.annotation))
 
-                param_str += "\n{spc:<{indent}}{key!r}={val},{annotation}".format(
+                param_str += "\n{spc:<{indent}}{key}={val},{annotation}".format(
                     spc="", indent=INDENT, key=param.name, annotation=annotation, val=val
                 )
             if param_str:

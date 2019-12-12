@@ -61,7 +61,7 @@ class TestLogWrapAsync(unittest.TestCase):
         self.loop.run_until_complete(func())
         self.assertEqual(
             "DEBUG>Awaiting: \n"
-            "'func'()\n"
+            "func()\n"
             "DEBUG>Done: 'func' with result:\n"
             "None\n",
             self.stream.getvalue(),
@@ -82,7 +82,7 @@ class TestLogWrapAsync(unittest.TestCase):
             [
                 mock.call.log(
                     level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
+                    msg="Awaiting: \nfunc()"
                 ),
                 mock.call.log(
                     level=logging.DEBUG,
@@ -102,9 +102,9 @@ class TestLogWrapAsync(unittest.TestCase):
 
         self.assertEqual(
             'DEBUG>Awaiting: \n'
-            "'func'()\n"
+            "func()\n"
             'ERROR>Failed: \n'
-            "'func'()\n"
+            "func()\n"
             'Traceback (most recent call last):',
             '\n'.join(self.stream.getvalue().split('\n')[:5]),
         )
@@ -128,7 +128,7 @@ class TestLogWrapAsync(unittest.TestCase):
             [
                 mock.call(
                     level=logging.DEBUG,
-                    msg="Awaiting: \n'func'()"
+                    msg="Awaiting: \nfunc()"
                 ),
             ],
             log.mock_calls,
