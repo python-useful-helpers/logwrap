@@ -361,7 +361,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             """
             self._logger.log(
                 level=self.log_level,
-                msg=f"{method}: \n{name!r}({arguments if self.log_call_args else ''})",
+                msg=f"{method}: \n{name}({arguments if self.log_call_args else ''})",
             )
 
         void _make_exc_record(self, str name, str arguments) except *:
@@ -381,7 +381,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 level=self.exc_level,
                 msg=(
                     f"Failed: \n"
-                    f"{name!r}({arguments if self.log_call_args_on_exc else ''})\n"
+                    f"{name}({arguments if self.log_call_args_on_exc else ''})\n"
                     f"{tb_text if self.log_traceback else ''}"
                 ),
                 exc_info=False,
