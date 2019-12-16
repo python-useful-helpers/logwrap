@@ -87,7 +87,7 @@ Argumented usage with arguments from signature:
         max_indent=20,  # forwarded to the pretty_repr
         spec=None,  # use target callable function for spec
         blacklisted_names=None,  # list argument names, which should be dropped from log
-        blacklisted_exceptions=None,  # Exceptions to skip in log
+        blacklisted_exceptions=None,  # Exceptions to skip details in log (no traceback, no exception details - just class name)
         log_call_args=True,  # Log call arguments before call
         log_call_args_on_exc=True,  # Log call arguments if exception happens
         log_traceback = True,  # Log traceback if exception happens

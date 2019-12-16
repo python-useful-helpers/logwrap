@@ -37,7 +37,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type blacklisted_names: typing.Optional[typing.Iterable[str]]
         :param blacklisted_exceptions: list of exception,
                                        which should be re-raised without
-                                       producing log record.
+                                       producing traceback and text log record.
         :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
         :param log_call_args: log call arguments before executing wrapped function.
         :type log_call_args: bool
