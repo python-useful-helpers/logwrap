@@ -185,7 +185,6 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         """
         return indent + multiplier * self.indent_step
 
-    @abc.abstractmethod
     def _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], indent: int = 0) -> str:
         """Repr callable object (function or method).
 
@@ -196,7 +195,29 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :return: Repr of function or method with signature.
         :rtype: str
         """
-        raise NotImplementedError()
+        param_str: str = ""
+
+        for param in _prepare_repr(src):
+            param_str += f"\n{'':<{self.next_indent(indent)}}{param.name}"
+            if param.annotation is not param.empty:
+                param_str += f": {param.annotation}"
+            if param.value is not param.empty:
+                param_str += f"={self.process_element(src=param.value, indent=indent, no_indent_start=True)}"
+            param_str += ","
+
+        if param_str:
+            param_str += "\n" + " " * indent
+
+        sig: inspect.Signature = inspect.signature(src)
+        if sig.return_annotation is inspect.Parameter.empty:
+            annotation: str = ""
+        else:
+            annotation = f" -> {getattr(sig.return_annotation, '__name__', sig.return_annotation)!s}"
+
+        return (
+            f"{'':<{indent}}"
+            f"<{src.__class__.__name__} {src.__module__}.{src.__name__} with interface ({param_str}){annotation}>"
+        )
 
     @abc.abstractmethod
     def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
@@ -300,7 +321,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
             else:
                 prefix, suffix = "{", "}"
             result = "".join(self._repr_iterable_items(src=src, indent=indent))
-        if type(src) in (list, tuple, set, dict):
+        if type(src) in (list, tuple, set, dict):  # pylint: disable=unidiomatic-typecheck
             new_line: str = "\n" if no_indent_start else ""
             return f"{new_line}{'':<{indent}}{prefix}{result}\n{'':<{indent}}{suffix}"
         return self._repr_iterable_item(
@@ -372,37 +393,6 @@ class PrettyRepr(PrettyFormat):
         for key, val in src.items():
             line: str = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
             yield f"\n{'':<{self.next_indent(indent)}}{key!r:{max_len}}: {line},"
-
-    def _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], indent: int = 0) -> str:
-        """Repr callable object (function or method).
-
-        :param src: Callable to process
-        :type src: typing.Union[types.FunctionType, types.MethodType]
-        :param indent: start indentation
-        :type indent: int
-        :return: Repr of function or method with signature.
-        :rtype: str
-        """
-        param_str: str = ""
-
-        for param in _prepare_repr(src):
-            param_str += f"\n{'':<{self.next_indent(indent)}}{param.name}"
-            if param.annotation is not param.empty:
-                param_str += f": {param.annotation}"
-            if param.value is not param.empty:
-                param_str += f"={self.process_element(src=param.value, indent=indent, no_indent_start=True)}"
-            param_str += ","
-
-        if param_str:
-            param_str += "\n" + " " * indent
-
-        sig: inspect.Signature = inspect.signature(src)
-        if sig.return_annotation is inspect.Parameter.empty:
-            annotation: str = ""
-        else:
-            annotation = f" -> {sig.return_annotation!r}"
-
-        return f"{'':<{indent}}<{src!r} with interface ({param_str}){annotation}>"
 
     @staticmethod
     def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
@@ -483,37 +473,6 @@ class PrettyStr(PrettyFormat):
         for key, val in src.items():
             line: str = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
             yield f"\n{'':<{self.next_indent(indent)}}{key!s:{max_len}}: {line},"
-
-    def _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], indent: int = 0) -> str:
-        """Repr callable object (function or method).
-
-        :param src: Callable to process
-        :type src: typing.Union[types.FunctionType, types.MethodType]
-        :param indent: start indentation
-        :type indent: int
-        :return: Repr of function or method with signature.
-        :rtype: str
-        """
-        param_str: str = ""
-
-        for param in _prepare_repr(src):
-            param_str += f"\n{'':<{self.next_indent(indent)}}{param.name}"
-            if param.annotation is not param.empty:
-                param_str += f": {param.annotation}"
-            if param.value is not param.empty:
-                param_str += f"={self.process_element(src=param.value, indent=indent, no_indent_start=True)}"
-            param_str += ","
-
-        if param_str:
-            param_str += "\n" + " " * indent
-
-        sig: inspect.Signature = inspect.signature(src)
-        if sig.return_annotation is inspect.Parameter.empty:
-            annotation: str = ""
-        else:
-            annotation = f" -> {sig.return_annotation!r}"
-
-        return f"{'':<{indent}}<{src!s} with interface ({param_str}){annotation}>"
 
     @staticmethod
     def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:

@@ -111,15 +111,35 @@ class TestPrettyRepr(unittest.TestCase):
         )
         self.assertEqual(exp_repr, logwrap.pretty_repr(test_obj))
 
-    def test_006_callable(self):
-        fmt = "{spc:<{indent}}<{obj!r} with interface ({args})>".format
-
+    def test_006_callable_simple(self):
         def empty_func():
             pass
 
+        self.assertEqual(
+            f"{'':<{0}}"
+            f"<{empty_func.__class__.__name__} {empty_func.__module__}.{empty_func.__name__} with interface ({''})>",
+            logwrap.pretty_repr(empty_func),
+        )
+
+    def test_007_callable_with_args(self):
         def full_func(arg, darg=1, *positional, **named):
             pass
 
+        args = (
+            '\n'
+            '    arg,\n'
+            '    darg=1,\n'
+            '    *positional,\n'
+            '    **named,\n'
+        )
+
+        self.assertEqual(
+            f"{'':<{0}}"
+            f"<{full_func.__class__.__name__} {full_func.__module__}.{full_func.__name__} with interface ({args})>",
+            logwrap.pretty_repr(full_func),
+        )
+
+    def test_008_callable_class_elements(self):
         # noinspection PyMissingOrEmptyDocstring
         class TstClass(object):
             def tst_method(self, arg, darg=1, *positional, **named):
@@ -131,94 +151,48 @@ class TestPrettyRepr(unittest.TestCase):
 
         tst_instance = TstClass()
 
-        self.assertEqual(
-            logwrap.pretty_repr(empty_func),
-            fmt(spc='', indent=0, obj=empty_func, args='')
+        c_m_args = (
+            '\n'
+            '    self,\n'
+            '    arg,\n'
+            '    darg=1,\n'
+            '    *positional,\n'
+            '    **named,\n'
         )
 
-        self.assertEqual(
-            logwrap.pretty_repr(full_func),
-            fmt(
-                spc='',
-                indent=0,
-                obj=full_func,
-                args='\n'
-                '    arg,\n'
-                '    darg=1,\n'
-                '    *positional,\n'
-                '    **named,\n'
+        cm_args = (
+            '\n'
+            '    cls={cls!r},\n'
+            '    arg,\n'
+            '    darg=1,\n'
+            '    *positional,\n'
+            '    **named,\n'.format(cls=TstClass)
+        )
+
+        i_m_args = (
+            f'\n'
+            f'    self={tst_instance!r},\n'
+            f'    arg,\n'
+            f'    darg=1,\n'
+            f'    *positional,\n'
+            f'    **named,\n'
+        )
+
+        for callable_obj, args in (
+            (TstClass.tst_method, c_m_args),
+            (TstClass.tst_classmethod, cm_args),
+            (tst_instance.tst_method, i_m_args),
+            (tst_instance.tst_classmethod, cm_args)
+        ):
+
+            self.assertEqual(
+                f"{'':<{0}}"
+                f"<{callable_obj.__class__.__name__} {callable_obj.__module__}.{callable_obj.__name__} "
+                f"with interface ({args})>",
+                logwrap.pretty_repr(callable_obj),
             )
-        )
 
-        obj = TstClass.tst_method
-
-        self.assertEqual(
-            logwrap.pretty_repr(obj),
-            fmt(
-                spc='',
-                indent=0,
-                obj=obj,
-                args='\n'
-                     '    self,\n'
-                     '    arg,\n'
-                     '    darg=1,\n'
-                     '    *positional,\n'
-                     '    **named,\n'
-            )
-        )
-
-        obj = TstClass.tst_classmethod
-
-        self.assertEqual(
-            logwrap.pretty_repr(obj),
-            fmt(
-                spc='',
-                indent=0,
-                obj=obj,
-                args='\n'
-                     '    cls={cls!r},\n'
-                     '    arg,\n'
-                     '    darg=1,\n'
-                     '    *positional,\n'
-                     '    **named,\n'.format(cls=TstClass)
-            )
-        )
-
-        obj = tst_instance.tst_method
-
-        self.assertEqual(
-            logwrap.pretty_repr(obj),
-            fmt(
-                spc='',
-                indent=0,
-                obj=obj,
-                args='\n'
-                     '    self={self!r},\n'
-                     '    arg,\n'
-                     '    darg=1,\n'
-                     '    *positional,\n'
-                     '    **named,\n'.format(self=tst_instance)
-            )
-        )
-
-        obj = tst_instance.tst_classmethod
-
-        self.assertEqual(
-            logwrap.pretty_repr(obj),
-            fmt(
-                spc='',
-                indent=0,
-                obj=obj,
-                args='\n'
-                     '    cls={cls!r},\n'
-                     '    arg,\n'
-                     '    darg=1,\n'
-                     '    *positional,\n'
-                     '    **named,\n'.format(cls=TstClass)
-            )
-        )
-
-    def test_007_indent(self):
+    def test_009_indent(self):
         obj = [[[[[[[[[[123]]]]]]]]]]
         self.assertEqual(
             "[\n"
@@ -255,7 +229,7 @@ class TestPrettyRepr(unittest.TestCase):
             logwrap.pretty_repr(obj, max_indent=10),
         )
 
-    def test_008_magic_override(self):
+    def test_010_magic_override(self):
         # noinspection PyMissingOrEmptyDocstring
         class Tst(object):
             def __repr__(self):
@@ -287,85 +261,33 @@ class TestPrettyRepr(unittest.TestCase):
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestAnnotated(unittest.TestCase):
     def test_001_annotation_args(self):
-        fmt = "{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
-
         def func(a: typing.Optional[int] = None):
             pass
 
-        self.assertEqual(
-            logwrap.pretty_repr(func),
-            fmt(
-                spc='',
-                indent=0,
-                obj=func,
-                args="\n    a: typing.Union[int, NoneType]=None,\n",
-                annotation=""
-            )
-        )
+        args = "\n    a: typing.Union[int, NoneType]=None,\n"
 
         self.assertEqual(
-            logwrap.pretty_str(func),
-            fmt(
-                spc='',
-                indent=0,
-                obj=func,
-                args="\n    a: typing.Union[int, NoneType]=None,\n",
-                annotation=""
-            )
+            f"{'':<{0}}<{func.__class__.__name__} {func.__module__}.{func.__name__} with interface ({args}){''}>",
+            logwrap.pretty_repr(func),
         )
 
     def test_002_annotation_return(self):
-        fmt = "{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
-
         def func() -> None:
             pass
 
         self.assertEqual(
+            f"{'':<{0}}<{func.__class__.__name__} {func.__module__}.{func.__name__} with interface ({''}){' -> None'}>",
             logwrap.pretty_repr(func),
-            fmt(
-                spc='',
-                indent=0,
-                obj=func,
-                args='',
-                annotation=' -> None'
-            )
-        )
-
-        self.assertEqual(
-            logwrap.pretty_str(func),
-            fmt(
-                spc='',
-                indent=0,
-                obj=func,
-                args='',
-                annotation=' -> None'
-            )
         )
 
     def test_003_complex(self):
-        fmt = "{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
-
         def func(a: typing.Optional[int] = None) -> None:
             pass
 
-        self.assertEqual(
-            logwrap.pretty_repr(func),
-            fmt(
-                spc='',
-                indent=0,
-                obj=func,
-                args="\n    a: typing.Union[int, NoneType]=None,\n",
-                annotation=" -> None"
-            )
-        )
+        args = "\n    a: typing.Union[int, NoneType]=None,\n"
 
         self.assertEqual(
-            logwrap.pretty_str(func),
-            fmt(
-                spc='',
-                indent=0,
-                obj=func,
-                args="\n    a: typing.Union[int, NoneType]=None,\n",
-                annotation=" -> None"
-            )
+            f"{'':<{0}}"
+            f"<{func.__class__.__name__} {func.__module__}.{func.__name__} with interface ({args}){' -> None'}>",
+            logwrap.pretty_repr(func),
         )
