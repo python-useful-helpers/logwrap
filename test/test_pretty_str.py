@@ -77,7 +77,7 @@ class TestPrettyStr(unittest.TestCase):
         )
 
     def test_callable(self):
-        fmt = "\n{spc:<{indent}}<{obj!s} with interface ({args})>".format
+        fmt = "{spc:<{indent}}<{obj!s} with interface ({args})>".format
 
         def empty_func():
             pass

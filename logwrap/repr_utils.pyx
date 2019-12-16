@@ -383,7 +383,7 @@ cdef class PrettyRepr(PrettyFormat):
             else:
                 annotation = f" -> {sig.return_annotation!r}"
 
-            return f"\n{'':<{indent}}<{src!r} with interface ({param_str}){annotation}>"
+            return f"{'':<{indent}}<{src!r} with interface ({param_str}){annotation}>"
 
         str _repr_iterable_item(
             self,
@@ -518,7 +518,7 @@ cdef class PrettyStr(PrettyFormat):
             else:
                 annotation = f" -> {sig.return_annotation!r}"
 
-            return f"\n{'':<{indent}}<{src!s} with interface ({param_str}){annotation}>"
+            return f"{'':<{indent}}<{src!s} with interface ({param_str}){annotation}>"
 
         str _repr_iterable_item(
             self,

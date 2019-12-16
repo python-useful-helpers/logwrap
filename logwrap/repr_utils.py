@@ -402,7 +402,7 @@ class PrettyRepr(PrettyFormat):
         else:
             annotation = f" -> {sig.return_annotation!r}"
 
-        return f"\n{'':<{indent}}<{src!r} with interface ({param_str}){annotation}>"
+        return f"{'':<{indent}}<{src!r} with interface ({param_str}){annotation}>"
 
     @staticmethod
     def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
@@ -513,7 +513,7 @@ class PrettyStr(PrettyFormat):
         else:
             annotation = f" -> {sig.return_annotation!r}"
 
-        return f"\n{'':<{indent}}<{src!s} with interface ({param_str}){annotation}>"
+        return f"{'':<{indent}}<{src!s} with interface ({param_str}){annotation}>"
 
     @staticmethod
     def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:

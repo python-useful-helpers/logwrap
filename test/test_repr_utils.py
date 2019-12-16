@@ -112,7 +112,7 @@ class TestPrettyRepr(unittest.TestCase):
         self.assertEqual(exp_repr, logwrap.pretty_repr(test_obj))
 
     def test_006_callable(self):
-        fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args})>".format
+        fmt = "{spc:<{indent}}<{obj!r} with interface ({args})>".format
 
         def empty_func():
             pass
@@ -287,7 +287,7 @@ class TestPrettyRepr(unittest.TestCase):
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestAnnotated(unittest.TestCase):
     def test_001_annotation_args(self):
-        fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
+        fmt = "{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
 
         def func(a: typing.Optional[int] = None):
             pass
@@ -315,7 +315,7 @@ class TestAnnotated(unittest.TestCase):
         )
 
     def test_002_annotation_return(self):
-        fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
+        fmt = "{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
 
         def func() -> None:
             pass
@@ -343,7 +343,7 @@ class TestAnnotated(unittest.TestCase):
         )
 
     def test_003_complex(self):
-        fmt = "\n{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
+        fmt = "{spc:<{indent}}<{obj!r} with interface ({args}){annotation}>".format
 
         def func(a: typing.Optional[int] = None) -> None:
             pass
