@@ -101,7 +101,7 @@ jobs:
       name: "Black formatting"
       install:
         - *upgrade_python_toolset
-        - pip install --upgrade black
+        - pip install --upgrade black regex
       script:
         - black --check logwrap
 
