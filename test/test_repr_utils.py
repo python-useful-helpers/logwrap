@@ -45,18 +45,16 @@ class TestPrettyRepr(unittest.TestCase):
 
     def test_003_iterable(self):
         self.assertEqual(
-            'list([{nl:<5}1,{nl:<5}2,{nl:<5}3,\n'
-            '])'.format(nl='\n'),
+            '[{nl:<5}1,{nl:<5}2,{nl:<5}3,\n]'.format(nl='\n'),
             logwrap.pretty_repr([1, 2, 3]),
         )
         self.assertEqual(
-            'tuple(({nl:<5}1,{nl:<5}2,{nl:<5}3,\n'
-            '))'.format(nl='\n'),
+            '({nl:<5}1,{nl:<5}2,{nl:<5}3,\n)'.format(nl='\n'),
             logwrap.pretty_repr((1, 2, 3)),
         )
         res = logwrap.pretty_repr({1, 2, 3})
         self.assertTrue(
-            res.startswith('set({') and res.endswith('\n})')
+            res.startswith('{') and res.endswith('\n}')
         )
         res = logwrap.pretty_repr(frozenset({1, 2, 3}))
         self.assertTrue(
@@ -65,11 +63,11 @@ class TestPrettyRepr(unittest.TestCase):
 
     def test_004_dict(self):
         self.assertEqual(
-            'dict({\n'
+            '{\n'
             '    1 : 1,\n'
             '    2 : 2,\n'
             '    33: 33,\n'
-            '})',
+            '}',
             logwrap.pretty_repr({1: 1, 2: 2, 33: 33}),
         )
 
@@ -85,31 +83,31 @@ class TestPrettyRepr(unittest.TestCase):
             set(),
         ]
         exp_repr = (
-            'list([\n'
-            '    dict({\n'
+            '[\n'
+            '    {\n'
             '        1: 2,\n'
-            '    }),\n'
-            '    dict({\n'
+            '    },\n'
+            '    {\n'
             '        3: \n'
-            '            set({\n'
+            '            {\n'
             '                4,\n'
-            '            }),\n'
-            '    }),\n'
-            '    list([\n'
+            '            },\n'
+            '    },\n'
+            '    [\n'
             '        5,\n'
             '        6,\n'
             '        7,\n'
-            '    ]),\n'
-            '    tuple((\n'
+            '    ],\n'
+            '    (\n'
             '        8,\n'
             '        9,\n'
             '        10,\n'
-            '    )),\n'
+            '    ),\n'
             '    {},\n'
             '    [],\n'
             '    (),\n'
             '    set(),\n'
-            '])'
+            ']'
         )
         self.assertEqual(exp_repr, logwrap.pretty_repr(test_obj))
 
@@ -223,37 +221,37 @@ class TestPrettyRepr(unittest.TestCase):
     def test_007_indent(self):
         obj = [[[[[[[[[[123]]]]]]]]]]
         self.assertEqual(
-            "list([\n"
-            "    list([\n"
-            "        list([\n"
-            "            list([\n"
-            "                list([\n"
-            "                    list([\n"
-            "                        list([\n"
-            "                            list([\n"
-            "                                list([\n"
-            "                                    list([\n"
+            "[\n"
+            "    [\n"
+            "        [\n"
+            "            [\n"
+            "                [\n"
+            "                    [\n"
+            "                        [\n"
+            "                            [\n"
+            "                                [\n"
+            "                                    [\n"
             "                                        123,\n"
-            "                                    ]),\n"
-            "                                ]),\n"
-            "                            ]),\n"
-            "                        ]),\n"
-            "                    ]),\n"
-            "                ]),\n"
-            "            ]),\n"
-            "        ]),\n"
-            "    ]),\n"
-            "])",
+            "                                    ],\n"
+            "                                ],\n"
+            "                            ],\n"
+            "                        ],\n"
+            "                    ],\n"
+            "                ],\n"
+            "            ],\n"
+            "        ],\n"
+            "    ],\n"
+            "]",
             logwrap.pretty_repr(obj, max_indent=40),
         )
         self.assertEqual(
-            "list([\n"
-            "    list([\n"
-            "        list([\n"
+            "[\n"
+            "    [\n"
+            "        [\n"
             "            [[[[[[[123]]]]]]],\n"
-            "        ]),\n"
-            "    ]),\n"
-            "])",
+            "        ],\n"
+            "    ],\n"
+            "]",
             logwrap.pretty_repr(obj, max_indent=10),
         )
 

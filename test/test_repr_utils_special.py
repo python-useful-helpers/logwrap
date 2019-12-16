@@ -74,9 +74,9 @@ class TestPrettyRepr(unittest.TestCase):
 
         val = MyDict(key='value')
         self.assertEqual(
-            "dict({\n"
+            "{\n"
             "    'key': 'value',\n"
-            "})",
+            "}",
             logwrap.pretty_repr(val)
         )
 
