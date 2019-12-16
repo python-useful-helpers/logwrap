@@ -188,7 +188,8 @@ class LogWrap(class_decorator.BaseDecorator):
         :type spec: typing.Optional[typing.Callable]
         :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
         :type blacklisted_names: typing.Optional[typing.Iterable[str]]
-        :param blacklisted_exceptions: list of exception, which should be re-raised without producing log record.
+        :param blacklisted_exceptions: list of exception, which should be re-raised
+               without producing traceback and text log record.
         :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
         :param log_call_args: log call arguments before executing wrapped function.
         :type log_call_args: bool
@@ -297,7 +298,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
     @property
     def blacklisted_exceptions(self) -> typing.List[typing.Type[Exception]]:
-        """List of exceptions to re-raise without log.
+        """List of exceptions to re-raise without log traceback and text.
 
         :rtype: typing.List[typing.Type[Exception]]
         """
@@ -535,11 +536,12 @@ class LogWrap(class_decorator.BaseDecorator):
         """
         self._logger.log(level=self.log_level, msg=f"{method}: \n{name}({arguments if self.log_call_args else ''})")
 
-    def _make_exc_record(self, name: str, arguments: str) -> None:
+    def _make_exc_record(self, name: str, arguments: str, exception: Exception) -> None:
         """Make log record if exception raised.
 
         :type name: str
         :type arguments: str
+        :type exception: Exception
         """
         exc_info = sys.exc_info()
         stack: traceback.StackSummary = traceback.extract_stack()
@@ -548,15 +550,13 @@ class LogWrap(class_decorator.BaseDecorator):
         # Make standard traceback string
         tb_text: str = (
             f"Traceback (most recent call last):\n{''.join(traceback.format_list(full_tb))}{''.join(exc_line)}"
+            if self.log_traceback and not isinstance(exception, tuple(self.blacklisted_exceptions))
+            else exception.__class__.__name__
         )
 
         self._logger.log(
             level=self.exc_level,
-            msg=(
-                f"Failed: \n"
-                f"{name}({arguments if self.log_call_args_on_exc else ''})\n"
-                f"{tb_text if self.log_traceback else ''}"
-            ),
+            msg=f"Failed: \n{name}({arguments if self.log_call_args_on_exc else ''})\n{tb_text}",
             exc_info=False,
         )
 
@@ -579,10 +579,8 @@ class LogWrap(class_decorator.BaseDecorator):
                 self._make_calling_record(name=func.__name__, arguments=args_repr, method="Awaiting")
                 result = await func(*args, **kwargs)
                 self._make_done_record(func.__name__, result)
-            except BaseException as e:
-                if isinstance(e, tuple(self.blacklisted_exceptions)):
-                    raise
-                self._make_exc_record(name=func.__name__, arguments=args_repr)
+            except Exception as e:
+                self._make_exc_record(name=func.__name__, arguments=args_repr, exception=e)
                 raise
             return result  # type: ignore
 
@@ -596,10 +594,8 @@ class LogWrap(class_decorator.BaseDecorator):
                 self._make_calling_record(name=func.__name__, arguments=args_repr)
                 result = func(*args, **kwargs)
                 self._make_done_record(func.__name__, result)
-            except BaseException as e:
-                if isinstance(e, tuple(self.blacklisted_exceptions)):
-                    raise
-                self._make_exc_record(name=func.__name__, arguments=args_repr)
+            except Exception as e:
+                self._make_exc_record(name=func.__name__, arguments=args_repr, exception=e)
                 raise
             return result
 
@@ -715,7 +711,8 @@ def logwrap(  # noqa: F811
     :type spec: typing.Optional[typing.Callable]
     :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
     :type blacklisted_names: typing.Optional[typing.Iterable[str]]
-    :param blacklisted_exceptions: list of exceptions, which should be re-raised without producing log record.
+    :param blacklisted_exceptions: list of exceptions, which should be re-raised
+                                   without producing traceback and text log record.
     :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
     :param log_call_args: log call arguments before executing wrapped function.
     :type log_call_args: bool

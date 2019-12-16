@@ -459,6 +459,7 @@ class TestLogWrap(unittest.TestCase):
                     level=logging.DEBUG,
                     msg="Calling: \nfunc()"
                 ),
+                mock.call(exc_info=False, level=40, msg=f'Failed: \nfunc()\n{TypeError.__name__}')
             ],
             log.mock_calls,
         )
