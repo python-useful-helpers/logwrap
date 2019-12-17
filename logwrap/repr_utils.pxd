@@ -58,6 +58,7 @@ cdef:
             str _repr_simple(self, src: typing.Any, unsigned long indent=?, bint no_indent_start=?)
             str _repr_iterable_item(self, str obj_type, str prefix, unsigned long indent, bint no_indent_start, str result, str suffix)
             str _repr_iterable_items(self, src: typing.Iterable, unsigned long indent=?)
+            str _repr_dict_items(self, object src: typing.Dict[typing.Any, typing.Any], unsigned long indent=?)
 
         cpdef str process_element(self, src: typing.Any, unsigned long indent=?, bint no_indent_start=?)
 

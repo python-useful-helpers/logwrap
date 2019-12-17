@@ -228,39 +228,43 @@ cdef class PrettyFormat:
             """
             raise NotImplementedError()
 
-    def _repr_dict_items(
-        self,
-        object src: typing.Dict[typing.Any, typing.Any],
-        unsigned long indent=0
-    ) -> typing.Iterator[str]:
-        """Repr dict items.
+        str _repr_dict_items(
+            self,
+            object src: typing.Dict[typing.Any, typing.Any],
+            unsigned long indent=0
+        ):
+            """Repr dict items.
 
-        :param src: object to process
-        :type src: typing.Dict
-        :param indent: start indentation
-        :type indent: int
-        :rtype: typing.Iterator[str]
-        """
-        raise NotImplementedError()
+            :param src: object to process
+            :type src: typing.Dict
+            :param indent: start indentation
+            :type indent: int
+            :rtype: typing.Iterator[str]
+            """
+            raise NotImplementedError()
 
-    cdef str _repr_iterable_items(
-        self,
-        src: typing.Iterable[typing.Any],
-        unsigned long indent=0
-    ):
-        """Repr iterable items (not designed for dicts).
+        str _repr_iterable_items(
+            self,
+            src: typing.Iterable[typing.Any],
+            unsigned long indent=0
+        ):
+            """Repr iterable items (not designed for dicts).
 
-        :param src: object to process
-        :type src: typing.Iterable
-        :param indent: start indentation
-        :type indent: int
-        :return: repr of element in iterable item
-        :rtype: typing.Iterator[str]
-        """
-        cdef str result = ""
-        for elem in src:
-            result += "\n" + self.process_element(src=elem, indent=self.next_indent(indent)) + ","
-        return result
+            :param src: object to process
+            :type src: typing.Iterable
+            :param indent: start indentation
+            :type indent: int
+            :return: repr of element in iterable item
+            :rtype: str
+            """
+            cdef:
+                unsigned long next_indent=self.next_indent(indent)
+                list buf = []
+            for elem in src:
+                buf.append("\n")
+                buf.append(self.process_element(src=elem, indent=next_indent))
+                buf.append(",")
+            return "".join(buf)
 
     cpdef str process_element(
         self,
@@ -297,7 +301,7 @@ cdef class PrettyFormat:
 
         if isinstance(src, dict):
             prefix, suffix = "{", "}"
-            result = "".join(self._repr_dict_items(src=src, indent=indent))
+            result = self._repr_dict_items(src=src, indent=indent)
         else:
             if isinstance(src, list):
                 prefix, suffix = "[", "]"
@@ -398,27 +402,31 @@ cdef class PrettyRepr(PrettyFormat):
             """
             return f"{'':<{indent if not no_indent_start else 0}}{obj_type}({prefix}{result}\n{'':<{indent}}{suffix})"
 
-    def _repr_dict_items(
-        self,
-        object src,
-        unsigned long indent=0
-    ) -> typing.Iterator[str]:
-        """Repr dict items.
+        str _repr_dict_items(
+            self,
+            object src: typing.Dict[typing.Any, typing.Any],
+            unsigned long indent=0
+        ):
+            """Repr dict items.
 
-        :param src: object to process
-        :type src: dict
-        :param indent: start indentation
-        :type indent: int
-        :return: repr of key/value pair from dict
-        :rtype: typing.Iterator[str]
-        """
-        cdef:
-            unsigned long max_len = max((len(repr(key)) for key in src)) if src else 0
-            str line
+            :param src: object to process
+            :type src: typing.Dict
+            :param indent: start indentation
+            :type indent: int
+            :rtype: str
+            """
+            cdef:
+                unsigned long max_len = max((len(repr(key)) for key in src)) if src else 0
+                unsigned long next_indent=self.next_indent(indent)
+                str prefix=f"\n{'':<{next_indent}}"
+                list buf = []
 
-        for key, val in src.items():
-            line = self.process_element(val, indent=self.next_indent(indent), no_indent_start=True)
-            yield f"\n{'':<{self.next_indent(indent)}}{key!r:{max_len}}: {line},"
+            for key, val in src.items():
+                buf.append(prefix)
+                buf.append(f"{key!r:{max_len}}: ")
+                buf.append(self.process_element(val, indent=next_indent, no_indent_start=True))
+                buf.append(f",")
+            return "".join(buf)
 
 
 cdef class PrettyStr(PrettyFormat):
@@ -493,26 +501,31 @@ cdef class PrettyStr(PrettyFormat):
             """
             return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
 
-    def _repr_dict_items(
-        self,
-        object src: typing.Dict[typing.Any, typing.Any],
-        unsigned long indent=0
-    ) -> typing.Iterator[str]:
-        """Repr dict items.
+        str _repr_dict_items(
+            self,
+            object src: typing.Dict[typing.Any, typing.Any],
+            unsigned long indent=0
+        ):
+            """Repr dict items.
 
-        :param src: object to process
-        :type src: dict
-        :param indent: start indentation
-        :type indent: int
-        :return: repr of key/value pair from dict
-        :rtype: typing.Iterator[str]
-        """
-        cdef:
-            unsigned long max_len = max((len(str(key)) for key in src)) if src else 0
-            str line
-        for key, val in src.items():
-            line = self.process_element(val, indent=self.next_indent(indent), no_indent_start=True)
-            yield f"\n{'':<{self.next_indent(indent)}}{key!s:{max_len}}: {line},"
+            :param src: object to process
+            :type src: typing.Dict
+            :param indent: start indentation
+            :type indent: int
+            :rtype: str
+            """
+            cdef:
+                unsigned long max_len = max((len(str(key)) for key in src)) if src else 0
+                unsigned long next_indent=self.next_indent(indent)
+                str prefix=f"\n{'':<{next_indent}}"
+                list buf = []
+
+            for key, val in src.items():
+                buf.append(prefix)
+                buf.append(f"{key!s:{max_len}}: ")
+                buf.append(self.process_element(val, indent=next_indent, no_indent_start=True))
+                buf.append(f",")
+            return "".join(buf)
 
 
 cpdef str pretty_repr(
