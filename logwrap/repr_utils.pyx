@@ -157,11 +157,12 @@ cdef class PrettyFormat:
             """
             cdef:
                 str param_str = ""
+                str prefix="\n" + " " * self.next_indent(indent)
                 str annotation
                 ReprParameter param
 
             for param in _prepare_repr(src):
-                param_str += f"\n{'':<{self.next_indent(indent)}}{param.name}"
+                param_str += f"{prefix}{param.name}"
                 if param.annotation is not param.empty:
                     param_str += f": {param.annotation}"
                 if param.value is not param.empty:
@@ -224,6 +225,7 @@ cdef class PrettyFormat:
             :type result: str
             :param suffix: suffix
             :type suffix: str
+            :return: iterable as string
             :rtype: str
             """
             raise NotImplementedError()
@@ -398,6 +400,7 @@ cdef class PrettyRepr(PrettyFormat):
             :type result: str
             :param suffix: suffix
             :type suffix: str
+            :return: iterable as string
             :rtype: str
             """
             return f"{'':<{indent if not no_indent_start else 0}}{obj_type}({prefix}{result}\n{'':<{indent}}{suffix})"
@@ -418,14 +421,14 @@ cdef class PrettyRepr(PrettyFormat):
             cdef:
                 unsigned long max_len = max((len(repr(key)) for key in src)) if src else 0
                 unsigned long next_indent=self.next_indent(indent)
-                str prefix=f"\n{'':<{next_indent}}"
+                str prefix="\n" + " " * next_indent
                 list buf = []
 
             for key, val in src.items():
                 buf.append(prefix)
                 buf.append(f"{key!r:{max_len}}: ")
                 buf.append(self.process_element(val, indent=next_indent, no_indent_start=True))
-                buf.append(f",")
+                buf.append(",")
             return "".join(buf)
 
 
@@ -497,6 +500,7 @@ cdef class PrettyStr(PrettyFormat):
             :type result: str
             :param suffix: suffix
             :type suffix: str
+            :return: iterable as string
             :rtype: str
             """
             return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
@@ -517,14 +521,14 @@ cdef class PrettyStr(PrettyFormat):
             cdef:
                 unsigned long max_len = max((len(str(key)) for key in src)) if src else 0
                 unsigned long next_indent=self.next_indent(indent)
-                str prefix=f"\n{'':<{next_indent}}"
+                str prefix="\n" + " " * next_indent
                 list buf = []
 
             for key, val in src.items():
                 buf.append(prefix)
                 buf.append(f"{key!s:{max_len}}: ")
                 buf.append(self.process_element(val, indent=next_indent, no_indent_start=True))
-                buf.append(f",")
+                buf.append(",")
             return "".join(buf)
 
 
