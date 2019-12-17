@@ -247,17 +247,19 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @staticmethod
-    def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
+    def _repr_iterable_item(
+        obj_type: str, prefix: str, indent: int, no_indent_start: bool, result: str, suffix: str
+    ) -> str:
         """Repr iterable item.
 
-        :param newline: newline before item
-        :type newline: bool
         :param obj_type: Object type
         :type obj_type: str
         :param prefix: prefix
         :type prefix: str
         :param indent: start indentation
         :type indent: int
+        :param no_indent_start: do not indent open bracket and simple parameters
+        :type no_indent_start: bool
         :param result: result of pre-formatting
         :type result: str
         :param suffix: suffix
@@ -322,13 +324,12 @@ class PrettyFormat(metaclass=abc.ABCMeta):
                 prefix, suffix = "{", "}"
             result = "".join(self._repr_iterable_items(src=src, indent=indent))
         if type(src) in (list, tuple, set, dict):  # pylint: disable=unidiomatic-typecheck
-            new_line: str = "\n" if no_indent_start else ""
-            return f"{new_line}{'':<{indent}}{prefix}{result}\n{'':<{indent}}{suffix}"
+            return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
         return self._repr_iterable_item(
-            newline=no_indent_start,
             obj_type=src.__class__.__name__,
             prefix=prefix,
             indent=indent,
+            no_indent_start=no_indent_start,
             result=result,
             suffix=suffix,
         )
@@ -391,30 +392,30 @@ class PrettyRepr(PrettyFormat):
         """
         max_len: int = max((len(repr(key)) for key in src)) if src else 0
         for key, val in src.items():
-            line: str = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
+            line: str = self.process_element(val, indent=self.next_indent(indent), no_indent_start=True)
             yield f"\n{'':<{self.next_indent(indent)}}{key!r:{max_len}}: {line},"
 
     @staticmethod
-    def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
+    def _repr_iterable_item(
+        obj_type: str, prefix: str, indent: int, no_indent_start: bool, result: str, suffix: str
+    ) -> str:
         """Repr iterable item.
 
-        :param newline: newline before item
-        :type newline: bool
         :param obj_type: Object type
         :type obj_type: str
         :param prefix: prefix
         :type prefix: str
         :param indent: start indentation
         :type indent: int
+        :param no_indent_start: do not indent open bracket and simple parameters
+        :type no_indent_start: bool
         :param result: result of pre-formatting
         :type result: str
         :param suffix: suffix
         :type suffix: str
-        :return: formatted repr of "result" with prefix and suffix to explain type.
         :rtype: str
         """
-        new_line: str = "\n" if newline else ""
-        return f"{new_line}{'':<{indent}}{obj_type}({prefix}{result}\n{'':<{indent}}{suffix})"
+        return f"{'':<{indent if not no_indent_start else 0}}{obj_type}({prefix}{result}\n{'':<{indent}}{suffix})"
 
 
 class PrettyStr(PrettyFormat):
@@ -471,30 +472,30 @@ class PrettyStr(PrettyFormat):
         """
         max_len = max((len(str(key)) for key in src)) if src else 0
         for key, val in src.items():
-            line: str = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
+            line: str = self.process_element(val, indent=self.next_indent(indent), no_indent_start=True)
             yield f"\n{'':<{self.next_indent(indent)}}{key!s:{max_len}}: {line},"
 
     @staticmethod
-    def _repr_iterable_item(newline: bool, obj_type: str, prefix: str, indent: int, result: str, suffix: str) -> str:
+    def _repr_iterable_item(
+        obj_type: str, prefix: str, indent: int, no_indent_start: bool, result: str, suffix: str
+    ) -> str:
         """Repr iterable item.
 
-        :param newline: newline before item
-        :type newline: bool
         :param obj_type: Object type
         :type obj_type: str
         :param prefix: prefix
         :type prefix: str
         :param indent: start indentation
         :type indent: int
+        :param no_indent_start: do not indent open bracket and simple parameters
+        :type no_indent_start: bool
         :param result: result of pre-formatting
         :type result: str
         :param suffix: suffix
         :type suffix: str
-        :return: formatted repr of "result" with prefix and suffix to explain type.
         :rtype: str
         """
-        new_line: str = "\n" if newline else ""
-        return f"{new_line}{'':<{indent}}{prefix}{result}\n{'':<{indent}}{suffix}"
+        return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
 
 
 def pretty_repr(

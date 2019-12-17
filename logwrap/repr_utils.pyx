@@ -203,23 +203,23 @@ cdef class PrettyFormat:
 
         str _repr_iterable_item(
             self,
-            bint newline,
             str obj_type,
             str prefix,
             unsigned long indent,
+            bint no_indent_start,
             str result,
             str suffix
         ):
             """Repr iterable item.
 
-            :param newline: newline before item
-            :type newline: bool
             :param obj_type: Object type
             :type obj_type: str
             :param prefix: prefix
             :type prefix: str
             :param indent: start indentation
             :type indent: int
+            :param no_indent_start: ignore indent
+            :type no_indent_start: bool
             :param result: result of pre-formatting
             :type result: str
             :param suffix: suffix
@@ -308,14 +308,13 @@ cdef class PrettyFormat:
             result = self._repr_iterable_items(src=src, indent=indent)
 
         if type(src) in (list, tuple, set, dict):
-            new_line = "\n" if no_indent_start else ""
-            return f"{new_line}{'':<{indent}}{prefix}{result}\n{'':<{indent}}{suffix}"
+            return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
 
         return self._repr_iterable_item(
-            newline=no_indent_start,
             obj_type=src.__class__.__name__,
             prefix=prefix,
             indent=indent,
+            no_indent_start=no_indent_start,
             result=result,
             suffix=suffix,
         )
@@ -374,32 +373,30 @@ cdef class PrettyRepr(PrettyFormat):
 
         str _repr_iterable_item(
             self,
-            bint newline,
             str obj_type,
             str prefix,
             unsigned long indent,
+            bint no_indent_start,
             str result,
             str suffix
         ):
             """Repr iterable item.
 
-            :param newline: newline before item
-            :type newline: bool
             :param obj_type: Object type
             :type obj_type: str
             :param prefix: prefix
             :type prefix: str
             :param indent: start indentation
             :type indent: int
+            :param no_indent_start: ignore indent
+            :type no_indent_start: bool
             :param result: result of pre-formatting
             :type result: str
             :param suffix: suffix
             :type suffix: str
-            :return: formatted repr of "result" with prefix and suffix to explain type.
             :rtype: str
             """
-            cdef str new_line = "\n" if newline else ""
-            return f"{new_line}{'':<{indent}}{obj_type}({prefix}{result}\n{'':<{indent}}{suffix})"
+            return f"{'':<{indent if not no_indent_start else 0}}{obj_type}({prefix}{result}\n{'':<{indent}}{suffix})"
 
     def _repr_dict_items(
         self,
@@ -420,7 +417,7 @@ cdef class PrettyRepr(PrettyFormat):
             str line
 
         for key, val in src.items():
-            line = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
+            line = self.process_element(val, indent=self.next_indent(indent), no_indent_start=True)
             yield f"\n{'':<{self.next_indent(indent)}}{key!r:{max_len}}: {line},"
 
 
@@ -471,32 +468,30 @@ cdef class PrettyStr(PrettyFormat):
 
         str _repr_iterable_item(
             self,
-            bint newline,
             str obj_type,
             str prefix,
             unsigned long indent,
+            bint no_indent_start,
             str result,
             str suffix
         ):
             """Repr iterable item.
 
-            :param newline: newline before item
-            :type newline: bool
             :param obj_type: Object type
             :type obj_type: str
             :param prefix: prefix
             :type prefix: str
             :param indent: start indentation
             :type indent: int
+            :param no_indent_start: ignore indent
+            :type no_indent_start: bool
             :param result: result of pre-formatting
             :type result: str
             :param suffix: suffix
             :type suffix: str
-            :return: formatted repr of "result" with prefix and suffix to explain type.
             :rtype: str
             """
-            cdef str new_line = "\n" if newline else ""
-            return f"{new_line}{'':<{indent}}{prefix}{result}\n{'':<{indent}}{suffix}"
+            return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
 
     def _repr_dict_items(
         self,
@@ -516,7 +511,7 @@ cdef class PrettyStr(PrettyFormat):
             unsigned long max_len = max((len(str(key)) for key in src)) if src else 0
             str line
         for key, val in src.items():
-            line = self.process_element(val, indent=self.next_indent(indent, multiplier=2), no_indent_start=True)
+            line = self.process_element(val, indent=self.next_indent(indent), no_indent_start=True)
             yield f"\n{'':<{self.next_indent(indent)}}{key!s:{max_len}}: {line},"
 
 
