@@ -148,34 +148,33 @@ This code during execution will produce log records:
     Calling:
     'example_function1'(
         # POSITIONAL_ONLY:
-        'arg0'=u'''arg0''',  # type: <class 'str'>
+        arg0='arg0',  # type: str
         # POSITIONAL_OR_KEYWORD:
-        'arg1'=u'''arg1''',  # type: <class 'str'>
-        'arg2'=u'''arg2''',  # type: <class 'str'>
+        arg1='arg1',  # type: str
+        arg2='arg2',  # type: str
         # VAR_POSITIONAL:
-        'args'=(),
+        args=(),
         # KEYWORD_ONLY:
-        'kwarg1'=u'''kwarg1''',  # type: <class 'str'>
-        'kwarg2'=u'''kwarg2''',  # type: <class 'str'>
+        kwarg1='kwarg1',  # type: str
+        kwarg2='kwarg2',  # type: str
         # VAR_KEYWORD:
-        'kwargs'=
-            dict({
-                'kwarg3': u'''kwarg3''',
-            }),
+        kwargs={
+            'kwarg3': 'kwarg3',
+        },
     )
     Done: 'example_function1' with result:
 
-     tuple((
-        u'''arg0''',
-        u'''arg1''',
-        u'''arg2''',
+     (
+        'arg0',
+        'arg1',
+        'arg2',
         (),
-        u'''kwarg1''',
-        u'''kwarg2''',
-         dict({
-            'kwarg3': u'''kwarg3''',
-         }),
-     ))
+        'kwarg1',
+        'kwarg2',
+        {
+            'kwarg3': 'kwarg3',
+        },
+     )
 
 LogWrap
 -------
@@ -217,7 +216,6 @@ Signature is self-documenting:
         indent_step=4,  # step between indents
     )
 
-Limitation: Dict like objects is always marked inside `{}` for readability, even if it is `collections.OrderedDict` (standard repr as list of tuples).
 
 pretty_str
 ----------

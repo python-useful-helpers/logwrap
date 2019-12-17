@@ -225,7 +225,7 @@ cdef class PrettyFormat:
             :type result: str
             :param suffix: suffix
             :type suffix: str
-            :return: iterable as string
+            :return: formatted repr of "result" with prefix and suffix to explain type.
             :rtype: str
             """
             raise NotImplementedError()
@@ -241,6 +241,7 @@ cdef class PrettyFormat:
             :type src: typing.Dict
             :param indent: start indentation
             :type indent: int
+            :return: repr of key/value pairs from dict
             :rtype: typing.Iterator[str]
             """
             raise NotImplementedError()
@@ -256,7 +257,7 @@ cdef class PrettyFormat:
             :type src: typing.Iterable
             :param indent: start indentation
             :type indent: int
-            :return: repr of element in iterable item
+            :return: repr of elements in iterable item
             :rtype: str
             """
             cdef:
@@ -400,7 +401,7 @@ cdef class PrettyRepr(PrettyFormat):
             :type result: str
             :param suffix: suffix
             :type suffix: str
-            :return: iterable as string
+            :return: formatted repr of "result" with prefix and suffix to explain type.
             :rtype: str
             """
             return f"{'':<{indent if not no_indent_start else 0}}{obj_type}({prefix}{result}\n{'':<{indent}}{suffix})"
@@ -416,6 +417,7 @@ cdef class PrettyRepr(PrettyFormat):
             :type src: typing.Dict
             :param indent: start indentation
             :type indent: int
+            :return: repr of key/value pairs from dict
             :rtype: str
             """
             cdef:
@@ -500,7 +502,7 @@ cdef class PrettyStr(PrettyFormat):
             :type result: str
             :param suffix: suffix
             :type suffix: str
-            :return: iterable as string
+            :return: formatted repr of "result" with prefix and suffix to explain type.
             :rtype: str
             """
             return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
@@ -516,6 +518,7 @@ cdef class PrettyStr(PrettyFormat):
             :type src: typing.Dict
             :param indent: start indentation
             :type indent: int
+            :return: repr of key/value pairs from dict
             :rtype: str
             """
             cdef:

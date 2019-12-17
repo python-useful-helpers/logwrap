@@ -233,21 +233,21 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :return: simple repr() over object
         :rtype: str
         """
-        raise NotImplementedError()
 
     @abc.abstractmethod
-    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
+    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> str:
         """Repr dict items.
 
         :param src: object to process
         :type src: typing.Dict
         :param indent: start indentation
         :type indent: int
-        :rtype: typing.Iterator[str]
+        :return: repr of key/value pairs from dict
+        :rtype: str
         """
-        raise NotImplementedError()
 
     @staticmethod
+    @abc.abstractmethod
     def _repr_iterable_item(
         obj_type: str, prefix: str, indent: int, no_indent_start: bool, result: str, suffix: str
     ) -> str:
@@ -265,24 +265,27 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :type result: str
         :param suffix: suffix
         :type suffix: str
-        :return: iterable as string
+        :return: formatted repr of "result" with prefix and suffix to explain type.
         :rtype: str
         """
-        raise NotImplementedError()
 
-    def _repr_iterable_items(self, src: typing.Iterable[typing.Any], indent: int = 0) -> typing.Iterator[str]:
+    def _repr_iterable_items(self, src: typing.Iterable[typing.Any], indent: int = 0) -> str:
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
         :type src: typing.Iterable
         :param indent: start indentation
         :type indent: int
-        :return: repr of element in iterable item
-        :rtype: typing.Iterator[str]
+        :return: repr of elements in iterable item
+        :rtype: str
         """
         next_indent: int = self.next_indent(indent)
+        buf: typing.List[str] = []
         for elem in src:
-            yield "\n" + self.process_element(src=elem, indent=next_indent) + ","
+            buf.append("\n")
+            buf.append(self.process_element(src=elem, indent=next_indent))
+            buf.append(",")
+        return "".join(buf)
 
     @property
     @abc.abstractmethod
@@ -291,7 +294,6 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
         :rtype: str
         """
-        raise NotImplementedError()
 
     def process_element(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
         """Make human readable representation of object.
@@ -317,7 +319,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
         if isinstance(src, dict):
             prefix, suffix = "{", "}"
-            result = "".join(self._repr_dict_items(src=src, indent=indent))
+            result = self._repr_dict_items(src=src, indent=indent)
         else:
             if isinstance(src, list):
                 prefix, suffix = "[", "]"
@@ -325,7 +327,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
                 prefix, suffix = "(", ")"
             else:
                 prefix, suffix = "{", "}"
-            result = "".join(self._repr_iterable_items(src=src, indent=indent))
+            result = self._repr_iterable_items(src=src, indent=indent)
         if type(src) in (list, tuple, set, dict):  # pylint: disable=unidiomatic-typecheck
             return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
         return self._repr_iterable_item(
@@ -383,23 +385,26 @@ class PrettyRepr(PrettyFormat):
         """
         return f"{'':<{0 if no_indent_start else indent}}{src!r}"
 
-    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
+    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> str:
         """Repr dict items.
 
         :param src: object to process
-        :type src: dict
+        :type src: typing.Dict
         :param indent: start indentation
         :type indent: int
-        :return: repr of key/value pair from dict
-        :rtype: typing.Iterator[str]
+        :return: repr of key/value pairs from dict
+        :rtype: str
         """
         max_len: int = max((len(repr(key)) for key in src)) if src else 0
         next_indent: int = self.next_indent(indent)
         prefix: str = "\n" + " " * next_indent
+        buf: typing.List[str] = []
         for key, val in src.items():
-            yield prefix + f"{key!r:{max_len}}: " + self.process_element(
-                val, indent=next_indent, no_indent_start=True
-            ) + ","
+            buf.append(prefix)
+            buf.append(f"{key!r:{max_len}}: ")
+            buf.append(self.process_element(val, indent=next_indent, no_indent_start=True))
+            buf.append(",")
+        return "".join(buf)
 
     @staticmethod
     def _repr_iterable_item(
@@ -419,7 +424,7 @@ class PrettyRepr(PrettyFormat):
         :type result: str
         :param suffix: suffix
         :type suffix: str
-        :return: iterable as string
+        :return: formatted repr of "result" with prefix and suffix to explain type.
         :rtype: str
         """
         return f"{'':<{indent if not no_indent_start else 0}}{obj_type}({prefix}{result}\n{'':<{indent}}{suffix})"
@@ -467,23 +472,26 @@ class PrettyStr(PrettyFormat):
             return self._strings_str(indent=indent, val=src)
         return f"{'':<{indent}}{src!s}"
 
-    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> typing.Iterator[str]:
+    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> str:
         """Repr dict items.
 
         :param src: object to process
-        :type src: dict
+        :type src: typing.Dict
         :param indent: start indentation
         :type indent: int
-        :return: repr of key/value pair from dict
-        :rtype: typing.Iterator[str]
+        :return: repr of key/value pairs from dict
+        :rtype: str
         """
         max_len = max((len(str(key)) for key in src)) if src else 0
         next_indent: int = self.next_indent(indent)
         prefix: str = "\n" + " " * next_indent
+        buf: typing.List[str] = []
         for key, val in src.items():
-            yield prefix + f"{key!s:{max_len}}: " + self.process_element(
-                val, indent=next_indent, no_indent_start=True
-            ) + ","
+            buf.append(prefix)
+            buf.append(f"{key!s:{max_len}}: ")
+            buf.append(self.process_element(val, indent=next_indent, no_indent_start=True))
+            buf.append(",")
+        return "".join(buf)
 
     @staticmethod
     def _repr_iterable_item(
@@ -503,7 +511,7 @@ class PrettyStr(PrettyFormat):
         :type result: str
         :param suffix: suffix
         :type suffix: str
-        :return: iterable as string
+        :return: formatted repr of "result" with prefix and suffix to explain type.
         :rtype: str
         """
         return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
