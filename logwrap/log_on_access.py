@@ -27,8 +27,8 @@ import traceback
 import typing
 
 # LogWrap Implementation
+from logwrap import constants
 from logwrap import repr_utils
-
 
 _LOGGER: logging.Logger = logging.getLogger(__name__)
 _CURRENT_FILE = os.path.abspath(__file__)
@@ -222,14 +222,13 @@ class LogOnAccess(property):
         """
         if self.logger is not None:
             return self.logger
-        valid_logger_names = ("logger", "log")
-        for logger_name in valid_logger_names:
+        for logger_name in constants.VALID_LOGGER_NAMES:
             logger_candidate = getattr(instance, logger_name, None)
             if isinstance(logger_candidate, logging.Logger):
                 return logger_candidate
         instance_module = inspect.getmodule(instance)
-        for logger_name in valid_logger_names:
-            logger_candidate = getattr(instance_module, logger_name.upper(), None)
+        for logger_name in constants.VALID_LOGGER_NAMES:
+            logger_candidate = getattr(instance_module, logger_name, None)
             if isinstance(logger_candidate, logging.Logger):
                 return logger_candidate
         return _LOGGER

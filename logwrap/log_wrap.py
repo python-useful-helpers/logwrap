@@ -30,6 +30,7 @@ import typing
 
 # LogWrap Implementation
 from logwrap import class_decorator
+from logwrap import constants
 from logwrap import repr_utils
 
 LOGGER: logging.Logger = logging.getLogger("logwrap")
@@ -154,7 +155,7 @@ class LogWrap(class_decorator.BaseDecorator):
         self,
         func: typing.Optional[typing.Callable[..., FuncResultType]] = None,
         *,
-        log: logging.Logger = LOGGER,
+        log: typing.Optional[logging.Logger] = None,
         log_level: int = logging.DEBUG,
         exc_level: int = logging.ERROR,
         max_indent: int = 20,
@@ -170,8 +171,8 @@ class LogWrap(class_decorator.BaseDecorator):
 
         :param func: function to wrap
         :type func: typing.Optional[typing.Callable]
-        :param log: logger object for decorator, by default used 'logwrap'
-        :type log: logging.Logger
+        :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
+        :type log: typing.Optional[logging.Logger]
         :param log_level: log level for successful calls
         :type log_level: int
         :param exc_level: log level for exception cases
@@ -202,6 +203,7 @@ class LogWrap(class_decorator.BaseDecorator):
 
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
         .. versionchanged:: 5.1.0 log_traceback parameter
+        .. versionchanged:: 8.0.0 pick up logger from target module if possible
         """
         super().__init__(func=func)
 
@@ -215,7 +217,13 @@ class LogWrap(class_decorator.BaseDecorator):
         else:
             self.__blacklisted_exceptions = list(blacklisted_exceptions)
 
-        self.__logger: logging.Logger = log
+        if isinstance(log, logging.Logger):
+            self.__logger: typing.Optional[logging.Logger] = log
+        else:
+            self.__logger = None
+
+        if func is not None:  # Special case: we can prefetch logger
+            self.__logger = self._get_logger_for_func(func)
 
         self.__log_level: int = log_level
         self.__exc_level: int = exc_level
@@ -227,6 +235,18 @@ class LogWrap(class_decorator.BaseDecorator):
         self.__log_result_obj: bool = log_result_obj
 
         # We are not interested to pass any arguments to object
+
+    def _get_logger_for_func(self, func: FuncResultType) -> logging.Logger:
+        """Get logger for function from function module if possible."""
+        if self.__logger is not None:
+            return self.__logger
+
+        func_module = inspect.getmodule(func)
+        for logger_name in constants.VALID_LOGGER_NAMES:
+            logger_candidate = getattr(func_module, logger_name, None)
+            if isinstance(logger_candidate, logging.Logger):
+                return logger_candidate
+        return LOGGER
 
     @property
     def log_level(self) -> int:
@@ -385,10 +405,10 @@ class LogWrap(class_decorator.BaseDecorator):
         self.__log_result_obj = val
 
     @property
-    def _logger(self) -> logging.Logger:
+    def _logger(self) -> typing.Optional[logging.Logger]:
         """Logger instance.
 
-        :rtype: logging.Logger
+        :rtype: typing.Optional[logging.Logger]
         """
         return self.__logger
 
@@ -515,9 +535,10 @@ class LogWrap(class_decorator.BaseDecorator):
             param_str += "\n"
         return param_str
 
-    def _make_done_record(self, func_name: str, result: typing.Any) -> None:
+    def _make_done_record(self, logger: logging.Logger, func_name: str, result: typing.Any) -> None:
         """Construct success record.
 
+        :type logger: logging.Logger
         :type func_name: str
         :type result: typing.Any
         """
@@ -525,20 +546,22 @@ class LogWrap(class_decorator.BaseDecorator):
 
         if self.log_result_obj:
             msg += f" with result:\n{repr_utils.pretty_repr(result, max_indent=self.max_indent)}"
-        self._logger.log(level=self.log_level, msg=msg)
+        logger.log(level=self.log_level, msg=msg)
 
-    def _make_calling_record(self, name: str, arguments: str, method: str = "Calling") -> None:
+    def _make_calling_record(self, logger: logging.Logger, name: str, arguments: str, method: str = "Calling") -> None:
         """Make log record before execution.
 
+        :type logger: logging.Logger
         :type name: str
         :type arguments: str
         :type method: str
         """
-        self._logger.log(level=self.log_level, msg=f"{method}: \n{name}({arguments if self.log_call_args else ''})")
+        logger.log(level=self.log_level, msg=f"{method}: \n{name}({arguments if self.log_call_args else ''})")
 
-    def _make_exc_record(self, name: str, arguments: str, exception: Exception) -> None:
+    def _make_exc_record(self, logger: logging.Logger, name: str, arguments: str, exception: Exception) -> None:
         """Make log record if exception raised.
 
+        :type logger: logging.Logger
         :type name: str
         :type arguments: str
         :type exception: Exception
@@ -554,7 +577,7 @@ class LogWrap(class_decorator.BaseDecorator):
             else exception.__class__.__name__
         )
 
-        self._logger.log(
+        logger.log(
             level=self.exc_level,
             msg=f"Failed: \n{name}({arguments if self.log_call_args_on_exc else ''})\n{tb_text}",
             exc_info=False,
@@ -569,6 +592,8 @@ class LogWrap(class_decorator.BaseDecorator):
         :rtype: typing.Callable
         """
 
+        logger: logging.Logger = self._get_logger_for_func(func)
+
         # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         async def async_wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
@@ -576,11 +601,11 @@ class LogWrap(class_decorator.BaseDecorator):
             args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
-                self._make_calling_record(name=func.__name__, arguments=args_repr, method="Awaiting")
+                self._make_calling_record(logger=logger, name=func.__name__, arguments=args_repr, method="Awaiting")
                 result = await func(*args, **kwargs)
-                self._make_done_record(func.__name__, result)
+                self._make_done_record(logger=logger, func_name=func.__name__, result=result)
             except Exception as e:
-                self._make_exc_record(name=func.__name__, arguments=args_repr, exception=e)
+                self._make_exc_record(logger=logger, name=func.__name__, arguments=args_repr, exception=e)
                 raise
             return result  # type: ignore
 
@@ -591,11 +616,11 @@ class LogWrap(class_decorator.BaseDecorator):
             args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
-                self._make_calling_record(name=func.__name__, arguments=args_repr)
+                self._make_calling_record(logger=logger, name=func.__name__, arguments=args_repr)
                 result = func(*args, **kwargs)
-                self._make_done_record(func.__name__, result)
+                self._make_done_record(logger=logger, func_name=func.__name__, result=result)
             except Exception as e:
-                self._make_exc_record(name=func.__name__, arguments=args_repr, exception=e)
+                self._make_exc_record(logger=logger, name=func.__name__, arguments=args_repr, exception=e)
                 raise
             return result
 
@@ -622,7 +647,7 @@ class LogWrap(class_decorator.BaseDecorator):
 def logwrap(
     func: None = None,
     *,
-    log: logging.Logger = LOGGER,
+    log: typing.Optional[logging.Logger] = None,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -641,7 +666,7 @@ def logwrap(
 def logwrap(
     func: typing.Callable[..., typing.Awaitable[FuncFinalResult]],
     *,
-    log: logging.Logger = LOGGER,
+    log: typing.Optional[logging.Logger] = None,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -660,7 +685,7 @@ def logwrap(
 def logwrap(
     func: typing.Callable[..., FuncFinalResult],
     *,
-    log: logging.Logger = LOGGER,
+    log: typing.Optional[logging.Logger] = None,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -678,7 +703,7 @@ def logwrap(
 def logwrap(  # noqa: F811
     func: typing.Optional[typing.Callable[..., FuncResultType]] = None,
     *,
-    log: logging.Logger = LOGGER,
+    log: typing.Optional[logging.Logger] = None,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
@@ -694,8 +719,8 @@ def logwrap(  # noqa: F811
 
     :param func: function to wrap
     :type func: typing.Optional[typing.Callable]
-    :param log: logger object for decorator, by default used 'logwrap'
-    :type log: logging.Logger
+    :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
+    :type log: typing.Optional[logging.Logger]
     :param log_level: log level for successful calls
     :type log_level: int
     :param exc_level: log level for exception cases
@@ -723,12 +748,13 @@ def logwrap(  # noqa: F811
     :param log_result_obj: log result of function call.
     :type log_result_obj: bool
     :return: built real decorator.
-    :rtype: _log_wrap_shared.BaseLogWrap
+    :rtype: typing.Union[LogWrap, typing.Callable[..., FuncResultType]]
 
     .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
     .. versionchanged:: 3.3.0 Deprecation of *args
     .. versionchanged:: 4.0.0 Drop of *args
     .. versionchanged:: 5.1.0 log_traceback parameter
+    .. versionchanged:: 8.0.0 pick up logger from target module if possible
     """
     wrapper = LogWrap(
         log=log,

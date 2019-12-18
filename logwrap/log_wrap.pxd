@@ -15,6 +15,7 @@
 """log_wrap shared code module."""
 
 import inspect
+import logging
 import typing
 
 from logwrap cimport class_decorator
@@ -48,6 +49,6 @@ cdef:
 
         cdef:
             str _get_func_args_repr(self, sig: inspect.Signature, tuple args, dict kwargs)
-            void _make_done_record(self, str func_name, result: typing.Any) except *
-            void _make_calling_record(self, str name, str arguments, str method=?) except *
-            void _make_exc_record(self, str name, str arguments, Exception exception) except *
+            void _make_done_record(self, logger: logging.Logger, str func_name, result: typing.Any) except *
+            void _make_calling_record(self, logger: logging.Logger, str name, str arguments, str method=?) except *
+            void _make_exc_record(self, logger: logging.Logger, str name, str arguments, Exception exception) except *

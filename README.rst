@@ -79,7 +79,7 @@ Argumented usage with arguments from signature:
 .. code-block:: python
 
     @logwrap.logwrap(
-        log=logging.getLogger(__name__),  # __name__ = 'logwrap'
+        log=None,  # if not set: try to find LOGGER, LOG, logger or log object in target module and use it if it logger instance. Fallback: logger named logwrap
         log_level=logging.DEBUG,
         exc_level=logging.ERROR,
         max_indent=20,  # forwarded to the pretty_repr

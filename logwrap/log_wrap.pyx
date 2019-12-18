@@ -25,6 +25,7 @@ import sys
 import traceback
 import typing
 
+from logwrap import constants
 from logwrap cimport class_decorator
 from logwrap cimport repr_utils
 
@@ -123,6 +124,7 @@ def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing
 
     .. versionadded:: 3.3.0
     .. versionchanged:: 5.3.1 cythonize and return list
+    .. versionchanged:: 8.0.0 pick up logger from target module if possible
     """
     cdef list result = []
 
@@ -139,7 +141,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         self,
         func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
         *,
-        log: logging.Logger = LOGGER,
+        log: typing.Optional[logging.Logger] = None,
         unsigned long log_level=logging.DEBUG,
         unsigned long exc_level=logging.ERROR,
         unsigned long max_indent=20,
@@ -155,8 +157,8 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
         :param func: function to wrap
         :type func: typing.Optional[typing.Callable]
-        :param log: logger object for decorator, by default used 'logwrap'
-        :type log: logging.Logger
+        :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
+        :type log: typing.Optional[logging.Logger]
         :param log_level: log level for successful calls
         :type log_level: int
         :param exc_level: log level for exception cases
@@ -209,10 +211,26 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         else:
             self.__blacklisted_exceptions = list(blacklisted_exceptions)
 
-        self._logger = log
+        if isinstance(log, logging.Logger):
+            self._logger = log
+        else:
+            self._logger = None
+
         self._spec = spec or self._func
 
         # We are not interested to pass any arguments to object
+
+    def _get_logger_for_func(self, func: FuncResultType) -> logging.Logger:
+        """Get logger for function from function module if possible."""
+        if self._logger is not None:
+            return self._logger
+
+        func_module = inspect.getmodule(func)
+        for logger_name in constants.VALID_LOGGER_NAMES:
+            logger_candidate = getattr(func_module, logger_name, None)
+            if isinstance(logger_candidate, logging.Logger):
+                return logger_candidate
+        return LOGGER
 
     @property
     def blacklisted_names(self) -> typing.List[str]:
@@ -331,9 +349,10 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 param_str += "\n"
             return param_str
 
-        void _make_done_record(self, str func_name, result: typing.Any) except *:
+        void _make_done_record(self, logger: logging.Logger, str func_name, result: typing.Any) except *:
             """Construct success record.
 
+            :type logger: logging.Logger
             :type func_name: str
             :type result: typing.Any
             """
@@ -351,23 +370,25 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
                 )
                 msg += f" with result:\n{result_repr}"
-            self._logger.log(level=self.log_level, msg=msg)
+            logger.log(level=self.log_level, msg=msg)
 
-        void _make_calling_record(self, str name, str arguments, str method="Calling") except *:
+        void _make_calling_record(self, logger: logging.Logger, str name, str arguments, str method="Calling") except *:
             """Make log record before execution.
 
+            :type logger: logging.Logger
             :type name: str
             :type arguments: str
             :type method: str
             """
-            self._logger.log(
+            logger.log(
                 level=self.log_level,
                 msg=f"{method}: \n{name}({arguments if self.log_call_args else ''})",
             )
 
-        void _make_exc_record(self, str name, str arguments, Exception exception) except *:
+        void _make_exc_record(self, logger: logging.Logger, str name, str arguments, Exception exception) except *:
             """Make log record if exception raised.
 
+            :type logger: logging.Logger
             :type name: str
             :type arguments: str
             :type exception: Exception
@@ -383,7 +404,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 else exception.__class__.__name__
             )
 
-            self._logger.log(
+            logger.log(
                 level=self.exc_level,
                 msg=(
                     f"Failed: \n"
@@ -402,17 +423,19 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         :rtype: typing.Callable
         """
 
+        logger = self._get_logger_for_func(func)
+
         @functools.wraps(func)
         async def async_wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
             sig = inspect.signature(self._spec or func)
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
-                self._make_calling_record(name=func.__name__, arguments=args_repr, method="Awaiting")
+                self._make_calling_record(logger=logger, name=func.__name__, arguments=args_repr, method="Awaiting")
                 result = await func(*args, **kwargs)
-                self._make_done_record(func.__name__, result)
+                self._make_done_record(logger=logger, func_name=func.__name__, result=result)
             except Exception as e:
-                self._make_exc_record(name=func.__name__, arguments=args_repr, exception=e)
+                self._make_exc_record(logger=logger, name=func.__name__, arguments=args_repr, exception=e)
                 raise
             return result
 
@@ -422,11 +445,11 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
-                self._make_calling_record(name=func.__name__, arguments=args_repr)
+                self._make_calling_record(logger=logger, name=func.__name__, arguments=args_repr)
                 result = func(*args, **kwargs)
-                self._make_done_record(func.__name__, result)
+                self._make_done_record(logger=logger, func_name=func.__name__, result=result)
             except Exception as e:
-                self._make_exc_record(name=func.__name__, arguments=args_repr, exception=e)
+                self._make_exc_record(logger=logger, name=func.__name__, arguments=args_repr, exception=e)
                 raise
             return result
 
@@ -444,7 +467,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 def logwrap(
     func: typing.Optional[typing.Callable[..., FuncResultType]] = None,
     *,
-    log: logging.Logger = LOGGER,
+    log: typing.Optional[logging.Logger] = None,
     unsigned long log_level=logging.DEBUG,
     unsigned long exc_level=logging.ERROR,
     unsigned long max_indent=20,
@@ -460,8 +483,8 @@ def logwrap(
 
     :param func: function to wrap
     :type func: typing.Optional[typing.Callable]
-    :param log: logger object for decorator, by default used 'logwrap'
-    :type log: logging.Logger
+    :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
+    :type log: typing.Optional[logging.Logger]
     :param log_level: log level for successful calls
     :type log_level: int
     :param exc_level: log level for exception cases
@@ -489,12 +512,13 @@ def logwrap(
     :param log_result_obj: log result of function call.
     :type log_result_obj: bool
     :return: built real decorator.
-    :rtype: _log_wrap_shared.BaseLogWrap
+    :rtype: typing.Union[LogWrap, typing.Callable[..., FuncResultType]]
 
     .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
     .. versionchanged:: 3.3.0 Deprecation of *args
     .. versionchanged:: 4.0.0 Drop of *args
     .. versionchanged:: 5.1.0 log_traceback parameter
+    .. versionchanged:: 8.0.0 pick up logger from target module if possible
     """
     wrapper = LogWrap(
         log=log,
