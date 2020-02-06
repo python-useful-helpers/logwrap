@@ -1,11 +1,11 @@
 language: python
 os: linux
-dist: xenial
+dist: bionic
 sudo: true
 
 install:
   - &upgrade_python_toolset pip install --upgrade pip setuptools wheel
-  - &install_test_deps pip install --upgrade pytest pytest-sugar
+  - &install_test_deps pip install --upgrade pytest pytest-sugar coverage[toml]>=5.0
   - &install_deps pip install -r CI_REQUIREMENTS.txt
   - pip install --upgrade pytest-cov coveralls
 
@@ -36,24 +36,41 @@ _helpers:
       - *build_package
       - *install_built
       - *test_no_cov
-    after_success: skip
 
   - &static_analysis
     stage: Static analysis
     <<: *python37
-    after_success: skip
 
   - &code_style_check
     stage: Code style check
     <<: *python37
-    after_success: skip
+
+  - &deploy
+    services:
+    - docker
+    install:
+      - *upgrade_python_toolset
+      - *install_deps
+    before_deploy:
+      - *build_package
+    deploy:
+      - provider: pypi
+        # `skip_cleanup: true` is required to preserve binary wheels, built
+        # inside of manylinux* docker container during `script` step above.
+        skip_cleanup: true
+        user: penguinolog
+        password:
+          secure: QNBIAaqj682K95G2jVBFLgKmzscDz8sYLrJOmRVa+TmwV/n19Nar1fTdt86V2FRgl5SBbuGwAz6s9RD+X1j+OAEUKQ/wUmkP8hLriKcTaP5dH5+WWvwH9TD5A3SSvYOI9G9Qq+0rG71F/OMEBtTI5lrIaiPt39YUwhejLsUYy2vcvT/yxEnrMFc3gGFEvIRA6pnZWY+t3cK/uDdhDXutNSvLKTEuPILswqiGQZ/79Aio5HzQasCjvmWKr2c9nwZB1SoSfbhvNWitOzJZ5+7wc0ewFcRHBMeiLmGjI/z6FRVp/QTHtwhAwzRQQ955MiqcX2fLnVlfE68qT47RpX9ueqhFXMgIDqJ/3O/ln5619xZ1ykuUT8i/gUm2/lXGV9Wz0IwDxz4RpL8ul24qLdECXhVlBBDA3VjJT8YbErvY3EB+YKHiJCywAcOa8boHTMDxmP/BLUh24PrsKs4eYW5MVRR3V6Un8ajCCk2ZhDlyQXSxPsRA7/dHQS5a6d1neCCapdwR+VKHjjBmW0MppxQmsxjg6poOtWR/d1bT9XuHdu6/vAmTAosZN56MnR0KD4ZVJxM5OoMqE3Fgw6jusJnyWyxJ5XRkG/NuDITTC7aS5MQuPOGUSw3GzzAwZOgSRCDmgLMxRaZcv8a8r8GqpzVHpB9D+zfOhvh8+1BOhNFXMMc=
+        on:
+          tags: true
+          distributions: sdist
+        skip_upload_docs: true
+        skip_existing: true
 
 script:
   - python setup.py develop -v
-  - py.test --cov-config .coveragerc --cov-report= --cov=logwrap test
+  - py.test --cov-report= --cov=logwrap test
   - coverage report -m --fail-under 87
-after_success:
-  - coveralls
 
 jobs:
   include:
@@ -107,10 +124,16 @@ jobs:
 
     - stage: test
       <<: *python36
+      after_success:
+        - coveralls
     - stage: test
       <<: *python37
+      after_success:
+        - coveralls
     - stage: test
       <<: *python38
+      after_success:
+        - coveralls
 
     - <<: *test_cythonized
       <<: *python36
@@ -122,31 +145,30 @@ jobs:
     - stage: deploy
       # This prevents job from appearing in test plan unless commit is tagged:
       if: tag IS present
-      # Run on pypy to build not cythonized wheel
       <<: *python37
+      <<: *deploy
       name: Build universal and cythonized bdist_wheel. Deploy bdist and sdist.
-      services:
-        - docker
-      install:
-        - *upgrade_python_toolset
-        - *install_deps
       script:
         - ./tools/run_docker.sh "logwrap"
-      before_deploy:
-        - *build_package
-      deploy:
-        - provider: pypi
-          # `skip_cleanup: true` is required to preserve binary wheels, built
-          # inside of manylinux1 docker container during `script` step above.
-          skip_cleanup: true
-          user: penguinolog
-          password:
-            secure: QNBIAaqj682K95G2jVBFLgKmzscDz8sYLrJOmRVa+TmwV/n19Nar1fTdt86V2FRgl5SBbuGwAz6s9RD+X1j+OAEUKQ/wUmkP8hLriKcTaP5dH5+WWvwH9TD5A3SSvYOI9G9Qq+0rG71F/OMEBtTI5lrIaiPt39YUwhejLsUYy2vcvT/yxEnrMFc3gGFEvIRA6pnZWY+t3cK/uDdhDXutNSvLKTEuPILswqiGQZ/79Aio5HzQasCjvmWKr2c9nwZB1SoSfbhvNWitOzJZ5+7wc0ewFcRHBMeiLmGjI/z6FRVp/QTHtwhAwzRQQ955MiqcX2fLnVlfE68qT47RpX9ueqhFXMgIDqJ/3O/ln5619xZ1ykuUT8i/gUm2/lXGV9Wz0IwDxz4RpL8ul24qLdECXhVlBBDA3VjJT8YbErvY3EB+YKHiJCywAcOa8boHTMDxmP/BLUh24PrsKs4eYW5MVRR3V6Un8ajCCk2ZhDlyQXSxPsRA7/dHQS5a6d1neCCapdwR+VKHjjBmW0MppxQmsxjg6poOtWR/d1bT9XuHdu6/vAmTAosZN56MnR0KD4ZVJxM5OoMqE3Fgw6jusJnyWyxJ5XRkG/NuDITTC7aS5MQuPOGUSw3GzzAwZOgSRCDmgLMxRaZcv8a8r8GqpzVHpB9D+zfOhvh8+1BOhNFXMMc=
-          on:
-            tags: true
-            distributions: sdist
-          skip_upload_docs: true
-          skip_existing: true
+
+    - stage: deploy
+      # This prevents job from appearing in test plan unless commit is tagged:
+      if: tag IS present
+      <<: *python37
+      <<: *deploy
+      name: Build universal and cythonized for x86_64 bdist_wheel. Deploy bdist.
+      script:
+        - ./tools/run_docker_manylinux2014.sh "logwrap" "x86_64"
+
+    - stage: deploy
+      # This prevents job from appearing in test plan unless commit is tagged:
+      if: tag IS present
+      <<: *python37
+      <<: *deploy
+      name: Build universal and cythonized for aarch64 bdist_wheel. Deploy bdist.
+      arch: arm64
+      script:
+        - ./tools/run_docker_manylinux2014.sh "logwrap" "aarch64"
 
 cache: pip
 before_cache:
