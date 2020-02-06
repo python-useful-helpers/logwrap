@@ -20,11 +20,10 @@ force_single_line = true
 
 import_heading_stdlib = "Standard Library"
 import_heading_thirdparty = "External Dependencies"
-import_heading_firstparty = "LogWrap Implementation"
+import_heading_firstparty = "Package Implementation"
 import_heading_localfolder = "Local Implementation"
 
 [tool.coverage.run]
-source = ["logwrap"]
 omit = ["test/*"]
 branch = true
 

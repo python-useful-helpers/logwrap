@@ -28,7 +28,7 @@ import sys
 import traceback
 import typing
 
-# LogWrap Implementation
+# Package Implementation
 from logwrap import class_decorator
 from logwrap import constants
 from logwrap import repr_utils

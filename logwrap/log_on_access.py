@@ -26,7 +26,7 @@ import time
 import traceback
 import typing
 
-# LogWrap Implementation
+# Package Implementation
 from logwrap import constants
 from logwrap import repr_utils
 
