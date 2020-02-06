@@ -1,7 +1,6 @@
 language: python
 os: linux
 dist: bionic
-sudo: true
 
 install:
   - &upgrade_python_toolset pip install --upgrade pip setuptools wheel
@@ -64,7 +63,7 @@ _helpers:
           secure: QNBIAaqj682K95G2jVBFLgKmzscDz8sYLrJOmRVa+TmwV/n19Nar1fTdt86V2FRgl5SBbuGwAz6s9RD+X1j+OAEUKQ/wUmkP8hLriKcTaP5dH5+WWvwH9TD5A3SSvYOI9G9Qq+0rG71F/OMEBtTI5lrIaiPt39YUwhejLsUYy2vcvT/yxEnrMFc3gGFEvIRA6pnZWY+t3cK/uDdhDXutNSvLKTEuPILswqiGQZ/79Aio5HzQasCjvmWKr2c9nwZB1SoSfbhvNWitOzJZ5+7wc0ewFcRHBMeiLmGjI/z6FRVp/QTHtwhAwzRQQ955MiqcX2fLnVlfE68qT47RpX9ueqhFXMgIDqJ/3O/ln5619xZ1ykuUT8i/gUm2/lXGV9Wz0IwDxz4RpL8ul24qLdECXhVlBBDA3VjJT8YbErvY3EB+YKHiJCywAcOa8boHTMDxmP/BLUh24PrsKs4eYW5MVRR3V6Un8ajCCk2ZhDlyQXSxPsRA7/dHQS5a6d1neCCapdwR+VKHjjBmW0MppxQmsxjg6poOtWR/d1bT9XuHdu6/vAmTAosZN56MnR0KD4ZVJxM5OoMqE3Fgw6jusJnyWyxJ5XRkG/NuDITTC7aS5MQuPOGUSw3GzzAwZOgSRCDmgLMxRaZcv8a8r8GqpzVHpB9D+zfOhvh8+1BOhNFXMMc=
         on:
           tags: true
-          distributions: sdist
+        distributions: sdist
         upload_docs: false
         skip_existing: true
 
