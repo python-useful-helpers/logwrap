@@ -155,6 +155,13 @@ jobs:
     - stage: deploy
       # This prevents job from appearing in test plan unless commit is tagged:
       <<: *deploy
+      name: Build universal and cythonized for i686 bdist_wheel. Deploy bdist.
+      script:
+        - ./tools/run_docker_manylinux2014.sh "logwrap" "i686"
+
+    - stage: deploy
+      # This prevents job from appearing in test plan unless commit is tagged:
+      <<: *deploy
       name: Build universal and cythonized for x86_64 bdist_wheel. Deploy bdist.
       script:
         - ./tools/run_docker_manylinux2014.sh "logwrap" "x86_64"
