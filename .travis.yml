@@ -21,7 +21,7 @@ _python:
 
 _helpers:
   - &install_cython pip install --upgrade Cython
-  - &build_package python setup.py bdist_wheel
+  - &build_package python setup.py bdist_wheel clean
   - &install_built pip install logwrap --no-index -f dist
   - &test_no_cov  py.test -vvv test
   - &test_cythonized
@@ -84,7 +84,7 @@ jobs:
         - *install_deps
         - pip install --upgrade "pylint >= 2.3" isort[pyproject,requirements]
       script:
-        - python setup.py --version
+        - python setup.py --version clean
         - pylint logwrap
     - <<: *static_analysis
       name: "Bandit"
@@ -100,7 +100,7 @@ jobs:
         - *install_deps
         - pip install --upgrade "mypy >= 0.720"
       script:
-        - python setup.py --version
+        - python setup.py --version clean
         - mypy --strict logwrap
     - <<: *static_analysis
       name: "PEP8"
