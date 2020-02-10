@@ -72,7 +72,7 @@ _helpers:
 
 script:
   - python setup.py develop -v
-  - py.test --cov-report= --cov=logwrap test
+  - py.test --cov-report= --cov=logwrap
   - coverage report -m --fail-under 87
 
 jobs:

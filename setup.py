@@ -245,7 +245,8 @@ SETUP_ARGS: typing.Dict[str, typing.Union[str, typing.List[str], typing.Dict[str
         "setuptools >= 21.0.0,!=24.0.0,"
         "!=34.0.0,!=34.0.1,!=34.0.2,!=34.0.3,!=34.1.0,!=34.1.1,!=34.2.0,!=34.3.0,!=34.3.1,!=34.3.2,"
         "!=36.2.0",
-        "setuptools_scm",
+        "wheel",
+        "setuptools_scm[toml]>=3.4",
     ],
     use_scm_version={'write_to': 'logwrap/_version.py'},
     install_requires=REQUIRED,
