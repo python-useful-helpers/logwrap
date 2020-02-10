@@ -69,11 +69,18 @@ class BoundParameter(inspect.Parameter):
 
     @property
     def value(self) -> typing.Any:
-        """Parameter value."""
+        """Parameter value.
+
+        :return: actual parameter value
+        :rtype: typing.Any
+        """
         return self._value
 
     def __str__(self) -> str:
-        """Debug purposes."""
+        """Debug purposes.
+
+        :return: string representation for parameter. */** flags is attached if positional (*args) or keyword (**kwargs)
+        :rtype: str"""
         cdef str as_str
 
         # POSITIONAL_ONLY is only in precompiled functions
@@ -106,7 +113,11 @@ class BoundParameter(inspect.Parameter):
         return as_str
 
     def __repr__(self) -> str:
-        """Debug purposes."""
+        """Debug purposes.
+
+        :return: parameter repr for debug purposes
+        :rtype: str
+        """
         return f'<{self.__class__.__name__} "{self}">'
 
 
@@ -221,7 +232,13 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         # We are not interested to pass any arguments to object
 
     def _get_logger_for_func(self, func: FuncResultType) -> logging.Logger:
-        """Get logger for function from function module if possible."""
+        """Get logger for function from function module if possible.
+
+        :param func: decorated function
+        :type func: FuncResultType
+        :return: logger instance
+        :rtype: logging.Logger
+        """
         if self._logger is not None:
             return self._logger
 
@@ -243,7 +260,11 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         return self.__blacklisted_exceptions
 
     def __repr__(self) -> str:
-        """Repr for debug purposes."""
+        """Repr for debug purposes.
+
+        :return: parameter repr for debug purposes
+        :rtype: str
+        """
         return (
             f"{self.__class__.__name__}("
             f"log={self._logger}, "
@@ -427,6 +448,12 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
         @functools.wraps(func)
         async def async_wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+            """Decorator for async callable objects.
+
+            :return: function result
+            :rtype: typing.Any
+            :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
+            """
             sig = inspect.signature(self._spec or func)
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
@@ -441,6 +468,12 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
         @functools.wraps(func)
         def wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+            """Decorator for normal callable objects.
+
+            :return: function result
+            :rtype: typing.Any
+            :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
+            """
             sig = inspect.signature(self._spec or func)
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
@@ -460,7 +493,11 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         *args: typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any],
         **kwargs: typing.Any,
     ) -> typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any]:
-        """Callable instance."""
+        """Callable instance.
+
+        :return: decorated function if it provided via arguments else function result
+        :rtype: typing.Union[typing.Callable[..., ReturnType], ReturnType]
+        """
         return super().__call__(*args, **kwargs)
 
 

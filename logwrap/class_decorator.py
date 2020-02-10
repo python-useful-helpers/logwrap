@@ -108,7 +108,11 @@ class BaseDecorator(metaclass=abc.ABCMeta):
     def __call__(  # type: ignore
         self, *args: typing.Union[typing.Callable[..., ReturnType], typing.Any], **kwargs: typing.Any
     ) -> typing.Union[typing.Callable[..., ReturnType], ReturnType]:
-        """Main decorator getter."""
+        """Main decorator getter.
+
+        :return: decorated function if it provided via arguments else function result
+        :rtype: typing.Union[typing.Callable[..., ReturnType], ReturnType]
+        """
         l_args = list(args)
 
         if self._func:
@@ -122,7 +126,11 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         return wrapper
 
     def __repr__(self) -> str:
-        """For debug purposes."""
+        """For debug purposes.
+
+        :return: representation for logging/debug purposes
+        :rtype: str
+        """
         return f"<{self.__class__.__name__}({self.__func!r}) at 0x{id(self):X}>"  # pragma: no cover
 
 

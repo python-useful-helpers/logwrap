@@ -195,7 +195,11 @@ class LogOnAccess(property):
 
     @property
     def __traceback(self) -> str:
-        """Get outer traceback text for logging."""
+        """Get outer traceback text for logging.
+
+        :return: traceback without decorator internals if traceback logging enabled else empty line
+        :rtype: str
+        """
         if not self.log_traceback:
             return ""
         exc_info = sys.exc_info()
@@ -207,7 +211,15 @@ class LogOnAccess(property):
         return tb_text
 
     def __get_obj_source(self, instance: typing.Any, owner: typing.Optional[type] = None) -> str:
-        """Get object repr block."""
+        """Get object repr block.
+
+        :param instance: object instance
+        :type instance: typing.Any
+        :param owner: object class (available for getter usage only)
+        :type owner: typing.Optional[type]
+        :return: repr of object if it not disabled else repr placeholder
+        :rtype: str
+        """
         if self.log_object_repr:
             return repr_utils.pretty_repr(instance, max_indent=self.max_indent)
         return f"<{owner.__name__ if owner is not None else instance.__class__.__name__}() at 0x{id(instance):X}>"
@@ -365,12 +377,20 @@ class LogOnAccess(property):
 
     @property
     def logger(self) -> typing.Optional[logging.Logger]:
-        """Logger instance to use as override."""
+        """Logger instance to use as override.
+
+        :return: logger instance if set
+        :rtype: typing.Optional[logging.Logger]
+        """
         return self.__logger
 
     @logger.setter
     def logger(self, logger: typing.Union[logging.Logger, str, None]) -> None:
-        """Logger instance to use as override."""
+        """Logger instance to use as override.
+
+        :param logger: logger instance, logger name or None if override disable required
+        :type logger: typing.Union[logging.Logger, str, None]
+        """
         if logger is None or isinstance(logger, logging.Logger):
             self.__logger = logger
         else:
@@ -378,106 +398,182 @@ class LogOnAccess(property):
 
     @property
     def log_object_repr(self) -> bool:
-        """Use `repr` over object to describe owner if True else owner class name and id."""
+        """Use `repr` over object to describe owner if True else owner class name and id.
+
+        :return: switch state
+        :rtype: bool
+        """
         return self.__log_object_repr
 
     @log_object_repr.setter
     def log_object_repr(self, value: bool) -> None:
-        """Use `repr` over object to describe owner if True else owner class name and id."""
+        """Use `repr` over object to describe owner if True else owner class name and id.
+
+        :param value: switch state
+        :type value: bool
+        """
         self.__log_object_repr = value
 
     @property
     def log_level(self) -> int:
-        """Log level for successful operations."""
+        """Log level for successful operations.
+
+        :return: log level
+        :rtype: int
+        """
         return self.__log_level
 
     @log_level.setter
     def log_level(self, value: int) -> None:
-        """Log level for successful operations."""
+        """Log level for successful operations.
+
+        :param value: log level
+        :type value: int
+        """
         self.__log_level = value
 
     @property
     def exc_level(self) -> int:
-        """Log level for exceptions."""
+        """Log level for exceptions.
+
+        :return: log level
+        :rtype: int
+        """
         return self.__exc_level
 
     @exc_level.setter
     def exc_level(self, value: int) -> None:
-        """Log level for exceptions."""
+        """Log level for exceptions.
+
+        :param value: log level
+        :type value: int
+        """
         self.__exc_level = value
 
     @property
     def log_before(self) -> bool:
-        """Log successful operations."""
+        """Log successful operations.
+
+        :return: switch state
+        :rtype: bool
+        """
         return self.__log_before
 
     @log_before.setter
     def log_before(self, value: bool) -> None:
-        """Log successful operations."""
+        """Log successful operations.
+
+        :param value: switch state
+        :type value: bool
+        """
         self.__log_before = value
 
     @property
     def log_success(self) -> bool:
-        """Log successful operations."""
+        """Log successful operations.
+
+        :return: switch state
+        :rtype: bool
+        """
         return self.__log_success
 
     @log_success.setter
     def log_success(self, value: bool) -> None:
-        """Log successful operations."""
+        """Log successful operations.
+
+        :param value: switch state
+        :type value: bool
+        """
         self.__log_success = value
 
     @property
     def log_failure(self) -> bool:
-        """Log exceptions."""
+        """Log exceptions.
+
+        :return: switch state
+        :rtype: bool
+        """
         return self.__log_failure
 
     @log_failure.setter
     def log_failure(self, value: bool) -> None:
-        """Log exceptions."""
+        """Log exceptions.
+
+        :param value: switch state
+        :type value: bool
+        """
         self.__log_failure = value
 
     @property
     def log_traceback(self) -> bool:
-        """Log traceback on exceptions."""
+        """Log traceback on exceptions.
+
+        :return: switch state
+        :rtype: bool
+        """
         return self.__log_traceback
 
     @log_traceback.setter
     def log_traceback(self, value: bool) -> None:
-        """Log traceback on exceptions."""
+        """Log traceback on exceptions.
+
+        :param value: switch state
+        :type value: bool
+        """
         self.__log_traceback = value
 
     @property
     def override_name(self) -> typing.Optional[str]:
-        """Override property name if not None else use getter/setter/deleter name."""
+        """Override property name if not None else use getter/setter/deleter name.
+
+        :return: property name override
+        :rtype: typing.Optional[str]
+        """
         return self.__override_name
 
     @override_name.setter
     def override_name(self, name: typing.Optional[str]) -> None:
-        """Override property name if not None else use getter/setter/deleter name."""
+        """Override property name if not None else use getter/setter/deleter name.
+
+        :param name: property name override
+        :type name: typing.Optional[str]
+        """
         self.__override_name = name
 
     @property
     def max_indent(self) -> int:
-        """Max indent during repr."""
+        """Max indent during repr.
+
+        :return: maximum indent before classic `repr()` call.
+        :rtype: int
+        """
         return self.__max_indent
 
     @max_indent.setter
     def max_indent(self, value: int) -> None:
-        """Max indent during repr."""
+        """Max indent during repr.
+
+        :param value: maximum indent before classic `repr()` call.
+        :type value: int
+        """
         self.__max_indent = value
 
     @property
     def __name__(self) -> str:
-        """Name getter."""
-        return (
-            self.override_name or self.fget.__name__
-            if self.fget is not None
-            else self.fset.__name__
-            if self.fset is not None
-            else self.fdel.__name__
-            if self.fdel is not None
-            else ""
-        )
+        """Name getter.
+
+        :return: attribute name (may be overridden)
+        :rtype: str
+        """
+        if self.override_name:
+            return self.override_name
+        if self.fget is not None:
+            return self.fget.__name__
+        if self.fset is not None:
+            return self.fset.__name__
+        if self.fdel is not None:
+            return self.fdel.__name__
+        return ""
 
 
 if __name__ == "__main__":

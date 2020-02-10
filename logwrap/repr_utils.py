@@ -30,12 +30,24 @@ import typing
 
 
 def _known_callable(item: typing.Any) -> bool:
-    """Check for possibility to parse callable."""
+    """Check for possibility to parse callable.
+
+    :param item:  item to check for repr() way
+    :type item: typing.Any
+    :return: item is callable and should be processed not using repr
+    :rtype: bool
+    """
     return isinstance(item, (types.FunctionType, types.MethodType))
 
 
 def _simple(item: typing.Any) -> bool:
-    """Check for nested iterations: True, if not."""
+    """Check for nested iterations: True, if not.
+
+    :param item: item to check for repr() way
+    :type item: typing.Any
+    :return: use repr() iver item by default
+    :rtype: bool
+    """
     return not isinstance(item, (list, set, tuple, dict, frozenset))
 
 
@@ -65,14 +77,19 @@ class ReprParameter:
 
     @property
     def parameter(self) -> inspect.Parameter:
-        """Parameter object."""
+        """Parameter object.
+
+        :return: original inspect.Parameter object
+        :rtype: inspect.Parameter
+        """
         return self._parameter
 
     @property
     def name(self) -> typing.Union[None, str]:
         """Parameter name.
 
-        For `*args` and `**kwargs` add prefixes
+        :return: parameter name. For `*args` and `**kwargs` add corresponding prefixes
+        :rtype: typing.Union[None, str]
         """
         if self.kind == inspect.Parameter.VAR_POSITIONAL:
             return "*" + self.parameter.name
@@ -84,18 +101,28 @@ class ReprParameter:
     def value(self) -> typing.Any:
         """Parameter value to log.
 
-        If function is bound to class -> value is class instance else default value.
+        :return: If function is bound to class -> value is class instance else default value.
+        :rtype: typing.Any
         """
         return self._value
 
     @property
     def annotation(self) -> typing.Union[inspect.Parameter.empty, str]:
-        """Parameter annotation."""
+        """Parameter annotation.
+
+        :return: parameter annotation from signature
+        :rtype: typing.Union[inspect.Parameter.empty, str]
+        """
         return self.parameter.annotation
 
     @property
     def kind(self) -> int:
-        """Parameter kind."""
+        """Parameter kind.
+
+        :return: parameter kind from inspect.Parameter
+        :rtype: int
+        """
+        # noinspection PyTypeChecker
         return self.parameter.kind  # type: ignore
 
     # noinspection PyTypeChecker
@@ -108,7 +135,11 @@ class ReprParameter:
         raise TypeError(msg)
 
     def __repr__(self) -> str:
-        """Debug purposes."""
+        """Debug purposes.
+
+        :return: parameter repr for debug purposes
+        :rtype: str
+        """
         return f'<{self.__class__.__name__} "{self}">'
 
 
@@ -448,7 +479,15 @@ class PrettyStr(PrettyFormat):
 
     @staticmethod
     def _strings_str(indent: int, val: typing.Union[bytes, str]) -> str:
-        """Custom repr for strings and binary strings."""
+        """Custom str for strings and binary strings.
+
+        :param indent: result indent
+        :type indent: int
+        :param val: value for repr
+        :type val: typing.Union[bytes, str]
+        :return: indented string as `str`
+        :rtype: str
+        """
         if isinstance(val, bytes):
             string: str = val.decode(encoding="utf-8", errors="backslashreplace")
         else:

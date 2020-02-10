@@ -72,11 +72,19 @@ class BoundParameter(inspect.Parameter):
 
     @property
     def value(self) -> typing.Any:
-        """Parameter value."""
+        """Parameter value.
+
+        :return: actual parameter value
+        :rtype: typing.Any
+        """
         return self._value
 
     def __str__(self) -> str:
-        """Debug purposes."""
+        """Debug purposes.
+
+        :return: string representation for parameter. */** flags is attached if positional (*args) or keyword (**kwargs)
+        :rtype: str
+        """
         # POSITIONAL_ONLY is only in precompiled functions
         if self.kind == self.POSITIONAL_ONLY:  # pragma: no cover
             as_str: str = "" if self.name is None else f"<{self.name}>"
@@ -107,7 +115,11 @@ class BoundParameter(inspect.Parameter):
         return as_str
 
     def __repr__(self) -> str:
-        """Debug purposes."""
+        """Debug purposes.
+
+        :return: representation for logging/debug purposes
+        :rtype: str
+        """
         return f'<{self.__class__.__name__} "{self}">'
 
 
@@ -237,7 +249,13 @@ class LogWrap(class_decorator.BaseDecorator):
         # We are not interested to pass any arguments to object
 
     def _get_logger_for_func(self, func: FuncResultType) -> logging.Logger:
-        """Get logger for function from function module if possible."""
+        """Get logger for function from function module if possible.
+
+        :param func: decorated function
+        :type func: FuncResultType
+        :return: logger instance
+        :rtype: logging.Logger
+        """
         if self.__logger is not None:
             return self.__logger
 
@@ -421,7 +439,11 @@ class LogWrap(class_decorator.BaseDecorator):
         return self.__spec
 
     def __repr__(self) -> str:
-        """Repr for debug purposes."""
+        """Repr for debug purposes.
+
+        :return: representation for logging/debug purposes
+        :rtype: str
+        """
         return (
             f"{self.__class__.__name__}("
             f"log={self._logger}, "
@@ -594,9 +616,14 @@ class LogWrap(class_decorator.BaseDecorator):
 
         logger: logging.Logger = self._get_logger_for_func(func)
 
-        # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         async def async_wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+            """Decorator for async callable objects.
+
+            :return: function result
+            :rtype: typing.Any
+            :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
+            """
             sig: inspect.Signature = inspect.signature(self._spec or func)
             args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
@@ -609,9 +636,14 @@ class LogWrap(class_decorator.BaseDecorator):
                 raise
             return result  # type: ignore
 
-        # noinspection PyCompatibility,PyMissingOrEmptyDocstring
         @functools.wraps(func)
         def wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+            """Decorator for normal callable objects.
+
+            :return: function result
+            :rtype: typing.Any
+            :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
+            """
             sig: inspect.Signature = inspect.signature(self._spec or func)
             args_repr: str = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
@@ -639,7 +671,11 @@ class LogWrap(class_decorator.BaseDecorator):
     def __call__(  # pylint: disable=useless-super-delegation
         self, *args: typing.Union[typing.Callable[..., FuncResultType], typing.Any], **kwargs: typing.Any,
     ) -> typing.Union[typing.Callable[..., FuncResultType], FuncResultType]:
-        """Callable instance."""
+        """Callable instance.
+
+        :return: decorated function if it provided via arguments else function result
+        :rtype: typing.Union[typing.Callable[..., ReturnType], ReturnType]
+        """
         return super().__call__(*args, **kwargs)  # type: ignore
 
 

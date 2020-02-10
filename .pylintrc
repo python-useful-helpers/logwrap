@@ -19,7 +19,7 @@ ignore-patterns=_version.py
 
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use.
-jobs=1
+jobs=0
 
 # Control the amount of potential inferred values when inferring a single
 # object. This can help the performance when dealing with large functions or
@@ -30,7 +30,10 @@ limit-inference-results=100
 # usually to register additional checkers.
 load-plugins=pylint.extensions.docparams,
              pylint.extensions.docstyle,
-             pylint.extensions.overlapping_exceptions
+             pylint.extensions.overlapping_exceptions,
+             pylint.extensions.emptystring,
+             pylint.extensions.comparetozero,
+             pylint.extensions.check_elif
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -69,7 +72,6 @@ disable=non-ascii-bytes-literal,
         locally-disabled,
         file-ignored,
         suppressed-message,
-        comprehension-escape,
         similarities,
         too-many-ancestors,
         too-few-public-methods,
@@ -524,7 +526,7 @@ accept-no-raise-doc=no
 
 # Whether to accept totally missing return documentation in the docstring of a
 # function that returns a statement.
-accept-no-return-doc=yes
+accept-no-return-doc=no
 
 # Whether to accept totally missing yields documentation in the docstring of a
 # generator.

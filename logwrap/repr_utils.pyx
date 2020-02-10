@@ -27,12 +27,24 @@ import typing
 
 cdef:
     bint _known_callable(item: typing.Any):
-        """Check for possibility to parse callable."""
+        """Check for possibility to parse callable.
+
+        :param item:  item to check for repr() way
+        :type item: typing.Any
+        :return: item is callable and should be processed not using repr
+        :rtype: bool
+        """
         return isinstance(item, (types.FunctionType, types.MethodType))
 
 
     bint _simple(item: typing.Any):
-        """Check for nested iterations: True, if not."""
+        """Check for nested iterations: True, if not.
+
+        :param item: item to check for repr() way
+        :type item: typing.Any
+        :return: use repr() iver item by default
+        :rtype: bool
+        """
         return not isinstance(item, (list, set, tuple, dict, frozenset))
 
 
@@ -80,7 +92,11 @@ cdef:
             raise TypeError(msg)
 
         def __repr__(self) -> str:
-            """Debug purposes."""
+            """Debug purposes.
+
+            :return: parameter repr for debug purposes
+            :rtype: str
+            """
             return f'<{self.__class__.__name__} "{self}">'
 
 
@@ -449,7 +465,15 @@ cdef class PrettyStr(PrettyFormat):
             unsigned long indent,
             val: typing.Union[bytes, str]
         ):
-            """Custom repr for strings and binary strings."""
+            """Custom repr for strings and binary strings.
+
+            :param indent: result indent
+            :type indent: int
+            :param val: value for repr
+            :type val: typing.Union[bytes, str]
+            :return: indented string as `str`
+            :rtype: str
+            """
             cdef str string
             if isinstance(val, bytes):
                 string = val.decode(encoding="utf-8", errors="backslashreplace")
