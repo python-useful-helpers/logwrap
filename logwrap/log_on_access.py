@@ -472,7 +472,7 @@ class LogOnAccess(property):
 
     @property
     def log_before(self) -> bool:
-        """Log successful operations.
+        """Log before operation.
 
         :return: switch state
         :rtype: bool
@@ -481,7 +481,7 @@ class LogOnAccess(property):
 
     @log_before.setter
     def log_before(self, value: bool) -> None:
-        """Log successful operations.
+        """Log before operations.
 
         :param value: switch state
         :type value: bool
