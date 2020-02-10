@@ -530,7 +530,7 @@ accept-no-return-doc=no
 
 # Whether to accept totally missing yields documentation in the docstring of a
 # generator.
-accept-no-yields-doc=yes
+accept-no-yields-doc=no
 
 # If the docstring type cannot be guessed the specified docstring type will be
 # used.
