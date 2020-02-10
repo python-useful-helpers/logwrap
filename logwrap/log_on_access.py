@@ -192,6 +192,22 @@ class LogOnAccess(property):
         self.__log_traceback: bool = log_traceback
         self.__override_name: typing.Optional[str] = override_name
         self.__max_indent: int = max_indent
+        self.__name: str = ""
+        self.__owner: typing.Optional[type] = None
+
+    def __set_name__(self, owner: typing.Optional[type], name: str) -> None:
+        """Set __name__ and __objclass__ property."""
+        self.__owner = owner
+        self.__name = name
+
+    @property
+    def __objclass__(self) -> typing.Optional[type]:  # pragma: no cover
+        """Read-only owner.
+
+        :return: property owner class
+        :rtype: typing.Optional[type]
+        """
+        return self.__owner
 
     @property
     def __traceback(self) -> str:
@@ -222,7 +238,11 @@ class LogOnAccess(property):
         """
         if self.log_object_repr:
             return repr_utils.pretty_repr(instance, max_indent=self.max_indent)
-        return f"<{owner.__name__ if owner is not None else instance.__class__.__name__}() at 0x{id(instance):X}>"
+        if owner is not None:
+            return f"<{owner.__name__}() at 0x{id(instance):X}>"
+        if self.__objclass__ is not None:
+            return f"<{self.__objclass__.__name__}() at 0x{id(instance):X}>"
+        return f"<{instance.__class__.__name__}() at 0x{id(instance):X}>"
 
     def _get_logger_for_instance(self, instance: typing.Any) -> logging.Logger:
         """Get logger for log calls.
@@ -567,6 +587,8 @@ class LogOnAccess(property):
         """
         if self.override_name:
             return self.override_name
+        if self.__name:
+            return self.__name
         if self.fget is not None:
             return self.fget.__name__
         if self.fset is not None:

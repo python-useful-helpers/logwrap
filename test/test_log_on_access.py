@@ -310,13 +310,13 @@ class TestLogOnAccess(unittest.TestCase):
         getattr(target, "on_init_set")  # noqa: B009
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:on_init_set:Request: Target().<lambda>",
+            f"DEBUG:on_init_set:Request: Target().on_init_set",
             logged[0]
         )
         self.assertRegex(
             logged[1],
             rf"DEBUG:on_init_set:Done at (?:\d+\.\d{{3}})s: "
-            rf"Target\(\)\.<lambda> -> {logwrap.pretty_repr(v_on_init_set)}"
+            rf"Target\(\)\.on_init_set -> {logwrap.pretty_repr(v_on_init_set)}"
         )
 
         self.stream.seek(0)
@@ -325,13 +325,13 @@ class TestLogOnAccess(unittest.TestCase):
         getattr(target, "on_init_name")  # noqa: B009
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:on_init_name:Request: Target().<lambda>",
+            f"DEBUG:on_init_name:Request: Target().on_init_name",
             logged[0]
         )
         self.assertRegex(
             logged[1],
             rf"DEBUG:on_init_name:Done at (?:\d+\.\d{{3}})s: "
-            rf"Target\(\)\.<lambda> -> {logwrap.pretty_repr(v_on_init_name)}"
+            rf"Target\(\)\.on_init_name -> {logwrap.pretty_repr(v_on_init_name)}"
         )
 
         self.stream.seek(0)
