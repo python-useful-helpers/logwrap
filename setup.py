@@ -156,7 +156,6 @@ def get_simple_vars_from_src(
         * Executable code, including string formatting and comprehensions.
 
     Examples:
-
     >>> string_sample = "a = '1'"
     >>> get_simple_vars_from_src(string_sample)
     {'a': '1'}
