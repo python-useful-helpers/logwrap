@@ -251,12 +251,20 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
     @property
     def blacklisted_names(self) -> typing.List[str]:
-        """List of arguments names to ignore in log."""
+        """List of arguments names to ignore in log.
+
+        :return: list of arguments to ignore in log
+        :rtype: typing.List[str]
+        """
         return self.__blacklisted_names
 
     @property
     def blacklisted_exceptions(self) -> typing.List[typing.Type[Exception]]:
-        """List of exceptions to re-raise without log."""
+        """List of exceptions to re-raise without log.
+
+        :return: list of exceptions to re-raise silent
+        :rtype: typing.List[typing.Type[Exception]]
+        """
         return self.__blacklisted_exceptions
 
     def __repr__(self) -> str:
@@ -373,8 +381,11 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         void _make_done_record(self, logger: logging.Logger, str func_name, result: typing.Any) except *:
             """Construct success record.
 
+            :param logger: logger instance to use
             :type logger: logging.Logger
+            :param func_name: function name
             :type func_name: str
+            :param result: function execution result
             :type result: typing.Any
             """
             cdef:
@@ -396,9 +407,13 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         void _make_calling_record(self, logger: logging.Logger, str name, str arguments, str method="Calling") except *:
             """Make log record before execution.
 
+            :param logger: logger instance to use
             :type logger: logging.Logger
+            :param name: function name
             :type name: str
+            :param arguments: function arguments repr
             :type arguments: str
+            :param method: "calling" or "awaiting"
             :type method: str
             """
             logger.log(
@@ -409,9 +424,13 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         void _make_exc_record(self, logger: logging.Logger, str name, str arguments, Exception exception) except *:
             """Make log record if exception raised.
 
+            :param logger: logger instance to use
             :type logger: logging.Logger
+            :param name: function name
             :type name: str
+            :param arguments: function arguments repr
             :type arguments: str
+            :param exception: exception captured
             :type exception: Exception
             """
             exc_info = sys.exc_info()

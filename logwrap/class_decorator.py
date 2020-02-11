@@ -71,7 +71,6 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         :param func: function to wrap
         :type func: typing.Optional[typing.Callable]
         """
-        # noinspection PyArgumentList
         super().__init__()
         self.__func: typing.Optional[typing.Callable[..., ReturnType]] = func
         if self.__func is not None:
@@ -81,6 +80,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
     def _func(self) -> typing.Optional[typing.Callable[..., ReturnType]]:
         """Get wrapped function.
 
+        :return: wrapped function
         :rtype: typing.Optional[typing.Callable]
         """
         return self.__func  # pragma: no cover
@@ -91,6 +91,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
 
         :param func: Wrapped function
         :type func: typing.Callable
+        :return: function wrapper
         :rtype: typing.Callable
         """
         raise NotImplementedError()
@@ -131,7 +132,7 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         :return: representation for logging/debug purposes
         :rtype: str
         """
-        return f"<{self.__class__.__name__}({self.__func!r}) at 0x{id(self):X}>"  # pragma: no cover
+        return f"<{self.__class__.__name__}({self.__func!r}) at 0x{id(self):X}>"
 
 
 # 8<----------------------------------------------------------------------------

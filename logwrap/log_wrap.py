@@ -85,14 +85,14 @@ class BoundParameter(inspect.Parameter):
         :return: string representation for parameter. */** flags is attached if positional (*args) or keyword (**kwargs)
         :rtype: str
         """
-        # POSITIONAL_ONLY is only in precompiled functions
+        # POSITIONAL_ONLY is only in precompiled functions or Python 3.8+
         if self.kind == self.POSITIONAL_ONLY:  # pragma: no cover
             as_str: str = "" if self.name is None else f"<{self.name}>"
         else:
             as_str = self.name or ""
 
         # Add annotation if applicable (python 3 only)
-        if self.annotation is not self.empty:  # pragma: no cover
+        if self.annotation is not self.empty:
             as_str += f": {inspect.formatannotation(self.annotation)!s}"
 
         value = self.value
@@ -145,7 +145,6 @@ def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing
     return result
 
 
-# noinspection PyAbstractClass
 class LogWrap(class_decorator.BaseDecorator):
     """Base class for LogWrap implementation."""
 
@@ -270,6 +269,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def log_level(self) -> int:
         """Log level for normal behavior.
 
+        :return: log level for normal behavior
         :rtype: int
         """
         return self.__log_level
@@ -290,6 +290,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def exc_level(self) -> int:
         """Log level for exceptions.
 
+        :return: log level for exceptions cases
         :rtype: int
         """
         return self.__exc_level
@@ -310,6 +311,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def max_indent(self) -> int:
         """Maximum indentation.
 
+        :return: maximum allowed identation before switch to normal repr
         :rtype: int
         """
         return self.__max_indent
@@ -330,6 +332,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def blacklisted_names(self) -> typing.List[str]:
         """List of arguments names to ignore in log.
 
+        :return: list of arguments to ignore in log
         :rtype: typing.List[str]
         """
         return self.__blacklisted_names
@@ -338,6 +341,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def blacklisted_exceptions(self) -> typing.List[typing.Type[Exception]]:
         """List of exceptions to re-raise without log traceback and text.
 
+        :return: list of exceptions to re-raise silent
         :rtype: typing.List[typing.Type[Exception]]
         """
         return self.__blacklisted_exceptions
@@ -346,6 +350,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def log_call_args(self) -> bool:
         """Flag: log call arguments before call.
 
+        :return: log cal arguments before call
         :rtype: bool
         """
         return self.__log_call_args
@@ -366,6 +371,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def log_call_args_on_exc(self) -> bool:
         """Flag: log call arguments on exception.
 
+        :return: log call arguments in case of exception logging
         :rtype: bool
         """
         return self.__log_call_args_on_exc
@@ -386,6 +392,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def log_traceback(self) -> bool:
         """Flag: log traceback on exception.
 
+        :return: log traceback in case of exception logging
         :rtype: bool
         """
         return self.__log_traceback
@@ -406,6 +413,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def log_result_obj(self) -> bool:
         """Flag: log result object.
 
+        :return: log execution result object
         :rtype: bool
         """
         return self.__log_result_obj
@@ -426,6 +434,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def _logger(self) -> typing.Optional[logging.Logger]:
         """Logger instance.
 
+        :return: logger instance if configured
         :rtype: typing.Optional[logging.Logger]
         """
         return self.__logger
@@ -434,6 +443,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def _spec(self) -> typing.Optional[typing.Callable[..., FuncResultType]]:
         """Spec for function arguments.
 
+        :return: function specification to grab information from
         :rtype: typing.Callable
         """
         return self.__spec
@@ -560,8 +570,11 @@ class LogWrap(class_decorator.BaseDecorator):
     def _make_done_record(self, logger: logging.Logger, func_name: str, result: typing.Any) -> None:
         """Construct success record.
 
+        :param logger: logger instance to use
         :type logger: logging.Logger
+        :param func_name: function name
         :type func_name: str
+        :param result: function execution result
         :type result: typing.Any
         """
         msg: str = f"Done: {func_name!r}"
@@ -573,9 +586,13 @@ class LogWrap(class_decorator.BaseDecorator):
     def _make_calling_record(self, logger: logging.Logger, name: str, arguments: str, method: str = "Calling") -> None:
         """Make log record before execution.
 
+        :param logger: logger instance to use
         :type logger: logging.Logger
+        :param name: function name
         :type name: str
+        :param arguments: function arguments repr
         :type arguments: str
+        :param method: "calling" or "awaiting"
         :type method: str
         """
         logger.log(level=self.log_level, msg=f"{method}: \n{name}({arguments if self.log_call_args else ''})")
@@ -583,9 +600,13 @@ class LogWrap(class_decorator.BaseDecorator):
     def _make_exc_record(self, logger: logging.Logger, name: str, arguments: str, exception: Exception) -> None:
         """Make log record if exception raised.
 
+        :param logger: logger instance to use
         :type logger: logging.Logger
+        :param name: function name
         :type name: str
+        :param arguments: function arguments repr
         :type arguments: str
+        :param exception: exception captured
         :type exception: Exception
         """
         exc_info = sys.exc_info()

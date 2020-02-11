@@ -34,7 +34,6 @@ cdef class BaseDecorator:
         :param func: function to wrap
         :type func: typing.Optional[typing.Callable]
         """
-        # noinspection PyArgumentList
         super().__init__()
         self._func = func
         if self._func is not None:
@@ -45,6 +44,7 @@ cdef class BaseDecorator:
 
         :param func: Wrapped function
         :type func: typing.Callable
+        :return: function wrapper
         :rtype: typing.Callable
         """
         raise NotImplementedError()
@@ -73,4 +73,4 @@ cdef class BaseDecorator:
         :return: representation for logging/debug purposes
         :rtype: str
         """
-        return f"<{self.__class__.__name__}({self._func!r}) at 0x{id(self):X}>"  # pragma: no cover
+        return f"<{self.__class__.__name__}({self._func!r}) at 0x{id(self):X}>"

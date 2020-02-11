@@ -126,7 +126,7 @@ class ReprParameter:
         return self.parameter.kind  # type: ignore
 
     # noinspection PyTypeChecker
-    def __hash__(self) -> typing.NoReturn:  # pragma: no cover
+    def __hash__(self) -> typing.NoReturn:
         """Block hashing.
 
         :raises TypeError: Not hashable.
@@ -192,6 +192,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
     def max_indent(self) -> int:
         """Max indent getter.
 
+        :return: maximal indent before switch to normal repr
         :rtype: int
         """
         return self.__max_indent
@@ -200,6 +201,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
     def indent_step(self) -> int:
         """Indent step getter.
 
+        :return: indent step for nested definitions
         :rtype: int
         """
         return self.__indent_step
@@ -323,6 +325,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
     def _magic_method_name(self) -> str:
         """Magic method name.
 
+        :return: magic method name to lookup in processing objects
         :rtype: str
         """
 
@@ -398,6 +401,7 @@ class PrettyRepr(PrettyFormat):
     def _magic_method_name(self) -> str:
         """Magic method name.
 
+        :return: magic method name to lookup in processing objects
         :rtype: str
         """
         return "__pretty_repr__"
