@@ -26,11 +26,7 @@ from distutils.command import build_ext
 
 # External Dependencies
 import setuptools
-
-try:
-    import typing
-except ImportError:
-    typing = None
+import typing
 
 
 try:
@@ -247,7 +243,7 @@ SETUP_ARGS: typing.Dict[str, typing.Union[str, typing.List[str], typing.Dict[str
         "wheel",
         "setuptools_scm[toml]>=3.4",
     ],
-    use_scm_version={'write_to': 'logwrap/_version.py'},
+    use_scm_version={"write_to": f'{PACKAGE_NAME}/_version.py'},
     install_requires=REQUIRED,
     package_data={PACKAGE_NAME: INTERFACES + ["py.typed"]},
 )
