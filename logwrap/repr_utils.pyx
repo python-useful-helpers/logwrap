@@ -180,7 +180,7 @@ cdef class PrettyFormat:
             for param in _prepare_repr(src):
                 param_str += f"{prefix}{param.name}"
                 if param.annotation is not param.empty:
-                    param_str += f": {param.annotation}"
+                    param_str += f": {getattr(param.annotation, '__name__', param.annotation)!s}"
                 if param.value is not param.empty:
                     param_str += f"={self.process_element(src=param.value, indent=indent, no_indent_start=True)}"
                 param_str += ","
