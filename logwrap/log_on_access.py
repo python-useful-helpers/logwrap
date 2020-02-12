@@ -196,7 +196,13 @@ class LogOnAccess(property):
         self.__owner: typing.Optional[type] = None
 
     def __set_name__(self, owner: typing.Optional[type], name: str) -> None:
-        """Set __name__ and __objclass__ property."""
+        """Set __name__ and __objclass__ property.
+
+        :param owner: owner class, where descriptor applied
+        :type owner: typing.Optional[type]
+        :param name: descriptor name
+        :type name: str
+        """
         self.__owner = owner
         self.__name = name
 
