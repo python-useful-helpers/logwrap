@@ -320,7 +320,13 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
     cdef:
         str _safe_val_repr(self, value: typing.Any):
-            """Try to get repr for value and provide fallback text in case of impossibility."""
+            """Try to get repr for value and provide fallback text in case of impossibility.
+
+            :param value: value to try make repr
+            :type value: typing.Any
+            :return: repr string or fallback description
+            :rtype: str
+            """
             try:
                 return repr_utils.pretty_repr(
                     src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent
