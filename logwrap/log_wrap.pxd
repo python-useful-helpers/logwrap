@@ -48,6 +48,7 @@ cdef:
         cpdef str post_process_param(self, object arg, str arg_repr)
 
         cdef:
+            str _safe_val_repr(self, object value)
             str _get_func_args_repr(self, sig: inspect.Signature, tuple args, dict kwargs)
             void _make_done_record(self, logger: logging.Logger, str func_name, result: typing.Any) except *
             void _make_calling_record(self, logger: logging.Logger, str name, str arguments, str method=?) except *

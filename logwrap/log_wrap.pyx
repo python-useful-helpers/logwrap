@@ -319,7 +319,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         return arg_repr
 
     cdef:
-        str _safe_val_repr(self, value: typing.Any):
+        str _safe_val_repr(self, object value: typing.Any):
             """Try to get repr for value and provide fallback text in case of impossibility.
 
             :param value: value to try make repr
@@ -327,14 +327,15 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             :return: repr string or fallback description
             :rtype: str
             """
+            cdef:
+                str base_name = getattr(value, "name", getattr(value, "__name__", value.__class__.__name__))
+                str base_details
             try:
                 return repr_utils.pretty_repr(
                     src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent
                 )
             except Exception as exc:
-                cdef:
-                    str base_name = getattr(value, "name", getattr(value, "__name__", value.__class__.__name__))
-                    str base_details = f"at 0x{id(value):X} (repr failed with reason: {exc})"
+                base_details = f"at 0x{id(value):X} (repr failed with reason: {exc})"
 
                 if isinstance(value, types.FunctionType):
                     return f"<function {base_name} {base_details}>"
