@@ -23,6 +23,7 @@ import logging
 import os
 import sys
 import traceback
+import types
 import typing
 
 from logwrap import constants
@@ -318,6 +319,34 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         return arg_repr
 
     cdef:
+        str _safe_val_repr(self, value: typing.Any):
+            """Try to get repr for value and provide fallback text in case of impossibility."""
+            try:
+                return repr_utils.pretty_repr(
+                    src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent
+                )
+            except Exception as exc:
+                cdef:
+                    str base_name = getattr(value, "name", getattr(value, "__name__", value.__class__.__name__))
+                    str base_details = f"at 0x{id(value):X} (repr failed with reason: {exc})"
+
+                if isinstance(value, types.FunctionType):
+                    return f"<function {base_name} {base_details}>"
+                if isinstance(value, types.MethodType):
+                    return f"<method {base_name} {base_details}>"
+                if isinstance(
+                    value,
+                    (
+                        types.WrapperDescriptorType,
+                        types.MethodDescriptorType,
+                        types.ClassMethodDescriptorType,
+                        types.GetSetDescriptorType,
+                        types.MemberDescriptorType,
+                    ),
+                ):
+                    return f"<descriptor {base_name} {base_details}>"
+            return f"<object {base_name} {base_details}>"
+
         str _get_func_args_repr(self, sig: inspect.Signature, tuple args: typing.Tuple[typing.Any, ...], dict kwargs: typing.Dict[str, typing.Any]):
             """Internal helper for reducing complexity of decorator code.
 
@@ -360,7 +389,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                     elif param.VAR_KEYWORD == param.kind:
                         value = {}
 
-                val = repr_utils.pretty_repr(src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent)
+                val = self._safe_val_repr(value)
 
                 val = self.post_process_param(param, val)
 

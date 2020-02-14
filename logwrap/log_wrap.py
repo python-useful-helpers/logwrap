@@ -26,6 +26,7 @@ import logging
 import os
 import sys
 import traceback
+import types
 import typing
 
 # Package Implementation
@@ -504,6 +505,32 @@ class LogWrap(class_decorator.BaseDecorator):
         """
         return arg_repr
 
+    def _safe_val_repr(self, value: typing.Any) -> str:
+        """Try to get repr for value and provide fallback text in case of impossibility."""
+        try:
+            return repr_utils.pretty_repr(
+                src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent
+            )
+        except Exception as exc:
+            base_name: str = getattr(value, "name", getattr(value, "__name__", value.__class__.__name__))
+            base_details: str = f"at 0x{id(value):X} (repr failed with reason: {exc})"
+            if isinstance(value, types.FunctionType):  # pragma: no cover
+                return f"<function {base_name} {base_details}>"
+            if isinstance(value, types.MethodType):  # pragma: no cover
+                return f"<method {base_name} {base_details}>"
+            if isinstance(
+                value,
+                (
+                    types.WrapperDescriptorType,
+                    types.MethodDescriptorType,
+                    types.ClassMethodDescriptorType,
+                    types.GetSetDescriptorType,
+                    types.MemberDescriptorType,
+                ),
+            ):
+                return f"<descriptor {base_name} {base_details}>"  # pragma: no cover
+            return f"<object {base_name} {base_details}>"
+
     def _get_func_args_repr(
         self, sig: inspect.Signature, args: typing.Tuple[typing.Any, ...], kwargs: typing.Dict[str, typing.Any]
     ) -> str:
@@ -547,9 +574,7 @@ class LogWrap(class_decorator.BaseDecorator):
                 elif param.VAR_KEYWORD == param.kind:
                     value = {}
 
-            val: str = repr_utils.pretty_repr(
-                src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent
-            )
+            val: str = self._safe_val_repr(value)
 
             val = self.post_process_param(param, val)
 

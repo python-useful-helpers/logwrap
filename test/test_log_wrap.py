@@ -650,6 +650,29 @@ class TestLogWrap(unittest.TestCase):
             log.mock_calls[1],
         )
 
+    def test_023_broken_repr(self):
+        class Tst:
+            @logwrap.logwrap
+            def func(tst_self):
+                return 'No args'
+
+            def __repr__(tst_self):
+                raise Exception("expected")
+
+        tst = Tst()
+        result = tst.func()
+        self.assertEqual(result, 'No args')
+        self.assertEqual(
+            f"DEBUG>Calling: \n"
+            f"func(\n"
+            f"    # POSITIONAL_OR_KEYWORD:\n"
+            f"    tst_self=<object Tst at 0x{id(tst):X} (repr failed with reason: expected)>,\n"
+            f")\n"
+            f"DEBUG>Done: 'func' with result:\n"
+            f"'No args'\n",
+            self.stream.getvalue(),
+        )
+
 
 class TestObject(unittest.TestCase):
     def test_001_basic(self):
