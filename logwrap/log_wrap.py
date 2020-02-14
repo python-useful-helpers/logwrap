@@ -518,17 +518,6 @@ class LogWrap(class_decorator.BaseDecorator):
                 return f"<function {base_name} {base_details}>"
             if isinstance(value, types.MethodType):  # pragma: no cover
                 return f"<method {base_name} {base_details}>"
-            if isinstance(
-                value,
-                (
-                    types.WrapperDescriptorType,
-                    types.MethodDescriptorType,
-                    types.ClassMethodDescriptorType,
-                    types.GetSetDescriptorType,
-                    types.MemberDescriptorType,
-                ),
-            ):
-                return f"<descriptor {base_name} {base_details}>"  # pragma: no cover
             return f"<object {base_name} {base_details}>"
 
     def _get_func_args_repr(

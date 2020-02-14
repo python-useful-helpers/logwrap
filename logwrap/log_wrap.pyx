@@ -334,17 +334,6 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                     return f"<function {base_name} {base_details}>"
                 if isinstance(value, types.MethodType):
                     return f"<method {base_name} {base_details}>"
-                if isinstance(
-                    value,
-                    (
-                        types.WrapperDescriptorType,
-                        types.MethodDescriptorType,
-                        types.ClassMethodDescriptorType,
-                        types.GetSetDescriptorType,
-                        types.MemberDescriptorType,
-                    ),
-                ):
-                    return f"<descriptor {base_name} {base_details}>"
             return f"<object {base_name} {base_details}>"
 
         str _get_func_args_repr(self, sig: inspect.Signature, tuple args: typing.Tuple[typing.Any, ...], dict kwargs: typing.Dict[str, typing.Any]):
