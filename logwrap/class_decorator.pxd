@@ -16,6 +16,13 @@
 
 
 cdef class BaseDecorator:
+    """Base class for decorators.
+
+    Implements wrapping and __call__, wrapper getter is abstract.
+
+    .. note:: wrapper getter is called only on function call, if decorator used without braces.
+    """
+
     cdef:
         readonly object _func
         dict __dict__

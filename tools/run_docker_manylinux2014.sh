@@ -26,7 +26,7 @@ echo "waiting for docker pull pid $docker_pull_pid to complete downloading conta
 wait $docker_pull_pid  # await for docker image for current arch to be pulled from hub
 
 echo "Building wheel for $arch arch"
-[ $arch == "i686" ] && dock_ext_args="linux32"
+[ "$arch" == "i686" ] && dock_ext_args="linux32"
 docker run --rm -v "$(pwd)":/io "${manylinux1_image_prefix}${arch}" $dock_ext_args /io/tools/build-wheels.sh "$package_name"
 
 dock_ext_args=""  # Reset docker args, just in case

@@ -37,6 +37,92 @@ _CURRENT_FILE = os.path.abspath(__file__)
 class LogOnAccess(property):
     """Property with logging on successful get/set/delete or failure.
 
+    Usage examples:
+
+    >>> import logging
+    >>> import io
+
+    >>> log = io.StringIO()
+    >>> logging.basicConfig(level=logging.DEBUG, stream=log)
+
+    >>> class Test:
+    ...     def __init__(self, val = 'ok'):
+    ...         self.val = val
+    ...     def __repr__(self):
+    ...         return f'{self.__class__.__name__}(val={self.val})'
+    ...     @LogOnAccess
+    ...     def ok(self):
+    ...         return self.val
+    ...     @ok.setter
+    ...     def ok(self, val):
+    ...         self.val = val
+    ...     @ok.deleter
+    ...     def ok(self):
+    ...         self.val = ''
+    ...     @LogOnAccess
+    ...     def fail_get(self):
+    ...         raise RuntimeError()
+    ...     @LogOnAccess
+    ...     def fail_set_del(self):
+    ...         return self.val
+    ...     @fail_set_del.setter
+    ...     def fail_set_del(self, value):
+    ...         raise ValueError(value)
+    ...     @fail_set_del.deleter
+    ...     def fail_set_del(self):
+    ...         raise RuntimeError()
+
+    >>> test = Test()
+    >>> test.ok
+    'ok'
+    >>> test.ok = 'OK'
+    >>> del test.ok
+    >>> test.ok = 'fail_get'
+
+    >>> test.fail_get
+    Traceback (most recent call last):
+    ...
+    RuntimeError
+
+    >>> test.ok = 'fail_set_del'
+    >>> test.fail_set_del
+    'fail_set_del'
+
+    >>> test.fail_set_del = 'fail'
+    Traceback (most recent call last):
+    ...
+    ValueError: fail
+
+    >>> del test.fail_set_del
+    Traceback (most recent call last):
+    ...
+    RuntimeError
+
+    >>> test.fail_set_del
+    'fail_set_del'
+
+    >>> logs = log.getvalue().splitlines()
+    >>> logs[0] == "DEBUG:log_on_access:Test(val=ok).ok -> 'ok'"
+    True
+    >>> logs[1] == "DEBUG:log_on_access:Test(val=ok).ok = 'OK'"
+    True
+    >>> logs[2] == "DEBUG:log_on_access:del Test(val=OK).ok"
+    True
+    >>> logs[3] == "DEBUG:log_on_access:Test(val=).ok = 'fail_get'"
+    True
+    >>> logs[4:6]
+    ['DEBUG:log_on_access:Failed Test(val=fail_get).fail_get', 'Traceback (most recent call last):']
+    >>> logs[14] == "DEBUG:log_on_access:Test(val=fail_get).ok = 'fail_set_del'"
+    True
+    >>> logs[16] == "DEBUG:log_on_access:Failed Test(val=fail_set_del).fail_set_del = 'fail'"
+    True
+    >>> logs[17] == 'Traceback (most recent call last):'
+    True
+    >>> logs[26] == 'DEBUG:log_on_access:Test(val=fail_set_del): failed to delete fail_set_del'
+    True
+    >>> logs[27] == 'Traceback (most recent call last):'
+    True
+
     .. versionadded:: 6.1.0
     """
 
@@ -89,92 +175,6 @@ class LogOnAccess(property):
         :type override_name: typing.Optional[str]
         :param max_indent: maximal indent before classic repr() call
         :type max_indent: int
-
-        Usage examples:
-
-        >>> import logging
-        >>> import io
-
-        >>> log = io.StringIO()
-        >>> logging.basicConfig(level=logging.DEBUG, stream=log)
-
-        >>> class Test:
-        ...     def __init__(self, val = 'ok'):
-        ...         self.val = val
-        ...     def __repr__(self):
-        ...         return f'{self.__class__.__name__}(val={self.val})'
-        ...     @LogOnAccess
-        ...     def ok(self):
-        ...         return self.val
-        ...     @ok.setter
-        ...     def ok(self, val):
-        ...         self.val = val
-        ...     @ok.deleter
-        ...     def ok(self):
-        ...         self.val = ''
-        ...     @LogOnAccess
-        ...     def fail_get(self):
-        ...         raise RuntimeError()
-        ...     @LogOnAccess
-        ...     def fail_set_del(self):
-        ...         return self.val
-        ...     @fail_set_del.setter
-        ...     def fail_set_del(self, value):
-        ...         raise ValueError(value)
-        ...     @fail_set_del.deleter
-        ...     def fail_set_del(self):
-        ...         raise RuntimeError()
-
-        >>> test = Test()
-        >>> test.ok
-        'ok'
-        >>> test.ok = 'OK'
-        >>> del test.ok
-        >>> test.ok = 'fail_get'
-
-        >>> test.fail_get
-        Traceback (most recent call last):
-        ...
-        RuntimeError
-
-        >>> test.ok = 'fail_set_del'
-        >>> test.fail_set_del
-        'fail_set_del'
-
-        >>> test.fail_set_del = 'fail'
-        Traceback (most recent call last):
-        ...
-        ValueError: fail
-
-        >>> del test.fail_set_del
-        Traceback (most recent call last):
-        ...
-        RuntimeError
-
-        >>> test.fail_set_del
-        'fail_set_del'
-
-        >>> logs = log.getvalue().splitlines()
-        >>> logs[0] == "DEBUG:log_on_access:Test(val=ok).ok -> 'ok'"
-        True
-        >>> logs[1] == "DEBUG:log_on_access:Test(val=ok).ok = 'OK'"
-        True
-        >>> logs[2] == "DEBUG:log_on_access:del Test(val=OK).ok"
-        True
-        >>> logs[3] == "DEBUG:log_on_access:Test(val=).ok = 'fail_get'"
-        True
-        >>> logs[4:6]
-        ['DEBUG:log_on_access:Failed Test(val=fail_get).fail_get', 'Traceback (most recent call last):']
-        >>> logs[14] == "DEBUG:log_on_access:Test(val=fail_get).ok = 'fail_set_del'"
-        True
-        >>> logs[16] == "DEBUG:log_on_access:Failed Test(val=fail_set_del).fail_set_del = 'fail'"
-        True
-        >>> logs[17] == 'Traceback (most recent call last):'
-        True
-        >>> logs[26] == 'DEBUG:log_on_access:Test(val=fail_set_del): failed to delete fail_set_del'
-        True
-        >>> logs[27] == 'Traceback (most recent call last):'
-        True
         """
         super().__init__(fget=fget, fset=fset, fdel=fdel, doc=doc)
 

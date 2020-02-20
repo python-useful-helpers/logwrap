@@ -88,7 +88,7 @@ cdef:
 
             :raises TypeError: Not hashable.
             """
-            cdef str msg = f"unhashable type: '{self.__class__.__name__}'"
+            cdef str msg = f"not hashable type: '{self.__class__.__name__}'"
             raise TypeError(msg)
 
         def __repr__(self) -> str:

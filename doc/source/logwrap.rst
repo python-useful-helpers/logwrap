@@ -43,7 +43,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
         :type log_call_args_on_exc: bool
-        :param log_traceback: log traceback on excaption in addition to failure info
+        :param log_traceback: log traceback on exception in addition to failure info
         :type log_traceback: bool
         :param log_result_obj: log result of function call.
         :type log_result_obj: bool
@@ -142,7 +142,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :type log_call_args: bool
     :param log_call_args_on_exc: log call arguments if exception raised.
     :type log_call_args_on_exc: bool
-    :param log_traceback: log traceback on excaption in addition to failure info
+    :param log_traceback: log traceback on exception in addition to failure info
     :type log_traceback: bool
     :param log_result_obj: log result of function call.
     :type log_result_obj: bool

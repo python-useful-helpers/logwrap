@@ -13,4 +13,4 @@
 
 """Global constants."""
 
-VALID_LOGGER_NAMES = ("LOGGER", "LOG", "logger", "log")
+VALID_LOGGER_NAMES = ("LOGGER", "LOG", "logger", "log", "_logger", "_log")

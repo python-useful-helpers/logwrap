@@ -129,9 +129,9 @@ def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing
 
     :param sig: source signature
     :type sig: inspect.Signature
-    :param args: not keyworded arguments
+    :param args: positional arguments
     :type args: typing.Any
-    :param kwargs: keyworded arguments
+    :param kwargs: keyword arguments
     :type kwargs: typing.Any
     :return: Iterator for bound parameters with all information about it
     :rtype: typing.List[BoundParameter]
@@ -208,7 +208,7 @@ class LogWrap(class_decorator.BaseDecorator):
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
         :type log_call_args_on_exc: bool
-        :param log_traceback: log traceback on excaption in addition to failure info
+        :param log_traceback: log traceback on exception in addition to failure info
         :type log_traceback: bool
         :param log_result_obj: log result of function call.
         :type log_result_obj: bool
@@ -312,7 +312,7 @@ class LogWrap(class_decorator.BaseDecorator):
     def max_indent(self) -> int:
         """Maximum indentation.
 
-        :return: maximum allowed identation before switch to normal repr
+        :return: maximum allowed indentation before switch to normal repr
         :rtype: int
         """
         return self.__max_indent
@@ -533,9 +533,9 @@ class LogWrap(class_decorator.BaseDecorator):
 
         :param sig: function signature
         :type sig: inspect.Signature
-        :param args: not keyworded arguments
+        :param args: positional arguments
         :type args: typing.Tuple
-        :param kwargs: keyworded arguments
+        :param kwargs: keyword arguments
         :type kwargs: typing.Dict[str, typing.Any]
         :return: repr over function arguments
         :rtype: str
@@ -820,7 +820,7 @@ def logwrap(  # noqa: F811
     :type log_call_args: bool
     :param log_call_args_on_exc: log call arguments if exception raised.
     :type log_call_args_on_exc: bool
-    :param log_traceback: log traceback on excaption in addition to failure info
+    :param log_traceback: log traceback on exception in addition to failure info
     :type log_traceback: bool
     :param log_result_obj: log result of function call.
     :type log_result_obj: bool

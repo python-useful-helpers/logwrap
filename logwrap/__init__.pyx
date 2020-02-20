@@ -12,6 +12,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+"""logwrap module.
+
+Contents: 'logwrap', 'pretty_repr', 'pretty_str'
+
+Original code was made for Mirantis Inc by Alexey Stepanov,
+later it has been reworked and extended for support of special cases.
+"""
+
 from logwrap.repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, pretty_str
 
 from logwrap.log_wrap import LogWrap

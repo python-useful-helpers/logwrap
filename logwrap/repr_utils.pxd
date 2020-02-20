@@ -29,6 +29,8 @@ cdef:
     bint _simple(item: typing.Any)
 
     class ReprParameter:
+        """Parameter wrapper wor repr and str operations over signature."""
+
         cdef:
             readonly object POSITIONAL_ONLY
             readonly object POSITIONAL_OR_KEYWORD
@@ -46,6 +48,11 @@ cdef:
     list _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType])
 
     class PrettyFormat:
+        """Pretty Formatter.
+
+        Designed for usage as __repr__ and __str__ replacement on complex objects
+        """
+
         cdef:
             readonly unsigned long max_indent
             readonly unsigned long indent_step
@@ -63,6 +70,11 @@ cdef:
         cpdef str process_element(self, src: typing.Any, unsigned long indent=?, bint no_indent_start=?)
 
     class PrettyStr(PrettyFormat):
+        """Pretty str.
+
+        Designed for usage as __str__ replacement on complex objects
+        """
+
         cdef str _strings_str(self, unsigned long indent, val: typing.Union[bytes, str])
 
 

@@ -26,6 +26,37 @@ cdef class BaseDecorator:
     Implements wrapping and __call__, wrapper getter is abstract.
 
     .. note:: wrapper getter is called only on function call, if decorator used without braces.
+
+    Usage example:
+
+    >>> class TestDecorator(BaseDecorator):
+    ...     def _get_function_wrapper(self, func):
+    ...         print('Wrapping: {}'.format(func.__name__))
+    ...         @functools.wraps(func)
+    ...         def wrapper(*args, **kwargs):
+    ...             print('call_function: {}'.format(func.__name__))
+    ...             return func(*args, **kwargs)
+    ...         return wrapper
+
+    >>> @TestDecorator
+    ... def func_no_init():
+    ...     pass
+    >>> func_no_init()
+    Wrapping: func_no_init
+    call_function: func_no_init
+    >>> isinstance(func_no_init, TestDecorator)
+    True
+    >>> func_no_init._func is func_no_init.__wrapped__
+    True
+
+    >>> @TestDecorator()
+    ... def func_init():
+    ...     pass
+    Wrapping: func_init
+    >>> func_init()
+    call_function: func_init
+    >>> isinstance(func_init, TestDecorator)
+    False
     """
 
     def __init__(self, func: typing.Optional[typing.Callable[..., ReturnType]] = None) -> None:

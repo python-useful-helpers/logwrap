@@ -131,7 +131,7 @@ class ReprParameter:
 
         :raises TypeError: Not hashable.
         """
-        msg = f"unhashable type: '{self.__class__.__name__}'"
+        msg = f"not hashable type: '{self.__class__.__name__}'"
         raise TypeError(msg)
 
     def __repr__(self) -> str:

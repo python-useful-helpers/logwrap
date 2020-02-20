@@ -779,7 +779,7 @@ class TestObject(unittest.TestCase):
         wrapper = ChangeArg(log=log, log_result_obj=False)
 
         @wrapper
-        def func(arg, arg_secret, arg2='public', secret_arg=('key')):
+        def func(arg, arg_secret, arg2='public', secret_arg='key'):
             pass
 
         func('data', 'key')
@@ -816,7 +816,7 @@ class TestObject(unittest.TestCase):
         wrapper = ChangeRepr(log=log, log_result_obj=False)
 
         @wrapper
-        def func(arg, arg_secret, arg2='public', secret_arg=('key')):
+        def func(arg, arg_secret, arg2='public', secret_arg='key'):
             pass
 
         func('data', 'key')
