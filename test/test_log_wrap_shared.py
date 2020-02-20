@@ -21,14 +21,13 @@ import unittest
 from inspect import signature
 
 # LogWrap Implementation
-# noinspection PyProtectedMember
 from logwrap import log_wrap
 
 
 def example_function(
-    arg1, arg2=2, arg3=3, *args, **kwargs
-):
-    pass
+    arg1, arg2: int = 2, *args, arg3, arg4: int = 4, **kwargs
+) -> None:
+    """Function to use as signature source."""
 
 
 sig = signature(example_function)
@@ -50,19 +49,11 @@ class TestBind(unittest.TestCase):
         self.assertEqual(arg_2_bound.name, 'arg2')
         self.assertEqual(arg_2_bound.value, 2)
         self.assertEqual(arg_2_bound.default, 2)
-        self.assertEqual(arg_2_bound.annotation, arg_2_bound.empty)
+        self.assertEqual(arg_2_bound.annotation, int)
         self.assertEqual(arg_2_bound.kind, arg_2_bound.POSITIONAL_OR_KEYWORD)
-        self.assertEqual(str(arg_2_bound), "arg2=2  # 2")
+        self.assertEqual(str(arg_2_bound), "arg2: int=2  # 2")
 
-        arg_3_bound = params[2]
-        self.assertEqual(arg_3_bound.name, 'arg3')
-        self.assertEqual(arg_3_bound.value, 33)
-        self.assertEqual(arg_3_bound.default, 3)
-        self.assertEqual(arg_3_bound.annotation, arg_3_bound.empty)
-        self.assertEqual(arg_3_bound.kind, arg_3_bound.POSITIONAL_OR_KEYWORD)
-        self.assertEqual(str(arg_3_bound), "arg3=33  # 3")
-
-        args_bound = params[3]
+        args_bound = params[2]
         self.assertEqual(args_bound.name, 'args')
         self.assertEqual(args_bound.value, args_bound.empty)
         self.assertEqual(args_bound.default, args_bound.empty)
@@ -70,7 +61,23 @@ class TestBind(unittest.TestCase):
         self.assertEqual(args_bound.kind, args_bound.VAR_POSITIONAL)
         self.assertEqual(str(args_bound), "*args=()")
 
-        kwargs_bound = params[4]
+        arg_3_bound = params[3]
+        self.assertEqual(arg_3_bound.name, 'arg3')
+        self.assertEqual(arg_3_bound.value, 33)
+        self.assertEqual(arg_3_bound.default, arg_3_bound.empty)
+        self.assertEqual(arg_3_bound.annotation, arg_3_bound.empty)
+        self.assertEqual(arg_3_bound.kind, arg_3_bound.KEYWORD_ONLY)
+        self.assertEqual(str(arg_3_bound), "arg3=33")
+
+        arg_4_bound = params[4]
+        self.assertEqual(arg_4_bound.name, 'arg4')
+        self.assertEqual(arg_4_bound.value, 4)
+        self.assertEqual(arg_4_bound.default, 4)
+        self.assertEqual(arg_4_bound.annotation, int)
+        self.assertEqual(arg_4_bound.kind, arg_4_bound.KEYWORD_ONLY)
+        self.assertEqual(str(arg_4_bound), "arg4: int=4  # 4")
+
+        kwargs_bound = params[5]
         self.assertEqual(kwargs_bound.name, 'kwargs')
         self.assertEqual(kwargs_bound.value, kwargs_bound.empty)
         self.assertEqual(kwargs_bound.default, kwargs_bound.empty)
@@ -79,23 +86,23 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(kwargs_bound), "**kwargs={}")
 
     def test_002_args_kwargs(self):
-        params = list(log_wrap.bind_args_kwargs(sig, 1, 2, 3, 4, arg5=5))
+        params = list(log_wrap.bind_args_kwargs(sig, 1, 2, 3, arg3=30, arg4=40, arg5=50))
 
-        args_bound = params[3]
+        args_bound = params[2]
         self.assertEqual(args_bound.name, 'args')
-        self.assertEqual(args_bound.value, (4,))
+        self.assertEqual(args_bound.value, (3,))
         self.assertEqual(args_bound.default, args_bound.empty)
         self.assertEqual(args_bound.annotation, args_bound.empty)
         self.assertEqual(args_bound.kind, args_bound.VAR_POSITIONAL)
-        self.assertEqual(str(args_bound), "*args=(4,)")
+        self.assertEqual(str(args_bound), "*args=(3,)")
 
-        kwargs_bound = params[4]
+        kwargs_bound = params[5]
         self.assertEqual(kwargs_bound.name, 'kwargs')
-        self.assertEqual(kwargs_bound.value, {'arg5': 5})
+        self.assertEqual(kwargs_bound.value, {'arg5': 50})
         self.assertEqual(kwargs_bound.default, kwargs_bound.empty)
         self.assertEqual(kwargs_bound.annotation, kwargs_bound.empty)
         self.assertEqual(kwargs_bound.kind, kwargs_bound.VAR_KEYWORD)
-        self.assertEqual(str(kwargs_bound), "**kwargs={'arg5': 5}")
+        self.assertEqual(str(kwargs_bound), "**kwargs={'arg5': 50}")
 
     def test_003_no_value(self):
         params = list(log_wrap.bind_args_kwargs(sig, 1, arg3=33))

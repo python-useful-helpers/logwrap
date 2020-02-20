@@ -27,7 +27,7 @@ import unittest
 import logwrap
 
 
-# noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
+# noinspection PyUnusedLocal
 class TestPrettyRepr(unittest.TestCase):
     def test_001_dict_subclass(self):
         class MyDict(dict):
@@ -69,6 +69,7 @@ class TestPrettyRepr(unittest.TestCase):
 
     @unittest.skipIf(sys.version_info[:2] < (3, 8), 'pep-0589 is implemented in python 3.8')
     def test_003_typed_dict(self):
+        # noinspection PyMissingOrEmptyDocstring
         class MyDict(typing.TypedDict):
             key: str
 

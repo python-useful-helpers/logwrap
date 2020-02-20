@@ -32,6 +32,7 @@ import logwrap
 class TestLogWrapAsync(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        """Global preparation for tests (run once per class)."""
         cls.loop = asyncio.get_event_loop()
 
     def setUp(self):

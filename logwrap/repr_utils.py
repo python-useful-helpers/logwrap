@@ -125,7 +125,6 @@ class ReprParameter:
         # noinspection PyTypeChecker
         return self.parameter.kind  # type: ignore
 
-    # noinspection PyTypeChecker
     def __hash__(self) -> typing.NoReturn:
         """Block hashing.
 

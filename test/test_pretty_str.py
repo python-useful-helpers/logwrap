@@ -25,7 +25,7 @@ import unittest
 import logwrap
 
 
-# noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
+# noinspection PyUnusedLocal
 class TestPrettyStr(unittest.TestCase):
     def test_simple(self):
         self.assertEqual(

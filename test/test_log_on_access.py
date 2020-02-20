@@ -1,5 +1,7 @@
 # pylint: skip-file
 
+"""Tests for logwrap.LogOnAccess."""
+
 # Standard Library
 import io
 import logging
@@ -14,15 +16,18 @@ VALUE = "ok"
 
 class TestLogOnAccess(unittest.TestCase):
     def setUp(self):
+        """Preparation for tests."""
         self.stream = io.StringIO()
         logging.getLogger().handlers.clear()
         logging.basicConfig(level=logging.DEBUG, stream=self.stream)
 
     def tearDown(self):
+        """Revert modifications."""
         logging.getLogger().handlers.clear()
         self.stream.close()
 
     def test_01_positive(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             def __init__(tself, val=VALUE):
                 tself.val = val
@@ -87,6 +92,7 @@ class TestLogOnAccess(unittest.TestCase):
         )
 
     def test_02_positive_properties(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             def __init__(tself, val=VALUE):
                 tself.val = val
@@ -117,6 +123,7 @@ class TestLogOnAccess(unittest.TestCase):
         )
 
     def test_03_positive_no_log(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             def __init__(tself, val=VALUE):
                 tself.val = val
@@ -137,6 +144,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual(self.stream.getvalue(), "")
 
     def test_04_negative(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             def __repr__(tself):
                 return f"{tself.__class__.__name__}()"
@@ -205,6 +213,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual("Traceback (most recent call last):", logged[2])
 
     def test_05_negative_properties(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             def __init__(tself, val=VALUE):
                 tself.val = val
@@ -239,6 +248,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual(len(logged), 2)
 
     def test_06_negative_no_log(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             def __init__(tself, val=VALUE):
                 tself.val = val
@@ -261,6 +271,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual(self.stream.getvalue(), "")
 
     def test_07_property_mimic(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             def __repr__(tself):
                 return f"{tself.__class__.__name__}()"
@@ -286,6 +297,7 @@ class TestLogOnAccess(unittest.TestCase):
         v_prop_set = "prop_set"
         v_prop_name = "prop_name"
 
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             on_init_set = logwrap.LogOnAccess(logger=logging.getLogger(v_on_init_set), fget=lambda self: v_on_init_set)
             on_init_name = logwrap.LogOnAccess(logger=v_on_init_name, fget=lambda self: v_on_init_name)
@@ -365,6 +377,7 @@ class TestLogOnAccess(unittest.TestCase):
         )
 
     def test_09_logger_implemented(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             def __init__(tself, val=VALUE):
                 tself.val = val
@@ -430,6 +443,7 @@ class TestLogOnAccess(unittest.TestCase):
         )
 
     def test_10_log_implemented(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Target:
             def __init__(tself, val=VALUE):
                 tself.val = val

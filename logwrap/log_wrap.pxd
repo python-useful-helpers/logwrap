@@ -44,7 +44,9 @@ cdef:
             list __blacklisted_names
             list __blacklisted_exceptions
 
+        # noinspection PyMissingOrEmptyDocstring
         cpdef object pre_process_param(self, object arg)
+        # noinspection PyMissingOrEmptyDocstring
         cpdef str post_process_param(self, object arg, str arg_repr)
 
         cdef:

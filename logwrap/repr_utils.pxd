@@ -58,6 +58,7 @@ cdef:
             readonly unsigned long indent_step
             readonly str _magic_method_name
 
+        # noinspection PyMissingOrEmptyDocstring
         cpdef long next_indent(self, unsigned long indent, unsigned long multiplier=?)
 
         cdef:
@@ -67,6 +68,7 @@ cdef:
             str _repr_iterable_items(self, src: typing.Iterable, unsigned long indent=?)
             str _repr_dict_items(self, object src: typing.Dict[typing.Any, typing.Any], unsigned long indent=?)
 
+        # noinspection PyMissingOrEmptyDocstring
         cpdef str process_element(self, src: typing.Any, unsigned long indent=?, bint no_indent_start=?)
 
     class PrettyStr(PrettyFormat):
@@ -78,6 +80,7 @@ cdef:
         cdef str _strings_str(self, unsigned long indent, val: typing.Union[bytes, str])
 
 
+# noinspection PyMissingOrEmptyDocstring
 cpdef str pretty_repr(
     src: typing.Any,
     unsigned long indent=?,
@@ -86,6 +89,7 @@ cpdef str pretty_repr(
     unsigned long indent_step=?
 )
 
+# noinspection PyMissingOrEmptyDocstring
 cpdef  str pretty_str(
     src: typing.Any,
     unsigned long indent=?,

@@ -30,7 +30,10 @@ import logwrap
 
 
 class AnyStringWith(str):
+    """Special string for substring-only checking in tests."""
+
     def __eq__(self, other):
+        """Equality check."""
         return self in other
 
 
@@ -297,6 +300,7 @@ class TestLogWrap(unittest.TestCase):
         )
 
     def test_011_method(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Tst:
             @logwrap.logwrap
             def func(tst_self):
@@ -651,6 +655,7 @@ class TestLogWrap(unittest.TestCase):
         )
 
     def test_023_broken_repr(self):
+        # noinspection PyMissingOrEmptyDocstring
         class Tst:
             @logwrap.logwrap
             def func(tst_self):
@@ -674,6 +679,7 @@ class TestLogWrap(unittest.TestCase):
         )
 
 
+# noinspection PyMissingOrEmptyDocstring
 class TestObject(unittest.TestCase):
     def test_001_basic(self):
         log_call = logwrap.LogWrap()
@@ -731,6 +737,7 @@ class TestObject(unittest.TestCase):
         )
 
     def test_002_override_skip_arg(self):
+        # noinspection PyMissingOrEmptyDocstring
         class SkipArg(logwrap.LogWrap):
             def pre_process_param(
                 self,
@@ -765,6 +772,7 @@ class TestObject(unittest.TestCase):
         )
 
     def test_003_override_change_arg(self):
+        # noinspection PyMissingOrEmptyDocstring
         class ChangeArg(logwrap.LogWrap):
             def pre_process_param(
                 self,
@@ -801,6 +809,7 @@ class TestObject(unittest.TestCase):
         )
 
     def test_004_override_change_repr(self):
+        # noinspection PyMissingOrEmptyDocstring
         class ChangeRepr(logwrap.LogWrap):
             def post_process_param(
                 self,

@@ -1,3 +1,5 @@
+"""LogWrap tests with logger instance pick-up from module."""
+
 # Standard Library
 import io
 import logging
