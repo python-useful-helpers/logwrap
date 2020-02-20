@@ -95,7 +95,7 @@ class BoundParameter(inspect.Parameter):
             as_str += f": {inspect.formatannotation(self.annotation)!s}"
 
         value = self.value
-        if self.empty is value:
+        if value is self.empty:
             if self.VAR_POSITIONAL == self.kind:
                 value = ()
             elif self.VAR_KEYWORD == self.kind:
@@ -379,7 +379,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 else:
                     value = param.value
 
-                if param.empty is value:
+                if value is param.empty:
                     if param.VAR_POSITIONAL == param.kind:
                         value = ()
                     elif param.VAR_KEYWORD == param.kind:
@@ -393,7 +393,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                     param_str += f"\n{'':<{INDENT}}# {param.kind!s}:"
                     last_kind = param.kind
 
-                if param.empty is param.annotation:
+                if param.annotation is param.empty:
                     annotation = ""
                 else:
                     annotation = f"  # type: {getattr(param.annotation, '__name__', param.annotation)!s}"
