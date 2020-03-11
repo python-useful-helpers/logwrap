@@ -123,7 +123,7 @@ class ReprParameter:
         :rtype: int
         """
         # noinspection PyTypeChecker
-        return self.parameter.kind  # type: ignore
+        return self.parameter.kind
 
     def __hash__(self) -> typing.NoReturn:
         """Block hashing.
