@@ -44,7 +44,7 @@ jobs:
     displayName: Build and install
 
   - script: |
-      pip install pytest pytest-sugar pytest-cov coverage[toml]>=5.0
+      pip install -r pytest_requirements.txt
 
       pytest --junitxml=unit_result.xml --cov=logwrap --cov-report=xml --cov-report term
     displayName: PyTest
