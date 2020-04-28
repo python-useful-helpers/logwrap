@@ -48,8 +48,8 @@ jobs:
         displayName: 'Install dependencies'
 
       - script: |
-          python setup.py --version clean
-        displayName: 'Generate version file'
+          python setup.py develop -v clean
+        displayName: 'Install package develop mode'
 
       - script: |
           pylint --output-format=pylint_junit.JUnitReporter logwrap > pylint_result.xml

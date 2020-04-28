@@ -84,6 +84,7 @@ jobs:
         - *install_deps
         - pip install --upgrade "pylint >= 2.3" isort[pyproject,requirements]
       script:
+        - python setup.py develop -v clean
         - python setup.py --version clean
         - pylint logwrap
     - <<: *static_analysis
