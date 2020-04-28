@@ -361,7 +361,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
             else:
                 prefix, suffix = "{", "}"
             result = self._repr_iterable_items(src=src, indent=indent)
-        if type(src) in (list, tuple, set, dict):  # pylint: disable=unidiomatic-typecheck
+        if type(src) in (list, tuple, set, dict):
             return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
         return self._repr_iterable_item(
             obj_type=src.__class__.__name__,
