@@ -109,7 +109,7 @@ jobs:
         - *upgrade_python_toolset
         - pip install --upgrade -r flake8_requirements.txt
       script:
-        - flake8
+        - flake8 logwrap
 
     #  - <<: *code_style_check
     #    name: "PEP257"

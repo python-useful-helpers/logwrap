@@ -240,7 +240,7 @@ class LogWrap(class_decorator.BaseDecorator):
         self.__log_level: int = log_level
         self.__exc_level: int = exc_level
         self.__max_indent: int = max_indent
-        self.__spec: typing.Optional[typing.Callable[..., FuncResultType]] = spec or self._func
+        self.__spec: typing.Optional[typing.Callable[..., FuncResultType]] = spec or self._func  # type: ignore
         self.__log_call_args: bool = log_call_args
         self.__log_call_args_on_exc: bool = log_call_args_on_exc
         self.__log_traceback: bool = log_traceback
