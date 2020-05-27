@@ -157,7 +157,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         unsigned long log_level=logging.DEBUG,
         unsigned long exc_level=logging.ERROR,
         unsigned long max_indent=20,
-        spec: typing.Optional[typing.Callable[..., typing.Any]] = None,
+        spec: typing.Optional[typing.Callable[..., FuncResultType]] = None,
         blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
         blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
         bint log_call_args=True,
