@@ -20,10 +20,10 @@ available from the main module.
 
 cpdef tuple __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
+# Standard Library
 import inspect
 import types
 import typing
-
 
 cdef:
     bint _known_callable(item: typing.Any):

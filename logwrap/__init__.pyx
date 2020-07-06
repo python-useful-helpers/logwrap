@@ -19,13 +19,18 @@ Contents: 'logwrap', 'pretty_repr', 'pretty_str'
 Original code was made for Mirantis Inc by Alexey Stepanov,
 later it has been reworked and extended for support of special cases.
 """
-
-from logwrap.repr_utils import PrettyFormat, PrettyRepr, PrettyStr, pretty_repr, pretty_str
-
-from logwrap.log_wrap import LogWrap
-from logwrap.log_wrap import logwrap, BoundParameter, bind_args_kwargs
-
+# Package Implementation
 from logwrap.log_on_access import LogOnAccess
+from logwrap.log_wrap import BoundParameter
+from logwrap.log_wrap import LogWrap
+from logwrap.log_wrap import bind_args_kwargs
+from logwrap.log_wrap import logwrap
+from logwrap.repr_utils import PrettyFormat
+from logwrap.repr_utils import PrettyRepr
+from logwrap.repr_utils import PrettyStr
+from logwrap.repr_utils import pretty_repr
+from logwrap.repr_utils import pretty_str
+
 
 cpdef tuple __all__ = (
     "LogWrap",
@@ -43,6 +48,7 @@ cpdef tuple __all__ = (
 cpdef str __version__
 
 try:
+    # Local Implementation
     from ._version import version as __version__
 except ImportError:
     pass

@@ -48,6 +48,7 @@ __all__ = (
 )
 
 try:
+    # Local Implementation
     from ._version import version as __version__
 except ImportError:
     pass

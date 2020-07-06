@@ -16,6 +16,7 @@
 
 cpdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
+# Standard Library
 import asyncio
 import functools
 import inspect
@@ -26,7 +27,10 @@ import traceback
 import types
 import typing
 
+# Package Implementation
 from logwrap import constants
+
+# Package Implementation
 from logwrap cimport class_decorator
 from logwrap cimport repr_utils
 
