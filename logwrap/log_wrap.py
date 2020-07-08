@@ -767,7 +767,7 @@ def logwrap(
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
     spec: typing.Optional[typing.Callable[..., FuncFinalResult]] = None,
-    blacklisted_names: typing.Optional[typing.List[str]] = None,
+    blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
     blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,

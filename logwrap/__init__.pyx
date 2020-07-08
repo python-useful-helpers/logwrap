@@ -31,7 +31,6 @@ from logwrap.repr_utils import PrettyStr
 from logwrap.repr_utils import pretty_repr
 from logwrap.repr_utils import pretty_str
 
-
 cpdef tuple __all__ = (
     "LogWrap",
     "logwrap",

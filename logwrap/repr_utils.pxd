@@ -18,9 +18,9 @@ This is no reason to import this submodule directly, all required methods is
 available from the main module.
 """
 
+# Standard Library
 import types
 import typing
-
 
 cpdef tuple __all__
 

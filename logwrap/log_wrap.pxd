@@ -14,10 +14,12 @@
 
 """log_wrap shared code module."""
 
+# Standard Library
 import inspect
 import logging
 import typing
 
+# Package Implementation
 from logwrap cimport class_decorator
 
 
