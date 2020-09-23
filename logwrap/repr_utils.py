@@ -217,7 +217,11 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         """
         return indent + multiplier * self.indent_step
 
-    def _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], indent: int = 0) -> str:
+    def _repr_callable(
+        self,
+        src: typing.Union[types.FunctionType, types.MethodType],
+        indent: int = 0,
+    ) -> str:
         """Repr callable object (function or method).
 
         :param src: Callable to process
@@ -253,7 +257,12 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         )
 
     @abc.abstractmethod
-    def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
+    def _repr_simple(
+        self,
+        src: typing.Any,
+        indent: int = 0,
+        no_indent_start: bool = False,
+    ) -> str:
         """Repr object without iteration.
 
         :param src: Source object
@@ -267,7 +276,11 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> str:
+    def _repr_dict_items(
+        self,
+        src: typing.Dict[typing.Any, typing.Any],
+        indent: int = 0,
+    ) -> str:
         """Repr dict items.
 
         :param src: object to process
@@ -281,7 +294,12 @@ class PrettyFormat(metaclass=abc.ABCMeta):
     @staticmethod
     @abc.abstractmethod
     def _repr_iterable_item(
-        obj_type: str, prefix: str, indent: int, no_indent_start: bool, result: str, suffix: str
+        obj_type: str,
+        prefix: str,
+        indent: int,
+        no_indent_start: bool,
+        result: str,
+        suffix: str,
     ) -> str:
         """Repr iterable item.
 
@@ -301,7 +319,11 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :rtype: str
         """
 
-    def _repr_iterable_items(self, src: typing.Iterable[typing.Any], indent: int = 0) -> str:
+    def _repr_iterable_items(
+        self,
+        src: typing.Iterable[typing.Any],
+        indent: int = 0,
+    ) -> str:
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
@@ -328,7 +350,12 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :rtype: str
         """
 
-    def process_element(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
+    def process_element(
+        self,
+        src: typing.Any,
+        indent: int = 0,
+        no_indent_start: bool = False,
+    ) -> str:
         """Make human readable representation of object.
 
         :param src: object to process
@@ -372,7 +399,12 @@ class PrettyFormat(metaclass=abc.ABCMeta):
             suffix=suffix,
         )
 
-    def __call__(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
+    def __call__(
+        self,
+        src: typing.Any,
+        indent: int = 0,
+        no_indent_start: bool = False,
+    ) -> str:
         """Make human readable representation of object. The main entry point.
 
         :param src: object to process
@@ -405,7 +437,12 @@ class PrettyRepr(PrettyFormat):
         """
         return "__pretty_repr__"
 
-    def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
+    def _repr_simple(
+        self,
+        src: typing.Any,
+        indent: int = 0,
+        no_indent_start: bool = False,
+    ) -> str:
         """Repr object without iteration.
 
         :param src: Source object
@@ -419,7 +456,11 @@ class PrettyRepr(PrettyFormat):
         """
         return f"{'':<{0 if no_indent_start else indent}}{src!r}"
 
-    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> str:
+    def _repr_dict_items(
+        self,
+        src: typing.Dict[typing.Any, typing.Any],
+        indent: int = 0,
+    ) -> str:
         """Repr dict items.
 
         :param src: object to process
@@ -442,7 +483,12 @@ class PrettyRepr(PrettyFormat):
 
     @staticmethod
     def _repr_iterable_item(
-        obj_type: str, prefix: str, indent: int, no_indent_start: bool, result: str, suffix: str
+        obj_type: str,
+        prefix: str,
+        indent: int,
+        no_indent_start: bool,
+        result: str,
+        suffix: str,
     ) -> str:
         """Repr iterable item.
 
@@ -481,7 +527,10 @@ class PrettyStr(PrettyFormat):
         return "__pretty_str__"
 
     @staticmethod
-    def _strings_str(indent: int, val: typing.Union[bytes, str]) -> str:
+    def _strings_str(
+        indent: int,
+        val: typing.Union[bytes, str],
+    ) -> str:
         """Custom str for strings and binary strings.
 
         :param indent: result indent
@@ -497,7 +546,12 @@ class PrettyStr(PrettyFormat):
             string = val
         return f"{'':<{indent}}{string}"
 
-    def _repr_simple(self, src: typing.Any, indent: int = 0, no_indent_start: bool = False) -> str:
+    def _repr_simple(
+        self,
+        src: typing.Any,
+        indent: int = 0,
+        no_indent_start: bool = False,
+    ) -> str:
         """Repr object without iteration.
 
         :param src: Source object
@@ -514,7 +568,11 @@ class PrettyStr(PrettyFormat):
             return self._strings_str(indent=indent, val=src)
         return f"{'':<{indent}}{src!s}"
 
-    def _repr_dict_items(self, src: typing.Dict[typing.Any, typing.Any], indent: int = 0) -> str:
+    def _repr_dict_items(
+        self,
+        src: typing.Dict[typing.Any, typing.Any],
+        indent: int = 0,
+    ) -> str:
         """Repr dict items.
 
         :param src: object to process
@@ -537,7 +595,12 @@ class PrettyStr(PrettyFormat):
 
     @staticmethod
     def _repr_iterable_item(
-        obj_type: str, prefix: str, indent: int, no_indent_start: bool, result: str, suffix: str
+        obj_type: str,
+        prefix: str,
+        indent: int,
+        no_indent_start: bool,
+        result: str,
+        suffix: str,
     ) -> str:
         """Repr iterable item.
 
@@ -560,7 +623,11 @@ class PrettyStr(PrettyFormat):
 
 
 def pretty_repr(
-    src: typing.Any, indent: int = 0, no_indent_start: bool = False, max_indent: int = 20, indent_step: int = 4
+    src: typing.Any,
+    indent: int = 0,
+    no_indent_start: bool = False,
+    max_indent: int = 20,
+    indent_step: int = 4,
 ) -> str:
     """Make human readable repr of object.
 
@@ -578,12 +645,18 @@ def pretty_repr(
     :rtype: str
     """
     return PrettyRepr(max_indent=max_indent, indent_step=indent_step)(
-        src=src, indent=indent, no_indent_start=no_indent_start
+        src=src,
+        indent=indent,
+        no_indent_start=no_indent_start,
     )
 
 
 def pretty_str(
-    src: typing.Any, indent: int = 0, no_indent_start: bool = False, max_indent: int = 20, indent_step: int = 4
+    src: typing.Any,
+    indent: int = 0,
+    no_indent_start: bool = False,
+    max_indent: int = 20,
+    indent_step: int = 4,
 ) -> str:
     """Make human readable str of object.
 
@@ -600,5 +673,7 @@ def pretty_str(
     :return: formatted string
     """
     return PrettyStr(max_indent=max_indent, indent_step=indent_step)(
-        src=src, indent=indent, no_indent_start=no_indent_start
+        src=src,
+        indent=indent,
+        no_indent_start=no_indent_start,
     )

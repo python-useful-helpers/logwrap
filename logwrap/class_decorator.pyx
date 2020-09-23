@@ -80,7 +80,11 @@ cdef class BaseDecorator:
         """
         raise NotImplementedError()
 
-    def __call__(self, *args: typing.Union[typing.Callable[..., ReturnType], typing.Any], **kwargs: typing.Any) -> typing.Union[typing.Callable[..., ReturnType], ReturnType]:
+    def __call__(
+        self,
+        *args: typing.Union[typing.Callable[..., ReturnType], typing.Any],
+        **kwargs: typing.Any,
+    ) -> typing.Union[typing.Callable[..., ReturnType], ReturnType]:
         """Main decorator getter.
 
         :return: decorated function if it provided via arguments else function result

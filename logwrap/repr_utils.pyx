@@ -582,7 +582,9 @@ cpdef str pretty_repr(
     :rtype: str
     """
     return PrettyRepr(max_indent=max_indent, indent_step=indent_step)(
-        src=src, indent=indent, no_indent_start=no_indent_start
+        src=src,
+        indent=indent,
+        no_indent_start=no_indent_start,
     )
 
 
@@ -608,5 +610,7 @@ cpdef str pretty_str(
     :return: formatted string
     """
     return PrettyStr(max_indent=max_indent, indent_step=indent_step)(
-        src=src, indent=indent, no_indent_start=no_indent_start
+        src=src,
+        indent=indent,
+        no_indent_start=no_indent_start,
     )

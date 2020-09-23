@@ -107,7 +107,9 @@ class BaseDecorator(metaclass=abc.ABCMeta):
         """Main decorator getter."""
 
     def __call__(  # type: ignore
-        self, *args: typing.Union[typing.Callable[..., ReturnType], typing.Any], **kwargs: typing.Any
+        self,
+        *args: typing.Union[typing.Callable[..., ReturnType], typing.Any],
+        **kwargs: typing.Any,
     ) -> typing.Union[typing.Callable[..., ReturnType], ReturnType]:
         """Main decorator getter.
 

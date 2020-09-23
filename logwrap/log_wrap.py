@@ -51,7 +51,11 @@ class BoundParameter(inspect.Parameter):
 
     __slots__ = ("_value",)
 
-    def __init__(self, parameter: inspect.Parameter, value: typing.Any = inspect.Parameter.empty) -> None:
+    def __init__(
+        self,
+        parameter: inspect.Parameter,
+        value: typing.Any = inspect.Parameter.empty,
+    ) -> None:
         """Parameter-like object store BOUND with value parameter.
 
         :param parameter: parameter from signature
@@ -61,7 +65,10 @@ class BoundParameter(inspect.Parameter):
         :raises ValueError: No default value and no value
         """
         super().__init__(
-            name=parameter.name, kind=parameter.kind, default=parameter.default, annotation=parameter.annotation
+            name=parameter.name,
+            kind=parameter.kind,
+            default=parameter.default,
+            annotation=parameter.annotation,
         )
 
         if value is self.empty:
@@ -471,7 +478,8 @@ class LogWrap(class_decorator.BaseDecorator):
 
     # noinspection PyMethodMayBeStatic
     def pre_process_param(  # pylint: disable=no-self-use
-        self, arg: BoundParameter
+        self,
+        arg: BoundParameter,
     ) -> typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]:
         """Process parameter for the future logging.
 
@@ -488,7 +496,9 @@ class LogWrap(class_decorator.BaseDecorator):
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def post_process_param(  # pylint: disable=unused-argument, no-self-use
-        self, arg: BoundParameter, arg_repr: str
+        self,
+        arg: BoundParameter,
+        arg_repr: str,
     ) -> str:
         """Process parameter for the future logging.
 
@@ -515,7 +525,10 @@ class LogWrap(class_decorator.BaseDecorator):
         """
         try:
             return repr_utils.pretty_repr(
-                src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent
+                src=value,
+                indent=INDENT + 4,
+                no_indent_start=True,
+                max_indent=self.max_indent,
             )
         except Exception as exc:
             base_name: str = getattr(value, "name", getattr(value, "__name__", value.__class__.__name__))
@@ -527,7 +540,10 @@ class LogWrap(class_decorator.BaseDecorator):
             return f"<object {base_name} {base_details}>"
 
     def _get_func_args_repr(
-        self, sig: inspect.Signature, args: typing.Tuple[typing.Any, ...], kwargs: typing.Dict[str, typing.Any]
+        self,
+        sig: inspect.Signature,
+        args: typing.Tuple[typing.Any, ...],
+        kwargs: typing.Dict[str, typing.Any],
     ) -> str:
         """Internal helper for reducing complexity of decorator code.
 
@@ -701,16 +717,24 @@ class LogWrap(class_decorator.BaseDecorator):
 
     @typing.overload
     def __call__(
-        self, *args: typing.Callable[..., FuncResultType], **kwargs: typing.Any
+        self,
+        *args: typing.Callable[..., FuncResultType],
+        **kwargs: typing.Any,
     ) -> typing.Callable[..., FuncResultType]:
         """Main decorator getter."""
 
     @typing.overload
-    def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> FuncResultType:
+    def __call__(
+        self,
+        *args: typing.Any,
+        **kwargs: typing.Any,
+    ) -> FuncResultType:
         """Main decorator getter."""
 
     def __call__(  # pylint: disable=useless-super-delegation
-        self, *args: typing.Union[typing.Callable[..., FuncResultType], typing.Any], **kwargs: typing.Any,
+        self,
+        *args: typing.Union[typing.Callable[..., FuncResultType], typing.Any],
+        **kwargs: typing.Any,
     ) -> typing.Union[typing.Callable[..., FuncResultType], FuncResultType]:
         """Callable instance.
 

@@ -336,7 +336,10 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 str base_details
             try:
                 return repr_utils.pretty_repr(
-                    src=value, indent=INDENT + 4, no_indent_start=True, max_indent=self.max_indent
+                    src=value,
+                    indent=INDENT + 4,
+                    no_indent_start=True,
+                    max_indent=self.max_indent,
                 )
             except Exception as exc:
                 base_details = f"at 0x{id(value):X} (repr failed with reason: {exc})"
@@ -347,7 +350,12 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                     return f"<method {base_name} {base_details}>"
             return f"<object {base_name} {base_details}>"
 
-        str _get_func_args_repr(self, sig: inspect.Signature, tuple args: typing.Tuple[typing.Any, ...], dict kwargs: typing.Dict[str, typing.Any]):
+        str _get_func_args_repr(
+            self,
+            sig: inspect.Signature,
+            tuple args: typing.Tuple[typing.Any, ...],
+            dict kwargs: typing.Dict[str, typing.Any],
+        ):
             """Internal helper for reducing complexity of decorator code.
 
             :param sig: function signature
