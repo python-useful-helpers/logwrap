@@ -746,6 +746,24 @@ class LogWrap(class_decorator.BaseDecorator):
 
 @typing.overload
 def logwrap(
+    *,
+    log: typing.Optional[logging.Logger] = None,
+    log_level: int = logging.DEBUG,
+    exc_level: int = logging.ERROR,
+    max_indent: int = 20,
+    spec: typing.Optional[typing.Callable[..., FuncResultType]] = None,
+    blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
+    blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
+    log_call_args: bool = True,
+    log_call_args_on_exc: bool = True,
+    log_traceback: bool = True,
+    log_result_obj: bool = True,
+) -> LogWrap:
+    """Overload: with no func."""
+
+
+@typing.overload
+def logwrap(
     func: None = None,
     *,
     log: typing.Optional[logging.Logger] = None,
