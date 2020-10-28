@@ -20,13 +20,15 @@ This is no reason to import this submodule directly, all required methods is
 available from the main module.
 """
 
-__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+from __future__ import annotations
 
 # Standard Library
 import abc
 import inspect
 import types
 import typing
+
+__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
 
 def _known_callable(item: typing.Any) -> bool:

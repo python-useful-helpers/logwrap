@@ -3,19 +3,112 @@ name: Python package
 on: [push]
 
 jobs:
-  build:
+  PEP8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+         python-version: '3.x'
+      - name: Install dependencies
+        run: |
+         python -m pip install --upgrade pip
+         pip install --upgrade -r flake8_requirements.txt
+      - name: Lint with flake8
+        run: |
+         flake8 logwrap
 
+  PyLint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade "pylint >= 2.6.0"
+      - name: Build package and install develop
+        run: |
+          python setup.py develop -v clean
+      - name: Lint with PyLint
+        run: |
+          pylint logwrap
+
+  MyPy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade "mypy >= 0.790"
+      - name: Genetate version file
+        run: |
+          python setup.py --version clean
+      - name: Lint with MyPy
+        run: |
+          mypy --strict logwrap
+
+  Black:
+   runs-on: ubuntu-latest
+   steps:
+     - uses: actions/checkout@v2
+     - name: Set up Python
+       uses: actions/setup-python@v2
+       with:
+        python-version: '3.x'
+     - name: Install dependencies
+       run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade black regex
+     - name: Check code style with black
+       run: |
+        black --check logwrap
+
+  ISort:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade "isort >= 5.6.0"
+      - name: Genetate version file
+        run: |
+          python setup.py --version clean
+      - name: Check imports sorting with isort
+        run: |
+          isort -c  logwrap
+
+  TestScript:
+    needs: [PEP8, PyLint, MyPy, Black, ISort]
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.7, 3.8, 3.9]
 
+    name: "Script based python ${{ matrix.PYTHON.VERSION }} on ${{ matrix.os }}"
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -25,8 +118,67 @@ jobs:
         pip install --upgrade -r pytest_requirements.txt
     - name: Build package and install develop
       run: |
-        python setup.py develop -v
+        python setup.py develop -v clean
     - name: Test with pytest
       run: |
         py.test --cov-report= --cov=logwrap test
         coverage report -m --fail-under 85
+
+  TestLinux:
+    needs: [TestScript]
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+    name: "Cython based python ${{ matrix.PYTHON.VERSION }} on linux"
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip wheel
+        pip install -r CI_REQUIREMENTS.txt
+        pip install --upgrade Cython
+        pip install --upgrade -r pytest_requirements.txt
+    - name: Build package and install
+      run: |
+        pip install logwrap --no-index -f dist clean
+    - name: Test with pytest
+      run: |
+        py.test
+
+  TestWindows:
+    needs: [TestScript]
+    runs-on: windows-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        WINDOWS:
+          - { ARCH: 'x86', WINDOWS: 'win32' }
+          - { ARCH: 'x64', WINDOWS: 'win64' }
+        python-version: [3.7, 3.8, 3.9]
+    name: "Cython based python ${{ matrix.PYTHON.VERSION }} on ${{ matrix.WINDOWS.WINDOWS }}"
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip wheel
+        pip install -r CI_REQUIREMENTS.txt
+        pip install --upgrade Cython
+        pip install --upgrade -r pytest_requirements.txt
+    - name: Build package and install
+      run: |
+        pip install logwrap --no-index -f dist clean
+    - name: Test with pytest
+      run: |
+        py.test

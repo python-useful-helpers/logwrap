@@ -15,8 +15,6 @@
 
 """Property with logging on successful get/set/delete or failure."""
 
-__all__ = ("LogOnAccess",)
-
 # Standard Library
 import inspect
 import logging
@@ -29,6 +27,8 @@ import typing
 # Package Implementation
 from logwrap import constants
 from logwrap import repr_utils
+
+__all__ = ("LogOnAccess",)
 
 _LOGGER: logging.Logger = logging.getLogger(__name__)
 _CURRENT_FILE = os.path.abspath(__file__)

@@ -16,7 +16,7 @@
 
 """log_wrap shared code module."""
 
-__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+from __future__ import annotations
 
 # Standard Library
 import asyncio
@@ -33,6 +33,8 @@ import typing
 from logwrap import class_decorator
 from logwrap import constants
 from logwrap import repr_utils
+
+__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
 LOGGER: logging.Logger = logging.getLogger("logwrap")
 INDENT = 4

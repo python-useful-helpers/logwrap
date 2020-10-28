@@ -14,8 +14,6 @@
 
 """log_wrap shared code module."""
 
-cpdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
-
 # Standard Library
 import asyncio
 import functools
@@ -33,6 +31,8 @@ from logwrap import constants
 # Package Implementation
 from logwrap cimport class_decorator
 from logwrap cimport repr_utils
+
+cpdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
 LOGGER = logging.getLogger("logwrap")  # type: logging.Logger
 cdef unsigned long INDENT = 4

@@ -19,6 +19,7 @@ Contents: 'logwrap', 'pretty_repr', 'pretty_str'
 Original code was made for Mirantis Inc by Alexey Stepanov,
 later it has been reworked and extended for support of special cases.
 """
+
 # Package Implementation
 from logwrap.log_on_access import LogOnAccess
 from logwrap.log_wrap import BoundParameter

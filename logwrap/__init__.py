@@ -22,6 +22,8 @@ Original code was made for Mirantis Inc by Alexey Stepanov,
 later it has been reworked and extended for support of special cases.
 """
 
+from __future__ import annotations
+
 # Local Implementation
 from .log_on_access import LogOnAccess
 from .log_wrap import BoundParameter

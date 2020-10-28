@@ -16,12 +16,14 @@
 
 """Base class for decorators."""
 
-__all__ = ("BaseDecorator",)
+from __future__ import annotations
 
 # Standard Library
 import abc
 import functools
 import typing
+
+__all__ = ("BaseDecorator",)
 
 ReturnType = typing.TypeVar("ReturnType")
 
