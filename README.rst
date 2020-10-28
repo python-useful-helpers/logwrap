@@ -3,9 +3,8 @@ logwrap
 
 .. image:: https://travis-ci.com/python-useful-helpers/logwrap.svg?branch=master
     :target: https://travis-ci.com/python-useful-helpers/logwrap
-.. image:: https://dev.azure.com/python-useful-helpers/logwrap/_apis/build/status/python-useful-helpers.logwrap?branchName=master
-    :alt: Azure DevOps builds
-    :target: https://dev.azure.com/python-useful-helpers/logwrap/_build?definitionId=1
+.. image:: https://github.com/python-useful-helpers/logwrap/workflows/Python%20package/badge.svg
+    :target: https://github.com/python-useful-helpers/logwrap/actions
 .. image:: https://coveralls.io/repos/github/python-useful-helpers/logwrap/badge.svg?branch=master
     :target: https://coveralls.io/github/python-useful-helpers/logwrap?branch=master
 .. image:: https://readthedocs.org/projects/logwrap/badge/?version=latest
@@ -44,9 +43,9 @@ Pros:
 
 ::
 
-    Python 3.6
     Python 3.7
     Python 3.8
+    Python 3.9
 
 .. note:: 2.7 is supported in versions < 5.0.0, python 3.5 in versions < 6 due to syntax changes.
 
@@ -381,7 +380,7 @@ For code checking several CI systems is used in parallel:
 
 2. `coveralls: <https://coveralls.io/github/python-useful-helpers/logwrap>`_ is used for coverage display.
 
-3. `Azure CI: <https://dev.azure.com/python-useful-helpers/logwrap/_build?definitionId=1>`_ is used for functional tests on Windows.
+3. `GitHub: <https://github.com/python-useful-helpers/logwrap/actions>`_ is used for functional tests.
 
 CD systems
 ==========

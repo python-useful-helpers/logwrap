@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade -r CI_REQUIREMENTS.txt
           pip install --upgrade "pylint >= 2.6.0"
       - name: Generate version file
         run: |
@@ -50,7 +50,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade -r CI_REQUIREMENTS.txt
           pip install --upgrade "mypy >= 0.790"
       - name: Generate version file
         run: |
@@ -114,7 +114,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
-          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade -r CI_REQUIREMENTS.txt
           pip install --upgrade -r pytest_requirements.txt
       - name: Build package and install develop
         run: |
@@ -142,7 +142,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
-          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade -r CI_REQUIREMENTS.txt
           pip install --upgrade Cython
           pip install --upgrade -r pytest_requirements.txt
       - name: Build package and install
@@ -175,7 +175,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip wheel
-          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade -r CI_REQUIREMENTS.txt
           pip install --upgrade Cython
           pip install --upgrade -r pytest_requirements.txt
       - name: Build package and install
@@ -185,3 +185,38 @@ jobs:
       - name: Test with pytest
         run: |
           py.test
+
+  DeployWindows:
+    needs: [TestLinux, TestWindows]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: windows-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        WINDOWS:
+          - { ARCH: 'x86', WINDOWS: 'win32' }
+          - { ARCH: 'x64', WINDOWS: 'win64' }
+        python-version: [3.7, 3.8, 3.9]
+    name: "Release for python ${{ matrix.PYTHON.VERSION }} on ${{ matrix.WINDOWS.WINDOWS }}"
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.WINDOWS.ARCH }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install --upgrade -r build_requirements.txt
+          pip install --upgrade twine
+      - name: Build package and install
+        run: |
+          python setup.py sdist bdist_wheel clean
+      - name: Deploy
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          twine upload dist/*
