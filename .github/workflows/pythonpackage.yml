@@ -99,7 +99,7 @@ jobs:
     needs: [PEP8, PyLint, MyPy, Black]  # isort is broken
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 4
+      max-parallel: 6
       matrix:
         os: [ubuntu-latest, windows-latest]
         python-version: [3.7, 3.8, 3.9]
@@ -211,9 +211,50 @@ jobs:
           python -m pip install --upgrade pip wheel
           pip install --upgrade -r build_requirements.txt
           pip install --upgrade twine
-      - name: Build package and install
+      - name: Build package
         run: |
           python setup.py sdist bdist_wheel clean
+      - name: Deploy
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          twine upload --skip-existing dist/*
+
+  DeployManyLinux:
+    needs: [ TestLinux, TestWindows ]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.MANYLINUX.CONTAINER }}
+      env:
+        PYTHONDONTWRITEBYTECODE: 1
+    strategy:
+      matrix:
+        PYTHON: [ "cp37-cp37m", "cp38-cp38", "cp39-cp39" ]
+        MANYLINUX:
+          - NAME: manylinux2010_x86_64
+            CONTAINER: "quay.io/pypa/manylinux2010_x86_64"
+          - NAME: manylinux2014_x86_64
+            CONTAINER: "quay.io/pypa/manylinux2014_x86_64"
+    name: "${{ matrix.PYTHON }} for ${{ matrix.MANYLINUX.NAME }}"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install main dependencies
+        run: |
+          /opt/python/${{ matrix.PYTHON }}/bin/python -m pip install -U pip wheel setuptools
+          /opt/python/${{ matrix.PYTHON }}/bin/pip install --upgrade -r build_requirements.txt
+          /opt/python/${{ matrix.PYTHON }}/bin/pip install --upgrade twine
+      - name: Build package
+        run: /opt/python/${{ matrix.PYTHON }}/bin/python setup.py bdist_wheel clean
+      - name: Bundle external shared libraries into the wheels
+        run: |
+          for whl in dist/*.whl; do
+              echo "Repairing $whl..."
+              auditwheel repair "$whl" -w dist/
+          done
+      - name: Cleanup OS specific wheels
+        run: rm -fv dist/*-linux_*.whl
       - name: Deploy
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
