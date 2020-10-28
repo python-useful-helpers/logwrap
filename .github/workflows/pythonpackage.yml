@@ -104,7 +104,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python-version: [3.7, 3.8, 3.9]
 
-    name: "Script based python ${{ matrix.PYTHON.VERSION }} on ${{ matrix.os }}"
+    name: "Script based python ${{ matrix.python-version }} on ${{ matrix.os }}"
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -131,7 +131,7 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: [3.7, 3.8, 3.9]
-    name: "Cython based python ${{ matrix.PYTHON.VERSION }} on linux"
+    name: "Cython based python ${{ matrix.python-version }} on linux"
 
     steps:
       - uses: actions/checkout@v2
@@ -163,7 +163,7 @@ jobs:
           - { ARCH: 'x86', WINDOWS: 'win32' }
           - { ARCH: 'x64', WINDOWS: 'win64' }
         python-version: [3.7, 3.8, 3.9]
-    name: "Cython based python ${{ matrix.PYTHON.VERSION }} on ${{ matrix.WINDOWS.WINDOWS }}"
+    name: "Cython based python ${{ matrix.python-version }} on ${{ matrix.WINDOWS.WINDOWS }}"
 
     steps:
       - uses: actions/checkout@v2
@@ -197,7 +197,7 @@ jobs:
           - { ARCH: 'x86', WINDOWS: 'win32' }
           - { ARCH: 'x64', WINDOWS: 'win64' }
         python-version: [3.7, 3.8, 3.9]
-    name: "Release for python ${{ matrix.PYTHON.VERSION }} on ${{ matrix.WINDOWS.WINDOWS }}"
+    name: "Release for python ${{ matrix.python-version }} on ${{ matrix.WINDOWS.WINDOWS }}"
 
     steps:
       - uses: actions/checkout@v2
@@ -219,4 +219,4 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          twine upload dist/*
+          twine upload --skip-existing dist/*
