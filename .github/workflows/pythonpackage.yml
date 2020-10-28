@@ -32,7 +32,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r CI_REQUIREMENTS.txt
           pip install --upgrade "pylint >= 2.6.0"
-      - name: Genetate version file
+      - name: Generate version file
         run: |
           python setup.py --version clean
       - name: Lint with PyLint
@@ -52,7 +52,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r CI_REQUIREMENTS.txt
           pip install --upgrade "mypy >= 0.790"
-      - name: Genetate version file
+      - name: Generate version file
         run: |
           python setup.py --version clean
       - name: Lint with MyPy
@@ -88,7 +88,7 @@ jobs:
 #          python -m pip install --upgrade pip
 #          pip install -r CI_REQUIREMENTS.txt
 #          pip install --upgrade "isort >= 5.6.0"
-#      - name: Genetate version file
+#      - name: Generate version file
 #        run: |
 #          python setup.py --version clean
 #      - name: Check imports sorting with isort
@@ -147,6 +147,7 @@ jobs:
           pip install --upgrade -r pytest_requirements.txt
       - name: Build package and install
         run: |
+          python setup.py bdist_wheel clean
           pip install logwrap --no-index -f dist clean
       - name: Test with pytest
         run: |
@@ -179,6 +180,7 @@ jobs:
           pip install --upgrade -r pytest_requirements.txt
       - name: Build package and install
         run: |
+          python setup.py bdist_wheel clean
           pip install logwrap --no-index -f dist clean
       - name: Test with pytest
         run: |
