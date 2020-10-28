@@ -111,12 +111,9 @@ jobs:
 
   - job: 'Build_and_deploy'
     dependsOn:
-      - Python_36_x64_native
       - Python_37_x64_native
       - Python_38_x64_native
 
-      - Python_36_x64_cython
-      - Python_36_x86_cython
       - Python_37_x64_cython
       - Python_37_x86_cython
       - Python_38_x64_cython
