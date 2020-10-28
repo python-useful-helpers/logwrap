@@ -22,7 +22,6 @@ import typing
 # Package Implementation
 from logwrap cimport class_decorator
 
-
 cdef:
     unsigned long indent
 

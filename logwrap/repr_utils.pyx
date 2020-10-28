@@ -23,6 +23,7 @@ import inspect
 import types
 import typing
 
+
 cpdef tuple __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
 cdef:
