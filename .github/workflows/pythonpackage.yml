@@ -108,21 +108,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip wheel
-        pip install -r CI_REQUIREMENTS.txt
-        pip install --upgrade -r pytest_requirements.txt
-    - name: Build package and install develop
-      run: |
-        python setup.py develop -v clean
-    - name: Test with pytest
-      run: |
-        py.test --cov-report= --cov=logwrap test
-        coverage report -m --fail-under 85
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade -r pytest_requirements.txt
+      - name: Build package and install develop
+        run: |
+          python setup.py develop -v clean
+      - name: Test with pytest
+        run: |
+          py.test --cov-report= --cov=logwrap test
+          coverage report -m --fail-under 85
 
   TestLinux:
     needs: [TestScript]
@@ -136,21 +136,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip wheel
-        pip install -r CI_REQUIREMENTS.txt
-        pip install --upgrade Cython
-        pip install --upgrade -r pytest_requirements.txt
-    - name: Build package and install
-      run: |
-        pip install logwrap --no-index -f dist clean
-    - name: Test with pytest
-      run: |
-        py.test
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade Cython
+          pip install --upgrade -r pytest_requirements.txt
+      - name: Build package and install
+        run: |
+          pip install logwrap --no-index -f dist clean
+      - name: Test with pytest
+        run: |
+          py.test
 
   TestWindows:
     needs: [TestScript]
@@ -167,18 +167,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip wheel
-        pip install -r CI_REQUIREMENTS.txt
-        pip install --upgrade Cython
-        pip install --upgrade -r pytest_requirements.txt
-    - name: Build package and install
-      run: |
-        pip install logwrap --no-index -f dist clean
-    - name: Test with pytest
-      run: |
-        py.test
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install -r CI_REQUIREMENTS.txt
+          pip install --upgrade Cython
+          pip install --upgrade -r pytest_requirements.txt
+      - name: Build package and install
+        run: |
+          pip install logwrap --no-index -f dist clean
+      - name: Test with pytest
+        run: |
+          py.test
