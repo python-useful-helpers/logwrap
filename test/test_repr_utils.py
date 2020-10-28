@@ -18,6 +18,8 @@
 
 """_repr_utils (internal helpers) specific tests."""
 
+from __future__ import annotations
+
 # Standard Library
 import typing
 import unittest
@@ -263,7 +265,7 @@ class TestAnnotated(unittest.TestCase):
         def func(a: typing.Optional[int] = None):
             pass
 
-        args = "\n    a: typing.Union[int, NoneType]=None,\n"
+        args = "\n    a: typing.Optional[int]=None,\n"
 
         self.assertEqual(
             f"{'':<{0}}<{func.__class__.__name__} {func.__module__}.{func.__name__} with interface ({args}){''}>",
@@ -283,7 +285,7 @@ class TestAnnotated(unittest.TestCase):
         def func(a: typing.Optional[int] = None) -> None:
             pass
 
-        args = "\n    a: typing.Union[int, NoneType]=None,\n"
+        args = "\n    a: typing.Optional[int]=None,\n"
 
         self.assertEqual(
             f"{'':<{0}}"

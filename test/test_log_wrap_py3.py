@@ -16,6 +16,8 @@
 
 """Python 3 specific tests"""
 
+from __future__ import annotations
+
 # Standard Library
 import asyncio
 import io
@@ -172,7 +174,7 @@ class TestAnnotated(unittest.TestCase):
             "DEBUG>Calling: \n"
             "func(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
-            "    a=None,  # type: typing.Union[int, NoneType]\n"
+            "    a=None,  # type: typing.Optional[int]\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
             "None\n",
