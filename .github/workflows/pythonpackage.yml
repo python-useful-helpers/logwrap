@@ -148,7 +148,7 @@ jobs:
       - name: Build package and install
         run: |
           python setup.py bdist_wheel clean
-          pip install logwrap --no-index -f dist clean
+          pip install logwrap --no-index -f dist
       - name: Test with pytest
         run: |
           py.test
@@ -181,7 +181,7 @@ jobs:
       - name: Build package and install
         run: |
           python setup.py bdist_wheel clean
-          pip install logwrap --no-index -f dist clean
+          pip install logwrap --no-index -f dist
       - name: Test with pytest
         run: |
           py.test
