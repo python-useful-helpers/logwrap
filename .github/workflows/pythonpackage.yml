@@ -10,14 +10,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-         python-version: '3.x'
+          python-version: '3.x'
       - name: Install dependencies
         run: |
-         python -m pip install --upgrade pip
-         pip install --upgrade -r flake8_requirements.txt
+          python -m pip install --upgrade pip
+          pip install --upgrade -r flake8_requirements.txt
       - name: Lint with flake8
         run: |
-         flake8 logwrap
+          flake8 logwrap
 
   PyLint:
     runs-on: ubuntu-latest
@@ -60,40 +60,40 @@ jobs:
           mypy --strict logwrap
 
   Black:
-   runs-on: ubuntu-latest
-   steps:
-     - uses: actions/checkout@v2
-     - name: Set up Python
-       uses: actions/setup-python@v2
-       with:
-        python-version: '3.x'
-     - name: Install dependencies
-       run: |
-        python -m pip install --upgrade pip
-        pip install --upgrade black regex
-     - name: Check code style with black
-       run: |
-        black --check logwrap
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade black regex
+      - name: Check code style with black
+        run: |
+          black --check logwrap
 
-#  ISort:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Set up Python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: '3.x'
-#      - name: Install dependencies
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install -r CI_REQUIREMENTS.txt
-#          pip install --upgrade "isort >= 5.6.0"
-#      - name: Generate version file
-#        run: |
-#          python setup.py --version clean
-#      - name: Check imports sorting with isort
-#        run: |
-#          isort -c --diff logwrap
+  #  ISort:
+  #    runs-on: ubuntu-latest
+  #    steps:
+  #      - uses: actions/checkout@v2
+  #      - name: Set up Python
+  #        uses: actions/setup-python@v2
+  #        with:
+  #          python-version: '3.x'
+  #      - name: Install dependencies
+  #        run: |
+  #          python -m pip install --upgrade pip
+  #          pip install -r CI_REQUIREMENTS.txt
+  #          pip install --upgrade "isort >= 5.6.0"
+  #      - name: Generate version file
+  #        run: |
+  #          python setup.py --version clean
+  #      - name: Check imports sorting with isort
+  #        run: |
+  #          isort -c --diff logwrap
 
   TestScript:
     needs: [PEP8, PyLint, MyPy, Black]  # isort is broken
