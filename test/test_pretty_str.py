@@ -102,5 +102,5 @@ class TestPrettyStr(unittest.TestCase):
         )
         self.assertEqual(
             result,
-            "Test Class".format(id(Tst))
+            "Test Class"  # .format(id(Tst))
         )

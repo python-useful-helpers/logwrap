@@ -51,7 +51,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual(target.ok, VALUE)
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:logwrap.log_on_access:Request: Target(val=ok).ok",
+            "DEBUG:logwrap.log_on_access:Request: Target(val=ok).ok",
             logged[0]
         )
         self.assertRegex(
@@ -83,12 +83,12 @@ class TestLogOnAccess(unittest.TestCase):
         del target.ok
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:logwrap.log_on_access:Request: del Target(val=OK).ok",
+            "DEBUG:logwrap.log_on_access:Request: del Target(val=OK).ok",
             logged[0]
         )
         self.assertRegex(
             logged[1],
-            rf"DEBUG:logwrap\.log_on_access:Done at (?:\d+\.\d{{3}})s: del Target\(val=OK\)\.ok"
+            r"DEBUG:logwrap\.log_on_access:Done at (?:\d+\.\d{3})s: del Target\(val=OK\)\.ok"
         )
 
     def test_02_positive_properties(self):
@@ -168,12 +168,12 @@ class TestLogOnAccess(unittest.TestCase):
 
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:logwrap.log_on_access:Request: Target().ok",
+            "DEBUG:logwrap.log_on_access:Request: Target().ok",
             logged[0]
         )
         self.assertRegex(
             logged[1],
-            rf"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{{3}})s: Target\(\)\.ok"
+            r"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{3})s: Target\(\)\.ok"
         )
         self.assertEqual("Traceback (most recent call last):", logged[2])
 
@@ -203,12 +203,12 @@ class TestLogOnAccess(unittest.TestCase):
 
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:logwrap.log_on_access:Request: del Target().ok",
+            "DEBUG:logwrap.log_on_access:Request: del Target().ok",
             logged[0]
         )
         self.assertRegex(
             logged[1],
-            rf"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{{3}})s: del Target\(\)\.ok"
+            r"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{3})s: del Target\(\)\.ok"
         )
         self.assertEqual("Traceback (most recent call last):", logged[2])
 
@@ -322,7 +322,7 @@ class TestLogOnAccess(unittest.TestCase):
         getattr(target, "on_init_set")  # noqa: B009
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:on_init_set:Request: Target().on_init_set",
+            "DEBUG:on_init_set:Request: Target().on_init_set",
             logged[0]
         )
         self.assertRegex(
@@ -337,7 +337,7 @@ class TestLogOnAccess(unittest.TestCase):
         getattr(target, "on_init_name")  # noqa: B009
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:on_init_name:Request: Target().on_init_name",
+            "DEBUG:on_init_name:Request: Target().on_init_name",
             logged[0]
         )
         self.assertRegex(
@@ -352,7 +352,7 @@ class TestLogOnAccess(unittest.TestCase):
         getattr(target, "prop_set")  # noqa: B009
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:prop_set:Request: Target().prop_set",
+            "DEBUG:prop_set:Request: Target().prop_set",
             logged[0]
         )
         self.assertRegex(
@@ -367,7 +367,7 @@ class TestLogOnAccess(unittest.TestCase):
         getattr(target, "prop_name")  # noqa: B009
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:prop_name:Request: Target().prop_name",
+            "DEBUG:prop_name:Request: Target().prop_name",
             logged[0]
         )
         self.assertRegex(
@@ -402,7 +402,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual(target.ok, VALUE)
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:Target:Request: Target(val=ok).ok",
+            "DEBUG:Target:Request: Target(val=ok).ok",
             logged[0]
         )
         self.assertRegex(
@@ -434,12 +434,12 @@ class TestLogOnAccess(unittest.TestCase):
         del target.ok
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:Target:Request: del Target(val=OK).ok",
+            "DEBUG:Target:Request: del Target(val=OK).ok",
             logged[0]
         )
         self.assertRegex(
             logged[1],
-            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: del Target\(val=OK\)\.ok"
+            r"DEBUG:Target:Done at (?:\d+\.\d{3})s: del Target\(val=OK\)\.ok"
         )
 
     def test_10_log_implemented(self):
@@ -468,7 +468,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual(target.ok, VALUE)
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:Target:Request: Target(val=ok).ok",
+            "DEBUG:Target:Request: Target(val=ok).ok",
             logged[0]
         )
         self.assertRegex(
@@ -500,10 +500,10 @@ class TestLogOnAccess(unittest.TestCase):
         del target.ok
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:Target:Request: del Target(val=OK).ok",
+            "DEBUG:Target:Request: del Target(val=OK).ok",
             logged[0]
         )
         self.assertRegex(
             logged[1],
-            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: del Target\(val=OK\)\.ok"
+            r"DEBUG:Target:Done at (?:\d+\.\d{3})s: del Target\(val=OK\)\.ok"
         )

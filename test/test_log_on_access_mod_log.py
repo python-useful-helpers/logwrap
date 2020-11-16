@@ -52,7 +52,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual(target.ok, VALUE)
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:Target_mod:Request: Target(val=ok).ok",
+            "DEBUG:Target_mod:Request: Target(val=ok).ok",
             logged[0]
         )
         self.assertRegex(
