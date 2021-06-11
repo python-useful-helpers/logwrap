@@ -31,45 +31,31 @@ import logwrap
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestPrettyRepr(unittest.TestCase):
     def test_001_simple(self):
-        self.assertEqual(
-            logwrap.pretty_repr(True), repr(True)
-        )
+        self.assertEqual(logwrap.pretty_repr(True), repr(True))
 
     def test_002_text(self):
-        txt = 'Unicode text'
-        b_txt = b'bytes text\x01'
-        self.assertEqual(
-            repr(txt), logwrap.pretty_repr(txt)
-        )
-        self.assertEqual(
-            repr(b_txt), logwrap.pretty_repr(b_txt)
-        )
+        txt = "Unicode text"
+        b_txt = b"bytes text\x01"
+        self.assertEqual(repr(txt), logwrap.pretty_repr(txt))
+        self.assertEqual(repr(b_txt), logwrap.pretty_repr(b_txt))
 
     def test_003_iterable(self):
         self.assertEqual(
-            '[{nl:<5}1,{nl:<5}2,{nl:<5}3,\n]'.format(nl='\n'),
+            "[{nl:<5}1,{nl:<5}2,{nl:<5}3,\n]".format(nl="\n"),
             logwrap.pretty_repr([1, 2, 3]),
         )
         self.assertEqual(
-            '({nl:<5}1,{nl:<5}2,{nl:<5}3,\n)'.format(nl='\n'),
+            "({nl:<5}1,{nl:<5}2,{nl:<5}3,\n)".format(nl="\n"),
             logwrap.pretty_repr((1, 2, 3)),
         )
         res = logwrap.pretty_repr({1, 2, 3})
-        self.assertTrue(
-            res.startswith('{') and res.endswith('\n}')
-        )
+        self.assertTrue(res.startswith("{") and res.endswith("\n}"))
         res = logwrap.pretty_repr(frozenset({1, 2, 3}))
-        self.assertTrue(
-            res.startswith('frozenset({') and res.endswith('\n})')
-        )
+        self.assertTrue(res.startswith("frozenset({") and res.endswith("\n})"))
 
     def test_004_dict(self):
         self.assertEqual(
-            '{\n'
-            '    1 : 1,\n'
-            '    2 : 2,\n'
-            '    33: 33,\n'
-            '}',
+            "{\n" "    1 : 1,\n" "    2 : 2,\n" "    33: 33,\n" "}",
             logwrap.pretty_repr({1: 1, 2: 2, 33: 33}),
         )
 
@@ -85,30 +71,30 @@ class TestPrettyRepr(unittest.TestCase):
             set(),
         ]
         exp_repr = (
-            '[\n'
-            '    {\n'
-            '        1: 2,\n'
-            '    },\n'
-            '    {\n'
-            '        3: {\n'
-            '            4,\n'
-            '        },\n'
-            '    },\n'
-            '    [\n'
-            '        5,\n'
-            '        6,\n'
-            '        7,\n'
-            '    ],\n'
-            '    (\n'
-            '        8,\n'
-            '        9,\n'
-            '        10,\n'
-            '    ),\n'
-            '    {},\n'
-            '    [],\n'
-            '    (),\n'
-            '    set(),\n'
-            ']'
+            "[\n"
+            "    {\n"
+            "        1: 2,\n"
+            "    },\n"
+            "    {\n"
+            "        3: {\n"
+            "            4,\n"
+            "        },\n"
+            "    },\n"
+            "    [\n"
+            "        5,\n"
+            "        6,\n"
+            "        7,\n"
+            "    ],\n"
+            "    (\n"
+            "        8,\n"
+            "        9,\n"
+            "        10,\n"
+            "    ),\n"
+            "    {},\n"
+            "    [],\n"
+            "    (),\n"
+            "    set(),\n"
+            "]"
         )
         self.assertEqual(exp_repr, logwrap.pretty_repr(test_obj))
 
@@ -126,13 +112,7 @@ class TestPrettyRepr(unittest.TestCase):
         def full_func(arg, darg=1, *positional, **named):
             pass
 
-        args = (
-            '\n'
-            '    arg,\n'
-            '    darg=1,\n'
-            '    *positional,\n'
-            '    **named,\n'
-        )
+        args = "\n" "    arg,\n" "    darg=1,\n" "    *positional,\n" "    **named,\n"
 
         self.assertEqual(
             f"{'':<{0}}"
@@ -152,38 +132,26 @@ class TestPrettyRepr(unittest.TestCase):
 
         tst_instance = TstClass()
 
-        c_m_args = (
-            '\n'
-            '    self,\n'
-            '    arg,\n'
-            '    darg=1,\n'
-            '    *positional,\n'
-            '    **named,\n'
-        )
+        c_m_args = "\n" "    self,\n" "    arg,\n" "    darg=1,\n" "    *positional,\n" "    **named,\n"
 
         cm_args = (
-            '\n'
-            '    cls={cls!r},\n'
-            '    arg,\n'
-            '    darg=1,\n'
-            '    *positional,\n'
-            '    **named,\n'.format(cls=TstClass)
+            "\n"
+            "    cls={cls!r},\n"
+            "    arg,\n"
+            "    darg=1,\n"
+            "    *positional,\n"
+            "    **named,\n".format(cls=TstClass)
         )
 
         i_m_args = (
-            f'\n'
-            f'    self={tst_instance!r},\n'
-            f'    arg,\n'
-            f'    darg=1,\n'
-            f'    *positional,\n'
-            f'    **named,\n'
+            f"\n" f"    self={tst_instance!r},\n" f"    arg,\n" f"    darg=1,\n" f"    *positional,\n" f"    **named,\n"
         )
 
         for callable_obj, args in (
             (TstClass.tst_method, c_m_args),
             (TstClass.tst_classmethod, cm_args),
             (tst_instance.tst_method, i_m_args),
-            (tst_instance.tst_classmethod, cm_args)
+            (tst_instance.tst_classmethod, cm_args),
         ):
 
             self.assertEqual(
@@ -220,13 +188,7 @@ class TestPrettyRepr(unittest.TestCase):
             logwrap.pretty_repr(obj, max_indent=40),
         )
         self.assertEqual(
-            "[\n"
-            "    [\n"
-            "        [\n"
-            "            [[[[[[[123]]]]]]],\n"
-            "        ],\n"
-            "    ],\n"
-            "]",
+            "[\n" "    [\n" "        [\n" "            [[[[[[[123]]]]]]],\n" "        ],\n" "    ],\n" "]",
             logwrap.pretty_repr(obj, max_indent=10),
         )
 
@@ -234,29 +196,16 @@ class TestPrettyRepr(unittest.TestCase):
         # noinspection PyMissingOrEmptyDocstring
         class Tst(object):
             def __repr__(self):
-                return 'Test'
+                return "Test"
 
-            def __pretty_repr__(
-                self,
-                parser,
-                indent,
-                no_indent_start
-            ):
+            def __pretty_repr__(self, parser, indent, no_indent_start):
                 return parser.process_element(
-                    f"<Test Class at 0x{id(self.__class__):X}>",
-                    indent=indent,
-                    no_indent_start=no_indent_start
+                    f"<Test Class at 0x{id(self.__class__):X}>", indent=indent, no_indent_start=no_indent_start
                 )
 
         result = logwrap.pretty_repr(Tst())
-        self.assertNotEqual(
-            result,
-            'Test'
-        )
-        self.assertEqual(
-            result,
-            f"'<Test Class at 0x{id(Tst):X}>'"
-        )
+        self.assertNotEqual(result, "Test")
+        self.assertEqual(result, f"'<Test Class at 0x{id(Tst):X}>'")
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring

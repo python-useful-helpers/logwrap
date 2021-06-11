@@ -24,9 +24,7 @@ from inspect import signature
 from logwrap import log_wrap
 
 
-def example_function(
-    arg1, arg2: int = 2, *args, arg3, arg4: int = 4, **kwargs
-) -> None:
+def example_function(arg1, arg2: int = 2, *args, arg3, arg4: int = 4, **kwargs) -> None:
     """Function to use as signature source."""
 
 
@@ -38,7 +36,7 @@ class TestBind(unittest.TestCase):
     def test_001_positive(self):
         params = list(log_wrap.bind_args_kwargs(sig, 1, arg3=33))
         arg_1_bound = params[0]
-        self.assertEqual(arg_1_bound.name, 'arg1')
+        self.assertEqual(arg_1_bound.name, "arg1")
         self.assertEqual(arg_1_bound.value, 1)
         self.assertEqual(arg_1_bound.default, arg_1_bound.empty)
         self.assertEqual(arg_1_bound.annotation, arg_1_bound.empty)
@@ -46,7 +44,7 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(arg_1_bound), "arg1=1")
 
         arg_2_bound = params[1]
-        self.assertEqual(arg_2_bound.name, 'arg2')
+        self.assertEqual(arg_2_bound.name, "arg2")
         self.assertEqual(arg_2_bound.value, 2)
         self.assertEqual(arg_2_bound.default, 2)
         self.assertEqual(arg_2_bound.annotation, int)
@@ -54,7 +52,7 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(arg_2_bound), "arg2: int=2  # 2")
 
         args_bound = params[2]
-        self.assertEqual(args_bound.name, 'args')
+        self.assertEqual(args_bound.name, "args")
         self.assertEqual(args_bound.value, args_bound.empty)
         self.assertEqual(args_bound.default, args_bound.empty)
         self.assertEqual(args_bound.annotation, args_bound.empty)
@@ -62,7 +60,7 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(args_bound), "*args=()")
 
         arg_3_bound = params[3]
-        self.assertEqual(arg_3_bound.name, 'arg3')
+        self.assertEqual(arg_3_bound.name, "arg3")
         self.assertEqual(arg_3_bound.value, 33)
         self.assertEqual(arg_3_bound.default, arg_3_bound.empty)
         self.assertEqual(arg_3_bound.annotation, arg_3_bound.empty)
@@ -70,7 +68,7 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(arg_3_bound), "arg3=33")
 
         arg_4_bound = params[4]
-        self.assertEqual(arg_4_bound.name, 'arg4')
+        self.assertEqual(arg_4_bound.name, "arg4")
         self.assertEqual(arg_4_bound.value, 4)
         self.assertEqual(arg_4_bound.default, 4)
         self.assertEqual(arg_4_bound.annotation, int)
@@ -78,7 +76,7 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(arg_4_bound), "arg4: int=4  # 4")
 
         kwargs_bound = params[5]
-        self.assertEqual(kwargs_bound.name, 'kwargs')
+        self.assertEqual(kwargs_bound.name, "kwargs")
         self.assertEqual(kwargs_bound.value, kwargs_bound.empty)
         self.assertEqual(kwargs_bound.default, kwargs_bound.empty)
         self.assertEqual(kwargs_bound.annotation, kwargs_bound.empty)
@@ -89,7 +87,7 @@ class TestBind(unittest.TestCase):
         params = list(log_wrap.bind_args_kwargs(sig, 1, 2, 3, arg3=30, arg4=40, arg5=50))
 
         args_bound = params[2]
-        self.assertEqual(args_bound.name, 'args')
+        self.assertEqual(args_bound.name, "args")
         self.assertEqual(args_bound.value, (3,))
         self.assertEqual(args_bound.default, args_bound.empty)
         self.assertEqual(args_bound.annotation, args_bound.empty)
@@ -97,8 +95,8 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(args_bound), "*args=(3,)")
 
         kwargs_bound = params[5]
-        self.assertEqual(kwargs_bound.name, 'kwargs')
-        self.assertEqual(kwargs_bound.value, {'arg5': 50})
+        self.assertEqual(kwargs_bound.name, "kwargs")
+        self.assertEqual(kwargs_bound.value, {"arg5": 50})
         self.assertEqual(kwargs_bound.default, kwargs_bound.empty)
         self.assertEqual(kwargs_bound.annotation, kwargs_bound.empty)
         self.assertEqual(kwargs_bound.kind, kwargs_bound.VAR_KEYWORD)
@@ -119,7 +117,7 @@ class TestBind(unittest.TestCase):
         params = list(log_wrap.bind_args_kwargs(sig, 1, 2, 4))
 
         arg_1_bound = params[0]
-        self.assertEqual(arg_1_bound.name, 'arg1')
+        self.assertEqual(arg_1_bound.name, "arg1")
         self.assertEqual(arg_1_bound.value, 1)
         self.assertEqual(arg_1_bound.default, arg_1_bound.empty)
         self.assertEqual(arg_1_bound.annotation, arg_1_bound.empty)
@@ -127,7 +125,7 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(arg_1_bound), "arg1=1")
 
         arg_2_bound = params[1]
-        self.assertEqual(arg_2_bound.name, 'arg2')
+        self.assertEqual(arg_2_bound.name, "arg2")
         self.assertEqual(arg_2_bound.value, 2)
         self.assertEqual(arg_2_bound.default, arg_2_bound.empty)
         self.assertEqual(arg_2_bound.annotation, int)
@@ -135,7 +133,7 @@ class TestBind(unittest.TestCase):
         self.assertEqual(str(arg_2_bound), "arg2: int=2")
 
         arg_3_bound = params[2]
-        self.assertEqual(arg_3_bound.name, 'arg3')
+        self.assertEqual(arg_3_bound.name, "arg3")
         self.assertEqual(arg_3_bound.value, 4)
         self.assertEqual(arg_3_bound.default, 3)
         self.assertEqual(arg_3_bound.annotation, int)

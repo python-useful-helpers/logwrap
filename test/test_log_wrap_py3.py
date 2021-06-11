@@ -42,14 +42,14 @@ class TestLogWrapAsync(unittest.TestCase):
 
         Due to no possibility of proper mock patch of function defaults, modify directly.
         """
-        self.logger = logging.getLogger('logwrap')
+        self.logger = logging.getLogger("logwrap")
         self.logger.setLevel(logging.DEBUG)
 
         self.stream = io.StringIO()
 
         self.logger.handlers.clear()
         handler = logging.StreamHandler(self.stream)
-        handler.setFormatter(logging.Formatter(fmt='%(levelname)s>%(message)s'))
+        handler.setFormatter(logging.Formatter(fmt="%(levelname)s>%(message)s"))
         self.logger.addHandler(handler)
 
     def tearDown(self):
@@ -64,17 +64,14 @@ class TestLogWrapAsync(unittest.TestCase):
 
         self.loop.run_until_complete(func())
         self.assertEqual(
-            "DEBUG>Awaiting: \n"
-            "func()\n"
-            "DEBUG>Done: 'func' with result:\n"
-            "None\n",
+            "DEBUG>Awaiting: \n" "func()\n" "DEBUG>Done: 'func' with result:\n" "None\n",
             self.stream.getvalue(),
         )
 
     def test_coroutine_async_as_argumented(self):
-        new_logger = mock.Mock(spec=logging.Logger, name='logger')
-        log = mock.Mock(name='log')
-        new_logger.attach_mock(log, 'log')
+        new_logger = mock.Mock(spec=logging.Logger, name="logger")
+        log = mock.Mock(name="log")
+        new_logger.attach_mock(log, "log")
 
         @logwrap.logwrap(log=new_logger)
         @asyncio.coroutine
@@ -85,14 +82,8 @@ class TestLogWrapAsync(unittest.TestCase):
 
         self.assertEqual(
             [
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \nfunc()"
-                ),
-                mock.call.log(
-                    level=logging.DEBUG,
-                    msg="Done: 'func' with result:\nNone"
-                )
+                mock.call.log(level=logging.DEBUG, msg="Awaiting: \nfunc()"),
+                mock.call.log(level=logging.DEBUG, msg="Done: 'func' with result:\nNone"),
             ],
             log.mock_calls,
         )
@@ -101,29 +92,25 @@ class TestLogWrapAsync(unittest.TestCase):
         @logwrap.logwrap
         @asyncio.coroutine
         def func():
-            raise Exception('Expected')
+            raise Exception("Expected")
 
         with self.assertRaises(Exception):
             self.loop.run_until_complete(func())
 
         self.assertEqual(
-            'DEBUG>Awaiting: \n'
-            "func()\n"
-            'ERROR>Failed: \n'
-            "func()\n"
-            'Traceback (most recent call last):',
-            '\n'.join(self.stream.getvalue().split('\n')[:5]),
+            "DEBUG>Awaiting: \n" "func()\n" "ERROR>Failed: \n" "func()\n" "Traceback (most recent call last):",
+            "\n".join(self.stream.getvalue().split("\n")[:5]),
         )
 
     def test_exceptions_blacklist(self):
-        new_logger = mock.Mock(spec=logging.Logger, name='logger')
-        log = mock.Mock(name='log')
-        new_logger.attach_mock(log, 'log')
+        new_logger = mock.Mock(spec=logging.Logger, name="logger")
+        log = mock.Mock(name="log")
+        new_logger.attach_mock(log, "log")
 
         @logwrap.logwrap(log=new_logger, blacklisted_exceptions=[TypeError])
         @asyncio.coroutine
         def func():
-            raise TypeError('Blacklisted')
+            raise TypeError("Blacklisted")
 
         with self.assertRaises(TypeError):
             self.loop.run_until_complete(func())
@@ -133,11 +120,8 @@ class TestLogWrapAsync(unittest.TestCase):
 
         self.assertEqual(
             [
-                mock.call(
-                    level=logging.DEBUG,
-                    msg="Awaiting: \nfunc()"
-                ),
-                mock.call(exc_info=False, level=40, msg=f'Failed: \nfunc()\n{TypeError.__name__}')
+                mock.call(level=logging.DEBUG, msg="Awaiting: \nfunc()"),
+                mock.call(exc_info=False, level=40, msg=f"Failed: \nfunc()\n{TypeError.__name__}"),
             ],
             log.mock_calls,
         )
@@ -150,14 +134,14 @@ class TestAnnotated(unittest.TestCase):
 
         Due to no possibility of proper mock patch of function defaults, modify directly.
         """
-        self.logger = logging.getLogger('logwrap')
+        self.logger = logging.getLogger("logwrap")
         self.logger.setLevel(logging.DEBUG)
 
         self.stream = io.StringIO()
 
         self.logger.handlers.clear()
         handler = logging.StreamHandler(self.stream)
-        handler.setFormatter(logging.Formatter(fmt='%(levelname)s>%(message)s'))
+        handler.setFormatter(logging.Formatter(fmt="%(levelname)s>%(message)s"))
         self.logger.addHandler(handler)
 
     def tearDown(self):

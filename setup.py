@@ -1,4 +1,4 @@
-#    Copyright 2016-2020 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2021 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -54,15 +54,12 @@ if cythonize is not None:
             setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
             setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
             setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
-            setuptools.Extension("logwrap.__init__", ["logwrap/__init__.pyx"]),
-            setuptools.Extension("logwrap.log_on_access", ["logwrap/log_on_access.py"]),
         ]
         INTERFACES = ["class_decorator.pxd", "log_wrap.pxd", "repr_utils.pxd"]
     else:
         REQUIRES_OPTIMIZATION = [
             setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
             setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-            setuptools.Extension("logwrap.log_on_access", ["logwrap/log_on_access.py"]),
         ]
         INTERFACES = ["class_decorator.pxd", "repr_utils.pxd"]
 
@@ -129,7 +126,7 @@ class AllowFailRepair(build_ext.build_ext):
 
 # noinspection PyUnresolvedReferences
 def get_simple_vars_from_src(
-    src: str
+    src: str,
 ) -> "typing.Dict[str, typing.Union[str, bytes, int, float, complex, list, set, dict, tuple, None, bool, Ellipsis]]":
     """Get simple (string/number/boolean and None) assigned values from source.
 
@@ -203,9 +200,11 @@ CLASSIFIERS = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
@@ -239,7 +238,7 @@ SETUP_ARGS: typing.Dict[str, typing.Union[str, typing.List[str], typing.Dict[str
         "wheel",
         "setuptools_scm[toml]>=3.4",
     ],
-    use_scm_version={"write_to": f'{PACKAGE_NAME}/_version.py'},
+    use_scm_version={"write_to": f"{PACKAGE_NAME}/_version.py"},
     install_requires=REQUIRED,
     package_data={PACKAGE_NAME: INTERFACES + ["py.typed"]},
 )
@@ -250,7 +249,7 @@ if cythonize is not None:
 try:
     setuptools.setup(**SETUP_ARGS)
 except BuildFailed:
-    print("*" * 80 + "\n" "* Build Failed!\n" "* Use clear scripts version.\n" "*" * 80 + "\n")
+    print("*" * 80 + "\n* Build Failed!\n* Use clear scripts version.\n" + "*" * 80 + "\n")
     del SETUP_ARGS["ext_modules"]
     del SETUP_ARGS["cmdclass"]
     SETUP_ARGS["package_data"][PACKAGE_NAME] = ["py.typed"]

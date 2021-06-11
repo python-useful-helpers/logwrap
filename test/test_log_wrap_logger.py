@@ -26,7 +26,7 @@ class TestLogWrapLoggerInTargetModule(unittest.TestCase):
 
         self.logger.handlers.clear()
         handler = logging.StreamHandler(self.stream)
-        handler.setFormatter(logging.Formatter(fmt='%(levelname)s>%(message)s'))
+        handler.setFormatter(logging.Formatter(fmt="%(levelname)s>%(message)s"))
         self.logger.addHandler(handler)
 
     def tearDown(self):
@@ -36,31 +36,25 @@ class TestLogWrapLoggerInTargetModule(unittest.TestCase):
     def test_001_simple(self):
         @logwrap.logwrap
         def func():
-            return 'No args'
+            return "No args"
 
         result = func()
-        self.assertEqual(result, 'No args')
+        self.assertEqual(result, "No args")
 
         self.assertEqual(
-            f"DEBUG>Calling: \n"
-            f"func()\n"
-            f"DEBUG>Done: 'func' with result:\n"
-            f"{logwrap.pretty_repr(result)}\n",
+            f"DEBUG>Calling: \n" f"func()\n" f"DEBUG>Done: 'func' with result:\n" f"{logwrap.pretty_repr(result)}\n",
             self.stream.getvalue(),
         )
 
     def test_002_logger_no_prefetch(self):
         @logwrap.logwrap()
         def func():
-            return 'No args'
+            return "No args"
 
         result = func()
-        self.assertEqual(result, 'No args')
+        self.assertEqual(result, "No args")
 
         self.assertEqual(
-            f"DEBUG>Calling: \n"
-            f"func()\n"
-            f"DEBUG>Done: 'func' with result:\n"
-            f"{logwrap.pretty_repr(result)}\n",
+            f"DEBUG>Calling: \n" f"func()\n" f"DEBUG>Done: 'func' with result:\n" f"{logwrap.pretty_repr(result)}\n",
             self.stream.getvalue(),
         )
