@@ -32,7 +32,7 @@ __all__ = ("LogOnAccess",)
 
 _LOGGER: logging.Logger = logging.getLogger(__name__)
 _CURRENT_FILE = os.path.abspath(__file__)
-_OwnerT = typing.TypeVar("_OwnerT", bound=type)
+_OwnerT = typing.TypeVar("_OwnerT")
 _ReturnT = typing.TypeVar("_ReturnT")
 
 
@@ -249,7 +249,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         if owner is not None:
             return f"<{owner.__name__}() at 0x{id(instance):X}>"
         if self.__objclass__ is not None:
-            return f"<{self.__objclass__.__name__}() at 0x{id(instance):X}>"
+            return f"<{self.__objclass__.__name__}() at 0x{id(instance):X}>"  # type: ignore
         return f"<{instance.__class__.__name__}() at 0x{id(instance):X}>"
 
     def _get_logger_for_instance(self, instance: _OwnerT) -> logging.Logger:
