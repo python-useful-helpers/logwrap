@@ -1,4 +1,4 @@
-#    Copyright 2016 - 2020 Alexey Stepanov aka penguinolog
+#    Copyright 2016 - 2021 Alexey Stepanov aka penguinolog
 
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -24,7 +24,7 @@ import types
 import typing
 
 
-cpdef tuple __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
 cdef:
     bint _known_callable(item: typing.Any):

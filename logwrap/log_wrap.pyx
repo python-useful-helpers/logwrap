@@ -1,4 +1,4 @@
-#    Copyright 2016 - 2020 Alexey Stepanov aka penguinolog
+#    Copyright 2016 - 2021 Alexey Stepanov aka penguinolog
 
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -32,7 +32,7 @@ from logwrap import constants
 from logwrap cimport class_decorator
 from logwrap cimport repr_utils
 
-cpdef tuple __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
 LOGGER = logging.getLogger("logwrap")  # type: logging.Logger
 cdef unsigned long INDENT = 4
