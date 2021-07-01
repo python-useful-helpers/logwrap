@@ -104,26 +104,33 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
     'fail_set_del'
 
     >>> logs = log.getvalue().splitlines()
-    >>> logs[0] == "DEBUG:log_on_access:Test(val=ok).ok -> 'ok'"
-    True
-    >>> logs[1] == "DEBUG:log_on_access:Test(val=ok).ok = 'OK'"
-    True
-    >>> logs[2] == "DEBUG:log_on_access:del Test(val=OK).ok"
-    True
-    >>> logs[3] == "DEBUG:log_on_access:Test(val=).ok = 'fail_get'"
-    True
-    >>> logs[4:6]
-    ['DEBUG:log_on_access:Failed Test(val=fail_get).fail_get', 'Traceback (most recent call last):']
-    >>> logs[14] == "DEBUG:log_on_access:Test(val=fail_get).ok = 'fail_set_del'"
-    True
-    >>> logs[16] == "DEBUG:log_on_access:Failed Test(val=fail_set_del).fail_set_del = 'fail'"
-    True
-    >>> logs[17] == 'Traceback (most recent call last):'
-    True
-    >>> logs[26] == 'DEBUG:log_on_access:Test(val=fail_set_del): failed to delete fail_set_del'
-    True
-    >>> logs[27] == 'Traceback (most recent call last):'
-    True
+    >>> # Getter
+    >>> logs[0]
+    'DEBUG:log_on_access:Request: Test(val=ok).ok'
+    >>> logs[1]
+    "DEBUG:log_on_access:Done at 0.000s: Test(val=ok).ok -> 'ok'"
+    >>> # Setter
+    >>> logs[2]
+    "DEBUG:log_on_access:Request: Test(val=ok).ok = 'OK'"
+    >>> logs[3]
+    "DEBUG:log_on_access:Done at 0.000s: Test(val=ok).ok = 'OK'"
+    >>> # Deleter
+    >>> logs[4]
+    'DEBUG:log_on_access:Request: del Test(val=OK).ok'
+    >>> logs[5]
+    'DEBUG:log_on_access:Done at 0.000s: del Test(val=OK).ok'
+    >>> # Setter without getter
+    >>> logs[6]
+    "DEBUG:log_on_access:Request: Test(val=).ok = 'fail_get'"
+    >>> logs[7]
+    "DEBUG:log_on_access:Done at 0.000s: Test(val=).ok = 'fail_get'"
+    >>> # Failed getter (not set)
+    >>> logs[8]
+    'DEBUG:log_on_access:Request: Test(val=fail_get).fail_get'
+    >>> logs[9]
+    'DEBUG:log_on_access:Failed after 0.000s: Test(val=fail_get).fail_get'
+    >>> logs[10]
+    'Traceback (most recent call last):'
 
     .. versionadded:: 6.1.0
     """
@@ -195,9 +202,9 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__override_name: typing.Optional[str] = override_name
         self.__max_indent: int = max_indent
         self.__name: str = ""
-        self.__owner: typing.Optional[_OwnerT] = None
+        self.__owner: typing.Optional[typing.Type[_OwnerT]] = None
 
-    def __set_name__(self, owner: typing.Optional[_OwnerT], name: str) -> None:
+    def __set_name__(self, owner: typing.Optional[typing.Type[_OwnerT]], name: str) -> None:
         """Set __name__ and __objclass__ property.
 
         :param owner: owner class, where descriptor applied
@@ -209,7 +216,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__name = name
 
     @property
-    def __objclass__(self) -> typing.Optional[_OwnerT]:  # pragma: no cover
+    def __objclass__(self) -> typing.Optional[typing.Type[_OwnerT]]:  # pragma: no cover
         """Read-only owner.
 
         :return: property owner class
