@@ -256,7 +256,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         if owner is not None:
             return f"<{owner.__name__}() at 0x{id(instance):X}>"
         if self.__objclass__ is not None:
-            return f"<{self.__objclass__.__name__}() at 0x{id(instance):X}>"  # type: ignore
+            return f"<{self.__objclass__.__name__}() at 0x{id(instance):X}>"
         return f"<{instance.__class__.__name__}() at 0x{id(instance):X}>"
 
     def _get_logger_for_instance(self, instance: _OwnerT) -> logging.Logger:

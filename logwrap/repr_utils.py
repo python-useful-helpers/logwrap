@@ -127,7 +127,7 @@ class ReprParameter:
         # noinspection PyTypeChecker
         return self.parameter.kind
 
-    def __hash__(self) -> typing.NoReturn:
+    def __hash__(self) -> typing.NoReturn:  # pylint: disable=invalid-hash-returned
         """Block hashing.
 
         :raises TypeError: Not hashable.
