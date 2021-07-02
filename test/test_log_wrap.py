@@ -219,40 +219,6 @@ class TestLogWrap(unittest.TestCase):
             log.mock_calls,
         )
 
-    def test_009_spec(self):
-
-        new_logger = mock.Mock(spec=logging.Logger, name="logger")
-        log = mock.Mock(name="log")
-        new_logger.attach_mock(log, "log")
-
-        arg = "test arg"
-
-        # noinspection PyShadowingNames
-        def spec_func(arg=arg):
-            pass
-
-        with self.assertWarns(DeprecationWarning):
-            @logwrap.logwrap(log=new_logger, spec=spec_func)
-            def func(*args, **kwargs):
-                return args[0] if args else kwargs.get("arg", arg)
-
-        result = func()
-        self.assertEqual(result, arg)
-        self.assertEqual(
-            [
-                mock.call(
-                    level=logging.DEBUG,
-                    msg=f"Calling: \n"
-                    f"func(\n"
-                    f"    # POSITIONAL_OR_KEYWORD:\n"
-                    f"    arg={logwrap.pretty_repr(arg, indent=8, no_indent_start=True)},\n"
-                    f")",
-                ),
-                mock.call(level=logging.DEBUG, msg=f"Done: 'func' with result:\n" f"{logwrap.pretty_repr(result)}"),
-            ],
-            log.mock_calls,
-        )
-
     def test_010_indent(self):
         new_logger = mock.Mock(spec=logging.Logger, name="logger")
         log = mock.Mock(name="log")
@@ -296,19 +262,6 @@ class TestLogWrap(unittest.TestCase):
             f")\n"
             f"DEBUG>Done: 'func' with result:\n"
             f"{logwrap.pretty_repr(result)}\n",
-            self.stream.getvalue(),
-        )
-
-    def test_012_class_decorator(self):
-        with self.assertWarns(DeprecationWarning):
-            @logwrap.LogWrap
-            def func():
-                return "No args"
-
-        result = func()
-        self.assertEqual(result, "No args")
-        self.assertEqual(
-            f"DEBUG>Calling: \n" f"func()\n" f"DEBUG>Done: 'func' with result:\n" f"{logwrap.pretty_repr(result)}\n",
             self.stream.getvalue(),
         )
 
@@ -644,7 +597,6 @@ class TestObject(unittest.TestCase):
             "log_level={obj.log_level}, "
             "exc_level={obj.exc_level}, "
             "max_indent={obj.max_indent}, "
-            "spec=None, "
             "blacklisted_names={obj.blacklisted_names}, "
             "blacklisted_exceptions={obj.blacklisted_exceptions}, "
             "log_call_args={obj.log_call_args}, "

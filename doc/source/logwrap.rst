@@ -12,10 +12,8 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
     .. versionadded:: 2.2.0
 
-    .. py:method:: __init__(func=None, *, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, spec=None, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
+    .. py:method:: __init__(*, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
 
-        :param func: function to wrap
-        :type func: typing.Optional[typing.Callable]
         :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
         :type log: typing.Optional[logging.Logger]
         :param log_level: log level for successful calls
@@ -24,14 +22,6 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type exc_level: int
         :param max_indent: maximum indent before classic `repr()` call.
         :type max_indent: int
-        :param spec: callable object used as spec for arguments bind.
-                     This is designed for the special cases only,
-                     when impossible to change signature of target object,
-                     but processed/redirected signature is accessible.
-                     Note: this object should provide fully compatible
-                     signature with decorated function, or arguments bind
-                     will be failed!
-        :type spec: typing.Optional[typing.Callable]
         :param blacklisted_names: Blacklisted argument names.
                                   Arguments with this names will be skipped in log.
         :type blacklisted_names: typing.Optional[typing.Iterable[str]]
@@ -53,6 +43,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         .. versionchanged:: 4.0.0 Drop of `*args`
         .. versionchanged:: 5.1.0 log_traceback parameter
         .. versionchanged:: 8.0.0 pick up logger from target module if possible
+        .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
 
     .. py:method:: pre_process_param(self, arg)
 
@@ -99,12 +90,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     .. py:attribute:: log_traceback
     .. py:attribute:: log_result_obj
 
-    .. py:attribute:: _func
-
-        ``typing.Optional[typing.Callable[..., typing.Awaitable]]``
-        Wrapped function. Used for inheritance only.
-
-    .. py:method:: __call__(*args, **kwargs)
+    .. py:method:: __call__(func)
 
         Decorator entry-point. Logic is stored separately and load depends on python version.
 
@@ -112,7 +98,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :rtype: typing.Union[typing.Callable, typing.Awaitable]
 
 
-.. py:function:: logwrap(func=None, *, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, spec=None, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
+.. py:function:: logwrap(func=None, *, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
 
     Log function calls and return values.
 
@@ -126,13 +112,6 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :type exc_level: int
     :param max_indent: maximum indent before classic `repr()` call.
     :type max_indent: int
-    :param spec: callable object used as spec for arguments bind.
-                 This is designed for the special cases only,
-                 when impossible to change signature of target object,
-                 but processed/redirected signature is accessible.
-                 Note: this object should provide fully compatible signature
-                 with decorated function, or arguments bind will be failed!
-    :type spec: typing.Optional[typing.Callable]
     :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
     :type blacklisted_names: typing.Optional[typing.Iterable[str]]
     :param blacklisted_exceptions: list of exceptions, which should be re-raised
@@ -154,6 +133,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     .. versionchanged:: 4.0.0 Drop of *args
     .. versionchanged:: 5.1.0 log_traceback parameter
     .. versionchanged:: 8.0.0 pick up logger from target module if possible
+    .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
 
 
 .. py:class:: BoundParameter(inspect.Parameter)

@@ -51,17 +51,15 @@ with open("README.rst") as f:
 if cythonize is not None:
     if "win32" != sys.platform:
         REQUIRES_OPTIMIZATION = [
-            setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
             setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
             setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
         ]
-        INTERFACES = ["class_decorator.pxd", "log_wrap.pxd", "repr_utils.pxd"]
+        INTERFACES = ["log_wrap.pxd", "repr_utils.pxd"]
     else:
         REQUIRES_OPTIMIZATION = [
-            setuptools.Extension("logwrap.class_decorator", ["logwrap/class_decorator.pyx"]),
             setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
         ]
-        INTERFACES = ["class_decorator.pxd", "repr_utils.pxd"]
+        INTERFACES = ["repr_utils.pxd"]
 
     EXT_MODULES = cythonize(
         module_list=REQUIRES_OPTIMIZATION,

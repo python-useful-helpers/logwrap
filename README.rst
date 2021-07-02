@@ -46,6 +46,7 @@ Pros:
     Python 3.7
     Python 3.8
     Python 3.9
+    Python 3.10
 
 .. note:: 2.7 is supported in versions < 5.0.0, python 3.5 in versions < 6 due to syntax changes.
 
@@ -82,7 +83,6 @@ Argumented usage with arguments from signature:
         log_level=logging.DEBUG,
         exc_level=logging.ERROR,
         max_indent=20,  # forwarded to the pretty_repr
-        spec=None,  # use target callable function for spec
         blacklisted_names=None,  # list argument names, which should be dropped from log
         blacklisted_exceptions=None,  # Exceptions to skip details in log (no traceback, no exception details - just class name)
         log_call_args=True,  # Log call arguments before call

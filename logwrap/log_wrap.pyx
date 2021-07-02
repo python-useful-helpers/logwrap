@@ -24,13 +24,11 @@ import sys
 import traceback
 import types
 import typing
-import warnings
 
 # Package Implementation
 from logwrap import constants
 
 # Package Implementation
-from logwrap cimport class_decorator
 from logwrap cimport repr_utils
 
 __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
@@ -39,7 +37,7 @@ LOGGER = logging.getLogger("logwrap")  # type: logging.Logger
 cdef unsigned long INDENT = 4
 cdef str _CURRENT_FILE = os.path.abspath(__file__)
 
-FuncResultType = typing.TypeVar("FuncResultType", typing.Awaitable[typing.Any], typing.Any)
+_WrappedT = typing.TypeVar("_WrappedT", bound=typing.Callable[..., typing.Any])
 
 
 class BoundParameter(inspect.Parameter):
@@ -151,18 +149,16 @@ def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing
     return result
 
 
-cdef class LogWrap(class_decorator.BaseDecorator):
+cdef class LogWrap:
     """Base class for LogWrap implementation."""
 
     def __init__(
         self,
-        func: typing.Optional[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]] = None,
         *,
         log: typing.Optional[logging.Logger] = None,
         unsigned long log_level=logging.DEBUG,
         unsigned long exc_level=logging.ERROR,
         unsigned long max_indent=20,
-        spec: typing.Optional[typing.Callable[..., FuncResultType]] = None,
         blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
         blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
         bint log_call_args=True,
@@ -172,8 +168,6 @@ cdef class LogWrap(class_decorator.BaseDecorator):
     ) -> None:
         """Log function calls and return values.
 
-        :param func: DEPRECATED. function to wrap
-        :type func: typing.Optional[typing.Callable]
         :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
         :type log: typing.Optional[logging.Logger]
         :param log_level: log level for successful calls
@@ -182,15 +176,6 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         :type exc_level: int
         :param max_indent: maximum indent before classic `repr()` call.
         :type max_indent: int
-        :param spec: DEPRECATED.
-                     Callable object used as spec for arguments bind.
-                     This is designed for the special cases only,
-                     when impossible to change signature of target object,
-                     but processed/redirected signature is accessible.
-                     Note: this object should provide fully compatible
-                     signature with decorated function, or arguments bind
-                     will be failed!
-        :type spec: typing.Optional[typing.Callable]
         :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
         :type blacklisted_names: typing.Optional[typing.Iterable[str]]
         :param blacklisted_exceptions: list of exception, which should be re-raised
@@ -208,14 +193,6 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
         .. versionchanged:: 5.1.0 log_traceback parameter
         """
-        super().__init__(func=func)
-
-        if func is not None:
-            warnings.warn(
-                "Using LogWrap class as decorator is deprecated and support will be removed at the next major version. "
-                "LogWrap class instance should be used as decorator.",
-                DeprecationWarning,
-            )
 
         self.log_level = log_level
         self.exc_level = exc_level
@@ -241,18 +218,9 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         else:
             self._logger = None
 
-        if spec:
-            warnings.warn(
-                "spec argument is deprecated and will be removed at the next major version. "
-                "Originally it was needed mostly for cases with lost original spec in wrappers (python 2 issue).",
-                DeprecationWarning,
-            )
-
-        self._spec = spec or self._func
-
         # We are not interested to pass any arguments to object
 
-    def _get_logger_for_func(self, func: FuncResultType) -> logging.Logger:
+    def _get_logger_for_func(self, func: _WrappedT) -> logging.Logger:
         """Get logger for function from function module if possible.
 
         :param func: decorated function
@@ -300,7 +268,6 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             f"log_level={self.log_level}, "
             f"exc_level={self.exc_level}, "
             f"max_indent={self.max_indent}, "
-            f"spec={self._spec}, "
             f"blacklisted_names={self.blacklisted_names}, "
             f"blacklisted_exceptions={self.blacklisted_exceptions}, "
             f"log_call_args={self.log_call_args}, "
@@ -507,7 +474,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
                 exc_info=False,
             )
 
-    def _get_function_wrapper(self, func: typing.Callable[..., FuncResultType]) -> typing.Callable[..., FuncResultType]:
+    def _get_function_wrapper(self, func: _WrappedT) -> _WrappedT:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -526,7 +493,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             :rtype: typing.Any
             :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
             """
-            sig = inspect.signature(self._spec or func)
+            sig = inspect.signature(func)
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
@@ -546,7 +513,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             :rtype: typing.Any
             :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
             """
-            sig = inspect.signature(self._spec or func)
+            sig = inspect.signature(func)
             args_repr = self._get_func_args_repr(sig=sig, args=args, kwargs=kwargs)
 
             try:
@@ -560,34 +527,29 @@ cdef class LogWrap(class_decorator.BaseDecorator):
 
         return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper
 
-    def __call__(
-        self,
-        *args: typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any],
-        **kwargs: typing.Any,
-    ) -> typing.Union[typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]], typing.Any]:
+    def __call__(self, func: _WrappedT) -> _WrappedT:
         """Callable instance.
 
-        :return: decorated function if it provided via arguments else function result
+        :return: decorated function
         :rtype: typing.Union[typing.Callable[..., ReturnType], ReturnType]
         """
-        return super().__call__(*args, **kwargs)
+        return self._get_function_wrapper(func)
 
 
 def logwrap(
-    func: typing.Optional[typing.Callable[..., FuncResultType]] = None,
+    func: typing.Optional[_WrappedT] = None,
     *,
     log: typing.Optional[logging.Logger] = None,
     unsigned long log_level=logging.DEBUG,
     unsigned long exc_level=logging.ERROR,
     unsigned long max_indent=20,
-    spec: typing.Optional[typing.Callable[..., FuncResultType]] = None,
     blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
     blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
     bint log_call_args=True,
     bint log_call_args_on_exc=True,
     bint log_traceback=True,
     bint log_result_obj=True
-) -> typing.Union[LogWrap, typing.Callable[..., FuncResultType]]:
+) -> typing.Union[LogWrap, _WrappedT]:
     """Log function calls and return values.
 
     :param func: function to wrap
@@ -600,13 +562,6 @@ def logwrap(
     :type exc_level: int
     :param max_indent: maximum indent before classic `repr()` call.
     :type max_indent: int
-    :param spec: callable object used as spec for arguments bind.
-                 This is designed for the special cases only,
-                 when impossible to change signature of target object,
-                 but processed/redirected signature is accessible.
-                 Note: this object should provide fully compatible signature
-                 with decorated function, or arguments bind will be failed!
-    :type spec: typing.Optional[typing.Callable]
     :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
     :type blacklisted_names: typing.Optional[typing.Iterable[str]]
     :param blacklisted_exceptions: list of exceptions, which should be re-raised
@@ -634,7 +589,6 @@ def logwrap(
         log_level=log_level,
         exc_level=exc_level,
         max_indent=max_indent,
-        spec=spec,
         blacklisted_names=blacklisted_names,
         blacklisted_exceptions=blacklisted_exceptions,
         log_call_args=log_call_args,

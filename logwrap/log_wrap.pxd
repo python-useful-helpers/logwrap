@@ -20,13 +20,12 @@ import logging
 import typing
 
 # Package Implementation
-from logwrap cimport class_decorator
 
 cdef:
     unsigned long indent
 
 
-    class LogWrap(class_decorator.BaseDecorator):
+    class LogWrap:
         """Base class for LogWrap implementation."""
 
         cdef:
@@ -39,7 +38,6 @@ cdef:
             public bint log_traceback
             public bint log_result_obj
 
-            readonly object _spec
             readonly object _logger
 
             list __blacklisted_names
