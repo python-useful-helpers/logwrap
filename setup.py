@@ -22,15 +22,15 @@ import distutils.errors
 import os.path
 import shutil
 import sys
+import typing
 from distutils.command import build_ext
 
 # External Dependencies
 import setuptools
-import typing
-
 
 try:
     # noinspection PyPackageRequirements
+    # External Dependencies
     from Cython.Build import cythonize
 except ImportError:
     cythonize = None

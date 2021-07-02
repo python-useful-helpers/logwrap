@@ -23,7 +23,7 @@ import logging
 import unittest
 from unittest import mock
 
-# LogWrap Implementation
+# Package Implementation
 import logwrap
 
 

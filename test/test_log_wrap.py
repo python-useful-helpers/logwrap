@@ -25,7 +25,7 @@ import logging
 import unittest
 from unittest import mock
 
-# LogWrap Implementation
+# Package Implementation
 import logwrap
 
 
@@ -220,6 +220,7 @@ class TestLogWrap(unittest.TestCase):
         )
 
     def test_009_spec(self):
+
         new_logger = mock.Mock(spec=logging.Logger, name="logger")
         log = mock.Mock(name="log")
         new_logger.attach_mock(log, "log")
@@ -230,12 +231,10 @@ class TestLogWrap(unittest.TestCase):
         def spec_func(arg=arg):
             pass
 
-        @logwrap.logwrap(
-            log=new_logger,
-            spec=spec_func,
-        )
-        def func(*args, **kwargs):
-            return args[0] if args else kwargs.get("arg", arg)
+        with self.assertWarns(DeprecationWarning):
+            @logwrap.logwrap(log=new_logger, spec=spec_func)
+            def func(*args, **kwargs):
+                return args[0] if args else kwargs.get("arg", arg)
 
         result = func()
         self.assertEqual(result, arg)
@@ -301,9 +300,10 @@ class TestLogWrap(unittest.TestCase):
         )
 
     def test_012_class_decorator(self):
-        @logwrap.LogWrap
-        def func():
-            return "No args"
+        with self.assertWarns(DeprecationWarning):
+            @logwrap.LogWrap
+            def func():
+                return "No args"
 
         result = func()
         self.assertEqual(result, "No args")

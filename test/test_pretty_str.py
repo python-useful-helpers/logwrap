@@ -21,7 +21,7 @@
 # Standard Library
 import unittest
 
-# LogWrap Implementation
+# Package Implementation
 import logwrap
 
 

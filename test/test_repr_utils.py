@@ -24,7 +24,7 @@ from __future__ import annotations
 import typing
 import unittest
 
-# LogWrap Implementation
+# Package Implementation
 import logwrap
 
 

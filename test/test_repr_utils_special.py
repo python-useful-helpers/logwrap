@@ -23,7 +23,7 @@ import sys
 import typing
 import unittest
 
-# LogWrap Implementation
+# Package Implementation
 import logwrap
 
 

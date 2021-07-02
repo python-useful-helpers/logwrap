@@ -24,6 +24,7 @@ import sys
 import traceback
 import types
 import typing
+import warnings
 
 # Package Implementation
 from logwrap import constants
@@ -171,7 +172,7 @@ cdef class LogWrap(class_decorator.BaseDecorator):
     ) -> None:
         """Log function calls and return values.
 
-        :param func: function to wrap
+        :param func: DEPRECATED. function to wrap
         :type func: typing.Optional[typing.Callable]
         :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
         :type log: typing.Optional[logging.Logger]
@@ -181,7 +182,8 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         :type exc_level: int
         :param max_indent: maximum indent before classic `repr()` call.
         :type max_indent: int
-        :param spec: callable object used as spec for arguments bind.
+        :param spec: DEPRECATED.
+                     Callable object used as spec for arguments bind.
                      This is designed for the special cases only,
                      when impossible to change signature of target object,
                      but processed/redirected signature is accessible.
@@ -208,6 +210,13 @@ cdef class LogWrap(class_decorator.BaseDecorator):
         """
         super().__init__(func=func)
 
+        if func is not None:
+            warnings.warn(
+                "Using LogWrap class as decorator is deprecated and support will be removed at the next major version. "
+                "LogWrap class instance should be used as decorator.",
+                DeprecationWarning,
+            )
+
         self.log_level = log_level
         self.exc_level = exc_level
         self.max_indent = max_indent
@@ -231,6 +240,13 @@ cdef class LogWrap(class_decorator.BaseDecorator):
             self._logger = log
         else:
             self._logger = None
+
+        if spec:
+            warnings.warn(
+                "spec argument is deprecated and will be removed at the next major version. "
+                "Originally it was needed mostly for cases with lost original spec in wrappers (python 2 issue).",
+                DeprecationWarning,
+            )
 
         self._spec = spec or self._func
 

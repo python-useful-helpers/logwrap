@@ -5,9 +5,8 @@ import io
 import logging
 import unittest
 
-# LogWrap Implementation
+# Package Implementation
 import logwrap
-
 
 LOGGER = logging.getLogger(__name__)
 

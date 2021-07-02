@@ -28,6 +28,7 @@ import sys
 import traceback
 import types
 import typing
+import warnings
 
 # Package Implementation
 from logwrap import class_decorator
@@ -190,7 +191,7 @@ class LogWrap(class_decorator.BaseDecorator):
     ) -> None:
         """Log function calls and return values.
 
-        :param func: function to wrap
+        :param func: DEPRECATED. function to wrap
         :type func: typing.Optional[typing.Callable]
         :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
         :type log: typing.Optional[logging.Logger]
@@ -200,7 +201,8 @@ class LogWrap(class_decorator.BaseDecorator):
         :type exc_level: int
         :param max_indent: maximum indent before classic `repr()` call.
         :type max_indent: int
-        :param spec: callable object used as spec for arguments bind.
+        :param spec: DEPRECATED.
+                     Callable object used as spec for arguments bind.
                      This is designed for the special cases only,
                      when impossible to change signature of target object,
                      but processed/redirected signature is accessible.
@@ -244,11 +246,22 @@ class LogWrap(class_decorator.BaseDecorator):
             self.__logger = None
 
         if func is not None:  # Special case: we can prefetch logger
+            warnings.warn(
+                "Using LogWrap class as decorator is deprecated and support will be removed at the next major version. "
+                "LogWrap class instance should be used as decorator.",
+                DeprecationWarning,
+            )
             self.__logger = self._get_logger_for_func(func)
 
         self.__log_level: int = log_level
         self.__exc_level: int = exc_level
         self.__max_indent: int = max_indent
+        if spec:
+            warnings.warn(
+                "spec argument is deprecated and will be removed at the next major version. "
+                "Originally it was needed mostly for cases with lost original spec in wrappers (python 2 issue).",
+                DeprecationWarning,
+            )
         self.__spec: typing.Optional[typing.Callable[..., FuncResultType]] = spec or self._func  # type: ignore
         self.__log_call_args: bool = log_call_args
         self.__log_call_args_on_exc: bool = log_call_args_on_exc

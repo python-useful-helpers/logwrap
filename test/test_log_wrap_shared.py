@@ -20,7 +20,7 @@
 import unittest
 from inspect import signature
 
-# LogWrap Implementation
+# Package Implementation
 from logwrap import log_wrap
 
 

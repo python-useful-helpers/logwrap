@@ -23,7 +23,6 @@ import inspect
 import types
 import typing
 
-
 __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
 cdef:

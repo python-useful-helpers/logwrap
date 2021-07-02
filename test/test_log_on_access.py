@@ -7,9 +7,8 @@ import io
 import logging
 import unittest
 
-# LogWrap Implementation
+# Package Implementation
 import logwrap
-
 
 VALUE = "ok"
 

@@ -22,7 +22,6 @@ available from the main module.
 import types
 import typing
 
-
 cdef:
     bint _known_callable(item: typing.Any)
     bint _simple(item: typing.Any)
