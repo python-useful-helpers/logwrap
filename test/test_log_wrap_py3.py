@@ -1,4 +1,4 @@
-#    Copyright 2016 - 2018 Alexey Stepanov aka penguinolog
+#    Copyright 2016 - 2021 Alexey Stepanov aka penguinolog
 
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -35,7 +35,7 @@ class TestLogWrapAsync(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Global preparation for tests (run once per class)."""
-        cls.loop = asyncio.get_event_loop()
+        cls.loop = asyncio.get_event_loop_policy().get_event_loop()
 
     def setUp(self):
         """Preparation for tests.

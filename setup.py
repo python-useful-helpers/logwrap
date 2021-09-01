@@ -63,9 +63,13 @@ if cythonize is not None:
 
     EXT_MODULES = cythonize(
         module_list=REQUIRES_OPTIMIZATION,
-        compiler_directives=dict(
-            always_allow_keywords=True, binding=True, embedsignature=True, overflowcheck=True, language_level=3
-        ),
+        compiler_directives={
+            "always_allow_keywords": True,
+            "binding": True,
+            "embedsignature": True,
+            "overflowcheck": True,
+            "language_level": 3,
+        },
     )
 else:
     REQUIRES_OPTIMIZATION = []
@@ -80,7 +84,7 @@ class BuildFailed(Exception):
 class AllowFailRepair(build_ext.build_ext):
     """This class allows C extension building to fail and repairs init."""
 
-    def run(self):
+    def run(self) -> None:
         """Run.
 
         :raises BuildFailed: Build is failed and clean python code should be used.
@@ -106,7 +110,7 @@ class AllowFailRepair(build_ext.build_ext):
         ):
             raise BuildFailed()
 
-    def build_extension(self, ext):
+    def build_extension(self, ext) -> None:
         """build_extension.
 
         :raises BuildFailed: Build is failed and clean python code should be used.
