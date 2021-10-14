@@ -18,6 +18,9 @@ _python:
   - &python39
     name: "Python 3.9"
     python: "3.9"
+  - &python310
+    name: "Python 3.10"
+    python: "3.10"
 
 _helpers:
   - &install_cython pip install --upgrade Cython
@@ -38,7 +41,7 @@ _helpers:
 
   - &static_analysis
     stage: Static analysis
-    <<: *python38
+    <<: *python310
 
   - &code_style_check
     stage: Code style check
@@ -78,6 +81,7 @@ script:
 jobs:
   include:
     - <<: *static_analysis
+      <<: *python37
       name: "PyLint"
       install:
         - *upgrade_python_toolset
@@ -138,6 +142,10 @@ jobs:
       <<: *python39
       after_success:
         - coveralls
+    - stage: test
+      <<: *python310
+      after_success:
+        - coveralls
 
     - <<: *test_cythonized
       <<: *python37
@@ -145,6 +153,8 @@ jobs:
       <<: *python38
     - <<: *test_cythonized
       <<: *python39
+    - <<: *test_cythonized
+      <<: *python310
 
     - stage: deploy
       # This prevents job from appearing in test plan unless commit is tagged:

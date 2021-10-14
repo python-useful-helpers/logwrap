@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-PYTHON_VERSIONS="cp37-cp37m cp38-cp38 cp39-cp39"
+PYTHON_VERSIONS="cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310"
 
 # Avoid creation of __pycache__/*.py[c|o]
 export PYTHONDONTWRITEBYTECODE=1

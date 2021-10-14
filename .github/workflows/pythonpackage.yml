@@ -26,7 +26,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.7'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -102,7 +102,7 @@ jobs:
       max-parallel: 6
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
 
     name: "Script based python ${{ matrix.python-version }} on ${{ matrix.os }}"
     steps:
@@ -130,7 +130,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
     name: "Cython based python ${{ matrix.python-version }} on linux"
 
     steps:
@@ -162,7 +162,7 @@ jobs:
         WINDOWS:
           - { ARCH: 'x86', WINDOWS: 'win32' }
           - { ARCH: 'x64', WINDOWS: 'win64' }
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
     name: "Cython based python ${{ matrix.python-version }} on ${{ matrix.WINDOWS.WINDOWS }}"
 
     steps:
@@ -196,7 +196,7 @@ jobs:
         WINDOWS:
           - { ARCH: 'x86', WINDOWS: 'win32' }
           - { ARCH: 'x64', WINDOWS: 'win64' }
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
     name: "Release for python ${{ matrix.python-version }} on ${{ matrix.WINDOWS.WINDOWS }}"
 
     steps:
