@@ -223,77 +223,38 @@ jobs:
 
   DeployManyLinux:
     needs: [ TestLinux, TestWindows ]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+#    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-#    strategy:
-#      max-parallel: 4
-#      matrix:
-#        MANYLINUX:
-#          - { VERSION: '2010', ARCH: 'x86_64' }
-#          - { VERSION: '2014', ARCH: 'i686' }
+    strategy:
+      max-parallel: 4
+      matrix:
+        PYTHON: [ "cp37-cp37m", "cp38-cp38", "cp39-cp39" , "cp310-cp310" ]
+        MANYLINUX:
+          - { VERSION: '2010', ARCH: 'x86_64' }
+          - { VERSION: '2014', ARCH: 'i686' }
 #          - { VERSION: '2014', ARCH: 'aarch64' }
-#    name: "Release for manylinux${{ matrix.MANYLINUX.VERSION }}_${{ matrix.MANYLINUX.ARCH }}"
+    name: "Release Python ${{ matrix.PYTHON }} for manylinux${{ matrix.MANYLINUX.VERSION }}_${{ matrix.MANYLINUX.ARCH }}"
+    container:
+      image: "quay.io/pypa/manylinux${{ matrix.MANYLINUX.VERSION }}_${{ matrix.MANYLINUX.ARCH }}"
+      env:
+        PYTHONDONTWRITEBYTECODE: 1
     steps:
       - uses: actions/checkout@v2
-      - name: Build Python manylinux2010-x86_64 wheels
-        uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
-        with:
-          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-          build-requirements: 'cython'
-      - name: Build Python manylinux2014-x86_64 wheels
-        uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2014_x86_64
-        with:
-          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-          build-requirements: 'cython'
-      - name: Build Python manylinux2010-i686 wheels
-        uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_i686
-        with:
-          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-          build-requirements: 'cython'
-      - name: Build Python manylinux2014-i686 wheels
-        uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2014_i686
-        with:
-          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-          build-requirements: 'cython'
-      - name: Install deploy dependencies
-        run: pip install --upgrade twine
-      - name: Deploy
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: "Install base requirements"
+          /opt/python/${{ matrix.PYTHON }}/bin/python -m pip install -U pip wheel setuptools auditwheel
+          /opt/python/${{ matrix.PYTHON }}/bin/pip install --upgrade -r build_requirements.txt
+      - name: Build package
+        run: /opt/python/${{ matrix.PYTHON }}/bin/python setup.py bdist_wheel clean
+      - name: Bundle external shared libraries into the wheels
         run: |
-          twine upload --skip-existing dist/*
-#    runs-on: ubuntu-latest
-#    container:
-#      image: ${{ matrix.MANYLINUX.CONTAINER }}
-#      env:
-#        PYTHONDONTWRITEBYTECODE: 1
-#    strategy:
-#      matrix:
-#        PYTHON: [ "cp37-cp37m", "cp38-cp38", "cp39-cp39" ]
-#        MANYLINUX:
-#          - NAME: manylinux2010_x86_64
-#            CONTAINER: "quay.io/pypa/manylinux2010_x86_64"
-#          - NAME: manylinux2014_x86_64
-#            CONTAINER: "quay.io/pypa/manylinux2014_x86_64"
-#    name: "${{ matrix.PYTHON }} for ${{ matrix.MANYLINUX.NAME }}"
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Install main dependencies
-#        run: |
-#          /opt/python/${{ matrix.PYTHON }}/bin/python -m pip install -U pip wheel setuptools
-#          /opt/python/${{ matrix.PYTHON }}/bin/pip install --upgrade -r build_requirements.txt
-#          /opt/python/${{ matrix.PYTHON }}/bin/pip install --upgrade twine
-#      - name: Build package
-#        run: /opt/python/${{ matrix.PYTHON }}/bin/python setup.py bdist_wheel clean
-#      - name: Bundle external shared libraries into the wheels
-#        run: |
-#          for whl in dist/*.whl; do
-#              echo "Repairing $whl..."
-#              auditwheel repair "$whl" -w dist/
-#          done
-#      - name: Cleanup OS specific wheels
-#        run: rm -fv dist/*-linux_*.whl
+          for whl in dist/*.whl; do
+              echo "Repairing $whl..."
+              auditwheel repair "$whl" -w dist/
+          done
+      - name: Cleanup OS specific wheels
+        run: rm -fv dist/*-linux_*.whl
+#      - name: Install deploy dependencies
+#        run: pip install --upgrade twine
 #      - name: Deploy
 #        env:
 #          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
