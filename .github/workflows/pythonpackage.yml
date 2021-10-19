@@ -3,228 +3,10 @@ name: Python package
 on: [push]
 
 jobs:
-  PEP8:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade -r flake8_requirements.txt
-      - name: Lint with flake8
-        run: |
-          flake8 logwrap
-
-  PyLint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.7'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade -r CI_REQUIREMENTS.txt
-          pip install --upgrade "pylint >= 2.6.0"
-      - name: Generate version file
-        run: |
-          python setup.py --version clean
-      - name: Lint with PyLint
-        run: |
-          pylint logwrap
-
-  MyPy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade -r CI_REQUIREMENTS.txt
-          pip install --upgrade "mypy >= 0.790"
-      - name: Generate version file
-        run: |
-          python setup.py --version clean
-      - name: Lint with MyPy
-        run: |
-          mypy --strict logwrap
-
-  Black:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade black regex
-      - name: Check code style with black
-        run: |
-          black --check logwrap
-
-  #  ISort:
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #      - uses: actions/checkout@v2
-  #      - name: Set up Python
-  #        uses: actions/setup-python@v2
-  #        with:
-  #          python-version: '3.x'
-  #      - name: Install dependencies
-  #        run: |
-  #          python -m pip install --upgrade pip
-  #          pip install -r CI_REQUIREMENTS.txt
-  #          pip install --upgrade "isort >= 5.6.0"
-  #      - name: Generate version file
-  #        run: |
-  #          python setup.py --version clean
-  #      - name: Check imports sorting with isort
-  #        run: |
-  #          isort -c --diff logwrap
-
-  TestScript:
-    needs: [PEP8, PyLint, MyPy, Black]  # isort is broken
-    runs-on: ${{ matrix.os }}
-    strategy:
-      max-parallel: 6
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
-
-    name: "Script based python ${{ matrix.python-version }} on ${{ matrix.os }}"
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip wheel
-          pip install --upgrade -r CI_REQUIREMENTS.txt
-          pip install --upgrade -r pytest_requirements.txt
-      - name: Build package and install develop
-        run: |
-          python setup.py develop -v clean
-      - name: Test with pytest
-        run: |
-          py.test --cov-report= --cov=logwrap test
-          coverage report -m --fail-under 85
-
-  TestLinux:
-    needs: [TestScript]
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
-    name: "Cython based python ${{ matrix.python-version }} on linux"
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip wheel
-          pip install --upgrade -r CI_REQUIREMENTS.txt
-          pip install --upgrade Cython
-          pip install --upgrade -r pytest_requirements.txt
-      - name: Build package and install
-        run: |
-          python setup.py bdist_wheel clean
-          pip install logwrap --no-index -f dist
-      - name: Test with pytest
-        run: |
-          py.test
-
-  TestWindows:
-    needs: [TestScript]
-    runs-on: windows-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        WINDOWS:
-          - { ARCH: 'x86', WINDOWS: 'win32' }
-          - { ARCH: 'x64', WINDOWS: 'win64' }
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
-    name: "Cython based python ${{ matrix.python-version }} on ${{ matrix.WINDOWS.WINDOWS }}"
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.WINDOWS.ARCH }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip wheel
-          pip install --upgrade -r CI_REQUIREMENTS.txt
-          pip install --upgrade Cython
-          pip install --upgrade -r pytest_requirements.txt
-      - name: Build package and install
-        run: |
-          python setup.py bdist_wheel clean
-          pip install logwrap --no-index -f dist
-      - name: Test with pytest
-        run: |
-          py.test
-
-  DeployWindows:
-    needs: [TestLinux, TestWindows]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-    runs-on: windows-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        WINDOWS:
-          - { ARCH: 'x86', WINDOWS: 'win32' }
-          - { ARCH: 'x64', WINDOWS: 'win64' }
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
-    name: "Release for python ${{ matrix.python-version }} on ${{ matrix.WINDOWS.WINDOWS }}"
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.WINDOWS.ARCH }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip wheel
-          pip install --upgrade -r build_requirements.txt
-          pip install --upgrade twine
-      - name: Build package
-        run: |
-          python setup.py sdist bdist_wheel clean
-      - name: Deploy
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          twine upload --skip-existing dist/*
-
-#  DeployManyLinux:
+  DeployManyLinux:
 #    needs: [ TestLinux, TestWindows ]
 ##    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-#    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 ##    strategy:
 ##      max-parallel: 4
 ##      matrix:
@@ -238,15 +20,15 @@ jobs:
 ##      image: "quay.io/pypa/manylinux${{ matrix.MANYLINUX.VERSION }}_${{ matrix.MANYLINUX.ARCH }}"
 ##      env:
 ##        PYTHONDONTWRITEBYTECODE: 1
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Build Python manylinux2010-x86_64 wheels
-#        uses: penguinolog/python-wheels-manylinux-build@18.10.2021-1-manylinux2010_x86_64
-#        with:
-#          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-#          build-requirements: 'cython'
-#          build-executable: 'python'
-#          build-command: 'setup.py bdist_wheel clean'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Python manylinux2010-x86_64 wheels
+        uses: penguinolog/python-wheels-manylinux-build
+        with:
+          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
+          build-requirements: 'cython'
+          build-executable: 'python'
+          build-command: 'setup.py bdist_wheel clean'
 #      - name: Build Python manylinux2014-x86_64 wheels
 #        uses: penguinolog/python-wheels-manylinux-build@18.10.2021-1-manylinux2014_x86_64
 #        with:
@@ -268,8 +50,8 @@ jobs:
 #          build-requirements: 'cython'
 #          build-executable: 'python'
 #          build-command: 'setup.py bdist_wheel clean'
-#      - name: List built packages
-#        run: ls -la dist
+      - name: List built packages
+        run: ls -la dist
 #      - name: Install deploy dependencies
 #        run: pip install --upgrade twine
 #      - name: Deploy
