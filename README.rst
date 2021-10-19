@@ -48,7 +48,12 @@ Pros:
     Python 3.9
     Python 3.10
 
-.. note:: 2.7 is supported in versions < 5.0.0, python 3.5 in versions < 6 due to syntax changes.
+.. note::
+
+    Support python versions:
+
+    * 2.7: < 5.0.0
+    * 3.5: < 6.0.0
 
 This package includes helpers:
 

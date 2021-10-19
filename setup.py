@@ -16,6 +16,8 @@
 
 """logwrap decorator for human-readable logging of command arguments."""
 
+from __future__ import annotations
+
 # Standard Library
 import ast
 import distutils.errors
@@ -129,7 +131,7 @@ class AllowFailRepair(build_ext.build_ext):
 # noinspection PyUnresolvedReferences
 def get_simple_vars_from_src(
     src: str,
-) -> "typing.Dict[str, typing.Union[str, bytes, int, float, complex, list, set, dict, tuple, None, bool, Ellipsis]]":
+) -> typing.Dict[str, typing.Union[str, bytes, int, float, complex, list, set, dict, tuple, None, bool, Ellipsis]]:
     """Get simple (string/number/boolean and None) assigned values from source.
 
     :param src: Source code
