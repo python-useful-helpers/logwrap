@@ -221,60 +221,47 @@ jobs:
         run: |
           twine upload --skip-existing dist/*
 
-#  DeployManyLinux:
-#    needs: [ TestLinux, TestWindows ]
-##    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-#    runs-on: ubuntu-latest
-##    strategy:
-##      max-parallel: 4
-##      matrix:
-##        PYTHON: [ "cp37-cp37m", "cp38-cp38", "cp39-cp39" , "cp310-cp310" ]
-##        MANYLINUX:
-##          - { VERSION: '2010', ARCH: 'x86_64' }
-##          - { VERSION: '2014', ARCH: 'i686' }
-##          - { VERSION: '2014', ARCH: 'aarch64' }
-##    name: "Release Python ${{ matrix.PYTHON }} for manylinux${{ matrix.MANYLINUX.VERSION }}_${{ matrix.MANYLINUX.ARCH }}"
-##    container:
-##      image: "quay.io/pypa/manylinux${{ matrix.MANYLINUX.VERSION }}_${{ matrix.MANYLINUX.ARCH }}"
-##      env:
-##        PYTHONDONTWRITEBYTECODE: 1
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Build Python manylinux2010-x86_64 wheels
-#        uses: penguinolog/python-wheels-manylinux-build@18.10.2021-1-manylinux2010_x86_64
-#        with:
-#          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-#          build-requirements: 'cython'
-#          build-executable: 'python'
-#          build-command: 'setup.py bdist_wheel clean'
-#      - name: Build Python manylinux2014-x86_64 wheels
-#        uses: penguinolog/python-wheels-manylinux-build@18.10.2021-1-manylinux2014_x86_64
-#        with:
-#          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-#          build-requirements: 'cython'
-#          build-executable: 'python'
-#          build-command: 'setup.py bdist_wheel clean'
-#      - name: Build Python manylinux2010-i686 wheels
-#        uses: penguinolog/python-wheels-manylinux-build@18.10.2021-1-manylinux2010_i686
-#        with:
-#          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-#          build-requirements: 'cython'
-#          build-executable: 'python'
-#          build-command: 'setup.py bdist_wheel clean'
-#      - name: Build Python manylinux2010-x86_64 wheels
-#        uses: penguinolog/python-wheels-manylinux-build@18.10.2021-1-manylinux2014_i686
-#        with:
-#          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
-#          build-requirements: 'cython'
-#          build-executable: 'python'
-#          build-command: 'setup.py bdist_wheel clean'
-#      - name: List built packages
-#        run: ls -la dist
-#      - name: Install deploy dependencies
-#        run: pip install --upgrade twine
-#      - name: Deploy
-#        env:
-#          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-#          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-#        run: |
-#          twine upload --skip-existing dist/*
+  DeployManyLinux:
+    needs: [ TestLinux, TestWindows ]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Python manylinux2014-x86_64 wheels
+        uses: penguinolog/python-wheels-manylinux-build@19.10.2021-manylinux2014_x86_64
+        with:
+          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
+          build-requirements: 'cython'
+          build-executable: 'python'
+          build-command: 'setup.py bdist_wheel clean'
+      - name: Build Python manylinux2010-x86_64 wheels
+        uses: penguinolog/python-wheels-manylinux-build@19.10.2021-manylinux2014_i686
+        with:
+          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
+          build-requirements: 'cython'
+          build-executable: 'python'
+          build-command: 'setup.py bdist_wheel clean'
+      - name: Build Python manylinux2010-x86_64 wheels
+        uses: penguinolog/python-wheels-manylinux-build@19.10.2021-manylinux2010_x86_64
+        with:
+          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
+          build-requirements: 'cython'
+          build-executable: 'python'
+          build-command: 'setup.py bdist_wheel clean'
+      - name: Build Python manylinux2010-i686 wheels
+        uses: penguinolog/python-wheels-manylinux-build@19.10.2021-manylinux2010_i686
+        with:
+          python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
+          build-requirements: 'cython'
+          build-executable: 'python'
+          build-command: 'setup.py bdist_wheel clean'
+      - name: List built packages
+        run: ls -la dist
+      - name: Install deploy dependencies
+        run: pip install --upgrade twine
+      - name: Deploy
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          twine upload --skip-existing dist/*
