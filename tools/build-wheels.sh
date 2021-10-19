@@ -18,8 +18,7 @@ arch=$(uname -m)
 rm -rf /io/.tox
 rm -rf /io/*.egg-info
 rm -rf /io/.pytest_cache
-rm -fv /io/dist/*-linux_*.whl
-find /io/ -noleaf -name "*.py[co]" -delete
+find /io/ -noleaf \( -iname "*.py[co]" -o -iname "*.c" -o -iname "*-linux_*.whl" \) -delete
 
 echo
 echo
@@ -65,16 +64,15 @@ for PYTHON in ${PYTHON_VERSIONS}; do
   echo
 done
 
-find /io/dist/ -noleaf -type f -not -name "*$package_name*" -delete
+# Clean caches + cythonized + not fixed
+find /io/ -noleaf \( -iname "*.py[co]" -o -iname "*.c" -o -iname "*-linux_*.whl" \) -delete
 rm -rf /io/.eggs
 rm -rf /io/build
 rm -rf /io/*.egg-info
 rm -rf /io/.pytest_cache
 rm -rf /io/.tox
 rm -f /io/.coverage
-# Clean caches and cythonized
-find /io/ -noleaf -name "*.py[co]" -delete
-find /io/ -noleaf -name "*.c" -delete
+
 # Reset permissions
 chmod -v a+rwx /io/dist
 chmod -v a+rw /io/dist/*
