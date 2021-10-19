@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -e -o pipefail
 PYTHON_VERSIONS="cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310"
 
 # Avoid creation of __pycache__/*.py[c|o]
@@ -28,38 +28,32 @@ cd /io
 for PYTHON in ${PYTHON_VERSIONS}; do
   echo "Python ${PYTHON} ${arch}:"
   python_bin="/opt/python/${PYTHON}/bin"
-  "$python_bin/pip" install -U pip setuptools auditwheel
-  "$python_bin/pip" install -r /io/build_requirements.txt
-  "$python_bin/pip" wheel /io/ -w /io/dist/
+  pip="$python_bin/pip"
+  "$pip" install -U pip setuptools auditwheel
+  "$pip" install -r /io/build_requirements.txt
+  "$pip" wheel /io/ -w /io/dist/
   "$python_bin/python" setup.py bdist_wheel clean
 
   wheels=(/io/dist/"${package_name}"*"${PYTHON}"*linux_"${arch}".whl)
   for whl in "${wheels[@]}"; do
     echo "Repairing $whl..."
-    "$python_bin/python" -m auditwheel repair "$whl" -w /io/dist/
-    echo "Cleanup OS specific wheels"
-    rm -fv "$whl"
+    if "$python_bin/python" -m auditwheel repair "$whl" -w /io/dist/; then
+      echo
+      echo "Cleanup OS specific wheels"
+      rm -fv "$whl"
+    else
+      auditwheel show "$whl"
+      exit 1
+    fi
   done
   echo
-done
+  echo
 
-echo
-echo "Cleanup OS specific wheels"
-rm -fv /io/dist/*-linux_*.whl
-
-echo
-echo
-echo "Install packages and test"
-echo "dist directory:"
-ls /io/dist
-echo
-
-for PYTHON in ${PYTHON_VERSIONS}; do
   echo -n "Test $PYTHON ${arch}: $package_name "
-  python_bin="/opt/python/${PYTHON}/bin"
   "$python_bin/python" -c "import platform;print(platform.platform())"
-  "$python_bin/pip" install "$package_name" --no-index -f file:///io/dist
-  "$python_bin/pip" install -r /io/pytest_requirements.txt
+  "$pip" install "$package_name" --no-index -f file:///io/dist
+  "$pip" install -r /io/pytest_requirements.txt
+  echo
   "$python_bin/py.test" -vvv /io/test
   echo
 done
