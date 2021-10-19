@@ -107,8 +107,8 @@ class AllowFailRepair(build_ext.build_ext):
         except (
             distutils.errors.DistutilsPlatformError,
             FileNotFoundError,
-        ):
-            raise BuildFailed()
+        ) as exc:
+            raise BuildFailed() from exc
 
     def build_extension(self, ext) -> None:
         """build_extension.
@@ -122,8 +122,8 @@ class AllowFailRepair(build_ext.build_ext):
             distutils.errors.DistutilsExecError,
             distutils.errors.DistutilsPlatformError,
             ValueError,
-        ):
-            raise BuildFailed()
+        ) as exc:
+            raise BuildFailed() from exc
 
 
 # noinspection PyUnresolvedReferences
@@ -224,6 +224,7 @@ SETUP_ARGS: typing.Dict[str, typing.Union[str, typing.List[str], typing.Dict[str
     license=VARIABLES["__license__"],
     description=VARIABLES["__description__"],
     long_description=LONG_DESCRIPTION,
+    long_description_content_type="text/x-rst",
     classifiers=CLASSIFIERS,
     keywords=KEYWORDS,
     python_requires=">=3.7.0",

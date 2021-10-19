@@ -250,6 +250,9 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         sig: inspect.Signature = inspect.signature(src)
         if sig.return_annotation is inspect.Parameter.empty:
             annotation: str = ""
+        elif sig.return_annotation is type(None):  # noqa: E721
+            # Python 3.10 special case
+            annotation = " -> None"
         else:
             annotation = f" -> {getattr(sig.return_annotation, '__name__', sig.return_annotation)!s}"
 
