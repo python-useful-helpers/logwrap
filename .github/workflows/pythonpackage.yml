@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build Python manylinux2010-x86_64 wheels
-        uses: penguinolog/python-wheels-manylinux-build
+        uses: penguinolog/python-wheels-manylinux-build@master
         with:
           python-versions: 'cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310'
           build-requirements: 'cython'
