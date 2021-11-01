@@ -52,7 +52,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :param arg: bound parameter
         :type arg: BoundParameter
         :return: value, value override for logging or None if argument should not be logged.
-        :rtype: typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]
+        :rtype: BoundParameter | tuple[BoundParameter, typing.Any] | None
 
         Override this method if some modifications required for parameter value before logging
 
@@ -65,9 +65,9 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :param arg: bound parameter
         :type arg: BoundParameter
         :param arg_repr: repr for value
-        :type arg_repr: typing.Text
+        :type arg_repr: str
         :return: processed repr for value
-        :rtype: typing.Text
+        :rtype: str
 
         Override this method if some modifications required for result of repr() over parameter
 
@@ -81,10 +81,10 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     .. py:attribute:: max_indent
     .. py:attribute:: blacklisted_names
 
-        ``typing.List[str]``, modified via mutability
+        ``list[str]``, modified via mutability
     .. py:attribute:: blacklisted_exceptions
 
-        ``typing.List[typing.Type[Exception]]``, modified via mutability
+        ``list[type[Exception]]``, modified via mutability
     .. py:attribute:: log_call_args
     .. py:attribute:: log_call_args_on_exc
     .. py:attribute:: log_traceback
@@ -95,7 +95,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         Decorator entry-point. Logic is stored separately and load depends on python version.
 
         :return: Decorated function. On python 3.3+ awaitable is supported.
-        :rtype: typing.Union[typing.Callable, typing.Awaitable]
+        :rtype: Callable | Awaitable
 
 
 .. py:function:: logwrap(func=None, *, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
@@ -103,7 +103,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     Log function calls and return values.
 
     :param func: function to wrap
-    :type func: typing.Optional[typing.Callable]
+    :type func: None | Callable
     :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
     :type log: logging.Logger | None
     :param log_level: log level for successful calls
@@ -126,7 +126,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :param log_result_obj: log result of function call.
     :type log_result_obj: bool
     :return: built real decorator.
-    :rtype: typing.Union[LogWrap, typing.Callable[..., typing.Union[typing.Awaitable[typing.Any], typing.Any]]]
+    :rtype: LogWrap | Callable[..., Awaitable[typing.Any] | typing.Any]
 
     .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
     .. versionchanged:: 3.3.0 Deprecation of *args
@@ -179,7 +179,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :param sig: source signature
     :type sig: inspect.Signature
     :return: Iterator for bound parameters with all information about it
-    :rtype: typing.List[BoundParameter]
+    :rtype: list[BoundParameter]
 
     .. versionadded:: 3.3.0
     .. versionchanged:: 5.3.1 return list

@@ -86,7 +86,7 @@ API: Helpers: `pretty_repr`, `pretty_str` and base class `PrettyFormat`.
             do not indent open bracket and simple parameters
         :type no_indent_start: bool
         :return: formatted string
-        :rtype: typing.Text
+        :rtype: str
 
     .. py:method:: __call__(src, indent=0, no_indent_start=False)
 
