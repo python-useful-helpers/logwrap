@@ -158,11 +158,11 @@ def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> t
     if not ismethod:
         real_func: typing.Callable[..., typing.Any] = func
     else:
-        real_func = func.__func__  # type: ignore
+        real_func = func.__func__  # type: ignore[union-attr]
 
     for param in inspect.signature(real_func).parameters.values():
-        if not self_processed and ismethod and func.__self__ is not None:  # type: ignore
-            result.append(ReprParameter(param, value=func.__self__))  # type: ignore
+        if not self_processed and ismethod and func.__self__ is not None:  # type: ignore[union-attr]
+            result.append(ReprParameter(param, value=func.__self__))  # type: ignore[union-attr]
             self_processed = True
         else:
             result.append(ReprParameter(param))
@@ -374,7 +374,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         """
         if hasattr(src, self._magic_method_name):
             result = getattr(src, self._magic_method_name)(self, indent=indent, no_indent_start=no_indent_start)
-            return result  # type: ignore
+            return result  # type: ignore[no-any-return]
 
         if _known_callable(src):
             return self._repr_callable(src=src, indent=indent)

@@ -12,9 +12,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-# pylint: disable=missing-docstring, unused-argument
+# pylint: disable=unused-argument
 
-"""Python 3 specific tests"""
+"""Python 3 specific tests."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from __future__ import annotations
 import asyncio
 import io
 import logging
-import typing  # noqa # pylint: disable=unused-import
+import typing
 import unittest
 from unittest import mock
 
@@ -150,7 +150,7 @@ class TestAnnotated(unittest.TestCase):
 
     def test_01_annotation_args(self):
         @logwrap.logwrap
-        def func(a: typing.Optional[int] = None):
+        def func(arg: typing.Optional[int] = None):
             pass
 
         func()
@@ -158,7 +158,7 @@ class TestAnnotated(unittest.TestCase):
             "DEBUG>Calling: \n"
             "func(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
-            "    a=None,  # type: typing.Optional[int]\n"
+            "    arg=None,  # type: typing.Optional[int]\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
             "None\n",
@@ -167,7 +167,7 @@ class TestAnnotated(unittest.TestCase):
 
     def test_02_annotation_args(self):
         @logwrap.logwrap
-        def func(a: int = 0):
+        def func(arg: int = 0):
             pass
 
         func()
@@ -175,7 +175,7 @@ class TestAnnotated(unittest.TestCase):
             "DEBUG>Calling: \n"
             "func(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
-            "    a=0,  # type: int\n"
+            "    arg=0,  # type: int\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
             "None\n",

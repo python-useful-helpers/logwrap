@@ -684,7 +684,7 @@ class LogWrap:
                 raise
             return result
 
-        return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper  # type: ignore
+        return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper  # type: ignore[return-value]
 
     def __call__(self, func: _WrappedT) -> _WrappedT:
         """Callable instance.

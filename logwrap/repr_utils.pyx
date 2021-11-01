@@ -115,7 +115,7 @@ cdef:
         if not ismethod:
             real_func = func
         else:
-            real_func = func.__func__  # type: ignore
+            real_func = func.__func__
 
         for param in inspect.signature(real_func).parameters.values():
             if not self_processed and ismethod and func.__self__ is not None:
@@ -313,7 +313,7 @@ cdef class PrettyFormat:
 
         if hasattr(src, self._magic_method_name):
             result = getattr(src, self._magic_method_name)(self, indent=indent, no_indent_start=no_indent_start)
-            return result  # type: ignore
+            return result
 
         if _known_callable(src):
             return self._repr_callable(src=src, indent=indent)
