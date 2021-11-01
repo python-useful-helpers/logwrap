@@ -33,6 +33,11 @@ import typing
 from logwrap import constants
 from logwrap import repr_utils
 
+if typing.TYPE_CHECKING:
+    # Standard Library
+    from collections.abc import Iterable
+    from collections.abc import MutableMapping
+
 __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
 LOGGER: logging.Logger = logging.getLogger("logwrap")
@@ -131,7 +136,7 @@ class BoundParameter(inspect.Parameter):
         return f'<{self.__class__.__name__} "{self}">'
 
 
-def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing.Any) -> typing.List[BoundParameter]:
+def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing.Any) -> list[BoundParameter]:
     """Bind *args and **kwargs to signature and get Bound Parameters.
 
     :param sig: source signature
@@ -146,8 +151,8 @@ def bind_args_kwargs(sig: inspect.Signature, *args: typing.Any, **kwargs: typing
     .. versionadded:: 3.3.0
     .. versionchanged:: 5.3.1 return list
     """
-    result: typing.List[BoundParameter] = []
-    bound: typing.MutableMapping[str, inspect.Parameter] = sig.bind(*args, **kwargs).arguments
+    result: list[BoundParameter] = []
+    bound: MutableMapping[str, inspect.Parameter] = sig.bind(*args, **kwargs).arguments
     for param in sig.parameters.values():
         result.append(BoundParameter(parameter=param, value=bound.get(param.name, param.default)))
     return result
@@ -171,12 +176,12 @@ class LogWrap:
 
     def __init__(
         self,
-        log: typing.Optional[logging.Logger] = None,
+        log: logging.Logger | None = None,
         log_level: int = logging.DEBUG,
         exc_level: int = logging.ERROR,
         max_indent: int = 20,
-        blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
-        blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
+        blacklisted_names: Iterable[str] | None = None,
+        blacklisted_exceptions: Iterable[type[Exception]] | None = None,
         log_call_args: bool = True,
         log_call_args_on_exc: bool = True,
         log_traceback: bool = True,
@@ -193,10 +198,10 @@ class LogWrap:
         :param max_indent: maximum indent before classic `repr()` call.
         :type max_indent: int
         :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
-        :type blacklisted_names: typing.Optional[typing.Iterable[str]]
+        :type blacklisted_names: Iterable[str] | None
         :param blacklisted_exceptions: list of exception, which should be re-raised
                without producing traceback and text log record.
-        :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
+        :type blacklisted_exceptions: Iterable[type[Exception]]
         :param log_call_args: log call arguments before executing wrapped function.
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
@@ -213,16 +218,16 @@ class LogWrap:
         """
         # Typing fix:
         if blacklisted_names is None:
-            self.__blacklisted_names: typing.List[str] = []
+            self.__blacklisted_names: list[str] = []
         else:
             self.__blacklisted_names = list(blacklisted_names)
         if blacklisted_exceptions is None:
-            self.__blacklisted_exceptions: typing.List[typing.Type[Exception]] = []
+            self.__blacklisted_exceptions: list[type[Exception]] = []
         else:
             self.__blacklisted_exceptions = list(blacklisted_exceptions)
 
         if isinstance(log, logging.Logger):
-            self.__logger: typing.Optional[logging.Logger] = log
+            self.__logger: logging.Logger | None = log
         else:
             self.__logger = None
 
@@ -318,7 +323,7 @@ class LogWrap:
         self.__max_indent = val
 
     @property
-    def blacklisted_names(self) -> typing.List[str]:
+    def blacklisted_names(self) -> list[str]:
         """List of arguments names to ignore in log.
 
         :return: list of arguments to ignore in log
@@ -327,7 +332,7 @@ class LogWrap:
         return self.__blacklisted_names
 
     @property
-    def blacklisted_exceptions(self) -> typing.List[typing.Type[Exception]]:
+    def blacklisted_exceptions(self) -> list[type[Exception]]:
         """List of exceptions to re-raise without log traceback and text.
 
         :return: list of exceptions to re-raise silent
@@ -420,7 +425,7 @@ class LogWrap:
         self.__log_result_obj = val
 
     @property
-    def _logger(self) -> typing.Optional[logging.Logger]:
+    def _logger(self) -> logging.Logger | None:
         """Logger instance.
 
         :return: logger instance if configured
@@ -451,7 +456,7 @@ class LogWrap:
     def pre_process_param(  # pylint: disable=no-self-use
         self,
         arg: BoundParameter,
-    ) -> typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]:
+    ) -> BoundParameter | tuple[BoundParameter, typing.Any] | None:
         """Process parameter for the future logging.
 
         :param arg: bound parameter
@@ -513,8 +518,8 @@ class LogWrap:
     def _get_func_args_repr(
         self,
         sig: inspect.Signature,
-        args: typing.Tuple[typing.Any, ...],
-        kwargs: typing.Dict[str, typing.Any],
+        args: tuple[typing.Any, ...],
+        kwargs: dict[str, typing.Any],
     ) -> str:
         """Internal helper for reducing complexity of decorator code.
 
@@ -539,9 +544,7 @@ class LogWrap:
             if param.name in self.blacklisted_names:
                 continue
 
-            preprocessed: typing.Union[
-                BoundParameter, typing.Tuple[BoundParameter, typing.Any], None
-            ] = self.pre_process_param(param)
+            preprocessed: (BoundParameter | tuple[BoundParameter, typing.Any] | None) = self.pre_process_param(param)
             if preprocessed is None:
                 continue
 
@@ -618,8 +621,8 @@ class LogWrap:
         """
         exc_info = sys.exc_info()
         stack: traceback.StackSummary = traceback.extract_stack()
-        full_tb: typing.List[traceback.FrameSummary] = [elem for elem in stack if elem.filename != _CURRENT_FILE]
-        exc_line: typing.List[str] = traceback.format_exception_only(*exc_info[:2])
+        full_tb: list[traceback.FrameSummary] = [elem for elem in stack if elem.filename != _CURRENT_FILE]
+        exc_line: list[str] = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
         tb_text: str = (
             f"Traceback (most recent call last):\n{''.join(traceback.format_list(full_tb))}{''.join(exc_line)}"
@@ -698,12 +701,12 @@ class LogWrap:
 @typing.overload
 def logwrap(
     *,
-    log: typing.Optional[logging.Logger] = None,
+    log: logging.Logger | None = None,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
-    blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
-    blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
+    blacklisted_names: Iterable[str] | None = None,
+    blacklisted_exceptions: Iterable[type[Exception]] | None = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
@@ -716,12 +719,12 @@ def logwrap(
 def logwrap(
     func: None = None,
     *,
-    log: typing.Optional[logging.Logger] = None,
+    log: logging.Logger | None = None,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
-    blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
-    blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
+    blacklisted_names: Iterable[str] | None = None,
+    blacklisted_exceptions: Iterable[type[Exception]] | None = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
@@ -730,16 +733,16 @@ def logwrap(
     """Overload: with no func."""
 
 
-@typing.overload  # noqa: F811
+@typing.overload
 def logwrap(
     func: _WrappedT,
     *,
-    log: typing.Optional[logging.Logger] = None,
+    log: logging.Logger | None = None,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
-    blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
-    blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
+    blacklisted_names: Iterable[str] | None = None,
+    blacklisted_exceptions: Iterable[type[Exception]] | None = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
@@ -748,20 +751,20 @@ def logwrap(
     """Overload: func provided."""
 
 
-def logwrap(  # noqa: F811
-    func: typing.Optional[_WrappedT] = None,
+def logwrap(
+    func: _WrappedT | None = None,
     *,
-    log: typing.Optional[logging.Logger] = None,
+    log: logging.Logger | None = None,
     log_level: int = logging.DEBUG,
     exc_level: int = logging.ERROR,
     max_indent: int = 20,
-    blacklisted_names: typing.Optional[typing.Iterable[str]] = None,
-    blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]] = None,
+    blacklisted_names: Iterable[str] | None = None,
+    blacklisted_exceptions: Iterable[type[Exception]] | None = None,
     log_call_args: bool = True,
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
     log_result_obj: bool = True,
-) -> typing.Union[LogWrap, _WrappedT]:
+) -> LogWrap | _WrappedT:
     """Log function calls and return values.
 
     :param func: function to wrap
@@ -775,10 +778,10 @@ def logwrap(  # noqa: F811
     :param max_indent: maximum indent before classic `repr()` call.
     :type max_indent: int
     :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
-    :type blacklisted_names: typing.Optional[typing.Iterable[str]]
+    :type blacklisted_names: Iterable[str] | None
     :param blacklisted_exceptions: list of exceptions, which should be re-raised
                                    without producing traceback and text log record.
-    :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
+    :type blacklisted_exceptions: Iterable[type[Exception]] | None
     :param log_call_args: log call arguments before executing wrapped function.
     :type log_call_args: bool
     :param log_call_args_on_exc: log call arguments if exception raised.

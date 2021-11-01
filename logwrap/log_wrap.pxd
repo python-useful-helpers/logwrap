@@ -19,8 +19,6 @@ import inspect
 import logging
 import typing
 
-# Package Implementation
-
 cdef:
     unsigned long indent
 

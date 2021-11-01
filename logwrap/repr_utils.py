@@ -28,6 +28,11 @@ import inspect
 import types
 import typing
 
+if typing.TYPE_CHECKING:
+    # Standard Library
+    from collections.abc import Callable
+    from collections.abc import Iterable
+
 __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
 
@@ -87,11 +92,11 @@ class ReprParameter:
         return self._parameter
 
     @property
-    def name(self) -> typing.Union[None, str]:
+    def name(self) -> None | str:
         """Parameter name.
 
         :return: parameter name. For `*args` and `**kwargs` add corresponding prefixes
-        :rtype: typing.Union[None, str]
+        :rtype: None | str
         """
         if self.kind == inspect.Parameter.VAR_POSITIONAL:
             return "*" + self.parameter.name
@@ -109,11 +114,11 @@ class ReprParameter:
         return self._value
 
     @property
-    def annotation(self) -> typing.Union[inspect.Parameter.empty, str]:
+    def annotation(self) -> inspect.Parameter.empty | str:
         """Parameter annotation.
 
         :return: parameter annotation from signature
-        :rtype: typing.Union[inspect.Parameter.empty, str]
+        :rtype: inspect.Parameter.empty | str
         """
         return self.parameter.annotation
 
@@ -144,19 +149,19 @@ class ReprParameter:
         return f'<{self.__class__.__name__} "{self}">'
 
 
-def _prepare_repr(func: typing.Union[types.FunctionType, types.MethodType]) -> typing.List[ReprParameter]:
+def _prepare_repr(func: types.FunctionType | types.MethodType) -> list[ReprParameter]:
     """Get arguments lists with defaults.
 
     :param func: Callable object to process
-    :type func: typing.Union[types.FunctionType, types.MethodType]
+    :type func: types.FunctionType | types.MethodType
     :return: repr of callable parameter from signature
-    :rtype: typing.List[ReprParameter]
+    :rtype: list[ReprParameter]
     """
     ismethod: bool = isinstance(func, types.MethodType)
     self_processed: bool = False
-    result: typing.List[ReprParameter] = []
+    result: list[ReprParameter] = []
     if not ismethod:
-        real_func: typing.Callable[..., typing.Any] = func
+        real_func: Callable[..., typing.Any] = func
     else:
         real_func = func.__func__  # type: ignore[union-attr]
 
@@ -221,13 +226,13 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
     def _repr_callable(
         self,
-        src: typing.Union[types.FunctionType, types.MethodType],
+        src: types.FunctionType | types.MethodType,
         indent: int = 0,
     ) -> str:
         """Repr callable object (function or method).
 
         :param src: Callable to process
-        :type src: typing.Union[types.FunctionType, types.MethodType]
+        :type src: types.FunctionType | types.MethodType
         :param indent: start indentation
         :type indent: int
         :return: Repr of function or method with signature.
@@ -283,13 +288,13 @@ class PrettyFormat(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _repr_dict_items(
         self,
-        src: typing.Dict[typing.Any, typing.Any],
+        src: dict[typing.Any, typing.Any],
         indent: int = 0,
     ) -> str:
         """Repr dict items.
 
         :param src: object to process
-        :type src: typing.Dict
+        :type src: dict[typing.Any, typing.Any]
         :param indent: start indentation
         :type indent: int
         :return: repr of key/value pairs from dict
@@ -326,20 +331,20 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
     def _repr_iterable_items(
         self,
-        src: typing.Iterable[typing.Any],
+        src: Iterable[typing.Any],
         indent: int = 0,
     ) -> str:
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
-        :type src: typing.Iterable
+        :type src: Iterable[typing.Any]
         :param indent: start indentation
         :type indent: int
         :return: repr of elements in iterable item
         :rtype: str
         """
         next_indent: int = self.next_indent(indent)
-        buf: typing.List[str] = []
+        buf: list[str] = []
         for elem in src:
             buf.append("\n")
             buf.append(self.process_element(src=elem, indent=next_indent))
@@ -463,22 +468,22 @@ class PrettyRepr(PrettyFormat):
 
     def _repr_dict_items(
         self,
-        src: typing.Dict[typing.Any, typing.Any],
+        src: dict[typing.Any, typing.Any],
         indent: int = 0,
     ) -> str:
         """Repr dict items.
 
         :param src: object to process
-        :type src: typing.Dict
+        :type src: dict[typing.Any, typing.Any]
         :param indent: start indentation
         :type indent: int
         :return: repr of key/value pairs from dict
         :rtype: str
         """
-        max_len: int = max((len(repr(key)) for key in src)) if src else 0
+        max_len: int = max(len(repr(key)) for key in src) if src else 0
         next_indent: int = self.next_indent(indent)
         prefix: str = "\n" + " " * next_indent
-        buf: typing.List[str] = []
+        buf: list[str] = []
         for key, val in src.items():
             buf.append(prefix)
             buf.append(f"{key!r:{max_len}}: ")
@@ -534,14 +539,14 @@ class PrettyStr(PrettyFormat):
     @staticmethod
     def _strings_str(
         indent: int,
-        val: typing.Union[bytes, str],
+        val: bytes | str,
     ) -> str:
         """Custom str for strings and binary strings.
 
         :param indent: result indent
         :type indent: int
         :param val: value for repr
-        :type val: typing.Union[bytes, str]
+        :type val: bytes | str
         :return: indented string as `str`
         :rtype: str
         """
@@ -575,22 +580,22 @@ class PrettyStr(PrettyFormat):
 
     def _repr_dict_items(
         self,
-        src: typing.Dict[typing.Any, typing.Any],
+        src: dict[typing.Any, typing.Any],
         indent: int = 0,
     ) -> str:
         """Repr dict items.
 
         :param src: object to process
-        :type src: typing.Dict
+        :type src: dict[typing.Any, typing.Any]
         :param indent: start indentation
         :type indent: int
         :return: repr of key/value pairs from dict
         :rtype: str
         """
-        max_len = max((len(str(key)) for key in src)) if src else 0
+        max_len = max(len(str(key)) for key in src) if src else 0
         next_indent: int = self.next_indent(indent)
         prefix: str = "\n" + " " * next_indent
-        buf: typing.List[str] = []
+        buf: list[str] = []
         for key, val in src.items():
             buf.append(prefix)
             buf.append(f"{key!s:{max_len}}: ")

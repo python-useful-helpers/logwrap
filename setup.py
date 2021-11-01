@@ -24,7 +24,6 @@ import distutils.errors
 import os.path
 import shutil
 import sys
-import typing
 from distutils.command import build_ext
 
 # External Dependencies
@@ -39,13 +38,13 @@ except ImportError:
 
 PACKAGE_NAME = "logwrap"
 
-with open(os.path.join(os.path.dirname(__file__), PACKAGE_NAME, "__init__.py")) as f:
+with open(os.path.join(os.path.dirname(__file__), PACKAGE_NAME, "__init__.py"), encoding="utf-8") as f:
     SOURCE = f.read()
 
-with open("requirements.txt") as f:
+with open("requirements.txt", encoding="utf-8") as f:
     REQUIRED = f.read().splitlines()
 
-with open("README.rst") as f:
+with open("README.rst", encoding="utf-8") as f:
     LONG_DESCRIPTION = f.read()
 
 
@@ -79,7 +78,7 @@ else:
     EXT_MODULES = []
 
 
-class BuildFailed(Exception):
+class BuildFailedError(Exception):
     """For install clear scripts."""
 
 
@@ -89,7 +88,7 @@ class AllowFailRepair(build_ext.build_ext):
     def run(self) -> None:
         """Run.
 
-        :raises BuildFailed: Build is failed and clean python code should be used.
+        :raises BuildFailedError: Build is failed and clean python code should be used.
         """
         try:
             build_ext.build_ext.run(self)
@@ -110,12 +109,12 @@ class AllowFailRepair(build_ext.build_ext):
             distutils.errors.DistutilsPlatformError,
             FileNotFoundError,
         ) as exc:
-            raise BuildFailed() from exc
+            raise BuildFailedError() from exc
 
     def build_extension(self, ext) -> None:
         """build_extension.
 
-        :raises BuildFailed: Build is failed and clean python code should be used.
+        :raises BuildFailedError: Build is failed and clean python code should be used.
         """
         try:
             build_ext.build_ext.build_extension(self, ext)
@@ -125,13 +124,13 @@ class AllowFailRepair(build_ext.build_ext):
             distutils.errors.DistutilsPlatformError,
             ValueError,
         ) as exc:
-            raise BuildFailed() from exc
+            raise BuildFailedError() from exc
 
 
 # noinspection PyUnresolvedReferences
 def get_simple_vars_from_src(
     src: str,
-) -> typing.Dict[str, typing.Union[str, bytes, int, float, complex, list, set, dict, tuple, None, bool, Ellipsis]]:
+) -> dict[str, str | bytes | int | float | complex | list | set | dict | tuple | None | bool | Ellipsis]:
     """Get simple (string/number/boolean and None) assigned values from source.
 
     :param src: Source code
@@ -215,13 +214,11 @@ CLASSIFIERS = [
 
 KEYWORDS = ["logging", "debugging", "development"]
 
-SETUP_ARGS: typing.Dict[str, typing.Union[str, typing.List[str], typing.Dict[str, typing.List[str]]]] = dict(
+SETUP_ARGS: dict[str, str | list[str] | dict[str, list[str]]] = dict(
     name=PACKAGE_NAME,
     author=VARIABLES["__author__"],
     author_email=VARIABLES["__author_email__"],
-    maintainer=", ".join(
-        "{name} <{email}>".format(name=name, email=email) for name, email in VARIABLES["__maintainers__"].items()
-    ),
+    maintainer=", ".join(f"{name} <{email}>" for name, email in VARIABLES["__maintainers__"].items()),
     url=VARIABLES["__url__"],
     license=VARIABLES["__license__"],
     description=VARIABLES["__description__"],
@@ -253,7 +250,7 @@ if cythonize is not None:
 
 try:
     setuptools.setup(**SETUP_ARGS)
-except BuildFailed:
+except BuildFailedError:
     print("*" * 80 + "\n* Build Failed!\n* Use clear scripts version.\n" + "*" * 80 + "\n")
     del SETUP_ARGS["ext_modules"]
     del SETUP_ARGS["cmdclass"]
