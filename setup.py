@@ -20,11 +20,8 @@ from __future__ import annotations
 
 # Standard Library
 import ast
-import distutils.errors
 import os.path
-import shutil
 import sys
-from distutils.command import build_ext
 
 # External Dependencies
 import setuptools
@@ -64,6 +61,7 @@ if cythonize is not None:
 
     EXT_MODULES = cythonize(
         module_list=REQUIRES_OPTIMIZATION,
+        exclude_failures=True,
         compiler_directives={
             "always_allow_keywords": True,
             "binding": True,
@@ -76,55 +74,6 @@ else:
     REQUIRES_OPTIMIZATION = []
     INTERFACES = []
     EXT_MODULES = []
-
-
-class BuildFailedError(Exception):
-    """For install clear scripts."""
-
-
-class AllowFailRepair(build_ext.build_ext):
-    """This class allows C extension building to fail and repairs init."""
-
-    def run(self) -> None:
-        """Run.
-
-        :raises BuildFailedError: Build is failed and clean python code should be used.
-        """
-        try:
-            build_ext.build_ext.run(self)
-
-            # Copy __init__.py back to repair package.
-            build_dir = os.path.abspath(self.build_lib)
-            root_dir = os.path.abspath(os.path.join(__file__, ".."))
-            target_dir = build_dir if not self.inplace else root_dir
-
-            src_file = os.path.join(PACKAGE_NAME, "__init__.py")
-
-            src = os.path.join(root_dir, src_file)
-            dst = os.path.join(target_dir, src_file)
-
-            if src != dst:
-                shutil.copyfile(src, dst)
-        except (
-            distutils.errors.DistutilsPlatformError,
-            FileNotFoundError,
-        ) as exc:
-            raise BuildFailedError() from exc
-
-    def build_extension(self, ext) -> None:
-        """build_extension.
-
-        :raises BuildFailedError: Build is failed and clean python code should be used.
-        """
-        try:
-            build_ext.build_ext.build_extension(self, ext)
-        except (
-            distutils.errors.CCompilerError,
-            distutils.errors.DistutilsExecError,
-            distutils.errors.DistutilsPlatformError,
-            ValueError,
-        ) as exc:
-            raise BuildFailedError() from exc
 
 
 # noinspection PyUnresolvedReferences
@@ -246,13 +195,6 @@ SETUP_ARGS: dict[str, str | list[str] | dict[str, list[str]]] = dict(
 )
 if cythonize is not None:
     SETUP_ARGS["ext_modules"] = EXT_MODULES
-    SETUP_ARGS["cmdclass"] = dict(build_ext=AllowFailRepair)
 
-try:
-    setuptools.setup(**SETUP_ARGS)
-except BuildFailedError:
-    print("*" * 80 + "\n* Build Failed!\n* Use clear scripts version.\n" + "*" * 80 + "\n")
-    del SETUP_ARGS["ext_modules"]
-    del SETUP_ARGS["cmdclass"]
-    SETUP_ARGS["package_data"][PACKAGE_NAME] = ["py.typed"]
-    setuptools.setup(**SETUP_ARGS)
+
+setuptools.setup(**SETUP_ARGS)

@@ -6,7 +6,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 .. py:module:: logwrap
 .. py:currentmodule:: logwrap
 
-.. py:class:: LogWrap(object)
+.. py:class:: LogWrap
 
     Log function calls and return values.
 
@@ -15,7 +15,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     .. py:method:: __init__(*, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
 
         :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
-        :type log: typing.Optional[logging.Logger]
+        :type log: logging.Logger | None
         :param log_level: log level for successful calls
         :type log_level: int
         :param exc_level: log level for exception cases
@@ -24,11 +24,11 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type max_indent: int
         :param blacklisted_names: Blacklisted argument names.
                                   Arguments with this names will be skipped in log.
-        :type blacklisted_names: typing.Optional[typing.Iterable[str]]
+        :type blacklisted_names: Iterable[str] | None
         :param blacklisted_exceptions: list of exception,
                                        which should be re-raised without
                                        producing traceback and text log record.
-        :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
+        :type blacklisted_exceptions: Iterable[type[Exception]] | None
         :param log_call_args: log call arguments before executing wrapped function.
         :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if exception raised.
@@ -105,7 +105,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :param func: function to wrap
     :type func: typing.Optional[typing.Callable]
     :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
-    :type log: typing.Optional[logging.Logger]
+    :type log: logging.Logger | None
     :param log_level: log level for successful calls
     :type log_level: int
     :param exc_level: log level for exception cases
@@ -113,10 +113,10 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :param max_indent: maximum indent before classic `repr()` call.
     :type max_indent: int
     :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
-    :type blacklisted_names: typing.Optional[typing.Iterable[str]]
+    :type blacklisted_names: Iterable[str] | None
     :param blacklisted_exceptions: list of exceptions, which should be re-raised
                                    without producing traceback and text log record.
-    :type blacklisted_exceptions: typing.Optional[typing.Iterable[typing.Type[Exception]]]
+    :type blacklisted_exceptions: Iterable[type[Exception]] | None
     :param log_call_args: log call arguments before executing wrapped function.
     :type log_call_args: bool
     :param log_call_args_on_exc: log call arguments if exception raised.
