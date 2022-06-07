@@ -59,7 +59,7 @@ class TestPrettyStr(unittest.TestCase):
 
     def test_magic_override(self):
         # noinspection PyMissingOrEmptyDocstring
-        class Tst(object):
+        class Tst:
             def __str__(self):
                 return "Test"
 

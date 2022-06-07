@@ -112,7 +112,7 @@ class TestPrettyRepr(unittest.TestCase):
         def full_func(arg, darg=1, *positional, **named):
             pass
 
-        args = "\n" "    arg,\n" "    darg=1,\n" "    *positional,\n" "    **named,\n"
+        args = "\n    arg,\n    darg=1,\n    *positional,\n    **named,\n"
 
         self.assertEqual(
             f"{'':<{0}}"
@@ -122,7 +122,7 @@ class TestPrettyRepr(unittest.TestCase):
 
     def test_008_callable_class_elements(self):
         # noinspection PyMissingOrEmptyDocstring
-        class TstClass(object):
+        class TstClass:
             def tst_method(self, arg, darg=1, *positional, **named):
                 pass
 
@@ -132,7 +132,7 @@ class TestPrettyRepr(unittest.TestCase):
 
         tst_instance = TstClass()
 
-        c_m_args = "\n" "    self,\n" "    arg,\n" "    darg=1,\n" "    *positional,\n" "    **named,\n"
+        c_m_args = "\n    self,\n    arg,\n    darg=1,\n    *positional,\n    **named,\n"
 
         cm_args = (
             "\n"
@@ -143,9 +143,7 @@ class TestPrettyRepr(unittest.TestCase):
             "    **named,\n".format(cls=TstClass)
         )
 
-        i_m_args = (
-            f"\n" f"    self={tst_instance!r},\n" f"    arg,\n" f"    darg=1,\n" f"    *positional,\n" f"    **named,\n"
-        )
+        i_m_args = f"\n    self={tst_instance!r},\n    arg,\n    darg=1,\n    *positional,\n    **named,\n"
 
         for callable_obj, args in (
             (TstClass.tst_method, c_m_args),
@@ -194,7 +192,7 @@ class TestPrettyRepr(unittest.TestCase):
 
     def test_010_magic_override(self):
         # noinspection PyMissingOrEmptyDocstring
-        class Tst(object):
+        class Tst:
             def __repr__(self):
                 return "Test"
 
@@ -211,10 +209,10 @@ class TestPrettyRepr(unittest.TestCase):
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestAnnotated(unittest.TestCase):
     def test_001_annotation_args(self):
-        def func(a: typing.Optional[int] = None):
+        def func(a: int | None = None):
             pass
 
-        args = "\n    a: typing.Optional[int]=None,\n"
+        args = "\n    a: int | None = None,\n"
 
         self.assertEqual(
             f"{'':<{0}}<{func.__class__.__name__} {func.__module__}.{func.__name__} with interface ({args}){''}>",
@@ -231,13 +229,77 @@ class TestAnnotated(unittest.TestCase):
         )
 
     def test_003_complex(self):
-        def func(a: typing.Optional[int] = None) -> None:
+        def func(a: int | None = None) -> None:
             pass
 
-        args = "\n    a: typing.Optional[int]=None,\n"
+        args = "\n    a: int | None = None,\n"
 
         self.assertEqual(
             f"{'':<{0}}"
             f"<{func.__class__.__name__} {func.__module__}.{func.__name__} with interface ({args}){' -> None'}>",
             logwrap.pretty_repr(func),
+        )
+
+
+class TestContainers(unittest.TestCase):
+    def test_001_argparse(self):
+        # Standard Library
+        import argparse
+
+        parser = argparse.ArgumentParser(prog="Test")
+
+        self.assertEqual(
+            "argparse.ArgumentParser(\n"
+            "    prog='Test',\n"
+            "    usage=None,\n"
+            "    description=None,\n"
+            "    formatter_class=<class 'argparse.HelpFormatter'>,\n"
+            "    conflict_handler='error',\n"
+            "    add_help=True,\n"
+            ")",
+            logwrap.pretty_repr(parser),
+        )
+
+    def test_002_named_tuple_basic(self):
+        # Standard Library
+        import collections
+
+        NTTest = collections.namedtuple("NTTest", ("test_field_1", "test_field_2"))
+        test_val = NTTest(1, 2)
+        self.assertEqual(
+            "test_repr_utils.NTTest(\n    test_field_1=1,\n    test_field_2=2,\n)",
+            logwrap.pretty_repr(test_val),
+        )
+
+    def test_003_typed(self):
+        class NTTest(typing.NamedTuple):
+            test_field_1: int
+            test_field_2: int
+
+        test_val = NTTest(1, 2)
+        self.assertEqual(
+            "test_repr_utils.NTTest(\n    test_field_1=1,\n    test_field_2=2,\n)",
+            logwrap.pretty_repr(test_val),
+        )
+
+    def test_004_dataclasses(self):
+        # Standard Library
+        import dataclasses
+
+        @dataclasses.dataclass
+        class TestDataClass:
+            b: int = 0
+            c: int = dataclasses.field(default=0, repr=False)
+            d: tuple[str] = dataclasses.field(default=("d",))
+
+        test_dc = TestDataClass()
+
+        self.assertEqual(
+            "test_repr_utils.TestDataClass(\n"
+            "    b=0,  # type: int\n"
+            "    d=(\n"
+            "        'd',\n"
+            "    ),  # type: tuple[str]\n"
+            ")",
+            logwrap.pretty_repr(test_dc),
         )

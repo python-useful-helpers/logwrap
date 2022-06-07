@@ -43,7 +43,6 @@ Pros:
 
 ::
 
-    Python 3.7
     Python 3.8
     Python 3.9
     Python 3.10
@@ -54,6 +53,7 @@ Pros:
 
     * 2.7: < 5.0.0
     * 3.5: < 6.0.0
+    * 3.7: < 10.0.0
 
 This package includes helpers:
 

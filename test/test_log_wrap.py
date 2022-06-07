@@ -1,4 +1,4 @@
-#    Copyright 2016 - 2021 Alexey Stepanov aka penguinolog
+#    Copyright 2016 - 2022 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -360,7 +360,7 @@ class TestLogWrap(unittest.TestCase):
                         f")"
                     ),
                 ),
-                mock.call(level=logging.DEBUG, msg="Done: 'func' with result:\n{}".format(logwrap.pretty_repr(result))),
+                mock.call(level=logging.DEBUG, msg=f"Done: 'func' with result:\n{logwrap.pretty_repr(result)}"),
             ],
         )
 
@@ -401,7 +401,7 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(
             [
                 mock.call(level=logging.DEBUG, msg="Calling: \n" "func()"),
-                mock.call(level=logging.DEBUG, msg="Done: 'func' with result:\n{}".format(logwrap.pretty_repr(result))),
+                mock.call(level=logging.DEBUG, msg=f"Done: 'func' with result:\n{logwrap.pretty_repr(result)}"),
             ],
             log.mock_calls,
         )

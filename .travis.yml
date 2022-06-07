@@ -9,9 +9,6 @@ install:
   - pip install --upgrade coveralls
 
 _python:
-  - &python37
-    name: "Python 3.7"
-    python: "3.7"
   - &python38
     name: "Python 3.8"
     python: "3.8"
@@ -81,7 +78,7 @@ script:
 jobs:
   include:
     - <<: *static_analysis
-      <<: *python37
+      <<: *python38
       name: "PyLint"
       install:
         - *upgrade_python_toolset
@@ -131,10 +128,6 @@ jobs:
         - black --check logwrap
 
     - stage: test
-      <<: *python37
-      after_success:
-        - coveralls
-    - stage: test
       <<: *python38
       after_success:
         - coveralls
@@ -148,34 +141,11 @@ jobs:
         - coveralls
 
     - <<: *test_cythonized
-      <<: *python37
-    - <<: *test_cythonized
       <<: *python38
     - <<: *test_cythonized
       <<: *python39
     - <<: *test_cythonized
       <<: *python310
-
-#    - stage: deploy
-#      # This prevents job from appearing in test plan unless commit is tagged:
-#      <<: *deploy
-#      name: Build universal and cythonized bdist_wheel. Deploy bdist and sdist.
-#      script:
-#        - ./tools/run_docker.sh "logwrap"
-#
-#    - stage: deploy
-#      # This prevents job from appearing in test plan unless commit is tagged:
-#      <<: *deploy
-#      name: Build universal and cythonized for i686 bdist_wheel. Deploy bdist.
-#      script:
-#        - ./tools/run_docker_manylinux2014.sh "logwrap" "i686"
-#
-#    - stage: deploy
-#      # This prevents job from appearing in test plan unless commit is tagged:
-#      <<: *deploy
-#      name: Build universal and cythonized for x86_64 bdist_wheel. Deploy bdist.
-#      script:
-#        - ./tools/run_docker_manylinux2014.sh "logwrap" "x86_64"
 
     - stage: deploy
       # This prevents job from appearing in test plan unless commit is tagged:

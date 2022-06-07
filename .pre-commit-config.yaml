@@ -1,14 +1,14 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.3.0
     hooks:
-    - id: check-yaml
+#    - id: check-yaml
     - id: end-of-file-fixer
     - id: trailing-whitespace
     - id: mixed-line-ending
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.9.3
+    rev: 5.10.1
     hooks:
       - id: isort
         name: isort (python)
@@ -20,15 +20,16 @@ repos:
         types: [pyi]
 
   - repo: https://github.com/psf/black
-    rev: 21.10b0
+    rev: 22.3.0
     hooks:
       - id: black
         # It is recommended to specify the latest version of Python
         # supported by your project here, or alternatively use
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
-        language_version: python3.7
+        language_version: python3.8
         always_run: true
+        exclude: (venv|test|doc)
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.9.0  # Use the ref you want to point at
@@ -43,10 +44,10 @@ repos:
     hooks:
       - id: flake8
         additional_dependencies: [flake8-bugbear, pep8-naming, flake8-docstrings]
-        exclude: test
+        exclude: (venv|test|doc)
 
   - repo: https://github.com/pycqa/pylint
-    rev: v2.11.1
+    rev: v2.14.1
     hooks:
     - id: pylint
-      exclude: test
+      exclude: (venv|test|doc)

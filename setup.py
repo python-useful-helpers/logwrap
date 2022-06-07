@@ -1,4 +1,4 @@
-#    Copyright 2016-2021 Alexey Stepanov aka penguinolog
+#    Copyright 2016-2022 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -122,10 +122,7 @@ def get_simple_vars_from_src(
     >>> get_simple_vars_from_src(multiple_assign)
     {'e': 1, 'f': 1, 'g': 1}
     """
-    if sys.version_info[:2] < (3, 8):
-        ast_data = (ast.Str, ast.Num, ast.List, ast.Set, ast.Dict, ast.Tuple, ast.Bytes, ast.NameConstant, ast.Ellipsis)
-    else:
-        ast_data = (ast.Constant, ast.List, ast.Set, ast.Dict, ast.Tuple)
+    ast_data = (ast.Constant, ast.List, ast.Set, ast.Dict, ast.Tuple)
 
     tree = ast.parse(src)
 
@@ -153,7 +150,6 @@ CLASSIFIERS = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -175,7 +171,7 @@ SETUP_ARGS: dict[str, str | list[str] | dict[str, list[str]]] = dict(
     long_description_content_type="text/x-rst",
     classifiers=CLASSIFIERS,
     keywords=KEYWORDS,
-    python_requires=">=3.7.0",
+    python_requires=">=3.8.0",
     # While setuptools cannot deal with pre-installed incompatible versions,
     # setting a lower bound is not harmful - it makes error messages cleaner. DO
     # NOT set an upper bound on setuptools, as that will lead to uninstallable

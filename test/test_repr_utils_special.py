@@ -34,7 +34,7 @@ class TestPrettyRepr(unittest.TestCase):
             """Dict subclass."""
 
         val = MyDict(key="value")
-        self.assertEqual("MyDict({\n" "    'key': 'value',\n" "})", logwrap.pretty_repr(val))
+        self.assertEqual("MyDict({\n    'key': 'value',\n})", logwrap.pretty_repr(val))
 
         self.assertEqual("{\n" "    key: value,\n" "}", logwrap.pretty_str(val))
 
@@ -43,7 +43,7 @@ class TestPrettyRepr(unittest.TestCase):
             """Dict subclass."""
 
         val = MyDict(key="value")
-        self.assertEqual("MyDict({\n" "    'key': 'value',\n" "})", logwrap.pretty_repr(val))
+        self.assertEqual("MyDict({\n    'key': 'value',\n})", logwrap.pretty_repr(val))
 
         self.assertEqual("{\n" "    key: value,\n" "}", logwrap.pretty_str(val))
 

@@ -1,4 +1,4 @@
-#    Copyright 2016 - 2021 Alexey Stepanov aka penguinolog
+#    Copyright 2016 - 2022 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -136,7 +136,7 @@ class BoundParameter(inspect.Parameter):
         return f'<{self.__class__.__name__} "{self}">'
 
 
-def bind_args_kwargs(  # pylint: disable=missing-param-doc,differing-param-doc,differing-type-doc
+def bind_args_kwargs(
     sig: inspect.Signature,
     *args: typing.Any,
     **kwargs: typing.Any,
@@ -457,7 +457,7 @@ class LogWrap:
         )
 
     # noinspection PyMethodMayBeStatic
-    def pre_process_param(  # pylint: disable=no-self-use
+    def pre_process_param(
         self,
         arg: BoundParameter,
     ) -> BoundParameter | tuple[BoundParameter, typing.Any] | None:
@@ -475,9 +475,9 @@ class LogWrap:
         return arg
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def post_process_param(  # pylint: disable=unused-argument, no-self-use
+    def post_process_param(  # pylint: disable=unused-argument
         self,
-        arg: BoundParameter,
+        arg: BoundParameter,  # NOSONAR
         arg_repr: str,
     ) -> str:
         """Process parameter for the future logging.
@@ -722,6 +722,7 @@ def logwrap(
 @typing.overload
 def logwrap(
     func: None = None,
+    /,
     *,
     log: logging.Logger | None = None,
     log_level: int = logging.DEBUG,
@@ -740,6 +741,7 @@ def logwrap(
 @typing.overload
 def logwrap(
     func: _WrappedT,
+    /,
     *,
     log: logging.Logger | None = None,
     log_level: int = logging.DEBUG,
@@ -755,8 +757,9 @@ def logwrap(
     """Overload: func provided."""
 
 
-def logwrap(
+def logwrap(  # pylint: disable=differing-param-doc,differing-type-doc
     func: _WrappedT | None = None,
+    /,
     *,
     log: logging.Logger | None = None,
     log_level: int = logging.DEBUG,

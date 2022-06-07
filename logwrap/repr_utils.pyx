@@ -1,4 +1,4 @@
-#    Copyright 2016 - 2021 Alexey Stepanov aka penguinolog
+#    Copyright 2016 - 2022 Alexey Stepanov aka penguinolog
 
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -19,11 +19,50 @@ available from the main module.
 """
 
 # Standard Library
+import dataclasses
 import inspect
 import types
 import typing
+from collections.abc import Iterable
 
 __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+
+
+@typing.runtime_checkable
+class _AttributeHolderProto(typing.Protocol):
+    __slots__ = ()
+
+    def _get_kwargs(self) -> list[tuple[str, typing.Any]]:
+        """Protocol stub."""
+
+    def _get_args(self) -> list[str]:
+        """Protocol stub."""
+
+
+@typing.runtime_checkable
+class _NamedTupleProto(typing.Protocol):
+    __slots__ = ()
+
+    def _asdict(self) -> dict[str, typing.Any]:
+        """Protocol stub."""
+
+    def __getnewargs__(self) -> tuple[typing.Any, ...]:
+        """Protocol stub."""
+
+    def _replace(self, **kwds: dict[str, typing.Any]) -> _NamedTupleProto:
+        """Protocol stub."""
+
+    @classmethod
+    def _make(cls, iterable: Iterable[typing.Any]) -> _NamedTupleProto:
+        """Protocol stub."""
+
+
+@typing.runtime_checkable
+class _DataClassProto(typing.Protocol):
+    __slots__ = ()
+
+    __dataclass_params__: dataclasses._DataclassParams  # type: ignore[name-defined]
+    __dataclass_fields__: dict[str, dataclasses.Field[typing.Any]] = {}
 
 cdef:
     bint _known_callable(item: typing.Any):
@@ -144,7 +183,7 @@ cdef class PrettyFormat:
         self.max_indent = max_indent
         self.indent_step = indent_step
 
-    cpdef long next_indent(self, unsigned long indent, unsigned long multiplier=1):
+    cpdef unsigned long next_indent(self, unsigned long indent, unsigned long multiplier=1):
         """Next indentation value.
 
         :param indent: current indentation value
@@ -173,16 +212,24 @@ cdef class PrettyFormat:
             """
             cdef:
                 str param_str = ""
-                str prefix="\n" + " " * self.next_indent(indent)
+                unsigned long next_indent = self.next_indent(indent)
+                str prefix="\n" + " " * next_indent
                 str annotation
                 ReprParameter param
 
             for param in _prepare_repr(src):
                 param_str += f"{prefix}{param.name}"
-                if param.annotation is not param.empty:
+                annotation_exist = param.annotation is not param.empty
+                if annotation_exist:
                     param_str += f": {getattr(param.annotation, '__name__', param.annotation)!s}"
                 if param.value is not param.empty:
-                    param_str += f"={self.process_element(src=param.value, indent=indent, no_indent_start=True)}"
+                    if annotation_exist:
+                        param_str += " = "
+                    else:
+                        param_str += "="
+                    cdef:
+                        value = self.process_element(src=param.value, indent=next_indent, no_indent_start=True)
+                    param_str += value
                 param_str += ","
 
             if param_str:
@@ -201,6 +248,132 @@ cdef class PrettyFormat:
                 f"{'':<{indent}}"
                 f"<{src.__class__.__name__} {src.__module__}.{src.__name__} with interface ({param_str}){annotation}>"
             )
+
+        str _repr_attribute_holder(
+            self,
+            src: _AttributeHolderProto,
+            unsigned long indent=0,
+            bint no_indent_start=False
+        ):
+            """Repr attribute holder object (like argparse objects).
+
+            :param src: attribute holder object to process
+            :type src: _AttributeHolderProto
+            :param indent: start indentation
+            :type indent: int
+            :return: Repr of attribute holder object.
+            :rtype: str
+            """
+            param_repr: list[str] = []
+            star_args: dict[str, typing.Any] = {}
+
+            cdef:
+                unsigned long next_indent = self.next_indent(indent)
+                str prefix = "\n" + " " * next_indent
+
+            for arg in src._get_args():  # pylint: disable=protected-access
+                cdef repr_val = self.process_element(arg, indent=next_indent)
+                param_repr.append(f"{prefix}{repr_val},")
+
+            for name, value in src._get_kwargs():  # pylint: disable=protected-access
+                if name.isidentifier():
+                    cdef repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
+                    param_repr.append(f"{prefix}{name}={repr_val},")
+                else:
+                    star_args[name] = value
+
+            if star_args:
+                cdef repr_val = self.process_element(star_args, indent=next_indent, no_indent_start=True)
+                param_repr.append(f"{prefix}**{repr_val},")
+
+            if param_repr:
+                param_repr.append("\n")
+                param_repr.append(" " * indent)
+
+            param_str = "".join(param_repr)
+            return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
+
+        str _repr_named_tuple(
+            self,
+            src: _NamedTupleProto,
+            unsigned long indent=0,
+            bint no_indent_start=False
+        ):
+            """Repr named tuple.
+
+            :param src: named tuple object to process
+            :type src: _NamedTupleProto
+            :param indent: start indentation
+            :type indent: int
+            :return: Repr of named tuple object.
+            :rtype: str
+            """
+            param_repr: list[str] = []
+
+            cdef :
+                unsigned long next_indent = self.next_indent(indent)
+                str prefix = "\n" + " " * next_indent
+
+            for arg_name, value in src._asdict().items():
+                cdef repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
+                param_repr.append(f"{prefix}{arg_name}={repr_val},")
+
+            if param_repr:
+                param_repr.append("\n")
+                param_repr.append(" " * indent)
+
+            param_str = "".join(param_repr)
+            return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
+
+        str _repr_dataclass(
+            self,
+            src: _DataClassProto,
+            unsigned long indent=0,
+            bint no_indent_start=False
+        ):
+            """Repr dataclass.
+
+            :param src: dataclass object to process
+            :type src: _DataClassProto
+            :param indent: start indentation
+            :type indent: int
+            :return: Repr of dataclass.
+            :rtype: str
+            """
+            param_repr: list[str] = []
+
+            cdef:
+                unsigned long next_indent = self.next_indent(indent)
+                str prefix = "\n" + " " * next_indent
+
+            for arg_name, field in src.__dataclass_fields__.items():
+                if not field.repr:
+                    continue
+                cdef repr_val = self.process_element(getattr(src, arg_name), indent=next_indent, no_indent_start=True)
+
+                comment: list[str] = []
+
+                if field.type:
+                    if isinstance(field.type, str):
+                        comment.append(f"type: {field.type}")
+                    else:
+                        comment.append(f"type: {field.type.__name__}")
+                if getattr(field, "kw_only", False):  # python 3.10+
+                    comment.append("kw_only")
+
+                if comment:
+                    comment_str = "  # " + "  # ".join(comment)
+                else:
+                    comment_str = ""
+
+                param_repr.append(f"{prefix}{arg_name}={repr_val},{comment_str}")
+
+            if param_repr:
+                param_repr.append("\n")
+                param_repr.append(" " * indent)
+
+            param_str = "".join(param_repr)
+            return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
 
         str _repr_simple(
             self,
@@ -317,6 +490,15 @@ cdef class PrettyFormat:
 
         if _known_callable(src):
             return self._repr_callable(src=src, indent=indent)
+
+        if isinstance(src, _AttributeHolderProto):
+            return self._repr_attribute_holder(src=src, indent=indent, no_indent_start=no_indent_start)
+
+        if isinstance(src, tuple) and isinstance(src, _NamedTupleProto):
+            return self._repr_named_tuple(src=src, indent=indent, no_indent_start=no_indent_start)
+
+        if isinstance(src, _DataClassProto) and not isinstance(src, type) and src.__dataclass_params__.repr:
+            return self._repr_dataclass(src=src, indent=indent, no_indent_start=no_indent_start)
 
         if _simple(src) or indent >= self.max_indent or not src:
             return self._repr_simple(src=src, indent=indent, no_indent_start=no_indent_start)

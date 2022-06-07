@@ -150,7 +150,7 @@ class TestAnnotated(unittest.TestCase):
 
     def test_01_annotation_args(self):
         @logwrap.logwrap
-        def func(arg: typing.Optional[int] = None):
+        def func(arg: int | None = None):
             pass
 
         func()
@@ -158,7 +158,7 @@ class TestAnnotated(unittest.TestCase):
             "DEBUG>Calling: \n"
             "func(\n"
             "    # POSITIONAL_OR_KEYWORD:\n"
-            "    arg=None,  # type: typing.Optional[int]\n"
+            "    arg=None,  # type: int | None\n"
             ")\n"
             "DEBUG>Done: 'func' with result:\n"
             "None\n",
