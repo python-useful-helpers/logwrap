@@ -24,6 +24,7 @@ from __future__ import annotations
 
 # Standard Library
 import abc
+import collections
 import inspect
 import types
 import typing
@@ -104,7 +105,7 @@ def _simple(item: typing.Any) -> bool:
                 for attribute in _SIMPLE_MAGIC_ATTRIBUTES
             )
         )
-        for data_type in (list, set, tuple, dict, frozenset)
+        for data_type in (list, set, tuple, dict, frozenset, collections.deque)
     )
 
 
@@ -388,7 +389,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
         # noinspection PyBroadException
         try:
-            args_annotations: dict[str, typing.Any] = typing.get_type_hints(src)
+            args_annotations: dict[str, typing.Any] = typing.get_type_hints(type(src))
         except BaseException:  # NOSONAR
             args_annotations = {}
 
@@ -593,16 +594,34 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         if isinstance(src, dict):
             prefix, suffix = "{", "}"
             result = self._repr_dict_items(src=src, indent=indent)
+        elif isinstance(src, collections.deque):
+            result = self._repr_iterable_items(src=src, indent=self.next_indent(indent))
+            prefix, suffix = "(", ")"
         else:
             if isinstance(src, list):
                 prefix, suffix = "[", "]"
             elif isinstance(src, tuple):
                 prefix, suffix = "(", ")"
-            else:
+            elif isinstance(src, (set, frozenset)):
                 prefix, suffix = "{", "}"
+            else:
+                prefix, suffix = "", ""
             result = self._repr_iterable_items(src=src, indent=indent)
+
+        if isinstance(src, collections.deque):
+            next_indent = self.next_indent(indent)
+            return (
+                f"{'':<{indent if not no_indent_start else 0}}"
+                f"{src.__class__.__name__}(\n"
+                f"{'':<{next_indent}}{prefix}{result}\n"
+                f"{'':<{next_indent}}{suffix},\n"
+                f"{'':<{self.next_indent(indent)}}maxlen={src.maxlen},\n"
+                f"{'':<{indent}})"
+            )
+
         if type(src) in (list, tuple, set, dict):
             return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
+
         return self._repr_iterable_item(
             obj_type=src.__class__.__name__,
             prefix=prefix,

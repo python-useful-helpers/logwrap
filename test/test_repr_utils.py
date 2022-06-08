@@ -55,7 +55,7 @@ class TestPrettyRepr(unittest.TestCase):
 
     def test_004_dict(self):
         self.assertEqual(
-            "{\n" "    1 : 1,\n" "    2 : 2,\n" "    33: 33,\n" "}",
+            "{\n    1 : 1,\n    2 : 2,\n    33: 33,\n}",
             logwrap.pretty_repr({1: 1, 2: 2, 33: 33}),
         )
 
@@ -186,7 +186,7 @@ class TestPrettyRepr(unittest.TestCase):
             logwrap.pretty_repr(obj, max_indent=40),
         )
         self.assertEqual(
-            "[\n" "    [\n" "        [\n" "            [[[[[[[123]]]]]]],\n" "        ],\n" "    ],\n" "]",
+            "[\n    [\n        [\n            [[[[[[[123]]]]]]],\n        ],\n    ],\n]",
             logwrap.pretty_repr(obj, max_indent=10),
         )
 
@@ -302,4 +302,27 @@ class TestContainers(unittest.TestCase):
             "    ),  # type: tuple[str]\n"
             ")",
             logwrap.pretty_repr(test_dc),
+        )
+
+    def test_005_deque(self):
+        # Standard Library
+        import collections
+
+        default_deque = collections.deque()
+        default_deque.append("middle")
+        default_deque.extend(("next", "last"))
+        default_deque.extendleft(("second", "first"))
+
+        self.assertEqual(
+            "deque(\n"
+            "    (\n"
+            "        'first',\n"
+            "        'second',\n"
+            "        'middle',\n"
+            "        'next',\n"
+            "        'last',\n"
+            "    ),\n"
+            "    maxlen=None,\n"
+            ")",
+            logwrap.pretty_repr(default_deque),
         )

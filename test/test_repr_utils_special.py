@@ -36,7 +36,7 @@ class TestPrettyRepr(unittest.TestCase):
         val = MyDict(key="value")
         self.assertEqual("MyDict({\n    'key': 'value',\n})", logwrap.pretty_repr(val))
 
-        self.assertEqual("{\n" "    key: value,\n" "}", logwrap.pretty_str(val))
+        self.assertEqual("{\n    key: value,\n}", logwrap.pretty_str(val))
 
     def test_002_typing_specific_dict(self):
         class MyDict(typing.Dict[str, str]):
@@ -45,7 +45,7 @@ class TestPrettyRepr(unittest.TestCase):
         val = MyDict(key="value")
         self.assertEqual("MyDict({\n    'key': 'value',\n})", logwrap.pretty_repr(val))
 
-        self.assertEqual("{\n" "    key: value,\n" "}", logwrap.pretty_str(val))
+        self.assertEqual("{\n    key: value,\n}", logwrap.pretty_str(val))
 
     def test_003_typing_specific_dict_repr_override(self):
         class MyDict(typing.Dict[str, str]):
@@ -68,6 +68,6 @@ class TestPrettyRepr(unittest.TestCase):
             key: str
 
         val = MyDict(key="value")
-        self.assertEqual("{\n" "    'key': 'value',\n" "}", logwrap.pretty_repr(val))
+        self.assertEqual("{\n    'key': 'value',\n}", logwrap.pretty_repr(val))
 
-        self.assertEqual("{\n" "    key: value,\n" "}", logwrap.pretty_str(val))
+        self.assertEqual("{\n    key: value,\n}", logwrap.pretty_str(val))
