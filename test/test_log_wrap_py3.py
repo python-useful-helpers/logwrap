@@ -31,6 +31,7 @@ import logwrap
 
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
+@unittest.skipIf(not hasattr(asyncio, "coroutine"), "Python 3.11 do not have `asyncio.coroutine`")
 class TestLogWrapAsync(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
