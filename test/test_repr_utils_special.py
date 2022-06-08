@@ -47,8 +47,22 @@ class TestPrettyRepr(unittest.TestCase):
 
         self.assertEqual("{\n" "    key: value,\n" "}", logwrap.pretty_str(val))
 
-    @unittest.skipIf(sys.version_info[:2] < (3, 8), "pep-0589 is implemented in python 3.8")
-    def test_003_typed_dict(self):
+    def test_003_typing_specific_dict_repr_override(self):
+        class MyDict(typing.Dict[str, str]):
+            """Dict subclass."""
+
+            def __repr__(self) -> str:
+                return f"{self.__class__.__name__}({tuple(zip(self.items()))})"
+
+            def __str__(self) -> str:
+                return str(dict(self))
+
+        val = MyDict(key="value")
+        self.assertEqual("MyDict(((('key', 'value'),),))", logwrap.pretty_repr(val))
+
+        self.assertEqual("{'key': 'value'}", logwrap.pretty_str(val))
+
+    def test_004_typed_dict(self):
         # noinspection PyMissingOrEmptyDocstring
         class MyDict(typing.TypedDict):
             key: str

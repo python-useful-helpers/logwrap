@@ -27,6 +27,8 @@ from collections.abc import Iterable
 
 __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
+_SIMPLE_MAGIC_ATTRIBUTES = ("__repr__", "__str__")
+
 
 @typing.runtime_checkable
 class _AttributeHolderProto(typing.Protocol):
@@ -84,7 +86,16 @@ cdef:
         :return: use repr() iver item by default
         :rtype: bool
         """
-        return not isinstance(item, (list, set, tuple, dict, frozenset))
+        return not any(
+            (
+                isinstance(item, data_type)
+                and all(
+                    getattr(type(item), attribute) is getattr(data_type, attribute)
+                    for attribute in _SIMPLE_MAGIC_ATTRIBUTES
+                )
+            )
+            for data_type in (list, set, tuple, dict, frozenset)
+        )
 
 
     class ReprParameter:
@@ -310,6 +321,11 @@ cdef class PrettyFormat:
             """
             param_repr: list[str] = []
 
+            try:
+                args_annotations: dict[str, typing.Any] = typing.get_type_hints(src)
+            except BaseException:  # NOSONAR
+                args_annotations = {}
+
             cdef :
                 unsigned long next_indent = self.next_indent(indent)
                 str prefix = "\n" + " " * next_indent
@@ -317,6 +333,11 @@ cdef class PrettyFormat:
             for arg_name, value in src._asdict().items():
                 cdef repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
                 param_repr.append(f"{prefix}{arg_name}={repr_val},")
+                if arg_name in args_annotations and not isinstance(
+                    getattr(args_annotations, arg_name, None), typing.ForwardRef
+                ):
+                    annotation = getattr(args_annotations[arg_name], '__name__', args_annotations[arg_name])
+                    param_repr.append(f"#  type: {annotation!s}")
 
             if param_repr:
                 param_repr.append("\n")
@@ -533,7 +554,7 @@ cdef class PrettyFormat:
         unsigned long indent=0,
         bint no_indent_start=False
     ) -> str:
-        """Make human readable representation of object. The main entry point.
+        """Make human-readable representation of object. The main entry point.
 
         :param src: object to process
         :type src: typing.Any

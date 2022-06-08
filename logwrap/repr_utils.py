@@ -35,6 +35,11 @@ if typing.TYPE_CHECKING:
     from collections.abc import Iterable
 
 
+__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
+
+_SIMPLE_MAGIC_ATTRIBUTES = ("__repr__", "__str__")
+
+
 @typing.runtime_checkable
 class _AttributeHolderProto(typing.Protocol):
     __slots__ = ()
@@ -72,9 +77,6 @@ class _DataClassProto(typing.Protocol):
     __dataclass_fields__: dict[str, dataclasses.Field[typing.Any]] = {}
 
 
-__all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
-
-
 def _known_callable(item: typing.Any) -> bool:
     """Check for possibility to parse callable.
 
@@ -94,7 +96,16 @@ def _simple(item: typing.Any) -> bool:
     :return: use repr() iver item by default
     :rtype: bool
     """
-    return not isinstance(item, (list, set, tuple, dict, frozenset))
+    return not any(
+        (
+            isinstance(item, data_type)
+            and all(
+                getattr(type(item), attribute) is getattr(data_type, attribute)
+                for attribute in _SIMPLE_MAGIC_ATTRIBUTES
+            )
+        )
+        for data_type in (list, set, tuple, dict, frozenset)
+    )
 
 
 class ReprParameter:
@@ -375,12 +386,23 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         """
         param_repr: list[str] = []
 
+        # noinspection PyBroadException
+        try:
+            args_annotations: dict[str, typing.Any] = typing.get_type_hints(src)
+        except BaseException:  # NOSONAR
+            args_annotations = {}
+
         next_indent = self.next_indent(indent)
         prefix: str = "\n" + " " * next_indent
 
         for arg_name, value in src._asdict().items():
             repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
             param_repr.append(f"{prefix}{arg_name}={repr_val},")
+            if arg_name in args_annotations and not isinstance(
+                getattr(args_annotations, arg_name, None), typing.ForwardRef
+            ):
+                annotation = getattr(args_annotations[arg_name], "__name__", args_annotations[arg_name])
+                param_repr.append(f"#  type: {annotation!s}")
 
         if param_repr:
             param_repr.append("\n")

@@ -278,7 +278,7 @@ class TestContainers(unittest.TestCase):
 
         test_val = NTTest(1, 2)
         self.assertEqual(
-            "test_repr_utils.NTTest(\n    test_field_1=1,\n    test_field_2=2,\n)",
+            "test_repr_utils.NTTest(\n    test_field_1=1,#  type: int\n    test_field_2=2,#  type: int\n)",
             logwrap.pretty_repr(test_val),
         )
 
