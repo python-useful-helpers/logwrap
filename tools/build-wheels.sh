@@ -20,6 +20,9 @@ rm -rf /io/*.egg-info
 rm -rf /io/.pytest_cache
 find /io/ -noleaf \( -iname "*.py[co]" -o -iname "*.c" -o -iname "*-linux_*.whl" \) -delete
 
+# tune git
+git config --global --add safe.directory "/io"
+
 echo
 echo
 echo "Compile wheels"
