@@ -1,8 +1,8 @@
 logwrap
 =======
 
-.. image:: https://travis-ci.com/python-useful-helpers/logwrap.svg?branch=master
-    :target: https://travis-ci.com/python-useful-helpers/logwrap
+.. image:: https://app.travis-ci.com/python-useful-helpers/logwrap.svg?branch=master
+    :target: https://app.travis-ci.com/github/python-useful-helpers/logwrap
 .. image:: https://github.com/python-useful-helpers/logwrap/workflows/Python%20package/badge.svg
     :target: https://github.com/python-useful-helpers/logwrap/actions
 .. image:: https://coveralls.io/repos/github/python-useful-helpers/logwrap/badge.svg?branch=master
@@ -381,7 +381,7 @@ CI systems
 ==========
 For code checking several CI systems is used in parallel:
 
-1. `Travis CI: <https://travis-ci.com/python-useful-helpers/logwrap>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests. Also it's publishes coverage on coveralls.
+1. `Travis CI: <https://app.travis-ci.com/github/python-useful-helpers/logwrap>`_ is used for checking: PEP8, pylint, bandit, installation possibility and unit tests. Also it's publishes coverage on coveralls.
 
 2. `coveralls: <https://coveralls.io/github/python-useful-helpers/logwrap>`_ is used for coverage display.
 
@@ -389,4 +389,4 @@ For code checking several CI systems is used in parallel:
 
 CD systems
 ==========
-1. `Travis CI: <https://travis-ci.com/python-useful-helpers/logwrap>`_ is used for linux and SDIST package delivery on PyPI.
+1. `Travis CI: <https://app.travis-ci.com/github/python-useful-helpers/logwrap>`_ is used for linux and SDIST package delivery on PyPI.
