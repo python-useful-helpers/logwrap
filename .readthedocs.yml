@@ -1,0 +1,15 @@
+version: 2
+
+# Build documentation in the docs/ directory with Sphinx
+sphinx:
+  builder: html
+  configuration: doc/conf.py
+
+formats: []
+
+python:
+  version: "3.8"
+  install:
+    - requirements: CI_REQUIREMENTS.txt
+    - method: pip
+      path: .

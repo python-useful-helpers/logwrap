@@ -22,7 +22,6 @@ from __future__ import annotations
 import asyncio
 import io
 import logging
-import typing
 import unittest
 from unittest import mock
 
