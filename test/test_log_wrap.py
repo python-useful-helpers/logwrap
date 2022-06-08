@@ -84,7 +84,7 @@ class TestLogWrap(unittest.TestCase):
             f"DEBUG>Calling: \n"
             f"func(\n"
             f"    # POSITIONAL_OR_KEYWORD:\n"
-            f"    tst={logwrap.pretty_repr(arg, indent=8, no_indent_start=True)},\n"
+            f"    tst={logwrap.pretty_repr(arg, indent=4, no_indent_start=True)},\n"
             f")\n"
             f"DEBUG>Done: 'func' with result:\n"
             f"{logwrap.pretty_repr(result)}\n",
@@ -105,7 +105,7 @@ class TestLogWrap(unittest.TestCase):
             f"DEBUG>Calling: \n"
             f"func(\n"
             f"    # POSITIONAL_OR_KEYWORD:\n"
-            f"    tst={logwrap.pretty_repr(arg, indent=8, no_indent_start=True)},\n"
+            f"    tst={logwrap.pretty_repr(arg, indent=4, no_indent_start=True)},\n"
             f")\n"
             f"DEBUG>Done: 'func' with result:\n"
             f"{logwrap.pretty_repr(result)}\n",
@@ -127,8 +127,8 @@ class TestLogWrap(unittest.TestCase):
             f"DEBUG>Calling: \n"
             f"func(\n"
             f"    # POSITIONAL_OR_KEYWORD:\n"
-            f"    arg_1={logwrap.pretty_repr(arg1, indent=8, no_indent_start=True)},\n"
-            f"    arg_2={logwrap.pretty_repr(arg2, indent=8, no_indent_start=True)},\n"
+            f"    arg_1={logwrap.pretty_repr(arg1, indent=4, no_indent_start=True)},\n"
+            f"    arg_2={logwrap.pretty_repr(arg2, indent=4, no_indent_start=True)},\n"
             f")\n"
             f"DEBUG>Done: 'func' with result:\n"
             f"{logwrap.pretty_repr(result)}\n",
@@ -150,9 +150,9 @@ class TestLogWrap(unittest.TestCase):
             f"DEBUG>Calling: \n"
             f"func(\n"
             f"    # VAR_POSITIONAL:\n"
-            f"    args={logwrap.pretty_repr(tuple(targs), indent=8, no_indent_start=True)},\n"
+            f"    args={logwrap.pretty_repr(tuple(targs), indent=4, no_indent_start=True)},\n"
             f"    # VAR_KEYWORD:\n"
-            f"    kwargs={logwrap.pretty_repr(tkwargs, indent=8, no_indent_start=True)},\n"
+            f"    kwargs={logwrap.pretty_repr(tkwargs, indent=4, no_indent_start=True)},\n"
             f")\n"
             f"DEBUG>Done: 'func' with result:\n"
             f"{logwrap.pretty_repr(result)}\n",
@@ -175,11 +175,11 @@ class TestLogWrap(unittest.TestCase):
             f"DEBUG>Calling: \n"
             f"func(\n"
             f"    # POSITIONAL_OR_KEYWORD:\n"
-            f"    arg={logwrap.pretty_repr(arg, indent=8, no_indent_start=True)},\n"
+            f"    arg={logwrap.pretty_repr(arg, indent=4, no_indent_start=True)},\n"
             f"    # VAR_POSITIONAL:\n"
-            f"    positional={logwrap.pretty_repr(tuple(targs), indent=8, no_indent_start=True)},\n"
+            f"    positional={logwrap.pretty_repr(tuple(targs), indent=4, no_indent_start=True)},\n"
             f"    # VAR_KEYWORD:\n"
-            f"    named={logwrap.pretty_repr(tkwargs, indent=8, no_indent_start=True)},\n"
+            f"    named={logwrap.pretty_repr(tkwargs, indent=4, no_indent_start=True)},\n"
             f")\n"
             f"DEBUG>Done: 'func' with result:\n"
             f"{logwrap.pretty_repr(result)}\n",
@@ -195,7 +195,7 @@ class TestLogWrap(unittest.TestCase):
             func()
 
         self.assertEqual(
-            "DEBUG>Calling: \n" "func()\n" "ERROR>Failed: \n" "func()\n" "Traceback (most recent call last):",
+            "DEBUG>Calling: \nfunc()\nERROR>Failed: \nfunc()\nTraceback (most recent call last):",
             "\n".join(self.stream.getvalue().split("\n")[:5]),
         )
 
@@ -232,7 +232,7 @@ class TestLogWrap(unittest.TestCase):
 
         self.assertEqual(
             [
-                mock.call(level=logging.DEBUG, msg="Calling: \n" "func()"),
+                mock.call(level=logging.DEBUG, msg="Calling: \nfunc()"),
                 mock.call(
                     level=logging.DEBUG,
                     msg=f"Done: 'func' with result:\n" f"{logwrap.pretty_repr(result, max_indent=10)}",
@@ -289,15 +289,15 @@ class TestLogWrap(unittest.TestCase):
                     f"    arg=0,\n"
                     f"    darg=1,\n"
                     f"    # VAR_POSITIONAL:\n"
-                    f"    args={logwrap.pretty_repr((2,), indent=8, no_indent_start=True)},\n"
+                    f"    args={logwrap.pretty_repr((2,), indent=4, no_indent_start=True)},\n"
                     f"    # KEYWORD_ONLY:\n"
                     f"    kwarg=3,\n"
                     f"    dkwarg=4,\n"
                     f"    # VAR_KEYWORD:\n"
-                    f"    kwargs={logwrap.pretty_repr(dict(somekwarg=5), indent=8, no_indent_start=True)},\n"
+                    f"    kwargs={logwrap.pretty_repr(dict(somekwarg=5), indent=4, no_indent_start=True)},\n"
                     f")",
                 ),
-                mock.call(level=logging.DEBUG, msg="Done: 'tst' with result:\n" "None"),
+                mock.call(level=logging.DEBUG, msg="Done: 'tst' with result:\nNone"),
             ],
         )
 
@@ -324,9 +324,9 @@ class TestLogWrap(unittest.TestCase):
             f"    arg=0,\n"
             f"    darg=1,\n"
             f"    # VAR_POSITIONAL:\n"
-            f"    args={logwrap.pretty_repr((2, ), indent=8, no_indent_start=True)},\n"
+            f"    args={logwrap.pretty_repr((2, ), indent=4, no_indent_start=True)},\n"
             f"    # VAR_KEYWORD:\n"
-            f"    kwargs={logwrap.pretty_repr(dict(arg3=3), indent=8, no_indent_start=True)},\n"
+            f"    kwargs={logwrap.pretty_repr(dict(arg3=3), indent=4, no_indent_start=True)},\n"
             f")\n"
             f"DEBUG>Done: 'func' with result:\n"
             f"{logwrap.pretty_repr(result)}\n",
@@ -356,7 +356,7 @@ class TestLogWrap(unittest.TestCase):
                         f"Calling: \n"
                         f"func(\n"
                         f"    # POSITIONAL_OR_KEYWORD:\n"
-                        f"    test_arg1={logwrap.pretty_repr(arg1, indent=8, no_indent_start=True)},\n"
+                        f"    test_arg1={logwrap.pretty_repr(arg1, indent=4, no_indent_start=True)},\n"
                         f")"
                     ),
                 ),
@@ -400,7 +400,7 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(result, (arg1, arg2))
         self.assertEqual(
             [
-                mock.call(level=logging.DEBUG, msg="Calling: \n" "func()"),
+                mock.call(level=logging.DEBUG, msg="Calling: \nfunc()"),
                 mock.call(level=logging.DEBUG, msg=f"Done: 'func' with result:\n{logwrap.pretty_repr(result)}"),
             ],
             log.mock_calls,
@@ -429,8 +429,8 @@ class TestLogWrap(unittest.TestCase):
                         f"Calling: \n"
                         f"func(\n"
                         f"    # POSITIONAL_OR_KEYWORD:\n"
-                        f"    test_arg1={logwrap.pretty_repr(arg1, indent=8, no_indent_start=True)},\n"
-                        f"    test_arg2={logwrap.pretty_repr(arg2, indent=8, no_indent_start=True)},\n"
+                        f"    test_arg1={logwrap.pretty_repr(arg1, indent=4, no_indent_start=True)},\n"
+                        f"    test_arg2={logwrap.pretty_repr(arg2, indent=4, no_indent_start=True)},\n"
                         f")"
                     ),
                 ),
@@ -456,7 +456,7 @@ class TestLogWrap(unittest.TestCase):
 
         self.assertEqual(
             [
-                mock.call(level=logging.DEBUG, msg="Calling: \n" "func()"),
+                mock.call(level=logging.DEBUG, msg="Calling: \nfunc()"),
                 mock.call(level=logging.ERROR, msg=AnyStringWith("Failed: \nfunc()"), exc_info=False),
             ],
             log.mock_calls,
@@ -515,7 +515,7 @@ class TestLogWrap(unittest.TestCase):
 
         self.assertEqual(
             [
-                mock.call(level=logging.DEBUG, msg="Calling: \n" "func()"),
+                mock.call(level=logging.DEBUG, msg="Calling: \nfunc()"),
                 mock.call(level=logging.ERROR, msg=AnyStringWith("Failed: \nfunc()"), exc_info=False),
             ],
             log.mock_calls,
@@ -631,7 +631,7 @@ class TestObject(unittest.TestCase):
             [
                 mock.call.log(
                     level=logging.DEBUG,
-                    msg="Calling: \n" "func(\n" "    # POSITIONAL_OR_KEYWORD:\n" "    arg=1,\n" "    arg2=None,\n" ")",
+                    msg="Calling: \nfunc(\n    # POSITIONAL_OR_KEYWORD:\n    arg=1,\n    arg2=None,\n)",
                 ),
                 mock.call.log(level=logging.DEBUG, msg="Done: 'func'"),
             ],

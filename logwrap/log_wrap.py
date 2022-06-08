@@ -506,7 +506,7 @@ class LogWrap:
         try:
             return repr_utils.pretty_repr(
                 src=value,
-                indent=INDENT + 4,
+                indent=INDENT,
                 no_indent_start=True,
                 max_indent=self.max_indent,
             )

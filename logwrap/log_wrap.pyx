@@ -34,8 +34,10 @@ from logwrap cimport repr_utils
 __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
 LOGGER = logging.getLogger("logwrap")  # type: logging.Logger
-cdef unsigned long INDENT = 4
-cdef str _CURRENT_FILE = os.path.abspath(__file__)
+
+cdef:
+    unsigned long INDENT = 4
+    str _CURRENT_FILE = os.path.abspath(__file__)
 
 _WrappedT = typing.TypeVar("_WrappedT", bound=typing.Callable[..., typing.Any])
 
@@ -320,7 +322,7 @@ cdef class LogWrap:
             try:
                 return repr_utils.pretty_repr(
                     src=value,
-                    indent=INDENT + 4,
+                    indent=INDENT,
                     no_indent_start=True,
                     max_indent=self.max_indent,
                 )
