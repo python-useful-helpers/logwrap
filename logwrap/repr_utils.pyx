@@ -20,7 +20,6 @@ available from the main module.
 
 # Standard Library
 import collections
-import dataclasses
 import inspect
 import types
 import typing
@@ -35,10 +34,10 @@ _SIMPLE_MAGIC_ATTRIBUTES = ("__repr__", "__str__")
 class _AttributeHolderProto(typing.Protocol):
     __slots__ = ()
 
-    def _get_kwargs(self) -> list[tuple[str, typing.Any]]:
+    def _get_kwargs(self) -> list:
         """Protocol stub."""
 
-    def _get_args(self) -> list[str]:
+    def _get_args(self) -> list:
         """Protocol stub."""
 
 
@@ -46,17 +45,17 @@ class _AttributeHolderProto(typing.Protocol):
 class _NamedTupleProto(typing.Protocol):
     __slots__ = ()
 
-    def _asdict(self) -> dict[str, typing.Any]:
+    def _asdict(self) -> dict:
         """Protocol stub."""
 
-    def __getnewargs__(self) -> tuple[typing.Any, ...]:
+    def __getnewargs__(self) -> tuple:
         """Protocol stub."""
 
-    def _replace(self, **kwds: dict[str, typing.Any]) -> _NamedTupleProto:
+    def _replace(self, **kwds: dict):
         """Protocol stub."""
 
     @classmethod
-    def _make(cls, iterable: Iterable[typing.Any]) -> _NamedTupleProto:
+    def _make(cls, iterable: Iterable):
         """Protocol stub."""
 
 
@@ -64,8 +63,8 @@ class _NamedTupleProto(typing.Protocol):
 class _DataClassProto(typing.Protocol):
     __slots__ = ()
 
-    __dataclass_params__: dataclasses._DataclassParams  # type: ignore[name-defined]
-    __dataclass_fields__: dict[str, dataclasses.Field[typing.Any]] = {}
+    __dataclass_params__: typing.Any
+    __dataclass_fields__: typing.Any = {}
 
 cdef:
     bint _known_callable(item: typing.Any):
@@ -239,8 +238,9 @@ cdef class PrettyFormat:
                         param_str += " = "
                     else:
                         param_str += "="
-                    cdef:
-                        value = self.process_element(src=param.value, indent=next_indent, no_indent_start=True)
+
+                    value = self.process_element(src=param.value, indent=next_indent, no_indent_start=True)
+
                     param_str += value
                 param_str += ","
 
@@ -284,18 +284,18 @@ cdef class PrettyFormat:
                 str prefix = "\n" + " " * next_indent
 
             for arg in src._get_args():  # pylint: disable=protected-access
-                cdef repr_val = self.process_element(arg, indent=next_indent)
+                repr_val = self.process_element(arg, indent=next_indent)
                 param_repr.append(f"{prefix}{repr_val},")
 
             for name, value in src._get_kwargs():  # pylint: disable=protected-access
                 if name.isidentifier():
-                    cdef repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
+                    repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
                     param_repr.append(f"{prefix}{name}={repr_val},")
                 else:
                     star_args[name] = value
 
             if star_args:
-                cdef repr_val = self.process_element(star_args, indent=next_indent, no_indent_start=True)
+                repr_val = self.process_element(star_args, indent=next_indent, no_indent_start=True)
                 param_repr.append(f"{prefix}**{repr_val},")
 
             if param_repr:
@@ -332,7 +332,7 @@ cdef class PrettyFormat:
                 str prefix = "\n" + " " * next_indent
 
             for arg_name, value in src._asdict().items():
-                cdef repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
+                repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
                 param_repr.append(f"{prefix}{arg_name}={repr_val},")
                 if arg_name in args_annotations and not isinstance(
                     getattr(args_annotations, arg_name, None), typing.ForwardRef
@@ -371,7 +371,7 @@ cdef class PrettyFormat:
             for arg_name, field in src.__dataclass_fields__.items():
                 if not field.repr:
                     continue
-                cdef repr_val = self.process_element(getattr(src, arg_name), indent=next_indent, no_indent_start=True)
+                repr_val = self.process_element(getattr(src, arg_name), indent=next_indent, no_indent_start=True)
 
                 comment: list[str] = []
 

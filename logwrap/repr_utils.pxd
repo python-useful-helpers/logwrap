@@ -19,48 +19,8 @@ available from the main module.
 """
 
 # Standard Library
-import dataclasses
 import types
 import typing
-from collections.abc import Iterable
-
-
-@typing.runtime_checkable
-class _AttributeHolderProto(typing.Protocol):
-    __slots__ = ()
-
-    def _get_kwargs(self) -> list[tuple[str, typing.Any]]:
-        """Protocol stub."""
-
-    def _get_args(self) -> list[str]:
-        """Protocol stub."""
-
-
-@typing.runtime_checkable
-class _NamedTupleProto(typing.Protocol):
-    __slots__ = ()
-
-    def _asdict(self) -> dict[str, typing.Any]:
-        """Protocol stub."""
-
-    def __getnewargs__(self) -> tuple[typing.Any, ...]:
-        """Protocol stub."""
-
-    def _replace(self, **kwds: dict[str, typing.Any]) -> _NamedTupleProto:
-        """Protocol stub."""
-
-    @classmethod
-    def _make(cls, iterable: Iterable[typing.Any]) -> _NamedTupleProto:
-        """Protocol stub."""
-
-
-@typing.runtime_checkable
-class _DataClassProto(typing.Protocol):
-    __slots__ = ()
-
-    __dataclass_params__: dataclasses._DataclassParams  # type: ignore[name-defined]
-    __dataclass_fields__: dict[str, dataclasses.Field[typing.Any]] = {}
-
 
 cdef:
     bint _known_callable(item: typing.Any)
@@ -101,9 +61,9 @@ cdef:
 
         cdef:
             str _repr_callable(self, src: typing.Union[types.FunctionType, types.MethodType], unsigned long indent=?)
-            str _repr_attribute_holder(self, src: _AttributeHolderProto, unsigned long indent=?, bint no_indent_start=?)
-            str _repr_named_tuple(self, src: _NamedTupleProto, unsigned long indent=?, bint no_indent_start=?)
-            str _repr_dataclass(self, src: _DataClassProto, unsigned long indent=?, bint no_indent_start=?)
+            str _repr_attribute_holder(self, object src, unsigned long indent=?, bint no_indent_start=?)
+            str _repr_named_tuple(self, object src, unsigned long indent=?, bint no_indent_start=?)
+            str _repr_dataclass(self, object src, unsigned long indent=?, bint no_indent_start=?)
             str _repr_simple(self, src: typing.Any, unsigned long indent=?, bint no_indent_start=?)
             str _repr_iterable_item(self, str obj_type, str prefix, unsigned long indent, bint no_indent_start, str result, str suffix)
             str _repr_iterable_items(self, src: typing.Iterable, unsigned long indent=?)
