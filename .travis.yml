@@ -17,7 +17,10 @@ _python:
     python: "3.9"
   - &python310
     name: "Python 3.10"
-    python: "3.10-dev"
+    python: "3.10"
+  - &python311
+    name: "Python 3.11"
+    python: "3.11-dev"
 
 _helpers:
   - &install_cython pip install --upgrade Cython
@@ -137,6 +140,10 @@ jobs:
         - coveralls
     - stage: test
       <<: *python310
+      after_success:
+        - coveralls
+    - stage: test
+      <<: *python311
       after_success:
         - coveralls
 

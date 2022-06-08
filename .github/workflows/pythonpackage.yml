@@ -130,7 +130,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9", "3.10", "3.11-dev"]
     name: "Cython based python ${{ matrix.python-version }} on linux"
 
     steps:

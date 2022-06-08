@@ -28,7 +28,6 @@ repos:
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
         language_version: python3.8
-        always_run: true
         exclude: (venv|test|doc)
 
   - repo: https://github.com/pre-commit/pygrep-hooks
