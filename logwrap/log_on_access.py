@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 #    Copyright 2018 - 2021 Alexey Stepanov aka penguinolog
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -19,16 +17,18 @@ from __future__ import annotations
 
 # Standard Library
 import inspect
-import logging
 import os
 import sys
 import time
 import traceback
 import typing
+from logging import DEBUG
+from logging import Logger
+from logging import getLogger
 
 # Package Implementation
-from logwrap import constants
 from logwrap import repr_utils
+from logwrap.constants import VALID_LOGGER_NAMES
 
 if typing.TYPE_CHECKING:
     # Standard Library
@@ -36,7 +36,7 @@ if typing.TYPE_CHECKING:
 
 __all__ = ("LogOnAccess",)
 
-_LOGGER: logging.Logger = logging.getLogger(__name__)
+_LOGGER: Logger = getLogger(__name__)
 _CURRENT_FILE = os.path.abspath(__file__)
 _OwnerT = typing.TypeVar("_OwnerT")
 _ReturnT = typing.TypeVar("_ReturnT")
@@ -149,10 +149,10 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         doc: str | None = None,
         *,
         # Extended settings start
-        logger: logging.Logger | str | None = None,
+        logger: Logger | str | None = None,
         log_object_repr: bool = True,
-        log_level: int = logging.DEBUG,
-        exc_level: int = logging.DEBUG,
+        log_level: int = DEBUG,
+        exc_level: int = DEBUG,
         log_before: bool = True,
         log_success: bool = True,
         log_failure: bool = True,
@@ -193,10 +193,10 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         """
         super().__init__(fget=fget, fset=fset, fdel=fdel, doc=doc)
 
-        if logger is None or isinstance(logger, logging.Logger):
-            self.__logger: logging.Logger | None = logger
+        if logger is None or isinstance(logger, Logger):
+            self.__logger: Logger | None = logger
         else:
-            self.__logger = logging.getLogger(logger)
+            self.__logger = getLogger(logger)
 
         self.__log_object_repr: bool = log_object_repr
         self.__log_level: int = log_level
@@ -265,7 +265,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
             return f"<{self.__objclass__.__name__}() at 0x{id(instance):X}>"
         return f"<{instance.__class__.__name__}() at 0x{id(instance):X}>"
 
-    def _get_logger_for_instance(self, instance: _OwnerT) -> logging.Logger:
+    def _get_logger_for_instance(self, instance: _OwnerT) -> Logger:
         """Get logger for log calls.
 
         :param instance: Owner class instance. Filled only if instance created, else None.
@@ -275,14 +275,14 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         """
         if self.logger is not None:
             return self.logger
-        for logger_name in constants.VALID_LOGGER_NAMES:
+        for logger_name in VALID_LOGGER_NAMES:
             logger_candidate = getattr(instance, logger_name, None)
-            if isinstance(logger_candidate, logging.Logger):
+            if isinstance(logger_candidate, Logger):
                 return logger_candidate
         instance_module = inspect.getmodule(instance)
-        for logger_name in constants.VALID_LOGGER_NAMES:
+        for logger_name in VALID_LOGGER_NAMES:
             logger_candidate = getattr(instance_module, logger_name, None)
-            if isinstance(logger_candidate, logging.Logger):
+            if isinstance(logger_candidate, Logger):
                 return logger_candidate
         return _LOGGER
 
@@ -339,7 +339,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
             raise AttributeError()
 
         source: str = self.__get_obj_source(instance, owner)
-        logger: logging.Logger = self._get_logger_for_instance(instance)
+        logger: Logger = self._get_logger_for_instance(instance)
 
         timestamp: float = time.time()
         try:
@@ -375,7 +375,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
             raise AttributeError()
 
         source: str = self.__get_obj_source(instance)
-        logger: logging.Logger = self._get_logger_for_instance(instance)
+        logger: Logger = self._get_logger_for_instance(instance)
 
         timestamp: float = time.time()
         try:
@@ -410,7 +410,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
             raise AttributeError()
 
         source: str = self.__get_obj_source(instance)
-        logger: logging.Logger = self._get_logger_for_instance(instance)
+        logger: Logger = self._get_logger_for_instance(instance)
 
         timestamp: float = time.time()
         try:
@@ -429,7 +429,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
             raise
 
     @property
-    def logger(self) -> logging.Logger | None:
+    def logger(self) -> Logger | None:
         """Logger instance to use as override.
 
         :return: logger instance if set
@@ -438,16 +438,16 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         return self.__logger
 
     @logger.setter
-    def logger(self, logger: logging.Logger | str | None) -> None:
+    def logger(self, logger: Logger | str | None) -> None:
         """Logger instance to use as override.
 
         :param logger: logger instance, logger name or None if override disable required
         :type logger: logging.Logger | str | None
         """
-        if logger is None or isinstance(logger, logging.Logger):
+        if logger is None or isinstance(logger, Logger):
             self.__logger = logger
         else:
-            self.__logger = logging.getLogger(logger)
+            self.__logger = getLogger(logger)
 
     @property
     def log_object_repr(self) -> bool:

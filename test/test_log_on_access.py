@@ -360,7 +360,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual("DEBUG:Target:Request: Target(val=ok).ok", logged[0])
         self.assertRegex(
             logged[1],
-            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: " rf"Target\(val=ok\)\.ok -> {logwrap.pretty_repr(VALUE)}",
+            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: Target\(val=ok\)\.ok -> {logwrap.pretty_repr(VALUE)}",
         )
 
         self.stream.seek(0)
@@ -413,7 +413,7 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual("DEBUG:Target:Request: Target(val=ok).ok", logged[0])
         self.assertRegex(
             logged[1],
-            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: " rf"Target\(val=ok\)\.ok -> {logwrap.pretty_repr(VALUE)}",
+            rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: Target\(val=ok\)\.ok -> {logwrap.pretty_repr(VALUE)}",
         )
 
         self.stream.seek(0)

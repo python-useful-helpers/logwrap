@@ -53,5 +53,5 @@ class TestLogOnAccess(unittest.TestCase):
         self.assertEqual("DEBUG:Target_mod:Request: Target(val=ok).ok", logged[0])
         self.assertRegex(
             logged[1],
-            rf"DEBUG:Target_mod:Done at (?:\d+\.\d{{3}})s: " rf"Target\(val=ok\)\.ok -> {logwrap.pretty_repr(VALUE)}",
+            rf"DEBUG:Target_mod:Done at (?:\d+\.\d{{3}})s: Target\(val=ok\)\.ok -> {logwrap.pretty_repr(VALUE)}",
         )

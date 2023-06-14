@@ -36,11 +36,11 @@ class TestPrettyStr(unittest.TestCase):
 
     def test_iterable(self):
         self.assertEqual(
-            "[{nl:<5}1,{nl:<5}2,{nl:<5}3,\n" "]".format(nl="\n"),
+            "[{nl:<5}1,{nl:<5}2,{nl:<5}3,\n]".format(nl="\n"),
             logwrap.pretty_str([1, 2, 3]),
         )
         self.assertEqual(
-            "({nl:<5}1,{nl:<5}2,{nl:<5}3,\n" ")".format(nl="\n"),
+            "({nl:<5}1,{nl:<5}2,{nl:<5}3,\n)".format(nl="\n"),
             logwrap.pretty_str((1, 2, 3)),
         )
         res = logwrap.pretty_str({1, 2, 3})
@@ -53,7 +53,7 @@ class TestPrettyStr(unittest.TestCase):
 
     def test_dict(self):
         self.assertEqual(
-            "{\n" "    1 : 1,\n" "    2 : 2,\n" "    33: 33,\n" "}",
+            "{\n    1 : 1,\n    2 : 2,\n    33: 33,\n}",
             logwrap.pretty_str({1: 1, 2: 2, 33: 33}),
         )
 

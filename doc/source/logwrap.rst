@@ -129,8 +129,8 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :rtype: LogWrap | Callable[..., Awaitable[typing.Any] | typing.Any]
 
     .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
-    .. versionchanged:: 3.3.0 Deprecation of *args
-    .. versionchanged:: 4.0.0 Drop of *args
+    .. versionchanged:: 3.3.0 Deprecation of `*args`
+    .. versionchanged:: 4.0.0 Drop of `*args`
     .. versionchanged:: 5.1.0 log_traceback parameter
     .. versionchanged:: 8.0.0 pick up logger from target module if possible
     .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator

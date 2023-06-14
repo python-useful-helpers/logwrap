@@ -25,15 +25,33 @@ from __future__ import annotations
 # Standard Library
 import abc
 import collections
-import inspect
 import types
 import typing
+from inspect import Parameter
+from inspect import Signature
+from inspect import signature
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import ForwardRef
+from typing import NoReturn
+from typing import Protocol
+from typing import get_type_hints
+from typing import runtime_checkable
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     # Standard Library
     import dataclasses
     from collections.abc import Callable
     from collections.abc import Iterable
+
+    # External Dependencies
+    from rich.repr import Result as RichReprResult
+
+    class RichReprSupport(typing.Protocol):
+        """Protocol for type checking."""
+
+        def __rich_repr__(self) -> RichReprResult:
+            ...
 
 
 __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
@@ -41,59 +59,59 @@ __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str
 _SIMPLE_MAGIC_ATTRIBUTES = ("__repr__", "__str__")
 
 
-@typing.runtime_checkable
-class _AttributeHolderProto(typing.Protocol):
+@runtime_checkable
+class _AttributeHolderProto(Protocol):
     __slots__ = ()
 
-    def _get_kwargs(self) -> list[tuple[str, typing.Any]]:
+    def _get_kwargs(self) -> list[tuple[str, Any]]:
         """Protocol stub."""
 
     def _get_args(self) -> list[str]:
         """Protocol stub."""
 
 
-@typing.runtime_checkable
-class _NamedTupleProto(typing.Protocol):
+@runtime_checkable
+class _NamedTupleProto(Protocol):
     __slots__ = ()
 
-    def _asdict(self) -> dict[str, typing.Any]:
+    def _asdict(self) -> dict[str, Any]:
         """Protocol stub."""
 
-    def __getnewargs__(self) -> tuple[typing.Any, ...]:
+    def __getnewargs__(self) -> tuple[Any, ...]:
         """Protocol stub."""
 
-    def _replace(self, /, **kwds: dict[str, typing.Any]) -> _NamedTupleProto:
+    def _replace(self, /, **kwds: dict[str, Any]) -> _NamedTupleProto:
         """Protocol stub."""
 
     @classmethod
-    def _make(cls, iterable: Iterable[typing.Any]) -> _NamedTupleProto:
+    def _make(cls, iterable: Iterable[Any]) -> _NamedTupleProto:
         """Protocol stub."""
 
 
-@typing.runtime_checkable
-class _DataClassProto(typing.Protocol):
+@runtime_checkable
+class _DataClassProto(Protocol):
     __slots__ = ()
 
     __dataclass_params__: dataclasses._DataclassParams  # type: ignore[name-defined]
-    __dataclass_fields__: dict[str, dataclasses.Field[typing.Any]] = {}
+    __dataclass_fields__: dict[str, dataclasses.Field[Any]] = {}
 
 
-def _known_callable(item: typing.Any) -> bool:
+def _known_callable(item: Any) -> bool:
     """Check for possibility to parse callable.
 
     :param item:  item to check for repr() way
-    :type item: typing.Any
+    :type item: Any
     :return: item is callable and should be processed not using repr
     :rtype: bool
     """
     return isinstance(item, (types.FunctionType, types.MethodType))
 
 
-def _simple(item: typing.Any) -> bool:
+def _simple(item: Any) -> bool:
     """Check for nested iterations: True, if not.
 
     :param item: item to check for repr() way
-    :type item: typing.Any
+    :type item: Any
     :return: use repr() iver item by default
     :rtype: bool
     """
@@ -114,31 +132,31 @@ class ReprParameter:
 
     __slots__ = ("_value", "_parameter")
 
-    POSITIONAL_ONLY = inspect.Parameter.POSITIONAL_ONLY
-    POSITIONAL_OR_KEYWORD = inspect.Parameter.POSITIONAL_OR_KEYWORD
-    VAR_POSITIONAL = inspect.Parameter.VAR_POSITIONAL
-    KEYWORD_ONLY = inspect.Parameter.KEYWORD_ONLY
-    VAR_KEYWORD = inspect.Parameter.VAR_KEYWORD
+    POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY
+    POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD
+    VAR_POSITIONAL = Parameter.VAR_POSITIONAL
+    KEYWORD_ONLY = Parameter.KEYWORD_ONLY
+    VAR_KEYWORD = Parameter.VAR_KEYWORD
 
-    empty = inspect.Parameter.empty
+    empty = Parameter.empty
 
-    def __init__(self, parameter: inspect.Parameter, value: typing.Any = inspect.Parameter.empty) -> None:
+    def __init__(self, parameter: Parameter, value: Any = Parameter.empty) -> None:
         """Parameter-like object store for repr and str tasks.
 
         :param parameter: parameter from signature
-        :type parameter: inspect.Parameter
+        :type parameter: Parameter
         :param value: default value override
-        :type value: typing.Any
+        :type value: Any
         """
-        self._parameter: inspect.Parameter = parameter
-        self._value: typing.Any = value if value is not parameter.empty else parameter.default
+        self._parameter: Parameter = parameter
+        self._value: Any = value if value is not parameter.empty else parameter.default
 
     @property
-    def parameter(self) -> inspect.Parameter:
+    def parameter(self) -> Parameter:
         """Parameter object.
 
-        :return: original inspect.Parameter object
-        :rtype: inspect.Parameter
+        :return: original Parameter object
+        :rtype: Parameter
         """
         return self._parameter
 
@@ -149,27 +167,27 @@ class ReprParameter:
         :return: parameter name. For `*args` and `**kwargs` add corresponding prefixes
         :rtype: None | str
         """
-        if self.kind == inspect.Parameter.VAR_POSITIONAL:
+        if self.kind == Parameter.VAR_POSITIONAL:
             return "*" + self.parameter.name
-        if self.kind == inspect.Parameter.VAR_KEYWORD:
+        if self.kind == Parameter.VAR_KEYWORD:
             return "**" + self.parameter.name
         return self.parameter.name
 
     @property
-    def value(self) -> typing.Any:
+    def value(self) -> Any:
         """Parameter value to log.
 
         :return: If function is bound to class -> value is class instance else default value.
-        :rtype: typing.Any
+        :rtype: Any
         """
         return self._value
 
     @property
-    def annotation(self) -> inspect.Parameter.empty | str:  # type: ignore[valid-type]
+    def annotation(self) -> Parameter.empty | str:  # type: ignore[valid-type]
         """Parameter annotation.
 
         :return: parameter annotation from signature
-        :rtype: inspect.Parameter.empty | str
+        :rtype: Parameter.empty | str
         """
         return self.parameter.annotation  # type: ignore[no-any-return]
 
@@ -177,13 +195,13 @@ class ReprParameter:
     def kind(self) -> int:
         """Parameter kind.
 
-        :return: parameter kind from inspect.Parameter
+        :return: parameter kind from Parameter
         :rtype: int
         """
         # noinspection PyTypeChecker
         return self.parameter.kind
 
-    def __hash__(self) -> typing.NoReturn:  # pylint: disable=invalid-hash-returned
+    def __hash__(self) -> NoReturn:  # pylint: disable=invalid-hash-returned
         """Block hashing.
 
         :raises TypeError: Not hashable.
@@ -212,11 +230,11 @@ def _prepare_repr(func: types.FunctionType | types.MethodType) -> list[ReprParam
     self_processed: bool = False
     result: list[ReprParameter] = []
     if not ismethod:
-        real_func: Callable[..., typing.Any] = func
+        real_func: Callable[..., Any] = func
     else:
         real_func = func.__func__  # type: ignore[union-attr]
 
-    for param in inspect.signature(real_func).parameters.values():
+    for param in signature(real_func).parameters.values():
         if not self_processed and ismethod and func.__self__ is not None:  # type: ignore[union-attr]
             result.append(ReprParameter(param, value=func.__self__))  # type: ignore[union-attr]
             self_processed = True
@@ -313,8 +331,8 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
         param_str = "".join(param_repr)
 
-        sig: inspect.Signature = inspect.signature(src)
-        if sig.return_annotation is inspect.Parameter.empty:
+        sig: Signature = signature(src)
+        if sig.return_annotation is Parameter.empty:
             annotation: str = ""
         elif sig.return_annotation is type(None):  # noqa: E721
             # Python 3.10 special case
@@ -339,11 +357,13 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :type src: _AttributeHolderProto
         :param indent: start indentation
         :type indent: int
+        :param no_indent_start: do not indent open bracket and simple parameters
+        :type no_indent_start: bool
         :return: Repr of attribute holder object.
         :rtype: str
         """
         param_repr: list[str] = []
-        star_args: dict[str, typing.Any] = {}
+        star_args: dict[str, Any] = {}
 
         next_indent = self.next_indent(indent)
         prefix: str = "\n" + " " * next_indent
@@ -382,6 +402,8 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :type src: _NamedTupleProto
         :param indent: start indentation
         :type indent: int
+        :param no_indent_start: do not indent open bracket and simple parameters
+        :type no_indent_start: bool
         :return: Repr of named tuple object.
         :rtype: str
         """
@@ -389,7 +411,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
         # noinspection PyBroadException
         try:
-            args_annotations: dict[str, typing.Any] = typing.get_type_hints(type(src))
+            args_annotations: dict[str, Any] = get_type_hints(type(src))
         except BaseException:  # NOSONAR
             args_annotations = {}
 
@@ -399,11 +421,9 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         for arg_name, value in src._asdict().items():
             repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
             param_repr.append(f"{prefix}{arg_name}={repr_val},")
-            if arg_name in args_annotations and not isinstance(
-                getattr(args_annotations, arg_name, None), typing.ForwardRef
-            ):
+            if arg_name in args_annotations and not isinstance(getattr(args_annotations, arg_name, None), ForwardRef):
                 annotation = getattr(args_annotations[arg_name], "__name__", args_annotations[arg_name])
-                param_repr.append(f"#  type: {annotation!s}")
+                param_repr.append(f"  # type: {annotation!s}")
 
         if param_repr:
             param_repr.append("\n")
@@ -424,6 +444,8 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :type src: _DataClassProto
         :param indent: start indentation
         :type indent: int
+        :param no_indent_start: do not indent open bracket and simple parameters
+        :type no_indent_start: bool
         :return: Repr of dataclass.
         :rtype: str
         """
@@ -464,14 +486,14 @@ class PrettyFormat(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _repr_simple(
         self,
-        src: typing.Any,
+        src: Any,
         indent: int = 0,
         no_indent_start: bool = False,
     ) -> str:
         """Repr object without iteration.
 
         :param src: Source object
-        :type src: typing.Any
+        :type src: Any
         :param indent: start indentation
         :type indent: int
         :param no_indent_start: ignore indent
@@ -483,13 +505,13 @@ class PrettyFormat(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _repr_dict_items(
         self,
-        src: dict[typing.Any, typing.Any],
+        src: dict[Any, Any],
         indent: int = 0,
     ) -> str:
         """Repr dict items.
 
         :param src: object to process
-        :type src: dict[typing.Any, typing.Any]
+        :type src: dict[Any, Any]
         :param indent: start indentation
         :type indent: int
         :return: repr of key/value pairs from dict
@@ -526,13 +548,13 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
     def _repr_iterable_items(
         self,
-        src: Iterable[typing.Any],
+        src: Iterable[Any],
         indent: int = 0,
     ) -> str:
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
-        :type src: Iterable[typing.Any]
+        :type src: Iterable[Any]
         :param indent: start indentation
         :type indent: int
         :return: repr of elements in iterable item
@@ -546,6 +568,59 @@ class PrettyFormat(metaclass=abc.ABCMeta):
             buf.append(",")
         return "".join(buf)
 
+    def _repr_rich(
+        self,
+        src: RichReprSupport,
+        indent: int = 0,
+        no_indent_start: bool = False,
+    ) -> str:
+        """Repr of objects with rich defined repr.
+
+        :param src: object to process
+        :type src: Any
+        :param indent: start indentation
+        :type indent: int
+        :param no_indent_start: do not indent open bracket and simple parameters
+        :type no_indent_start: bool
+        :return: formatted string
+        :rtype: str
+        """
+        param_repr: list[str] = []
+
+        next_indent = self.next_indent(indent)
+        prefix: str = "\n" + " " * next_indent
+
+        for arg in src.__rich_repr__():
+            if isinstance(arg, tuple):
+                if len(arg) == 1:
+                    arg_name = None
+                    default = ()
+                    value = arg[0]
+                else:
+                    arg_name, value, *default = arg  # type: ignore[assignment]
+
+                repr_val = self.process_element(value, indent=next_indent, no_indent_start=True)
+
+                if arg_name is None:
+                    param_repr.append(f"{prefix}{repr_val},")
+                else:
+                    if default and default[0] == value:
+                        # standard behavior for rich
+                        continue
+
+                    param_repr.append(f"{prefix}{arg_name}={repr_val},")
+
+            else:
+                repr_val = self.process_element(arg, indent=next_indent, no_indent_start=True)
+                param_repr.append(f"{prefix}{repr_val},")
+
+        if param_repr:
+            param_repr.append("\n")
+            param_repr.append(" " * indent)
+
+        param_str = "".join(param_repr)
+        return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
+
     @property
     @abc.abstractmethod
     def _magic_method_name(self) -> str:
@@ -557,14 +632,14 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
     def process_element(
         self,
-        src: typing.Any,
+        src: Any,
         indent: int = 0,
         no_indent_start: bool = False,
     ) -> str:
         """Make human readable representation of object.
 
         :param src: object to process
-        :type src: typing.Any
+        :type src: Any
         :param indent: start indentation
         :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
@@ -575,6 +650,9 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         if hasattr(src, self._magic_method_name):
             result = getattr(src, self._magic_method_name)(self, indent=indent, no_indent_start=no_indent_start)
             return result  # type: ignore[no-any-return]
+
+        if hasattr(src, "__rich_repr__"):
+            return self._repr_rich(src=src, indent=indent)
 
         if _known_callable(src):
             return self._repr_callable(src=src, indent=indent)
@@ -633,14 +711,14 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
     def __call__(
         self,
-        src: typing.Any,
+        src: Any,
         indent: int = 0,
         no_indent_start: bool = False,
     ) -> str:
         """Make human-readable representation of object. The main entry point.
 
         :param src: object to process
-        :type src: typing.Any
+        :type src: Any
         :param indent: start indentation
         :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
@@ -671,14 +749,14 @@ class PrettyRepr(PrettyFormat):
 
     def _repr_simple(
         self,
-        src: typing.Any,
+        src: Any,
         indent: int = 0,
         no_indent_start: bool = False,
     ) -> str:
         """Repr object without iteration.
 
         :param src: Source object
-        :type src: typing.Any
+        :type src: Any
         :param indent: start indentation
         :type indent: int
         :param no_indent_start: ignore indent
@@ -690,13 +768,13 @@ class PrettyRepr(PrettyFormat):
 
     def _repr_dict_items(
         self,
-        src: dict[typing.Any, typing.Any],
+        src: dict[Any, Any],
         indent: int = 0,
     ) -> str:
         """Repr dict items.
 
         :param src: object to process
-        :type src: dict[typing.Any, typing.Any]
+        :type src: dict[Any, Any]
         :param indent: start indentation
         :type indent: int
         :return: repr of key/value pairs from dict
@@ -780,14 +858,14 @@ class PrettyStr(PrettyFormat):
 
     def _repr_simple(
         self,
-        src: typing.Any,
+        src: Any,
         indent: int = 0,
         no_indent_start: bool = False,
     ) -> str:
         """Repr object without iteration.
 
         :param src: Source object
-        :type src: typing.Any
+        :type src: Any
         :param indent: start indentation
         :type indent: int
         :param no_indent_start: ignore indent
@@ -802,13 +880,13 @@ class PrettyStr(PrettyFormat):
 
     def _repr_dict_items(
         self,
-        src: dict[typing.Any, typing.Any],
+        src: dict[Any, Any],
         indent: int = 0,
     ) -> str:
         """Repr dict items.
 
         :param src: object to process
-        :type src: dict[typing.Any, typing.Any]
+        :type src: dict[Any, Any]
         :param indent: start indentation
         :type indent: int
         :return: repr of key/value pairs from dict
@@ -855,7 +933,7 @@ class PrettyStr(PrettyFormat):
 
 
 def pretty_repr(
-    src: typing.Any,
+    src: Any,
     indent: int = 0,
     no_indent_start: bool = False,
     max_indent: int = 20,
@@ -864,7 +942,7 @@ def pretty_repr(
     """Make human readable repr of object.
 
     :param src: object to process
-    :type src: typing.Any
+    :type src: Any
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
@@ -884,7 +962,7 @@ def pretty_repr(
 
 
 def pretty_str(
-    src: typing.Any,
+    src: Any,
     indent: int = 0,
     no_indent_start: bool = False,
     max_indent: int = 20,
@@ -893,7 +971,7 @@ def pretty_str(
     """Make human readable str of object.
 
     :param src: object to process
-    :type src: typing.Any
+    :type src: Any
     :param indent: start indentation, all next levels is +indent_step
     :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters

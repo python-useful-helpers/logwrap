@@ -25,6 +25,8 @@ later it has been reworked and extended for support of special cases.
 from __future__ import annotations
 
 # Local Implementation
+from ._version import __version__
+from ._version import __version_tuple__
 from .log_on_access import LogOnAccess
 from .log_wrap import BoundParameter
 from .log_wrap import LogWrap
@@ -47,18 +49,14 @@ __all__ = (
     "BoundParameter",
     "bind_args_kwargs",
     "LogOnAccess",
+    "__version__",
+    "__version_tuple__",
 )
 
-try:
-    # Local Implementation
-    from ._version import version as __version__
-except ImportError:
-    pass
-
-__author__ = "Alexey Stepanov"
+__author__ = "Aleksei Stepanov"
 __author_email__ = "penguinolog@gmail.com"
 __maintainers__ = {
-    "Alexey Stepanov": "penguinolog@gmail.com",
+    "Aleksei Stepanov": "penguinolog@gmail.com",
     "Antonio Esposito": "esposito.cloud@gmail.com",
     "Dennis Dmitriev": "dis-xcom@gmail.com",
 }

@@ -22,29 +22,40 @@ from __future__ import annotations
 import asyncio
 import functools
 import inspect
-import logging
 import os
 import sys
 import traceback
 import types
-import typing
+from logging import DEBUG
+from logging import ERROR
+from logging import Logger
+from logging import getLogger
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import TypeVar
+from typing import overload
 
 # Package Implementation
-from logwrap import constants
 from logwrap import repr_utils
+from logwrap.constants import VALID_LOGGER_NAMES
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     # Standard Library
+    from collections.abc import Callable
     from collections.abc import Iterable
     from collections.abc import MutableMapping
 
+    # External Dependencies
+    from typing_extensions import ParamSpec
+
+    Spec = ParamSpec("Spec")
+    RetVal = TypeVar("RetVal")
+
 __all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
 
-LOGGER: logging.Logger = logging.getLogger("logwrap")
+LOGGER: Logger = getLogger("logwrap")
 INDENT = 4
 _CURRENT_FILE = os.path.abspath(__file__)
-
-_WrappedT = typing.TypeVar("_WrappedT", bound=typing.Callable[..., typing.Any])
 
 
 class BoundParameter(inspect.Parameter):
@@ -59,14 +70,14 @@ class BoundParameter(inspect.Parameter):
     def __init__(
         self,
         parameter: inspect.Parameter,
-        value: typing.Any = inspect.Parameter.empty,
+        value: Any = inspect.Parameter.empty,
     ) -> None:
         """Parameter-like object store BOUND with value parameter.
 
         :param parameter: parameter from signature
         :type parameter: inspect.Parameter
         :param value: parameter real value
-        :type value: typing.Any
+        :type value: Any
         :raises ValueError: No default value and no value
         """
         super().__init__(
@@ -79,16 +90,16 @@ class BoundParameter(inspect.Parameter):
         if value is self.empty:
             if parameter.default is self.empty and parameter.kind not in (self.VAR_POSITIONAL, self.VAR_KEYWORD):
                 raise ValueError("Value is not set and no default value")
-            self._value: typing.Any = parameter.default
+            self._value: Any = parameter.default
         else:
             self._value = value
 
     @property
-    def value(self) -> typing.Any:
+    def value(self) -> Any:
         """Parameter value.
 
         :return: actual parameter value
-        :rtype: typing.Any
+        :rtype: Any
         """
         return self._value
 
@@ -110,9 +121,9 @@ class BoundParameter(inspect.Parameter):
 
         value = self.value
         if value is self.empty:
-            if self.VAR_POSITIONAL == self.kind:
+            if self.kind == self.VAR_POSITIONAL:
                 value = ()
-            elif self.VAR_KEYWORD == self.kind:
+            elif self.kind == self.VAR_KEYWORD:
                 value = {}
 
         as_str += f"={value!r}"
@@ -138,28 +149,31 @@ class BoundParameter(inspect.Parameter):
 
 def bind_args_kwargs(
     sig: inspect.Signature,
-    *args: typing.Any,
-    **kwargs: typing.Any,
+    *args: Any,
+    **kwargs: Any,
 ) -> list[BoundParameter]:
     """Bind *args and **kwargs to signature and get Bound Parameters.
 
     :param sig: source signature
     :type sig: inspect.Signature
     :param args: positional arguments
-    :type args: typing.Any
+    :type args: Any
     :param kwargs: keyword arguments
-    :type kwargs: typing.Any
+    :type kwargs: Any
     :return: Iterator for bound parameters with all information about it
     :rtype: typing.List[BoundParameter]
 
     .. versionadded:: 3.3.0
     .. versionchanged:: 5.3.1 return list
     """
-    result: list[BoundParameter] = []
     bound: MutableMapping[str, inspect.Parameter] = sig.bind(*args, **kwargs).arguments
-    for param in sig.parameters.values():
-        result.append(BoundParameter(parameter=param, value=bound.get(param.name, param.default)))
-    return result
+    return [
+        BoundParameter(
+            parameter=param,
+            value=bound.get(param.name, param.default),
+        )
+        for param in sig.parameters.values()
+    ]
 
 
 class LogWrap:
@@ -180,9 +194,9 @@ class LogWrap:
 
     def __init__(
         self,
-        log: logging.Logger | None = None,
-        log_level: int = logging.DEBUG,
-        exc_level: int = logging.ERROR,
+        log: Logger | None = None,
+        log_level: int = DEBUG,
+        exc_level: int = ERROR,
         max_indent: int = 20,
         blacklisted_names: Iterable[str] | None = None,
         blacklisted_exceptions: Iterable[type[Exception]] | None = None,
@@ -194,7 +208,7 @@ class LogWrap:
         """Log function calls and return values.
 
         :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
-        :type log: typing.Optional[logging.Logger]
+        :type log: typing.Optional[Logger]
         :param log_level: log level for successful calls
         :type log_level: int
         :param exc_level: log level for exception cases
@@ -230,8 +244,8 @@ class LogWrap:
         else:
             self.__blacklisted_exceptions = list(blacklisted_exceptions)
 
-        if isinstance(log, logging.Logger):
-            self.__logger: logging.Logger | None = log
+        if isinstance(log, Logger):
+            self.__logger: Logger | None = log
         else:
             self.__logger = None
 
@@ -245,21 +259,21 @@ class LogWrap:
 
         # We are not interested to pass any arguments to object
 
-    def _get_logger_for_func(self, func: _WrappedT) -> logging.Logger:
+    def _get_logger_for_func(self, func: Callable[Spec, RetVal]) -> Logger:
         """Get logger for function from function module if possible.
 
         :param func: decorated function
         :type func: FuncResultType
         :return: logger instance
-        :rtype: logging.Logger
+        :rtype: Logger
         """
         if self.__logger is not None:
             return self.__logger
 
         func_module = inspect.getmodule(func)
-        for logger_name in constants.VALID_LOGGER_NAMES:
+        for logger_name in VALID_LOGGER_NAMES:
             logger_candidate = getattr(func_module, logger_name, None)
-            if isinstance(logger_candidate, logging.Logger):
+            if isinstance(logger_candidate, Logger):
                 return logger_candidate
         return LOGGER
 
@@ -429,11 +443,11 @@ class LogWrap:
         self.__log_result_obj = val
 
     @property
-    def _logger(self) -> logging.Logger | None:
+    def _logger(self) -> Logger | None:
         """Logger instance.
 
         :return: logger instance if configured
-        :rtype: typing.Optional[logging.Logger]
+        :rtype: typing.Optional[Logger]
         """
         return self.__logger
 
@@ -460,13 +474,13 @@ class LogWrap:
     def pre_process_param(
         self,
         arg: BoundParameter,
-    ) -> BoundParameter | tuple[BoundParameter, typing.Any] | None:
+    ) -> BoundParameter | tuple[BoundParameter, Any] | None:
         """Process parameter for the future logging.
 
         :param arg: bound parameter
         :type arg: BoundParameter
         :return: value, value override for logging or None if argument should not be logged.
-        :rtype: typing.Union[BoundParameter, typing.Tuple[BoundParameter, typing.Any], None]
+        :rtype: typing.Union[BoundParameter, typing.Tuple[BoundParameter, Any], None]
 
         Override this method if some modifications required for parameter value before logging
 
@@ -495,11 +509,11 @@ class LogWrap:
         """
         return arg_repr
 
-    def _safe_val_repr(self, value: typing.Any) -> str:
+    def _safe_val_repr(self, value: Any) -> str:
         """Try to get repr for value and provide fallback text in case of impossibility.
 
         :param value: value to try make repr
-        :type value: typing.Any
+        :type value: Any
         :return: repr string or fallback description
         :rtype: str
         """
@@ -522,8 +536,8 @@ class LogWrap:
     def _get_func_args_repr(
         self,
         sig: inspect.Signature,
-        args: tuple[typing.Any, ...],
-        kwargs: dict[str, typing.Any],
+        args: tuple[Any, ...],
+        kwargs: dict[str, Any],
     ) -> str:
         """Internal helper for reducing complexity of decorator code.
 
@@ -532,7 +546,7 @@ class LogWrap:
         :param args: positional arguments
         :type args: typing.Tuple
         :param kwargs: keyword arguments
-        :type kwargs: typing.Dict[str, typing.Any]
+        :type kwargs: typing.Dict[str, Any]
         :return: repr over function arguments
         :rtype: str
 
@@ -542,13 +556,14 @@ class LogWrap:
             return ""
 
         param_str: str = ""
+        indent = INDENT
 
         last_kind = None
         for param in bind_args_kwargs(sig, *args, **kwargs):
             if param.name in self.blacklisted_names:
                 continue
 
-            preprocessed: (BoundParameter | tuple[BoundParameter, typing.Any] | None) = self.pre_process_param(param)
+            preprocessed: (BoundParameter | tuple[BoundParameter, Any] | None) = self.pre_process_param(param)
             if preprocessed is None:
                 continue
 
@@ -558,9 +573,9 @@ class LogWrap:
                 value = param.value
 
             if value is param.empty:
-                if param.VAR_POSITIONAL == param.kind:
+                if param.kind == param.VAR_POSITIONAL:
                     value = ()
-                elif param.VAR_KEYWORD == param.kind:
+                elif param.kind == param.VAR_KEYWORD:
                     value = {}
 
             val: str = self._safe_val_repr(value)
@@ -568,7 +583,7 @@ class LogWrap:
             val = self.post_process_param(param, val)
 
             if last_kind != param.kind:
-                param_str += f"\n{'':<{INDENT}}# {param.kind!s}:"
+                param_str += f"\n{'':<{indent}}# {param.kind!s}:"
                 last_kind = param.kind
 
             if param.annotation is param.empty:
@@ -576,20 +591,25 @@ class LogWrap:
             else:
                 annotation = f"  # type: {getattr(param.annotation, '__name__', param.annotation)!s}"
 
-            param_str += f"\n{'':<{INDENT}}{param.name}={val},{annotation}"
+            param_str += f"\n{'':<{indent}}{param.name}={val},{annotation}"
         if param_str:
             param_str += "\n"
         return param_str
 
-    def _make_done_record(self, logger: logging.Logger, func_name: str, result: typing.Any) -> None:
+    def _make_done_record(
+        self,
+        logger: Logger,
+        func_name: str,
+        result: Any,
+    ) -> None:
         """Construct success record.
 
         :param logger: logger instance to use
-        :type logger: logging.Logger
+        :type logger: Logger
         :param func_name: function name
         :type func_name: str
         :param result: function execution result
-        :type result: typing.Any
+        :type result: Any
         """
         msg: str = f"Done: {func_name!r}"
 
@@ -597,11 +617,17 @@ class LogWrap:
             msg += f" with result:\n{repr_utils.pretty_repr(result, max_indent=self.max_indent)}"
         logger.log(level=self.log_level, msg=msg)
 
-    def _make_calling_record(self, logger: logging.Logger, name: str, arguments: str, method: str = "Calling") -> None:
+    def _make_calling_record(
+        self,
+        logger: Logger,
+        name: str,
+        arguments: str,
+        method: str = "Calling",
+    ) -> None:
         """Make log record before execution.
 
         :param logger: logger instance to use
-        :type logger: logging.Logger
+        :type logger: Logger
         :param name: function name
         :type name: str
         :param arguments: function arguments repr
@@ -611,11 +637,17 @@ class LogWrap:
         """
         logger.log(level=self.log_level, msg=f"{method}: \n{name}({arguments if self.log_call_args else ''})")
 
-    def _make_exc_record(self, logger: logging.Logger, name: str, arguments: str, exception: Exception) -> None:
+    def _make_exc_record(
+        self,
+        logger: Logger,
+        name: str,
+        arguments: str,
+        exception: Exception,
+    ) -> None:
         """Make log record if exception raised.
 
         :param logger: logger instance to use
-        :type logger: logging.Logger
+        :type logger: Logger
         :param name: function name
         :type name: str
         :param arguments: function arguments repr
@@ -640,7 +672,10 @@ class LogWrap:
             exc_info=False,
         )
 
-    def _get_function_wrapper(self, func: _WrappedT) -> _WrappedT:
+    def _get_function_wrapper(
+        self,
+        func: Callable[Spec, RetVal],
+    ) -> Callable[Spec, RetVal]:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
@@ -649,14 +684,14 @@ class LogWrap:
         :rtype: typing.Callable
         """
 
-        logger: logging.Logger = self._get_logger_for_func(func)
+        logger: Logger = self._get_logger_for_func(func)
 
         @functools.wraps(func)
-        async def async_wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+        async def async_wrapper(*args: Spec.args, **kwargs: Spec.kwargs) -> Any:
             """Decorator for async callable objects.
 
             :return: function result
-            :rtype: typing.Any
+            :rtype: Any
             :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
             """
             sig: inspect.Signature = inspect.signature(func)
@@ -664,7 +699,7 @@ class LogWrap:
 
             try:
                 self._make_calling_record(logger=logger, name=func.__name__, arguments=args_repr, method="Awaiting")
-                result = await func(*args, **kwargs)
+                result = await func(*args, **kwargs)  # type: ignore[misc]
                 self._make_done_record(logger=logger, func_name=func.__name__, result=result)
             except Exception as e:
                 self._make_exc_record(logger=logger, name=func.__name__, arguments=args_repr, exception=e)
@@ -672,11 +707,11 @@ class LogWrap:
             return result
 
         @functools.wraps(func)
-        def wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+        def wrapper(*args: Spec.args, **kwargs: Spec.kwargs) -> RetVal:
             """Decorator for normal callable objects.
 
             :return: function result
-            :rtype: typing.Any
+            :rtype: Any
             :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
             """
             sig: inspect.Signature = inspect.signature(func)
@@ -684,7 +719,7 @@ class LogWrap:
 
             try:
                 self._make_calling_record(logger=logger, name=func.__name__, arguments=args_repr)
-                result = func(*args, **kwargs)
+                result: RetVal = func(*args, **kwargs)
                 self._make_done_record(logger=logger, func_name=func.__name__, result=result)
             except Exception as e:
                 self._make_exc_record(logger=logger, name=func.__name__, arguments=args_repr, exception=e)
@@ -693,7 +728,10 @@ class LogWrap:
 
         return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper  # type: ignore[return-value]
 
-    def __call__(self, func: _WrappedT) -> _WrappedT:
+    def __call__(
+        self,
+        func: Callable[Spec, RetVal],
+    ) -> Callable[Spec, RetVal]:
         """Callable instance.
 
         :return: decorated function
@@ -702,12 +740,12 @@ class LogWrap:
         return self._get_function_wrapper(func)
 
 
-@typing.overload
+@overload
 def logwrap(
     *,
-    log: logging.Logger | None = None,
-    log_level: int = logging.DEBUG,
-    exc_level: int = logging.ERROR,
+    log: Logger | None = None,
+    log_level: int = DEBUG,
+    exc_level: int = ERROR,
     max_indent: int = 20,
     blacklisted_names: Iterable[str] | None = None,
     blacklisted_exceptions: Iterable[type[Exception]] | None = None,
@@ -719,14 +757,14 @@ def logwrap(
     """Overload: with no func."""
 
 
-@typing.overload
+@overload
 def logwrap(
     func: None = None,
     /,
     *,
-    log: logging.Logger | None = None,
-    log_level: int = logging.DEBUG,
-    exc_level: int = logging.ERROR,
+    log: Logger | None = None,
+    log_level: int = DEBUG,
+    exc_level: int = ERROR,
     max_indent: int = 20,
     blacklisted_names: Iterable[str] | None = None,
     blacklisted_exceptions: Iterable[type[Exception]] | None = None,
@@ -738,14 +776,14 @@ def logwrap(
     """Overload: with no func."""
 
 
-@typing.overload
+@overload
 def logwrap(
-    func: _WrappedT,
+    func: Callable[Spec, RetVal],
     /,
     *,
-    log: logging.Logger | None = None,
-    log_level: int = logging.DEBUG,
-    exc_level: int = logging.ERROR,
+    log: Logger | None = None,
+    log_level: int = DEBUG,
+    exc_level: int = ERROR,
     max_indent: int = 20,
     blacklisted_names: Iterable[str] | None = None,
     blacklisted_exceptions: Iterable[type[Exception]] | None = None,
@@ -753,17 +791,17 @@ def logwrap(
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
     log_result_obj: bool = True,
-) -> _WrappedT:
+) -> Callable[Spec, RetVal]:
     """Overload: func provided."""
 
 
-def logwrap(  # pylint: disable=differing-param-doc,differing-type-doc
-    func: _WrappedT | None = None,
+def logwrap(
+    func: Callable[Spec, RetVal] | None = None,
     /,
     *,
-    log: logging.Logger | None = None,
-    log_level: int = logging.DEBUG,
-    exc_level: int = logging.ERROR,
+    log: Logger | None = None,
+    log_level: int = DEBUG,
+    exc_level: int = ERROR,
     max_indent: int = 20,
     blacklisted_names: Iterable[str] | None = None,
     blacklisted_exceptions: Iterable[type[Exception]] | None = None,
@@ -771,13 +809,13 @@ def logwrap(  # pylint: disable=differing-param-doc,differing-type-doc
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
     log_result_obj: bool = True,
-) -> LogWrap | _WrappedT:
+) -> LogWrap | Callable[Spec, RetVal]:
     """Log function calls and return values.
 
     :param func: function to wrap
     :type func: typing.Optional[typing.Callable]
     :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
-    :type log: typing.Optional[logging.Logger]
+    :type log: typing.Optional[Logger]
     :param log_level: log level for successful calls
     :type log_level: int
     :param exc_level: log level for exception cases

@@ -33,7 +33,8 @@ load-plugins=pylint.extensions.docparams,
              pylint.extensions.overlapping_exceptions,
              pylint.extensions.emptystring,
              pylint.extensions.comparetozero,
-             pylint.extensions.check_elif
+             pylint.extensions.check_elif,
+             perflint
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -67,8 +68,7 @@ confidence=
 # --disable=W".
 enable=all
 
-disable=raw-checker-failed,
-        locally-disabled,
+disable=locally-disabled,
         file-ignored,
         suppressed-message,
         similarities,
@@ -85,7 +85,8 @@ disable=raw-checker-failed,
         broad-except,
         logging-fstring-interpolation,
         logging-format-interpolation,
-        unsubscriptable-object
+        unsubscriptable-object,
+        loop-invariant-statement
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -532,5 +533,5 @@ default-docstring-type=default
 
 # Exceptions that will emit a warning when being caught. Defaults to
 # "BaseException, Exception".
-overgeneral-exceptions=BaseException,
-                       Exception
+overgeneral-exceptions=builtins.BaseException,
+                       builtins.Exception

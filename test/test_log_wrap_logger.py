@@ -41,7 +41,7 @@ class TestLogWrapLoggerInTargetModule(unittest.TestCase):
         self.assertEqual(result, "No args")
 
         self.assertEqual(
-            f"DEBUG>Calling: \n" f"func()\n" f"DEBUG>Done: 'func' with result:\n" f"{logwrap.pretty_repr(result)}\n",
+            f"DEBUG>Calling: \nfunc()\nDEBUG>Done: 'func' with result:\n{logwrap.pretty_repr(result)}\n",
             self.stream.getvalue(),
         )
 
@@ -54,6 +54,6 @@ class TestLogWrapLoggerInTargetModule(unittest.TestCase):
         self.assertEqual(result, "No args")
 
         self.assertEqual(
-            f"DEBUG>Calling: \n" f"func()\n" f"DEBUG>Done: 'func' with result:\n" f"{logwrap.pretty_repr(result)}\n",
+            f"DEBUG>Calling: \nfunc()\nDEBUG>Done: 'func' with result:\n{logwrap.pretty_repr(result)}\n",
             self.stream.getvalue(),
         )

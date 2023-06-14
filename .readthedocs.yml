@@ -10,6 +10,6 @@ formats: []
 python:
   version: "3.8"
   install:
-    - requirements: CI_REQUIREMENTS.txt
+    - requirements: requirements.txt
     - method: pip
       path: .

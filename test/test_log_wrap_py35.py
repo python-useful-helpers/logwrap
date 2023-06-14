@@ -62,7 +62,7 @@ class TestLogWrapAsync(unittest.TestCase):
 
         self.loop.run_until_complete(func())
         self.assertEqual(
-            "DEBUG>Awaiting: \n" "func()\n" "DEBUG>Done: 'func' with result:\n" "None\n",
+            "DEBUG>Awaiting: \nfunc()\nDEBUG>Done: 'func' with result:\nNone\n",
             self.stream.getvalue(),
         )
 
@@ -90,11 +90,11 @@ class TestLogWrapAsync(unittest.TestCase):
         async def func():
             raise Exception("Expected")
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # noqa: B017
             self.loop.run_until_complete(func())
 
         self.assertEqual(
-            "DEBUG>Awaiting: \n" "func()\n" "ERROR>Failed: \n" "func()\n" "Traceback (most recent call last):",
+            "DEBUG>Awaiting: \nfunc()\nERROR>Failed: \nfunc()\nTraceback (most recent call last):",
             "\n".join(self.stream.getvalue().split("\n")[:5]),
         )
 

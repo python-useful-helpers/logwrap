@@ -67,7 +67,7 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(result, "No args")
 
         self.assertEqual(
-            f"DEBUG>Calling: \n" f"func()\n" f"DEBUG>Done: 'func' with result:\n" f"{logwrap.pretty_repr(result)}\n",
+            f"DEBUG>Calling: \nfunc()\nDEBUG>Done: 'func' with result:\n{logwrap.pretty_repr(result)}\n",
             self.stream.getvalue(),
         )
 
@@ -235,7 +235,7 @@ class TestLogWrap(unittest.TestCase):
                 mock.call(level=logging.DEBUG, msg="Calling: \nfunc()"),
                 mock.call(
                     level=logging.DEBUG,
-                    msg=f"Done: 'func' with result:\n" f"{logwrap.pretty_repr(result, max_indent=10)}",
+                    msg=f"Done: 'func' with result:\n{logwrap.pretty_repr(result, max_indent=10)}",
                 ),
             ],
             log.mock_calls,
@@ -294,7 +294,7 @@ class TestLogWrap(unittest.TestCase):
                     f"    kwarg=3,\n"
                     f"    dkwarg=4,\n"
                     f"    # VAR_KEYWORD:\n"
-                    f"    kwargs={logwrap.pretty_repr(dict(somekwarg=5), indent=4, no_indent_start=True)},\n"
+                    f"    kwargs={logwrap.pretty_repr({'somekwarg': 5}, indent=4, no_indent_start=True)},\n"
                     f")",
                 ),
                 mock.call(level=logging.DEBUG, msg="Done: 'tst' with result:\nNone"),
@@ -326,7 +326,7 @@ class TestLogWrap(unittest.TestCase):
             f"    # VAR_POSITIONAL:\n"
             f"    args={logwrap.pretty_repr((2, ), indent=4, no_indent_start=True)},\n"
             f"    # VAR_KEYWORD:\n"
-            f"    kwargs={logwrap.pretty_repr(dict(arg3=3), indent=4, no_indent_start=True)},\n"
+            f"    kwargs={logwrap.pretty_repr({'arg3': 3}, indent=4, no_indent_start=True)},\n"
             f")\n"
             f"DEBUG>Done: 'func' with result:\n"
             f"{logwrap.pretty_repr(result)}\n",

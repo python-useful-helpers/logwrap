@@ -21,59 +21,14 @@ from __future__ import annotations
 # Standard Library
 import ast
 import os.path
-import sys
 
 # External Dependencies
 import setuptools
-
-try:
-    # noinspection PyPackageRequirements
-    # External Dependencies
-    from Cython.Build import cythonize
-except ImportError:
-    cythonize = None
 
 PACKAGE_NAME = "logwrap"
 
 with open(os.path.join(os.path.dirname(__file__), PACKAGE_NAME, "__init__.py"), encoding="utf-8") as f:
     SOURCE = f.read()
-
-with open("requirements.txt", encoding="utf-8") as f:
-    REQUIRED = f.read().splitlines()
-
-with open("README.rst", encoding="utf-8") as f:
-    LONG_DESCRIPTION = f.read()
-
-
-# noinspection PyCallingNonCallable
-if cythonize is not None:
-    if "win32" != sys.platform:
-        REQUIRES_OPTIMIZATION = [
-            setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-            setuptools.Extension("logwrap.log_wrap", ["logwrap/log_wrap.pyx"]),
-        ]
-        INTERFACES = ["log_wrap.pxd", "repr_utils.pxd"]
-    else:
-        REQUIRES_OPTIMIZATION = [
-            setuptools.Extension("logwrap.repr_utils", ["logwrap/repr_utils.pyx"]),
-        ]
-        INTERFACES = ["repr_utils.pxd"]
-
-    EXT_MODULES = cythonize(
-        module_list=REQUIRES_OPTIMIZATION,
-        exclude_failures=True,
-        compiler_directives={
-            "always_allow_keywords": True,
-            "binding": True,
-            "embedsignature": True,
-            "overflowcheck": True,
-            "language_level": 3,
-        },
-    )
-else:
-    REQUIRES_OPTIMIZATION = []
-    INTERFACES = []
-    EXT_MODULES = []
 
 
 # noinspection PyUnresolvedReferences
@@ -143,54 +98,20 @@ def get_simple_vars_from_src(
 
 VARIABLES = get_simple_vars_from_src(SOURCE)
 
-CLASSIFIERS = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
-]
-
-KEYWORDS = ["logging", "debugging", "development"]
-
-SETUP_ARGS: dict[str, str | list[str] | dict[str, list[str]]] = dict(
-    name=PACKAGE_NAME,
-    author=VARIABLES["__author__"],
-    author_email=VARIABLES["__author_email__"],
-    maintainer=", ".join(f"{name} <{email}>" for name, email in VARIABLES["__maintainers__"].items()),
-    url=VARIABLES["__url__"],
-    license=VARIABLES["__license__"],
-    description=VARIABLES["__description__"],
-    long_description=LONG_DESCRIPTION,
-    long_description_content_type="text/x-rst",
-    classifiers=CLASSIFIERS,
-    keywords=KEYWORDS,
-    python_requires=">=3.8.0",
+SETUP_ARGS: dict[str, str | list[str] | dict[str, list[str]]] = {
+    "name": PACKAGE_NAME,
+    "url": VARIABLES["__url__"],
+    "python_requires": ">=3.8.0",
     # While setuptools cannot deal with pre-installed incompatible versions,
     # setting a lower bound is not harmful - it makes error messages cleaner. DO
     # NOT set an upper bound on setuptools, as that will lead to uninstallable
     # situations as progressive releases of projects are done.
-    # Blacklist setuptools 34.0.0-34.3.2 due to https://github.com/pypa/setuptools/issues/951
-    # Blacklist setuptools 36.2.0 due to https://github.com/pypa/setuptools/issues/1086
-    setup_requires=[
-        "setuptools >= 21.0.0,!=24.0.0,"
-        "!=34.0.0,!=34.0.1,!=34.0.2,!=34.0.3,!=34.1.0,!=34.1.1,!=34.2.0,!=34.3.0,!=34.3.1,!=34.3.2,"
-        "!=36.2.0",
+    "setup_requires": [
+        "setuptools >= 61.0.0",
+        "setuptools_scm[toml]>=6.2",
         "wheel",
-        "setuptools_scm[toml]>=3.4",
     ],
-    use_scm_version={"write_to": f"{PACKAGE_NAME}/_version.py"},
-    install_requires=REQUIRED,
-    package_data={PACKAGE_NAME: INTERFACES + ["py.typed"]},
-)
-if cythonize is not None:
-    SETUP_ARGS["ext_modules"] = EXT_MODULES
-
+    "package_data": {PACKAGE_NAME: ["py.typed"]},
+}
 
 setuptools.setup(**SETUP_ARGS)

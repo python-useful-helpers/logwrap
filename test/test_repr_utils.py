@@ -27,6 +27,13 @@ import unittest
 # Package Implementation
 import logwrap
 
+if typing.TYPE_CHECKING:
+    # Standard Library
+    from collections.abc import Iterable
+
+    # External Dependencies
+    from rich.repr import Result as RichReprResult
+
 
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestPrettyRepr(unittest.TestCase):
@@ -151,7 +158,6 @@ class TestPrettyRepr(unittest.TestCase):
             (tst_instance.tst_method, i_m_args),
             (tst_instance.tst_classmethod, cm_args),
         ):
-
             self.assertEqual(
                 f"{'':<{0}}"
                 f"<{callable_obj.__class__.__name__} {callable_obj.__module__}.{callable_obj.__name__} "
@@ -278,7 +284,7 @@ class TestContainers(unittest.TestCase):
 
         test_val = NTTest(1, 2)
         self.assertEqual(
-            "test_repr_utils.NTTest(\n    test_field_1=1,#  type: int\n    test_field_2=2,#  type: int\n)",
+            "test_repr_utils.NTTest(\n    test_field_1=1,  # type: int\n    test_field_2=2,  # type: int\n)",
             logwrap.pretty_repr(test_val),
         )
 
@@ -325,4 +331,47 @@ class TestContainers(unittest.TestCase):
             "    maxlen=None,\n"
             ")",
             logwrap.pretty_repr(default_deque),
+        )
+
+
+class TestRich(unittest.TestCase):
+    class Bird:
+        def __init__(
+            self,
+            name: str,
+            eats: Iterable[str] = (),
+            fly: bool = True,
+        ) -> None:
+            self.name = name
+            self.eats = list(eats)
+            self.fly = fly
+
+        def __rich_repr__(self) -> RichReprResult:
+            yield self.name
+            yield "eats", self.eats
+            yield "fly", self.fly, True
+
+    def test_001_skip_def(self):
+        eats = ["fish", "chips", "ice cream", "sausage rolls"]
+        val = self.Bird("gull", eats=eats)
+
+        self.assertEqual(
+            f"test_repr_utils.Bird(\n"
+            f"    'gull',\n"
+            f"    eats={logwrap.pretty_repr(eats, indent=4, no_indent_start=True)},\n"
+            f")",
+            logwrap.pretty_repr(val),
+        )
+
+    def test_002_ndef(self):
+        eats = ["fish"]
+        val = self.Bird("penguin", eats=eats, fly=False)
+
+        self.assertEqual(
+            f"test_repr_utils.Bird(\n"
+            f"    'penguin',\n"
+            f"    eats={logwrap.pretty_repr(eats, indent=4, no_indent_start=True)},\n"
+            f"    fly=False,\n"
+            f")",
+            logwrap.pretty_repr(val),
         )
