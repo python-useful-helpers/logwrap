@@ -1,6 +1,10 @@
 name: Python package
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request: {}
 
 jobs:
   PEP8:
@@ -119,6 +123,22 @@ jobs:
         run: |
           py.test --cov-report= --cov=logwrap test
           coverage report -m --fail-under 85
+      - name: Coveralls Parallel
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: run-${{ matrix.python-version }}-${{ matrix.os }}"
+          parallel: true
+
+  UploadCoverage:
+    name: Upload coverage to Coveralls
+    needs: [ Test ]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
 
   Build:
     needs: [ Test ]
