@@ -72,26 +72,6 @@ jobs:
       - name: Check code style with black
         run: |
           black --check logwrap
-
-  #  ISort:
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #      - uses: actions/checkout@v3
-  #      - name: Set up Python
-  #        uses: actions/setup-python@v4
-  #        with:
-  #          python-version: '3.x'
-  #      - name: Install dependencies
-  #        run: |
-  #          python -m pip install --upgrade pip
-  #          pip install -r requirements.txt
-  #          pip install --upgrade "isort >= 5.6.0"
-  #      - name: Install develop
-  #        run: |
-  #          pip install -e .
-  #      - name: Check imports sorting with isort
-  #        run: |
-  #          isort -c --diff logwrap
   Metadata:
     name: Validate metadata
     runs-on: ubuntu-latest
@@ -113,7 +93,7 @@ jobs:
           twine check dist/*
 
   Test:
-    needs: [PEP8, PyLint, MyPy, Black]  # isort is broken
+    needs: [PEP8, PyLint, MyPy, Black, Metadata]  # isort is broken
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 6
