@@ -123,11 +123,13 @@ jobs:
         run: |
           py.test --cov-report= --cov=logwrap test
           coverage report -m --fail-under 85
+          coverage xml
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@v2
         with:
           flag-name: run-${{ matrix.python-version }}-${{ matrix.os }}"
           parallel: true
+          file: coverage.xml
 
   UploadCoverage:
     name: Upload coverage to Coveralls
