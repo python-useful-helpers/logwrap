@@ -376,6 +376,6 @@ The main test mechanism for the package `logwrap` is using `tox`.
 Available environments can be collected via `tox -l`
 
 CI/CD systems
-==========
+=============
 
 `GitHub: <https://github.com/python-useful-helpers/logwrap/actions>`_ is used for functional tests.
