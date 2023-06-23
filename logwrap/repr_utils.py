@@ -47,12 +47,6 @@ if TYPE_CHECKING:
     # External Dependencies
     from rich.repr import Result as RichReprResult
 
-    class RichReprSupport(typing.Protocol):
-        """Protocol for type checking."""
-
-        def __rich_repr__(self) -> RichReprResult:
-            ...
-
 
 __all__ = ("PrettyFormat", "PrettyRepr", "PrettyStr", "pretty_repr", "pretty_str")
 
@@ -94,6 +88,14 @@ class _DataClassProto(Protocol):
 
     __dataclass_params__: dataclasses._DataclassParams  # type: ignore[name-defined]
     __dataclass_fields__: dict[str, dataclasses.Field[Any]] = {}
+
+
+@runtime_checkable
+class _RichReprProto(Protocol):
+    """Protocol for type checking."""
+
+    def __rich_repr__(self) -> RichReprResult:
+        """Protocol stub."""
 
 
 def _known_callable(item: Any) -> bool:
@@ -570,7 +572,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
 
     def _repr_rich(
         self,
-        src: RichReprSupport,
+        src: _RichReprProto,
         indent: int = 0,
         no_indent_start: bool = False,
     ) -> str:
@@ -651,7 +653,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
             result = getattr(src, self._magic_method_name)(self, indent=indent, no_indent_start=no_indent_start)
             return result  # type: ignore[no-any-return]
 
-        if hasattr(src, "__rich_repr__"):
+        if isinstance(src, _RichReprProto):
             return self._repr_rich(src=src, indent=indent)
 
         if _known_callable(src):
