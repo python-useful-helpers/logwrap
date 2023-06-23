@@ -26,7 +26,6 @@ from __future__ import annotations
 import abc
 import collections
 import types
-import typing
 from inspect import Parameter
 from inspect import Signature
 from inspect import signature
@@ -87,7 +86,7 @@ class _DataClassProto(Protocol):
     __slots__ = ()
 
     __dataclass_params__: dataclasses._DataclassParams  # type: ignore[name-defined]
-    __dataclass_fields__: dict[str, dataclasses.Field[Any]] = {}
+    __dataclass_fields__: dict[str, dataclasses.Field[Any]] = {}  # noqa: RUF012
 
 
 @runtime_checkable
@@ -336,7 +335,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         sig: Signature = signature(src)
         if sig.return_annotation is Parameter.empty:
             annotation: str = ""
-        elif sig.return_annotation is type(None):  # noqa: E721
+        elif sig.return_annotation is type(None):
             # Python 3.10 special case
             annotation = " -> None"
         else:

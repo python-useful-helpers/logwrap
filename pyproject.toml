@@ -151,7 +151,7 @@ extend-select = [
   "ICN", "PGH",  # flake8-import-conventions, pygrep-hooks
   "Q002", "Q003",  # Double quote docstring as PEP8, Change outer quotes to avoid escaping inner quotes
   "FLY",  # Flynt
-  "TRY", "UP", "I", "PL", "RUF",  # tryceratops, pyupgrade, isort, pylint, Ruff-specific
+  "TRY", "UP", "I", "PL", "PERF", "RUF",  # tryceratops, pyupgrade, isort, pylint, Ruff-specific
 ]
 extend-ignore = [
   "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004",  # refactor rules (too many statements/arguments/branches)
