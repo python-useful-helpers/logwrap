@@ -40,14 +40,9 @@ def get_simple_vars_from_src(
     :param src: Source code
     :type src: str
     :return: OrderedDict with keys, values = variable names, values
-    :rtype: typing.Dict[
+    :rtype: dict[
                 str,
-                typing.Union[
-                    str, bytes,
-                    int, float, complex,
-                    list, set, dict, tuple,
-                    None, bool, Ellipsis
-                ]
+                str | bytes | int | float | complex | list | set | dict | tuple | None | bool | Ellipsis
             ]
 
     Limitations: Only defined from scratch variables.
@@ -98,20 +93,18 @@ def get_simple_vars_from_src(
 
 VARIABLES = get_simple_vars_from_src(SOURCE)
 
-SETUP_ARGS: dict[str, str | list[str] | dict[str, list[str]]] = {
-    "name": PACKAGE_NAME,
-    "url": VARIABLES["__url__"],
-    "python_requires": ">=3.8.0",
+setuptools.setup(
+    name=PACKAGE_NAME,
+    url=VARIABLES["__url__"],
+    python_requires=">=3.8.0",
     # While setuptools cannot deal with pre-installed incompatible versions,
     # setting a lower bound is not harmful - it makes error messages cleaner. DO
     # NOT set an upper bound on setuptools, as that will lead to uninstallable
     # situations as progressive releases of projects are done.
-    "setup_requires": [
+    setup_requires=[
         "setuptools >= 61.0.0",
         "setuptools_scm[toml]>=6.2",
         "wheel",
     ],
-    "package_data": {PACKAGE_NAME: ["py.typed"]},
-}
-
-setuptools.setup(**SETUP_ARGS)
+    package_data={PACKAGE_NAME: ["py.typed"]},
+)

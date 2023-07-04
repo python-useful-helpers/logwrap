@@ -28,6 +28,12 @@ dynamic = ["classifiers", "version"]  # "dependencies",
 "Repository" = "https://github.com/python-useful-helpers/logwrap"
 "Bug Tracker" = "https://github.com/python-useful-helpers/logwrap/issues"
 
+[tool.setuptools.package-data]
+logwrap=[
+  "py.typed",
+  "*.pyi",
+]
+
 [tool.setuptools]
 zip-safe = false
 
@@ -41,6 +47,7 @@ exclude = [
   ".*"
 ]
 namespaces = false
+
 [tool.setuptools.dynamic]
 classifiers = {file = ["classifiers.txt"]}
 
@@ -81,13 +88,21 @@ ignore = [
 # Multi-line docstring summary should start at the second line
 match = "(?!_version|test_)*.py"
 
+[tool.mypy]
+strict = true
+warn_unused_configs = true
+warn_redundant_casts = true
+show_error_context = true
+show_column_numbers = true
+show_error_codes = true
+pretty = true
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-vvv -s -p no:django -p no:ipdb"
 testpaths = ["test"]
 mock_use_standalone_module = false
 junit_family = "xunit2"
-
 
 [tool.coverage.run]
 omit = ["test/*"]
@@ -129,13 +144,6 @@ exclude_lines = [
 
 [tool.coverage.json]
 pretty_print = true
-
-[tool.mypy]
-show_error_context = true
-show_column_numbers = true
-show_error_codes = true
-warn_redundant_casts = true
-pretty = true
 
 [tool.ruff]
 line-length = 120
