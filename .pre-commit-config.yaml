@@ -2,7 +2,7 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
-#    - id: check-yaml
+    - id: check-yaml
     - id: end-of-file-fixer
     - id: trailing-whitespace
     - id: mixed-line-ending
@@ -10,43 +10,35 @@ repos:
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
-      - id: isort
-        name: isort (python)
-      - id: isort
-        name: isort (cython)
-        types: [cython]
-      - id: isort
-        name: isort (pyi)
-        types: [pyi]
+    - id: isort
+      name: isort (python)
+    - id: isort
+      name: isort (cython)
+      types: [cython]
+    - id: isort
+      name: isort (pyi)
+      types: [pyi]
 
   - repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 23.7.0
     hooks:
-      - id: black
-        # It is recommended to specify the latest version of Python
-        # supported by your project here, or alternatively use
-        # pre-commit's default_language_version, see
-        # https://pre-commit.com/#top_level-default_language_version
-        language_version: python3.8
-        exclude: (venv|test|doc)
+    - id: black
+      # It is recommended to specify the latest version of Python
+      # supported by your project here, or alternatively use
+      # pre-commit's default_language_version, see
+      # https://pre-commit.com/#top_level-default_language_version
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.0.280
+    hooks:
+    - id: ruff
+      args: [ --fix, --exit-non-zero-on-fix ]
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0  # Use the ref you want to point at
     hooks:
-      - id: python-check-blanket-noqa
-      - id: python-check-blanket-type-ignore
-      - id: rst-directive-colons
-      - id: rst-inline-touching-normal
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        additional_dependencies: [flake8-bugbear, pep8-naming, flake8-docstrings]
-        exclude: (venv|test|doc)
-
-  - repo: https://github.com/pycqa/pylint
-    rev: v3.0.0a6
-    hooks:
-    - id: pylint
-      exclude: (venv|test|doc)
+    - id: python-check-blanket-noqa
+    - id: python-check-blanket-type-ignore
+    - id: rst-directive-colons
+    - id: rst-inline-touching-normal
