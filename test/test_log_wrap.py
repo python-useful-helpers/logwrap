@@ -32,6 +32,8 @@ import logwrap
 class AnyStringWith(str):
     """Special string for substring-only checking in tests."""
 
+    __slots__ = ()
+
     def __eq__(self, other):
         """Equality check."""
         return self in other

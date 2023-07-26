@@ -612,7 +612,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__max_indent = value
 
     @property
-    def __name__(self) -> str:
+    def __name__(self) -> str:  # noqa: A003
         """Name getter.
 
         :return: attribute name (may be overridden)
