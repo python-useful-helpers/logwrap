@@ -83,7 +83,7 @@ def get_simple_vars_from_src(
             continue
         try:
             value = ast.literal_eval(node.value)
-        except ValueError:  # noqa: PERF203
+        except ValueError:
             continue
         for tgt in node.targets:
             if isinstance(tgt, ast.Name) and isinstance(tgt.ctx, ast.Store):
