@@ -568,7 +568,7 @@ class LogWrap:
                 continue
 
             if isinstance(preprocessed, (tuple, list)):
-                param, value = preprocessed
+                param, value = preprocessed  # noqa: PLW2901
             else:
                 value = param.value
 

@@ -352,7 +352,6 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
                     f"Done at {time.time() - timestamp:.03f}s: "
                     f"{source}.{self.__name__} -> {repr_utils.pretty_repr(result)}",
                 )
-            return result
         except Exception:
             if self.log_failure:
                 logger.log(
@@ -361,6 +360,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
                     exc_info=False,
                 )
             raise
+        return result
 
     def __set__(self, instance: _OwnerT, value: _ReturnT) -> None:
         """Set descriptor.
