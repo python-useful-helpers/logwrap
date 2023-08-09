@@ -139,15 +139,17 @@ class TestPrettyRepr(unittest.TestCase):
 
         tst_instance = TstClass()
 
-        c_m_args = "\n    self,\n    arg,\n    darg=1,\n    *positional,\n    **named,\n"
+        c_m_args = (
+            "\n    self,\n    arg,\n    darg=1,\n    *positional,\n    **named,\n"
+        )
 
         cm_args = (
             "\n"
-            "    cls={cls!r},\n"
+            f"    cls={TstClass!r},\n"
             "    arg,\n"
             "    darg=1,\n"
             "    *positional,\n"
-            "    **named,\n".format(cls=TstClass)
+            "    **named,\n"
         )
 
         i_m_args = f"\n    self={tst_instance!r},\n    arg,\n    darg=1,\n    *positional,\n    **named,\n"
@@ -204,7 +206,9 @@ class TestPrettyRepr(unittest.TestCase):
 
             def __pretty_repr__(self, parser, indent, no_indent_start):
                 return parser.process_element(
-                    f"<Test Class at 0x{id(self.__class__):X}>", indent=indent, no_indent_start=no_indent_start
+                    f"<Test Class at 0x{id(self.__class__):X}>",
+                    indent=indent,
+                    no_indent_start=no_indent_start,
                 )
 
         result = logwrap.pretty_repr(Tst())
@@ -267,10 +271,10 @@ class TestContainers(unittest.TestCase):
         )
 
     def test_002_named_tuple_basic(self):
-        # Standard Library
-        import collections
+        class NTTest(typing.NamedTuple):
+            test_field_1: int
+            test_field_2: int
 
-        NTTest = collections.namedtuple("NTTest", ("test_field_1", "test_field_2"))
         test_val = NTTest(1, 2)
         self.assertEqual(
             "test_repr_utils.NTTest(\n    test_field_1=1,\n    test_field_2=2,\n)",

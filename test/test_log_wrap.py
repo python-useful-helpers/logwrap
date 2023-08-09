@@ -206,7 +206,11 @@ class TestLogWrap(unittest.TestCase):
         log = mock.Mock(name="log")
         new_logger.attach_mock(log, "log")
 
-        @logwrap.logwrap(log=new_logger, log_level=logging.INFO, exc_level=logging.WARNING)
+        @logwrap.logwrap(
+            log=new_logger,
+            log_level=logging.INFO,
+            exc_level=logging.WARNING,
+        )
         def func():
             raise ValueError("as expected")
 
@@ -216,7 +220,11 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(
             [
                 mock.call(level=logging.INFO, msg="Calling: \nfunc()"),
-                mock.call(level=logging.WARNING, msg=AnyStringWith("Failed: \nfunc()"), exc_info=False),
+                mock.call(
+                    level=logging.WARNING,
+                    msg=AnyStringWith("Failed: \nfunc()"),
+                    exc_info=False,
+                ),
             ],
             log.mock_calls,
         )
@@ -362,7 +370,10 @@ class TestLogWrap(unittest.TestCase):
                         f")"
                     ),
                 ),
-                mock.call(level=logging.DEBUG, msg=f"Done: 'func' with result:\n{logwrap.pretty_repr(result)}"),
+                mock.call(
+                    level=logging.DEBUG,
+                    msg=f"Done: 'func' with result:\n{logwrap.pretty_repr(result)}",
+                ),
             ],
         )
 
@@ -381,7 +392,11 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(
             [
                 mock.call(level=logging.DEBUG, msg="Calling: \nfunc()"),
-                mock.call(exc_info=False, level=40, msg=f"Failed: \nfunc()\n{TypeError.__name__}"),
+                mock.call(
+                    exc_info=False,
+                    level=40,
+                    msg=f"Failed: \nfunc()\n{TypeError.__name__}",
+                ),
             ],
             log.mock_calls,
         )
@@ -403,7 +418,10 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(
             [
                 mock.call(level=logging.DEBUG, msg="Calling: \nfunc()"),
-                mock.call(level=logging.DEBUG, msg=f"Done: 'func' with result:\n{logwrap.pretty_repr(result)}"),
+                mock.call(
+                    level=logging.DEBUG,
+                    msg=f"Done: 'func' with result:\n{logwrap.pretty_repr(result)}",
+                ),
             ],
             log.mock_calls,
         )
@@ -436,7 +454,11 @@ class TestLogWrap(unittest.TestCase):
                         f")"
                     ),
                 ),
-                mock.call(level=logging.ERROR, msg=AnyStringWith("Failed: \nfunc()"), exc_info=False),
+                mock.call(
+                    level=logging.ERROR,
+                    msg=AnyStringWith("Failed: \nfunc()"),
+                    exc_info=False,
+                ),
             ],
             log.mock_calls,
         )
@@ -449,7 +471,11 @@ class TestLogWrap(unittest.TestCase):
         arg1 = "test arg 1"
         arg2 = "test arg 2"
 
-        @logwrap.logwrap(log=new_logger, log_call_args=False, log_call_args_on_exc=False)
+        @logwrap.logwrap(
+            log=new_logger,
+            log_call_args=False,
+            log_call_args_on_exc=False,
+        )
         def func(test_arg1, test_arg2):
             raise TypeError("Blacklisted")
 
@@ -459,7 +485,11 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(
             [
                 mock.call(level=logging.DEBUG, msg="Calling: \nfunc()"),
-                mock.call(level=logging.ERROR, msg=AnyStringWith("Failed: \nfunc()"), exc_info=False),
+                mock.call(
+                    level=logging.ERROR,
+                    msg=AnyStringWith("Failed: \nfunc()"),
+                    exc_info=False,
+                ),
             ],
             log.mock_calls,
         )
@@ -518,14 +548,20 @@ class TestLogWrap(unittest.TestCase):
         self.assertEqual(
             [
                 mock.call(level=logging.DEBUG, msg="Calling: \nfunc()"),
-                mock.call(level=logging.ERROR, msg=AnyStringWith("Failed: \nfunc()"), exc_info=False),
+                mock.call(
+                    level=logging.ERROR,
+                    msg=AnyStringWith("Failed: \nfunc()"),
+                    exc_info=False,
+                ),
             ],
             log.mock_calls,
         )
         self.assertNotEqual(
             mock.call(
                 level=logging.ERROR,
-                msg=AnyStringWith("Failed: \nfunc()\nTraceback (most recent call last):"),
+                msg=AnyStringWith(
+                    "Failed: \nfunc()\nTraceback (most recent call last):"
+                ),
                 exc_info=False,
             ),
             log.mock_calls[1],
@@ -594,17 +630,17 @@ class TestObject(unittest.TestCase):
             log_call.log_level = "WARNING"
 
         self.assertEqual(
-            "{cls}("
-            "log={logger}, "
-            "log_level={obj.log_level}, "
-            "exc_level={obj.exc_level}, "
-            "max_indent={obj.max_indent}, "
-            "blacklisted_names={obj.blacklisted_names}, "
-            "blacklisted_exceptions={obj.blacklisted_exceptions}, "
-            "log_call_args={obj.log_call_args}, "
-            "log_call_args_on_exc={obj.log_call_args_on_exc}, "
-            "log_result_obj={obj.log_result_obj}, "
-            ")".format(cls=log_call.__class__.__name__, logger=log_call._logger, obj=log_call),
+            f"{log_call.__class__.__name__}("
+            f"log={log_call._logger}, "
+            f"log_level={log_call.log_level}, "
+            f"exc_level={log_call.exc_level}, "
+            f"max_indent={log_call.max_indent}, "
+            f"blacklisted_names={log_call.blacklisted_names}, "
+            f"blacklisted_exceptions={log_call.blacklisted_exceptions}, "
+            f"log_call_args={log_call.log_call_args}, "
+            f"log_call_args_on_exc={log_call.log_call_args_on_exc}, "
+            f"log_result_obj={log_call.log_result_obj}, "
+            ")",
             repr(log_call),
         )
 
