@@ -271,10 +271,13 @@ class TestContainers(unittest.TestCase):
         )
 
     def test_002_named_tuple_basic(self):
-        class NTTest(typing.NamedTuple):
-            test_field_1: int
-            test_field_2: int
+        # Standard Library
+        import collections
 
+        NTTest = collections.namedtuple(  # noqa: PYI024  # we need old one
+            "NTTest",
+            ("test_field_1", "test_field_2"),
+        )
         test_val = NTTest(1, 2)
         self.assertEqual(
             "test_repr_utils.NTTest(\n    test_field_1=1,\n    test_field_2=2,\n)",
