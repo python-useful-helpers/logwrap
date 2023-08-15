@@ -186,6 +186,7 @@ class LogWrap:
         "__log_level",
         "__exc_level",
         "__max_indent",
+        "__max_iter",
         "__log_call_args",
         "__log_call_args_on_exc",
         "__log_traceback",
@@ -198,6 +199,7 @@ class LogWrap:
         log_level: int = DEBUG,
         exc_level: int = ERROR,
         max_indent: int = 20,
+        max_iter: int = 20,
         blacklisted_names: Iterable[str] | None = None,
         blacklisted_exceptions: Iterable[type[Exception]] | None = None,
         log_call_args: bool = True,
@@ -215,6 +217,8 @@ class LogWrap:
         :type exc_level: int
         :param max_indent: maximum indent before classic `repr()` call.
         :type max_indent: int
+        :param max_iter: maximum number of elements in iterable before ellipsis.
+        :type max_iter: int
         :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
         :type blacklisted_names: Iterable[str] | None
         :param blacklisted_exceptions: list of exception, which should be re-raised
@@ -233,6 +237,7 @@ class LogWrap:
         .. versionchanged:: 5.1.0 log_traceback parameter
         .. versionchanged:: 8.0.0 pick up logger from target module if possible
         .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
+        .. versionchanged:: 12.0.0 max_iter parameter
         """
         # Typing fix:
         if blacklisted_names is None:
@@ -252,6 +257,7 @@ class LogWrap:
         self.__log_level: int = log_level
         self.__exc_level: int = exc_level
         self.__max_indent: int = max_indent
+        self.__max_iter: int = max_iter
         self.__log_call_args: bool = log_call_args
         self.__log_call_args_on_exc: bool = log_call_args_on_exc
         self.__log_traceback: bool = log_traceback
@@ -339,6 +345,27 @@ class LogWrap:
         if not isinstance(val, int):
             raise TypeError(f"Unexpected type: {val.__class__.__name__}. Should be {int.__name__}.")
         self.__max_indent = val
+
+    @property
+    def max_iter(self) -> int:
+        """Maximum number of elements in iterable before ellipsis.
+
+        :return: maximum number of elements in iterable before ellipsis
+        :rtype: int
+        """
+        return self.__max_iter
+
+    @max_iter.setter
+    def max_iter(self, val: int) -> None:
+        """Maximum number of elements in iterable before ellipsis.
+
+        :param val: maximum number of elements in iterable before ellipsis
+        :type val: int
+        :raises TypeError: max_iter is not integer
+        """
+        if not isinstance(val, int):
+            raise TypeError(f"Unexpected type: {val.__class__.__name__}. Should be {int.__name__}.")
+        self.__max_iter = val
 
     @property
     def blacklisted_names(self) -> list[str]:
@@ -463,6 +490,7 @@ class LogWrap:
             f"log_level={self.log_level}, "
             f"exc_level={self.exc_level}, "
             f"max_indent={self.max_indent}, "
+            f"max_iter={self.max_iter}, "
             f"blacklisted_names={self.blacklisted_names}, "
             f"blacklisted_exceptions={self.blacklisted_exceptions}, "
             f"log_call_args={self.log_call_args}, "
@@ -523,6 +551,7 @@ class LogWrap:
                 indent=INDENT,
                 no_indent_start=True,
                 max_indent=self.max_indent,
+                max_iter=self.max_iter,
             )
         except Exception as exc:
             base_name: str = getattr(value, "name", getattr(value, "__name__", value.__class__.__name__))
@@ -614,7 +643,9 @@ class LogWrap:
         msg: str = f"Done: {func_name!r}"
 
         if self.log_result_obj:
-            msg += f" with result:\n{repr_utils.pretty_repr(result, max_indent=self.max_indent)}"
+            msg += (
+                f" with result:\n{repr_utils.pretty_repr(result, max_indent=self.max_indent, max_iter=self.max_iter)}"
+            )
         logger.log(level=self.log_level, msg=msg)
 
     def _make_calling_record(
@@ -747,6 +778,7 @@ def logwrap(
     log_level: int = DEBUG,
     exc_level: int = ERROR,
     max_indent: int = 20,
+    max_iter: int = 20,
     blacklisted_names: Iterable[str] | None = None,
     blacklisted_exceptions: Iterable[type[Exception]] | None = None,
     log_call_args: bool = True,
@@ -766,6 +798,7 @@ def logwrap(
     log_level: int = DEBUG,
     exc_level: int = ERROR,
     max_indent: int = 20,
+    max_iter: int = 20,
     blacklisted_names: Iterable[str] | None = None,
     blacklisted_exceptions: Iterable[type[Exception]] | None = None,
     log_call_args: bool = True,
@@ -785,6 +818,7 @@ def logwrap(
     log_level: int = DEBUG,
     exc_level: int = ERROR,
     max_indent: int = 20,
+    max_iter: int = 20,
     blacklisted_names: Iterable[str] | None = None,
     blacklisted_exceptions: Iterable[type[Exception]] | None = None,
     log_call_args: bool = True,
@@ -803,6 +837,7 @@ def logwrap(
     log_level: int = DEBUG,
     exc_level: int = ERROR,
     max_indent: int = 20,
+    max_iter: int = 20,
     blacklisted_names: Iterable[str] | None = None,
     blacklisted_exceptions: Iterable[type[Exception]] | None = None,
     log_call_args: bool = True,
@@ -822,6 +857,8 @@ def logwrap(
     :type exc_level: int
     :param max_indent: maximum indent before classic `repr()` call.
     :type max_indent: int
+    :param max_iter: maximum number of elements to log from iterables.
+    :type max_iter: int
     :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
     :type blacklisted_names: Iterable[str] | None
     :param blacklisted_exceptions: list of exceptions, which should be re-raised
@@ -844,12 +881,14 @@ def logwrap(
     .. versionchanged:: 5.1.0 log_traceback parameter
     .. versionchanged:: 8.0.0 pick up logger from target module if possible
     .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
+    .. versionchanged:: 12.0.0 max_iter parameter
     """
     wrapper = LogWrap(
         log=log,
         log_level=log_level,
         exc_level=exc_level,
         max_indent=max_indent,
+        max_iter=max_iter,
         blacklisted_names=blacklisted_names,
         blacklisted_exceptions=blacklisted_exceptions,
         log_call_args=log_call_args,

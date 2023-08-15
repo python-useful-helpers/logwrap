@@ -12,7 +12,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
     .. versionadded:: 2.2.0
 
-    .. py:method:: __init__(*, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
+    .. py:method:: __init__(*, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, max_iter=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
 
         :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
         :type log: logging.Logger | None
@@ -22,6 +22,8 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :type exc_level: int
         :param max_indent: maximum indent before classic `repr()` call.
         :type max_indent: int
+        :param max_iter: maximum number of elements to log from iterable
+        :type max_iter: int
         :param blacklisted_names: Blacklisted argument names.
                                   Arguments with this names will be skipped in log.
         :type blacklisted_names: Iterable[str] | None
@@ -44,6 +46,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         .. versionchanged:: 5.1.0 log_traceback parameter
         .. versionchanged:: 8.0.0 pick up logger from target module if possible
         .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
+        .. versionchanged:: 12.0.0 max_iter parameter
 
     .. py:method:: pre_process_param(self, arg)
 
@@ -79,6 +82,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     .. py:attribute:: log_level
     .. py:attribute:: exc_level
     .. py:attribute:: max_indent
+    .. py:attribute:: max_iter
     .. py:attribute:: blacklisted_names
 
         ``list[str]``, modified via mutability
@@ -98,7 +102,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :rtype: Callable | Awaitable
 
 
-.. py:function:: logwrap(func=None, *, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
+.. py:function:: logwrap(func=None, *, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, max_iter=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
 
     Log function calls and return values.
 
@@ -112,6 +116,8 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     :type exc_level: int
     :param max_indent: maximum indent before classic `repr()` call.
     :type max_indent: int
+    :param max_iter: maximum number of elements to log from iterable
+    :type max_iter: int
     :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
     :type blacklisted_names: Iterable[str] | None
     :param blacklisted_exceptions: list of exceptions, which should be re-raised
@@ -134,6 +140,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     .. versionchanged:: 5.1.0 log_traceback parameter
     .. versionchanged:: 8.0.0 pick up logger from target module if possible
     .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
+    .. versionchanged:: 12.0.0 max_iter parameter
 
 
 .. py:class:: BoundParameter(inspect.Parameter)

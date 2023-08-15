@@ -591,6 +591,22 @@ class TestLogWrap(unittest.TestCase):
             self.stream.getvalue(),
         )
 
+    def test_024_max_iter(self):
+        @logwrap.logwrap(max_iter=1)
+        def func():
+            return [1, 2, 3]
+
+        result = func()
+        self.assertEqual(result, [1, 2, 3])
+        self.assertEqual(
+            f"DEBUG>Calling: \n"
+            f"func()\n"
+            f"DEBUG>Done: 'func' with result:\n"
+            f"[\n"
+            f"    1...\n"
+            f"]\n",
+            self.stream.getvalue(),
+        )
 
 # noinspection PyMissingOrEmptyDocstring
 class TestObject(unittest.TestCase):
@@ -609,6 +625,7 @@ class TestObject(unittest.TestCase):
         log_call.log_level = logging.INFO
         log_call.exc_level = logging.CRITICAL
         log_call.max_indent = 40
+        log_call.max_iter = 40
         log_call.blacklisted_names.append("password")
         log_call.blacklisted_exceptions.append(IOError)
         log_call.log_call_args = False
@@ -635,6 +652,7 @@ class TestObject(unittest.TestCase):
             f"log_level={log_call.log_level}, "
             f"exc_level={log_call.exc_level}, "
             f"max_indent={log_call.max_indent}, "
+            f"max_iter={log_call.max_iter}, "
             f"blacklisted_names={log_call.blacklisted_names}, "
             f"blacklisted_exceptions={log_call.blacklisted_exceptions}, "
             f"log_call_args={log_call.log_call_args}, "
