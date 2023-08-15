@@ -599,12 +599,12 @@ class TestLogWrap(unittest.TestCase):
         result = func()
         self.assertEqual(result, [1, 2, 3])
         self.assertEqual(
-            f"DEBUG>Calling: \n"
-            f"func()\n"
-            f"DEBUG>Done: 'func' with result:\n"
-            f"[\n"
-            f"    1...\n"
-            f"]\n",
+            "DEBUG>Calling: \n"
+            "func()\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "[\n"
+            "    1...\n"
+            "]\n",
             self.stream.getvalue(),
         )
 
