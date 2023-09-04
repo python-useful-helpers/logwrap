@@ -573,14 +573,12 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         """
         next_indent: int = self.next_indent(indent)
         buf: list[str] = []
-        ix = 0
 
-        for elem in src:
+        for idx, elem in enumerate(src, start=1):
             buf.append("\n")
             buf.append(self.process_element(src=elem, indent=next_indent))
 
-            ix += 1
-            if ix == self.max_iter:
+            if idx == self.max_iter:
                 buf.append("...")
                 break
 

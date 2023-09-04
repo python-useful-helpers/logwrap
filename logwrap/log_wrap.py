@@ -199,7 +199,7 @@ class LogWrap:
         log_level: int = DEBUG,
         exc_level: int = ERROR,
         max_indent: int = 20,
-        max_iter: int = 20,
+        max_iter: int = 0,
         blacklisted_names: Iterable[str] | None = None,
         blacklisted_exceptions: Iterable[type[Exception]] | None = None,
         log_call_args: bool = True,
