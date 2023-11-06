@@ -88,7 +88,7 @@ class BoundParameter(inspect.Parameter):
         )
 
         if value is self.empty:
-            if parameter.default is self.empty and parameter.kind not in (self.VAR_POSITIONAL, self.VAR_KEYWORD):
+            if parameter.default is self.empty and parameter.kind not in {self.VAR_POSITIONAL, self.VAR_KEYWORD}:
                 raise ValueError("Value is not set and no default value")
             self._value: Any = parameter.default
         else:

@@ -151,6 +151,7 @@ show-source = true
 target-version = "py38"
 
 extend-select = [
+  "E",
   "W",  # also pycodestyle warnings
   "PYI",  # flake8-pyi
   "ASYNC",  # flake8-async
