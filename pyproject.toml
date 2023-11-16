@@ -156,6 +156,7 @@ extend-select = [
   "PYI",  # flake8-pyi
   "ASYNC",  # flake8-async
   "FA",  # from __future__ import annotations
+  "DTZ",  # flake8-datetimez
   "SLOT",  # flake8-slots
   "TCH",  # flake8-type-checking
   "S",  # flake8-bandit
@@ -166,6 +167,7 @@ extend-select = [
   "ICN", "PGH",  # flake8-import-conventions, pygrep-hooks
   "Q",  # quotes
   "FLY",  # Flynt
+  "FURB",  # Refurb
   "TRY", "UP", "I", "PL", "PERF", "RUF",  # tryceratops, pyupgrade, isort, pylint + perflint, Ruff-specific
 ]
 extend-ignore = [

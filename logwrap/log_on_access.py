@@ -141,6 +141,22 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
     .. versionadded:: 6.1.0
     """
 
+    __slots__ = (
+        "__logger",
+        "__log_object_repr",
+        "__log_level",
+        "__exc_level",
+        "__log_before",
+        "__log_success",
+        "__log_failure",
+        "__log_traceback",
+        "__override_name",
+        "__max_indent",
+        "__name",
+        "__owner",
+        "__dict__",
+    )
+
     def __init__(
         self,
         fget: Callable[[_OwnerT], _ReturnT] | None = None,
@@ -222,7 +238,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__name = name
 
     @property
-    def __objclass__(self) -> type[_OwnerT] | None:  # pragma: no cover
+    def __objclass__(self) -> type[_OwnerT] | None:  # pragma: no cover  # noqa: PLW3201,RUF100
         """Read-only owner.
 
         :return: property owner class
@@ -612,7 +628,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__max_indent = value
 
     @property
-    def __name__(self) -> str:  # noqa: A003
+    def __name__(self) -> str:  # noqa: A003,PLW3201,RUF100
         """Name getter.
 
         :return: attribute name (may be overridden)
