@@ -27,7 +27,10 @@ import setuptools
 
 PACKAGE_NAME = "logwrap"
 
-with open(os.path.join(os.path.dirname(__file__), PACKAGE_NAME, "__init__.py"), encoding="utf-8") as f:
+with open(  # noqa: FURB101,RUF100
+    os.path.join(os.path.dirname(__file__), PACKAGE_NAME, "__init__.py"),
+    encoding="utf-8",
+) as f:
     SOURCE = f.read()
 
 

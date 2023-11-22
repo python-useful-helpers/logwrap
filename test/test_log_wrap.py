@@ -29,7 +29,7 @@ from unittest import mock
 import logwrap
 
 
-class AnyStringWith(str):
+class AnyStringWith(str):  # noqa: PLW1641,RUF100
     """Special string for substring-only checking in tests."""
 
     __slots__ = ()
