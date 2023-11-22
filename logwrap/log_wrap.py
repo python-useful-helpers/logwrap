@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-# Standard Library
 import asyncio
 import functools
 import inspect
@@ -35,17 +34,14 @@ from typing import Any
 from typing import TypeVar
 from typing import overload
 
-# Package Implementation
 from logwrap import repr_utils
 from logwrap.constants import VALID_LOGGER_NAMES
 
 if TYPE_CHECKING:
-    # Standard Library
     from collections.abc import Callable
     from collections.abc import Iterable
     from collections.abc import MutableMapping
 
-    # External Dependencies
     from typing_extensions import ParamSpec
 
     Spec = ParamSpec("Spec")

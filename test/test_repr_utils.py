@@ -20,21 +20,17 @@
 
 from __future__ import annotations
 
-# Standard Library
 import argparse
 import collections
 import dataclasses
 import typing
 import unittest
 
-# Package Implementation
 import logwrap
 
 if typing.TYPE_CHECKING:
-    # Standard Library
     from collections.abc import Iterable
 
-    # External Dependencies
     from rich.repr import Result as RichReprResult
 
 

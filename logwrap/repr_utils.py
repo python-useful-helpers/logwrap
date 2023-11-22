@@ -22,7 +22,6 @@ available from the main module.
 
 from __future__ import annotations
 
-# Standard Library
 import abc
 import collections
 import types
@@ -38,12 +37,10 @@ from typing import get_type_hints
 from typing import runtime_checkable
 
 if TYPE_CHECKING:
-    # Standard Library
     import dataclasses
     from collections.abc import Callable
     from collections.abc import Iterable
 
-    # External Dependencies
     from rich.repr import Result as RichReprResult
 
 

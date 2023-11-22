@@ -18,11 +18,9 @@
 
 from __future__ import annotations
 
-# Standard Library
 import ast
 import os.path
 
-# External Dependencies
 import setuptools
 
 PACKAGE_NAME = "logwrap"

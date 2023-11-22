@@ -18,14 +18,12 @@
 
 """Python independent logwrap tests."""
 
-# Standard Library
 import functools
 import io
 import logging
 import unittest
 from unittest import mock
 
-# Package Implementation
 import logwrap
 
 

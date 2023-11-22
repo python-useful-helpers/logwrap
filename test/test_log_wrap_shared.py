@@ -16,11 +16,9 @@
 
 """_repr_utils (internal helpers) specific tests."""
 
-# Standard Library
 import unittest
 from inspect import signature
 
-# Package Implementation
 from logwrap import log_wrap
 
 

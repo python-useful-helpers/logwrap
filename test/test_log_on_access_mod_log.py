@@ -2,12 +2,10 @@
 
 """Tests for logwrap.LogOnAccess with logger pick-up from module/instance."""
 
-# Standard Library
 import io
 import logging
 import unittest
 
-# Package Implementation
 import logwrap
 
 VALUE = "ok"

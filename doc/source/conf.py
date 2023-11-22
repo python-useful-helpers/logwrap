@@ -12,7 +12,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-# External Dependencies
 import pkg_resources
 
 release = pkg_resources.get_distribution("logwrap").version

@@ -15,7 +15,6 @@
 
 from __future__ import annotations
 
-# Standard Library
 import inspect
 import os
 import sys
@@ -26,12 +25,10 @@ from logging import DEBUG
 from logging import Logger
 from logging import getLogger
 
-# Package Implementation
 from logwrap import repr_utils
 from logwrap.constants import VALID_LOGGER_NAMES
 
 if typing.TYPE_CHECKING:
-    # Standard Library
     from collections.abc import Callable
 
 __all__ = ("LogOnAccess",)
@@ -648,7 +645,6 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
 
 
 if __name__ == "__main__":
-    # Standard Library
     import doctest
 
     doctest.testmod(verbose=True)
