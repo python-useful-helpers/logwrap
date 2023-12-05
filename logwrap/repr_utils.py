@@ -645,8 +645,14 @@ class PrettyFormat(abc.ABC):
         :rtype: str
         """
         if hasattr(src, self._magic_method_name):
-            result = getattr(src, self._magic_method_name)(self, indent=indent, no_indent_start=no_indent_start)
-            return result  # type: ignore[no-any-return]
+            return getattr(  # type: ignore[no-any-return]
+                src,
+                self._magic_method_name,
+            )(
+                self,
+                indent=indent,
+                no_indent_start=no_indent_start,
+            )
 
         if isinstance(src, _RichReprProto):
             return self._repr_rich(src=src, indent=indent)
@@ -723,8 +729,7 @@ class PrettyFormat(abc.ABC):
         :return: formatted string
         :rtype: str
         """
-        result = self.process_element(src, indent=indent, no_indent_start=no_indent_start)
-        return result
+        return self.process_element(src, indent=indent, no_indent_start=no_indent_start)
 
 
 class PrettyRepr(PrettyFormat):

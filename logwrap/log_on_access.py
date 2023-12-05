@@ -257,8 +257,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         full_tb: list[traceback.FrameSummary] = [elem for elem in stack if elem.filename != _CURRENT_FILE]
         exc_line: list[str] = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
-        tb_text = "\nTraceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
-        return tb_text
+        return "\nTraceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
 
     def __get_obj_source(self, instance: _OwnerT, owner: type[_OwnerT] | None = None) -> str:
         """Get object repr block.
