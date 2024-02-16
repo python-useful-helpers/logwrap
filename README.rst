@@ -37,21 +37,6 @@ Pros:
 * PyPI packaged: https://pypi.python.org/pypi/logwrap
 * Self-documented code: docstrings with types in comments
 * Tested: see bages on top
-* Support multiple Python versions:
-
-::
-
-    Python 3.8
-    Python 3.9
-    Python 3.10
-
-.. note::
-
-    Support python versions:
-
-    * 2.7: < 5.0.0
-    * 3.5: < 6.0.0
-    * 3.7: < 10.0.0
 
 This package includes helpers:
 

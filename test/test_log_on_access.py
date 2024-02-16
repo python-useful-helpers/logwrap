@@ -2,12 +2,10 @@
 
 """Tests for logwrap.LogOnAccess."""
 
-# Standard Library
 import io
 import logging
 import unittest
 
-# Package Implementation
 import logwrap
 
 VALUE = "ok"
@@ -62,7 +60,8 @@ class TestLogOnAccess(unittest.TestCase):
         target.ok = VALUE.upper()
         logged = self.stream.getvalue().splitlines()
         self.assertEqual(
-            f"DEBUG:logwrap.log_on_access:Request: Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}", logged[0]
+            f"DEBUG:logwrap.log_on_access:Request: Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}",
+            logged[0],
         )
         self.assertRegex(
             logged[1],
@@ -78,7 +77,10 @@ class TestLogOnAccess(unittest.TestCase):
         del target.ok
         logged = self.stream.getvalue().splitlines()
         self.assertEqual("DEBUG:logwrap.log_on_access:Request: del Target(val=OK).ok", logged[0])
-        self.assertRegex(logged[1], r"DEBUG:logwrap\.log_on_access:Done at (?:\d+\.\d{3})s: del Target\(val=OK\)\.ok")
+        self.assertRegex(
+            logged[1],
+            r"DEBUG:logwrap\.log_on_access:Done at (?:\d+\.\d{3})s: del Target\(val=OK\)\.ok",
+        )
 
     def test_02_positive_properties(self):
         # noinspection PyMissingOrEmptyDocstring
@@ -101,7 +103,10 @@ class TestLogOnAccess(unittest.TestCase):
 
         self.assertEqual(target.ok, VALUE)
         logged = self.stream.getvalue().splitlines()
-        self.assertEqual(f"INFO:logwrap.log_on_access:Request: <Target() at 0x{id(target):X}>.override", logged[0])
+        self.assertEqual(
+            f"INFO:logwrap.log_on_access:Request: <Target() at 0x{id(target):X}>.override",
+            logged[0],
+        )
         self.assertRegex(
             logged[1],
             rf"INFO:logwrap\.log_on_access:Done at (?:\d+\.\d{{3}})s: "
@@ -154,7 +159,10 @@ class TestLogOnAccess(unittest.TestCase):
 
         logged = self.stream.getvalue().splitlines()
         self.assertEqual("DEBUG:logwrap.log_on_access:Request: Target().ok", logged[0])
-        self.assertRegex(logged[1], r"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{3})s: Target\(\)\.ok")
+        self.assertRegex(
+            logged[1],
+            r"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{3})s: Target\(\)\.ok",
+        )
         self.assertEqual("Traceback (most recent call last):", logged[2])
 
         self.stream.seek(0)
@@ -164,7 +172,10 @@ class TestLogOnAccess(unittest.TestCase):
             target.ok = VALUE
 
         logged = self.stream.getvalue().splitlines()
-        self.assertEqual(f"DEBUG:logwrap.log_on_access:Request: Target().ok = {logwrap.pretty_repr(VALUE)}", logged[0])
+        self.assertEqual(
+            f"DEBUG:logwrap.log_on_access:Request: Target().ok = {logwrap.pretty_repr(VALUE)}",
+            logged[0],
+        )
         self.assertRegex(
             logged[1],
             rf"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{{3}})s: "
@@ -180,7 +191,10 @@ class TestLogOnAccess(unittest.TestCase):
 
         logged = self.stream.getvalue().splitlines()
         self.assertEqual("DEBUG:logwrap.log_on_access:Request: del Target().ok", logged[0])
-        self.assertRegex(logged[1], r"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{3})s: del Target\(\)\.ok")
+        self.assertRegex(
+            logged[1],
+            r"DEBUG:logwrap\.log_on_access:Failed after (?:\d+\.\d{3})s: del Target\(\)\.ok",
+        )
         self.assertEqual("Traceback (most recent call last):", logged[2])
 
     def test_05_negative_properties(self):
@@ -207,7 +221,10 @@ class TestLogOnAccess(unittest.TestCase):
             self.assertIsNone(target.ok)
 
         logged = self.stream.getvalue().splitlines()
-        self.assertEqual(f"DEBUG:logwrap.log_on_access:Request: <Target() at 0x{id(target):X}>.override", logged[0])
+        self.assertEqual(
+            f"DEBUG:logwrap.log_on_access:Request: <Target() at 0x{id(target):X}>.override",
+            logged[0],
+        )
         self.assertRegex(
             logged[1],
             rf"ERROR:logwrap\.log_on_access:Failed after (?:\d+\.\d{{3}})s: <Target\(\) at 0x{id(target):X}>\.override",
@@ -368,7 +385,10 @@ class TestLogOnAccess(unittest.TestCase):
 
         target.ok = VALUE.upper()
         logged = self.stream.getvalue().splitlines()
-        self.assertEqual(f"DEBUG:Target:Request: Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}", logged[0])
+        self.assertEqual(
+            f"DEBUG:Target:Request: Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}",
+            logged[0],
+        )
         self.assertRegex(
             logged[1],
             rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: "
@@ -421,7 +441,10 @@ class TestLogOnAccess(unittest.TestCase):
 
         target.ok = VALUE.upper()
         logged = self.stream.getvalue().splitlines()
-        self.assertEqual(f"DEBUG:Target:Request: Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}", logged[0])
+        self.assertEqual(
+            f"DEBUG:Target:Request: Target(val=ok).ok = {logwrap.pretty_repr(VALUE.upper())}",
+            logged[0],
+        )
         self.assertRegex(
             logged[1],
             rf"DEBUG:Target:Done at (?:\d+\.\d{{3}})s: "

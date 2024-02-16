@@ -18,18 +18,16 @@
 
 """Python independent logwrap tests."""
 
-# Standard Library
 import functools
 import io
 import logging
 import unittest
 from unittest import mock
 
-# Package Implementation
 import logwrap
 
 
-class AnyStringWith(str):
+class AnyStringWith(str):  # noqa: PLW1641,RUF100
     """Special string for substring-only checking in tests."""
 
     __slots__ = ()
@@ -556,16 +554,20 @@ class TestLogWrap(unittest.TestCase):
             ],
             log.mock_calls,
         )
+        # fmt: off
         self.assertNotEqual(
             mock.call(
                 level=logging.ERROR,
                 msg=AnyStringWith(
-                    "Failed: \nfunc()\nTraceback (most recent call last):"
+                    "Failed: \n"
+                    "func()\n"
+                    "Traceback (most recent call last):"
                 ),
                 exc_info=False,
             ),
             log.mock_calls[1],
         )
+        # fmt: on
 
     def test_023_broken_repr(self):
         # noinspection PyMissingOrEmptyDocstring

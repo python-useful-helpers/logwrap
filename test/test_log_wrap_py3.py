@@ -18,14 +18,12 @@
 
 from __future__ import annotations
 
-# Standard Library
 import asyncio
 import io
 import logging
 import unittest
 from unittest import mock
 
-# Package Implementation
 import logwrap
 
 
@@ -121,7 +119,11 @@ class TestLogWrapAsync(unittest.TestCase):
         self.assertEqual(
             [
                 mock.call(level=logging.DEBUG, msg="Awaiting: \nfunc()"),
-                mock.call(exc_info=False, level=40, msg=f"Failed: \nfunc()\n{TypeError.__name__}"),
+                mock.call(
+                    exc_info=False,
+                    level=40,
+                    msg=f"Failed: \nfunc()\n{TypeError.__name__}",
+                ),
             ],
             log.mock_calls,
         )

@@ -15,7 +15,6 @@
 
 from __future__ import annotations
 
-# Standard Library
 import inspect
 import os
 import sys
@@ -26,12 +25,10 @@ from logging import DEBUG
 from logging import Logger
 from logging import getLogger
 
-# Package Implementation
 from logwrap import repr_utils
 from logwrap.constants import VALID_LOGGER_NAMES
 
 if typing.TYPE_CHECKING:
-    # Standard Library
     from collections.abc import Callable
 
 __all__ = ("LogOnAccess",)
@@ -141,6 +138,22 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
     .. versionadded:: 6.1.0
     """
 
+    __slots__ = (
+        "__logger",
+        "__log_object_repr",
+        "__log_level",
+        "__exc_level",
+        "__log_before",
+        "__log_success",
+        "__log_failure",
+        "__log_traceback",
+        "__override_name",
+        "__max_indent",
+        "__name",
+        "__owner",
+        "__dict__",
+    )
+
     def __init__(
         self,
         fget: Callable[[_OwnerT], _ReturnT] | None = None,
@@ -226,7 +239,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__name = name
 
     @property
-    def __objclass__(self) -> type[_OwnerT] | None:  # pragma: no cover
+    def __objclass__(self) -> type[_OwnerT] | None:  # pragma: no cover  # noqa: PLW3201,RUF100
         """Read-only owner.
 
         :return: property owner class
@@ -248,8 +261,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         full_tb: list[traceback.FrameSummary] = [elem for elem in stack if elem.filename != _CURRENT_FILE]
         exc_line: list[str] = traceback.format_exception_only(*exc_info[:2])
         # Make standard traceback string
-        tb_text = "\nTraceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
-        return tb_text
+        return "\nTraceback (most recent call last):\n" + "".join(traceback.format_list(full_tb)) + "".join(exc_line)
 
     def __get_obj_source(self, instance: _OwnerT, owner: type[_OwnerT] | None = None) -> str:
         """Get object repr block.
@@ -634,7 +646,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__max_iter = value
 
     @property
-    def __name__(self) -> str:  # noqa: A003
+    def __name__(self) -> str:  # noqa: A003,PLW3201,RUF100
         """Name getter.
 
         :return: attribute name (may be overridden)
@@ -654,7 +666,6 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
 
 
 if __name__ == "__main__":
-    # Standard Library
     import doctest
 
     doctest.testmod(verbose=True)

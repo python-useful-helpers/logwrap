@@ -39,10 +39,9 @@ zip-safe = false
 
 [tool.setuptools.packages.find]
 exclude = [
-  "doc",
-  "docs",
+  "doc*",
   "examples",
-  "test",
+  "test*",
   "bin",
   ".*"
 ]
@@ -66,11 +65,6 @@ target-version = ["py38"]
 line_length = 120
 multi_line_output = 3
 force_single_line = true
-
-import_heading_stdlib = "Standard Library"
-import_heading_thirdparty = "External Dependencies"
-import_heading_firstparty = "Package Implementation"
-import_heading_localfolder = "Local Implementation"
 
 [tool.doc8]
 max-line-length = 150
@@ -151,10 +145,12 @@ show-source = true
 target-version = "py38"
 
 extend-select = [
+  "E",
   "W",  # also pycodestyle warnings
   "PYI",  # flake8-pyi
   "ASYNC",  # flake8-async
   "FA",  # from __future__ import annotations
+  "DTZ",  # flake8-datetimez
   "SLOT",  # flake8-slots
   "TCH",  # flake8-type-checking
   "S",  # flake8-bandit
@@ -165,18 +161,94 @@ extend-select = [
   "ICN", "PGH",  # flake8-import-conventions, pygrep-hooks
   "Q",  # quotes
   "FLY",  # Flynt
+  "FURB",  # Refurb
   "TRY", "UP", "I", "PL", "PERF", "RUF",  # tryceratops, pyupgrade, isort, pylint + perflint, Ruff-specific
 ]
 extend-ignore = [
-  "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004",  # refactor rules (too many statements/arguments/branches)
+  # refactor rules (too many statements/arguments/branches)
+  "PLR0904", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR0917", "PLR2004",
+  "PLR6301",  # "maybe staticmethod"
   "RET504",  # Unnecessary variable assignment before return statement
   "SIM108",  # Use ternary operator,
-  "TRY003",  #long messages prepare outside, ...
+  "TRY003",  # long messages prepare outside, ...
 ]
 
 [tool.ruff.isort]
 force-single-line = true
 known-third-party = []
 
+[tool.ruff.lint.pylint]
+
+allow-dunder-method-names = ["__pretty_repr__", "__pretty_str__", "__rich_repr__"]
+
 [tool.ruff.pydocstyle]
 convention = "pep257"
+
+[tool.refurb]
+python_version = "3.8"
+enable_all = true
+ignore = ["FURB120"]
+
+[tool.pylint]
+extension-pkg-whitelist = ["lxml.etree"]
+ignore = ["CVS", "_version.py"]
+jobs = 0
+py-version = "3.8"
+
+load-plugins = [
+  "pylint.extensions.docparams",
+  "pylint.extensions.docstyle",
+  "pylint.extensions.overlapping_exceptions",
+  "pylint.extensions.check_elif",
+  "pylint.extensions.for_any_all",
+  "pylint.extensions.code_style",
+  "pylint.extensions.redefined_variable_type",
+  "pylint.extensions.typing",
+  "pylint.extensions.empty_comment",
+  "pylint.extensions.dunder",
+]
+
+enable = "all"
+disable = [
+  "locally-disabled",
+  "file-ignored",
+  "suppressed-message",
+  "similarities",
+  "too-many-ancestors",
+  "too-few-public-methods",
+  "too-many-public-methods",
+  "too-many-return-statements",
+  "too-many-branches",
+  "too-many-arguments",
+  "too-many-locals",
+  "too-many-statements",
+  "too-many-instance-attributes",
+  "too-many-lines",
+  "broad-except",
+  "logging-fstring-interpolation",
+  "logging-format-interpolation",
+  "consider-alternative-union-syntax",
+  "consider-using-assignment-expr",
+  "deprecated-typing-alias",
+  "invalid-name"
+]
+max-line-length = 120
+reports = false
+
+[tool.pylint.dunder]
+good-dunder-names = [
+  "__pretty_repr__",
+  "__pretty_str__",
+  "__rich_repr__",
+  "__objclass__",
+  "__name__",
+]
+
+[tool.pylint.parameter_documentation]
+accept-no-param-doc = true
+accept-no-raise-doc = false
+accept-no-return-doc = false
+accept-no-yields-doc = false
+
+# Possible choices: ['sphinx', 'epytext', 'google', 'numpy', 'default']
+default-docstring-type = "default"

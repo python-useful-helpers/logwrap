@@ -20,18 +20,17 @@
 
 from __future__ import annotations
 
-# Standard Library
+import argparse
+import collections
+import dataclasses
 import typing
 import unittest
 
-# Package Implementation
 import logwrap
 
 if typing.TYPE_CHECKING:
-    # Standard Library
     from collections.abc import Iterable
 
-    # External Dependencies
     from rich.repr import Result as RichReprResult
 
 
@@ -139,8 +138,14 @@ class TestPrettyRepr(unittest.TestCase):
 
         tst_instance = TstClass()
 
+        # fmt: off
         c_m_args = (
-            "\n    self,\n    arg,\n    darg=1,\n    *positional,\n    **named,\n"
+            "\n"
+            "    self,\n"
+            "    arg,\n"
+            "    darg=1,\n"
+            "    *positional,\n"
+            "    **named,\n"
         )
 
         cm_args = (
@@ -151,6 +156,7 @@ class TestPrettyRepr(unittest.TestCase):
             "    *positional,\n"
             "    **named,\n"
         )
+        # fmt: on
 
         i_m_args = f"\n    self={tst_instance!r},\n    arg,\n    darg=1,\n    *positional,\n    **named,\n"
 
@@ -253,9 +259,6 @@ class TestAnnotated(unittest.TestCase):
 
 class TestContainers(unittest.TestCase):
     def test_001_argparse(self):
-        # Standard Library
-        import argparse
-
         parser = argparse.ArgumentParser(prog="Test")
 
         self.assertEqual(
@@ -271,9 +274,6 @@ class TestContainers(unittest.TestCase):
         )
 
     def test_002_named_tuple_basic(self):
-        # Standard Library
-        import collections
-
         NTTest = collections.namedtuple(  # noqa: PYI024  # we need old one
             "NTTest",
             ("test_field_1", "test_field_2"),
@@ -296,9 +296,6 @@ class TestContainers(unittest.TestCase):
         )
 
     def test_004_dataclasses(self):
-        # Standard Library
-        import dataclasses
-
         @dataclasses.dataclass
         class TestDataClass:
             b: int = 0
@@ -318,9 +315,6 @@ class TestContainers(unittest.TestCase):
         )
 
     def test_005_deque(self):
-        # Standard Library
-        import collections
-
         default_deque = collections.deque()
         default_deque.append("middle")
         default_deque.extend(("next", "last"))

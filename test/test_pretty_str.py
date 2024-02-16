@@ -18,10 +18,8 @@
 
 """pretty_str specific tests"""
 
-# Standard Library
 import unittest
 
-# Package Implementation
 import logwrap
 
 

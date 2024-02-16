@@ -24,7 +24,6 @@ later it has been reworked and extended for support of special cases.
 
 from __future__ import annotations
 
-# Local Implementation
 from ._version import __version__
 from ._version import __version_tuple__
 from .log_on_access import LogOnAccess

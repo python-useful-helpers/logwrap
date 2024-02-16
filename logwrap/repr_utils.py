@@ -22,7 +22,6 @@ available from the main module.
 
 from __future__ import annotations
 
-# Standard Library
 import abc
 import collections
 import types
@@ -38,12 +37,10 @@ from typing import get_type_hints
 from typing import runtime_checkable
 
 if TYPE_CHECKING:
-    # Standard Library
     import dataclasses
     from collections.abc import Callable
     from collections.abc import Iterable
 
-    # External Dependencies
     from rich.repr import Result as RichReprResult
 
 
@@ -93,7 +90,7 @@ class _DataClassProto(Protocol):
 class _RichReprProto(Protocol):
     """Protocol for type checking."""
 
-    def __rich_repr__(self) -> RichReprResult:
+    def __rich_repr__(self) -> RichReprResult:  # noqa: PLW3201,RUF100
         """Protocol stub."""
 
 
@@ -245,7 +242,7 @@ def _prepare_repr(func: types.FunctionType | types.MethodType) -> list[ReprParam
     return result
 
 
-class PrettyFormat(metaclass=abc.ABCMeta):
+class PrettyFormat(abc.ABC):
     """Pretty Formatter.
 
     Designed for usage as __repr__ and __str__ replacement on complex objects
@@ -337,8 +334,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
             param_repr.append(",")
 
         if param_repr:
-            param_repr.append("\n")
-            param_repr.append(" " * indent)
+            param_repr.extend(("\n", " " * indent))
 
         param_str = "".join(param_repr)
 
@@ -395,8 +391,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
             param_repr.append(f"{prefix}**{repr_val},")
 
         if param_repr:
-            param_repr.append("\n")
-            param_repr.append(" " * indent)
+            param_repr.extend(("\n", " " * indent))
 
         param_str = "".join(param_repr)
         return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
@@ -437,8 +432,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
                 param_repr.append(f"  # type: {annotation!s}")
 
         if param_repr:
-            param_repr.append("\n")
-            param_repr.append(" " * indent)
+            param_repr.extend(("\n", " " * indent))
 
         param_str = "".join(param_repr)
         return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
@@ -488,8 +482,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
             param_repr.append(f"{prefix}{arg_name}={repr_val},{comment_str}")
 
         if param_repr:
-            param_repr.append("\n")
-            param_repr.append(" " * indent)
+            param_repr.extend(("\n", " " * indent))
 
         param_str = "".join(param_repr)
         return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
@@ -632,8 +625,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
                 param_repr.append(f"{prefix}{repr_val},")
 
         if param_repr:
-            param_repr.append("\n")
-            param_repr.append(" " * indent)
+            param_repr.extend(("\n", " " * indent))
 
         param_str = "".join(param_repr)
         return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
@@ -665,8 +657,14 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :rtype: str
         """
         if hasattr(src, self._magic_method_name):
-            result = getattr(src, self._magic_method_name)(self, indent=indent, no_indent_start=no_indent_start)
-            return result  # type: ignore[no-any-return]
+            return getattr(  # type: ignore[no-any-return]
+                src,
+                self._magic_method_name,
+            )(
+                self,
+                indent=indent,
+                no_indent_start=no_indent_start,
+            )
 
         if isinstance(src, _RichReprProto):
             return self._repr_rich(src=src, indent=indent)
@@ -714,7 +712,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
                 f"{'':<{indent}})"
             )
 
-        if type(src) in (list, tuple, set, dict):
+        if type(src) in {list, tuple, set, dict}:
             return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
 
         return self._repr_iterable_item(
@@ -743,8 +741,7 @@ class PrettyFormat(metaclass=abc.ABCMeta):
         :return: formatted string
         :rtype: str
         """
-        result = self.process_element(src, indent=indent, no_indent_start=no_indent_start)
-        return result
+        return self.process_element(src, indent=indent, no_indent_start=no_indent_start)
 
 
 class PrettyRepr(PrettyFormat):
@@ -802,10 +799,14 @@ class PrettyRepr(PrettyFormat):
         prefix: str = "\n" + " " * next_indent
         buf: list[str] = []
         for key, val in src.items():
-            buf.append(prefix)
-            buf.append(f"{key!r:{max_len}}: ")
-            buf.append(self.process_element(val, indent=next_indent, no_indent_start=True))
-            buf.append(",")
+            buf.extend(
+                (
+                    prefix,
+                    f"{key!r:{max_len}}: ",
+                    self.process_element(val, indent=next_indent, no_indent_start=True),
+                    ",",
+                )
+            )
         return "".join(buf)
 
     @staticmethod
@@ -914,10 +915,14 @@ class PrettyStr(PrettyFormat):
         prefix: str = "\n" + " " * next_indent
         buf: list[str] = []
         for key, val in src.items():
-            buf.append(prefix)
-            buf.append(f"{key!s:{max_len}}: ")
-            buf.append(self.process_element(val, indent=next_indent, no_indent_start=True))
-            buf.append(",")
+            buf.extend(
+                (
+                    prefix,
+                    f"{key!s:{max_len}}: ",
+                    self.process_element(val, indent=next_indent, no_indent_start=True),
+                    ",",
+                )
+            )
         return "".join(buf)
 
     @staticmethod
