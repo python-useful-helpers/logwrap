@@ -2,6 +2,7 @@
 # Extend the `pyproject.toml` file in the parent directory.
 extend = "../pyproject.toml"
 
+[tool.ruff.lint]
 extend-ignore = [
   "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004",  # refactor rules (too many statements/arguments/branches)
   "PLW2901",  # `Outer variable overwritten by inner target
@@ -12,5 +13,5 @@ extend-ignore = [
   "S",
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["logwrap"]

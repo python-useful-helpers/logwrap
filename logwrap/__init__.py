@@ -38,18 +38,18 @@ from .repr_utils import pretty_repr
 from .repr_utils import pretty_str
 
 __all__ = (
+    "BoundParameter",
+    "LogOnAccess",
     "LogWrap",
-    "logwrap",
     "PrettyFormat",
     "PrettyRepr",
     "PrettyStr",
-    "pretty_repr",
-    "pretty_str",
-    "BoundParameter",
-    "bind_args_kwargs",
-    "LogOnAccess",
     "__version__",
     "__version_tuple__",
+    "bind_args_kwargs",
+    "logwrap",
+    "pretty_repr",
+    "pretty_str",
 )
 
 __author__ = "Aleksei Stepanov"

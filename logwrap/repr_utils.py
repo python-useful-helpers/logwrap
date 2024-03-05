@@ -128,7 +128,7 @@ def _simple(item: Any) -> bool:
 class ReprParameter:
     """Parameter wrapper wor repr and str operations over signature."""
 
-    __slots__ = ("_value", "_parameter")
+    __slots__ = ("_parameter", "_value")
 
     POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY
     POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD
@@ -248,7 +248,7 @@ class PrettyFormat(abc.ABC):
     Designed for usage as __repr__ and __str__ replacement on complex objects
     """
 
-    __slots__ = ("__max_indent", "__indent_step")
+    __slots__ = ("__indent_step", "__max_indent")
 
     def __init__(self, max_indent: int = 20, indent_step: int = 4) -> None:
         """Pretty Formatter.
