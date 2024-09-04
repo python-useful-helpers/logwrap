@@ -248,9 +248,9 @@ class PrettyFormat(abc.ABC):
     Designed for usage as __repr__ and __str__ replacement on complex objects
     """
 
-    __slots__ = ("__indent_step", "__max_indent")
+    __slots__ = ("__indent_step", "__max_indent", "__max_iter")
 
-    def __init__(self, max_indent: int = 20, indent_step: int = 4) -> None:
+    def __init__(self, max_indent: int = 20, max_iter: int = 0, indent_step: int = 4) -> None:
         """Pretty Formatter.
 
         :param max_indent: maximal indent before classic repr() call
@@ -259,6 +259,7 @@ class PrettyFormat(abc.ABC):
         :type indent_step: int
         """
         self.__max_indent: int = max_indent
+        self.__max_iter: int = max_iter
         self.__indent_step: int = indent_step
 
     @property
@@ -269,6 +270,15 @@ class PrettyFormat(abc.ABC):
         :rtype: int
         """
         return self.__max_indent
+
+    @property
+    def max_iter(self) -> int:
+        """Max iterable items getter.
+
+        :return: maximal items count for iterable objects
+        :rtype: int
+        """
+        return self.__max_iter
 
     @property
     def indent_step(self) -> int:
@@ -556,14 +566,15 @@ class PrettyFormat(abc.ABC):
         """
         next_indent: int = self.next_indent(indent)
         buf: list[str] = []
-        for elem in src:
-            buf.extend(
-                (
-                    "\n",
-                    self.process_element(src=elem, indent=next_indent),
-                    ",",
-                )
-            )
+
+        for idx, elem in enumerate(src, start=1):
+            buf.extend(("\n", self.process_element(src=elem, indent=next_indent)))
+
+            if idx == self.max_iter:
+                buf.append("...")
+                break
+
+            buf.append(",")
         return "".join(buf)
 
     def _repr_rich(
@@ -947,6 +958,7 @@ def pretty_repr(
     indent: int = 0,
     no_indent_start: bool = False,
     max_indent: int = 20,
+    max_iter: int = 0,
     indent_step: int = 4,
 ) -> str:
     """Make human readable repr of object.
@@ -959,12 +971,14 @@ def pretty_repr(
     :type no_indent_start: bool
     :param max_indent: maximal indent before classic repr() call
     :type max_indent: int
+    :param max_iter: maximal number of items to iterate
+    :type max_iter: int
     :param indent_step: step for the next indentation level
     :type indent_step: int
     :return: formatted string
     :rtype: str
     """
-    return PrettyRepr(max_indent=max_indent, indent_step=indent_step)(
+    return PrettyRepr(max_indent=max_indent, max_iter=max_iter, indent_step=indent_step)(
         src=src,
         indent=indent,
         no_indent_start=no_indent_start,
@@ -976,6 +990,7 @@ def pretty_str(
     indent: int = 0,
     no_indent_start: bool = False,
     max_indent: int = 20,
+    max_iter: int = 20,
     indent_step: int = 4,
 ) -> str:
     """Make human readable str of object.
@@ -988,11 +1003,13 @@ def pretty_str(
     :type no_indent_start: bool
     :param max_indent: maximal indent before classic repr() call
     :type max_indent: int
+    :param max_iter: maximal number of items to log in iterables
+    :type max_iter: int
     :param indent_step: step for the next indentation level
     :type indent_step: int
     :return: formatted string
     """
-    return PrettyStr(max_indent=max_indent, indent_step=indent_step)(
+    return PrettyStr(max_indent=max_indent, max_iter=max_iter, indent_step=indent_step)(
         src=src,
         indent=indent,
         no_indent_start=no_indent_start,

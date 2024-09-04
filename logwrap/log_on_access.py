@@ -172,6 +172,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         log_traceback: bool = True,
         override_name: str | None = None,
         max_indent: int = 20,
+        max_iter: int = 0,
     ) -> None:
         """Advanced property main entry point.
 
@@ -203,6 +204,8 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         :type override_name: str | None
         :param max_indent: maximal indent before classic repr() call
         :type max_indent: int
+        :param max_iter: maximal number of items to display in iterables
+        :type max_iter: int
         """
         super().__init__(fget=fget, fset=fset, fdel=fdel, doc=doc)
 
@@ -220,6 +223,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__log_traceback: bool = log_traceback
         self.__override_name: str | None = override_name
         self.__max_indent: int = max_indent
+        self.__max_iter: int = max_iter
         self.__name: str = ""
         self.__owner: type[_OwnerT] | None = None
 
@@ -270,7 +274,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         :rtype: str
         """
         if self.log_object_repr:
-            return repr_utils.pretty_repr(instance, max_indent=self.max_indent)
+            return repr_utils.pretty_repr(instance, max_indent=self.max_indent, max_iter=self.max_iter)
         if owner is not None:
             return f"<{owner.__name__}() at 0x{id(instance):X}>"
         if self.__objclass__ is not None:
@@ -622,6 +626,24 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         :type value: int
         """
         self.__max_indent = value
+
+    @property
+    def max_iter(self) -> int:
+        """Max number of items in iterables during repr.
+
+        :return: maximum iter before classic `repr()` call.
+        :rtype: int
+        """
+        return self.__max_iter
+
+    @max_iter.setter
+    def max_iter(self, value: int) -> None:
+        """Max number of items in iterables during repr.
+
+        :param value: maximum iter before classic `repr()` call.
+        :type value: int
+        """
+        self.__max_iter = value
 
     @property
     def __name__(self) -> str:  # noqa: A003,PLW3201,RUF100
