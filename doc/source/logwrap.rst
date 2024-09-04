@@ -46,7 +46,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         .. versionchanged:: 5.1.0 log_traceback parameter
         .. versionchanged:: 8.0.0 pick up logger from target module if possible
         .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
-        .. versionchanged:: 12.0.0 max_iter parameter
+        .. versionchanged:: 11.1.0 max_iter parameter
 
     .. py:method:: pre_process_param(self, arg)
 
@@ -140,7 +140,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
     .. versionchanged:: 5.1.0 log_traceback parameter
     .. versionchanged:: 8.0.0 pick up logger from target module if possible
     .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
-    .. versionchanged:: 12.0.0 max_iter parameter
+    .. versionchanged:: 11.1.0 max_iter parameter
 
 
 .. py:class:: BoundParameter(inspect.Parameter)

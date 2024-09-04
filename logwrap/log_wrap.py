@@ -233,7 +233,7 @@ class LogWrap:
         .. versionchanged:: 5.1.0 log_traceback parameter
         .. versionchanged:: 8.0.0 pick up logger from target module if possible
         .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
-        .. versionchanged:: 12.0.0 max_iter parameter
+        .. versionchanged:: 11.1.0 max_iter parameter
         """
         # Typing fix:
         if blacklisted_names is None:
@@ -877,7 +877,7 @@ def logwrap(
     .. versionchanged:: 5.1.0 log_traceback parameter
     .. versionchanged:: 8.0.0 pick up logger from target module if possible
     .. versionchanged:: 9.0.0 Only LogWrap instance act as decorator
-    .. versionchanged:: 12.0.0 max_iter parameter
+    .. versionchanged:: 11.1.0 max_iter parameter
     """
     wrapper = LogWrap(
         log=log,
