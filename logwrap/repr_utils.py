@@ -568,8 +568,7 @@ class PrettyFormat(abc.ABC):
         buf: list[str] = []
 
         for idx, elem in enumerate(src, start=1):
-            buf.append("\n")
-            buf.append(self.process_element(src=elem, indent=next_indent))
+            buf.extend(("\n", self.process_element(src=elem, indent=next_indent)))
 
             if idx == self.max_iter:
                 buf.append("...")
