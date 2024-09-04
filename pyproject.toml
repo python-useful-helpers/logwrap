@@ -178,7 +178,6 @@ force-single-line = true
 known-third-party = []
 
 [tool.ruff.lint.pylint]
-
 allow-dunder-method-names = ["__pretty_repr__", "__pretty_str__", "__rich_repr__"]
 
 [tool.ruff.lint.pydocstyle]
