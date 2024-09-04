@@ -250,7 +250,7 @@ class PrettyFormat(abc.ABC):
 
     __slots__ = ("__indent_step", "__max_indent", "__max_iter")
 
-    def __init__(self, max_indent: int = 20, max_iter: int = 20, indent_step: int = 4) -> None:
+    def __init__(self, max_indent: int = 20, max_iter: int = 0, indent_step: int = 4) -> None:
         """Pretty Formatter.
 
         :param max_indent: maximal indent before classic repr() call
@@ -958,7 +958,7 @@ def pretty_repr(
     indent: int = 0,
     no_indent_start: bool = False,
     max_indent: int = 20,
-    max_iter: int = 20,
+    max_iter: int = 0,
     indent_step: int = 4,
 ) -> str:
     """Make human readable repr of object.

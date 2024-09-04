@@ -71,7 +71,7 @@ Argumented usage with arguments from signature:
         log_level=logging.DEBUG,
         exc_level=logging.ERROR,
         max_indent=20,  # forwarded to the pretty_repr,
-        max_iter=20,  # forwarded to the pretty_repr, max number of items in list/tuple/set before ellipsis
+        max_iter=0,  # forwarded to the pretty_repr, max number of items in the Iterable before ellipsis. Unlimited if 0.
         blacklisted_names=None,  # list argument names, which should be dropped from log
         blacklisted_exceptions=None,  # Exceptions to skip details in log (no traceback, no exception details - just class name)
         log_call_args=True,  # Log call arguments before call

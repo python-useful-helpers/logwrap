@@ -172,7 +172,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         log_traceback: bool = True,
         override_name: str | None = None,
         max_indent: int = 20,
-        max_iter: int = 20,
+        max_iter: int = 0,
     ) -> None:
         """Advanced property main entry point.
 

@@ -12,7 +12,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
 
     .. versionadded:: 2.2.0
 
-    .. py:method:: __init__(*, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, max_iter=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
+    .. py:method:: __init__(*, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, max_iter=0, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
 
         :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
         :type log: logging.Logger | None
@@ -102,7 +102,7 @@ API: Decorators: `LogWrap` class and `logwrap` function.
         :rtype: Callable | Awaitable
 
 
-.. py:function:: logwrap(func=None, *, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, max_iter=20, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
+.. py:function:: logwrap(func=None, *, log=None, log_level=logging.DEBUG, exc_level=logging.ERROR, max_indent=20, max_iter=0, blacklisted_names=None, blacklisted_exceptions=None, log_call_args=True, log_call_args_on_exc=True, log_traceback=True, log_result_obj=True, )
 
     Log function calls and return values.
 
