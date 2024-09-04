@@ -94,7 +94,7 @@ jobs:
           pip install --upgrade refurb
       - name: Lint with refurb
         run: |
-          refurb logwrap
+          refurb --format github logwrap
   Test:
     needs: [PEP8, PyLint, MyPy, Black, Refurb]  # isort is broken
     runs-on: ${{ matrix.os }}
