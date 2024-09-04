@@ -139,19 +139,19 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
     """
 
     __slots__ = (
-        "__logger",
-        "__log_object_repr",
-        "__log_level",
+        "__dict__",
         "__exc_level",
         "__log_before",
-        "__log_success",
         "__log_failure",
+        "__log_level",
+        "__log_object_repr",
+        "__log_success",
         "__log_traceback",
-        "__override_name",
+        "__logger",
         "__max_indent",
         "__name",
+        "__override_name",
         "__owner",
-        "__dict__",
     )
 
     def __init__(

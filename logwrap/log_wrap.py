@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     Spec = ParamSpec("Spec")
     RetVal = TypeVar("RetVal")
 
-__all__ = ("LogWrap", "logwrap", "BoundParameter", "bind_args_kwargs")
+__all__ = ("BoundParameter", "LogWrap", "bind_args_kwargs", "logwrap")
 
 LOGGER: Logger = getLogger("logwrap")
 INDENT = 4
@@ -176,17 +176,17 @@ class LogWrap:
     """Base class for LogWrap implementation."""
 
     __slots__ = (
-        "__blacklisted_names",
         "__blacklisted_exceptions",
-        "__logger",
-        "__log_level",
+        "__blacklisted_names",
         "__exc_level",
-        "__max_indent",
-        "__max_iter",
         "__log_call_args",
         "__log_call_args_on_exc",
-        "__log_traceback",
+        "__log_level",
         "__log_result_obj",
+        "__log_traceback",
+        "__logger",
+        "__max_indent",
+        "__max_iter",
     )
 
     def __init__(
@@ -588,7 +588,7 @@ class LogWrap:
             if param.name in self.blacklisted_names:
                 continue
 
-            preprocessed: (BoundParameter | tuple[BoundParameter, Any] | None) = self.pre_process_param(param)
+            preprocessed: BoundParameter | tuple[BoundParameter, Any] | None = self.pre_process_param(param)
             if preprocessed is None:
                 continue
 
