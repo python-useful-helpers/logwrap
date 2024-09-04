@@ -990,7 +990,7 @@ def pretty_str(
     indent: int = 0,
     no_indent_start: bool = False,
     max_indent: int = 20,
-    max_iter: int = 20,
+    max_iter: int = 0,
     indent_step: int = 4,
 ) -> str:
     """Make human readable str of object.

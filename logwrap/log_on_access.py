@@ -51,28 +51,36 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
     >>> logging.basicConfig(level=logging.DEBUG, stream=log)
 
     >>> class Test:
-    ...     def __init__(self, val = 'ok'):
+    ...     def __init__(self, val="ok"):
     ...         self.val = val
+    ...
     ...     def __repr__(self):
-    ...         return f'{self.__class__.__name__}(val={self.val})'
+    ...         return f"{self.__class__.__name__}(val={self.val})"
+    ...
     ...     @LogOnAccess
     ...     def ok(self):
     ...         return self.val
+    ...
     ...     @ok.setter
     ...     def ok(self, val):
     ...         self.val = val
+    ...
     ...     @ok.deleter
     ...     def ok(self):
-    ...         self.val = ''
+    ...         self.val = ""
+    ...
     ...     @LogOnAccess
     ...     def fail_get(self):
     ...         raise RuntimeError()
+    ...
     ...     @LogOnAccess
     ...     def fail_set_del(self):
     ...         return self.val
+    ...
     ...     @fail_set_del.setter
     ...     def fail_set_del(self, value):
     ...         raise ValueError(value)
+    ...
     ...     @fail_set_del.deleter
     ...     def fail_set_del(self):
     ...         raise RuntimeError()
@@ -80,20 +88,20 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
     >>> test = Test()
     >>> test.ok
     'ok'
-    >>> test.ok = 'OK'
+    >>> test.ok = "OK"
     >>> del test.ok
-    >>> test.ok = 'fail_get'
+    >>> test.ok = "fail_get"
 
     >>> test.fail_get
     Traceback (most recent call last):
     ...
     RuntimeError
 
-    >>> test.ok = 'fail_set_del'
+    >>> test.ok = "fail_set_del"
     >>> test.fail_set_del
     'fail_set_del'
 
-    >>> test.fail_set_del = 'fail'
+    >>> test.fail_set_del = "fail"
     Traceback (most recent call last):
     ...
     ValueError: fail

@@ -600,6 +600,7 @@ class TestLogWrap(unittest.TestCase):
 
         result = func()
         self.assertEqual(result, [1, 2, 3])
+        # fmt: off
         self.assertEqual(
             "DEBUG>Calling: \n"
             "func()\n"
@@ -609,6 +610,8 @@ class TestLogWrap(unittest.TestCase):
             "]\n",
             self.stream.getvalue(),
         )
+        # fmt: on
+
 
 # noinspection PyMissingOrEmptyDocstring
 class TestObject(unittest.TestCase):

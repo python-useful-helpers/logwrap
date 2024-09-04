@@ -62,7 +62,7 @@ def get_simple_vars_from_src(
 
     >>> list_sample = "c = [u'1', b'1', 1, 1.0, 1j, None]"
     >>> result = get_simple_vars_from_src(list_sample)
-    >>> result == {'c': [u'1', b'1', 1, 1.0, 1j, None]}
+    >>> result == {"c": ["1", b"1", 1, 1.0, 1j, None]}
     True
 
     >>> iterable_sample = "d = ([1], {1: 1}, {1})"
