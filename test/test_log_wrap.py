@@ -18,6 +18,9 @@
 
 """Python independent logwrap tests."""
 
+from __future__ import annotations
+
+import dataclasses
 import functools
 import io
 import logging
@@ -608,6 +611,33 @@ class TestLogWrap(unittest.TestCase):
             "[\n"
             "    1...\n"
             "]\n",
+            self.stream.getvalue(),
+        )
+        # fmt: on
+
+    def test_025_union_ann_call_arg(self):
+        @dataclasses.dataclass
+        class WithUnionAnn:
+            a: int | None
+
+        @logwrap.logwrap
+        def func(val: WithUnionAnn) -> WithUnionAnn:
+            return val
+
+        func(WithUnionAnn(1))
+        # fmt: off
+        self.assertEqual(
+            "DEBUG>Calling: \n"
+            "func(\n"
+            "    # POSITIONAL_OR_KEYWORD:\n"
+            "    val=test_log_wrap.WithUnionAnn(\n"
+            "        a=1,  # type: int | None\n"
+            "    ),  # type: WithUnionAnn\n"
+            ")\n"
+            "DEBUG>Done: 'func' with result:\n"
+            "test_log_wrap.WithUnionAnn(\n"
+            "    a=1,  # type: int | None\n"
+            ")\n",
             self.stream.getvalue(),
         )
         # fmt: on

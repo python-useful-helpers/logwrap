@@ -27,6 +27,7 @@ import collections
 import types
 from inspect import Parameter
 from inspect import Signature
+from inspect import isclass
 from inspect import signature
 from typing import TYPE_CHECKING
 from typing import Any
@@ -469,8 +470,12 @@ class PrettyFormat(abc.ABC):
             if field.type:
                 if isinstance(field.type, str):
                     comment.append(f"type: {field.type}")
-                else:
+                elif isinstance(field.type, ForwardRef):
+                    comment.append(f"type: {field.type!r}")
+                elif isclass(field.type):
                     comment.append(f"type: {field.type.__name__}")
+                else:
+                    comment.append(f"type: {field.type!r}")
             if getattr(field, "kw_only", False):  # python 3.10+
                 comment.append("kw_only")
 

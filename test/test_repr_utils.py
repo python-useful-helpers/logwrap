@@ -334,6 +334,19 @@ class TestContainers(unittest.TestCase):
             logwrap.pretty_repr(default_deque),
         )
 
+    def tests_006_union_ann(self):
+        @dataclasses.dataclass
+        class WithUnionAnn:
+            a: int | None
+
+        test_dc = WithUnionAnn(None)
+        self.assertEqual(
+            "test_repr_utils.WithUnionAnn(\n"
+            "    a=None,  # type: int | None\n"
+            ")",
+            logwrap.pretty_repr(test_dc),
+        )
+
 
 class TestRich(unittest.TestCase):
     class Bird:
