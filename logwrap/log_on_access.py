@@ -654,7 +654,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__max_iter = value
 
     @property
-    def __name__(self) -> str:  # noqa: A003,PLW3201,RUF100
+    def __name__(self) -> str:  # type: ignore[override]  # noqa: A003,PLW3201,RUF100
         """Name getter.
 
         :return: attribute name (may be overridden)

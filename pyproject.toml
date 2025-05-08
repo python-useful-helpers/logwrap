@@ -11,7 +11,7 @@ build-backend="setuptools.build_meta"
 [project]
 name = "logwrap"
 description = "Decorator for logging function arguments and return value by human-readable way"
-requires-python = ">=3.8.0"
+requires-python = ">=3.9.0"
 keywords = ["logging", "debugging", "development"]
 license={text="Apache-2.0"}  # Use SPDX classifier
 readme = {file = "README.rst", content-type = "text/x-rst"}
@@ -58,7 +58,7 @@ write_to = "logwrap/_version.py"
 
 [tool.black]
 line-length = 120
-target-version = ["py38"]
+target-version = ["py39"]
 
 [tool.isort]
 line_length = 120
@@ -96,6 +96,7 @@ addopts = "-vvv -s -p no:django -p no:ipdb"
 testpaths = ["test"]
 mock_use_standalone_module = false
 junit_family = "xunit2"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 omit = ["test/*"]
@@ -141,7 +142,7 @@ pretty_print = true
 [tool.ruff]
 line-length = 120
 output-format = "full"
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.lint]
 extend-select = [
@@ -188,7 +189,7 @@ convention = "pep257"
 docstring-code-format = true
 
 [tool.refurb]
-python_version = "3.8"
+python_version = "3.9"
 enable_all = true
 ignore = ["FURB120"]
 
@@ -196,7 +197,7 @@ ignore = ["FURB120"]
 extension-pkg-whitelist = ["lxml.etree"]
 ignore = ["CVS", "_version.py"]
 jobs = 0
-py-version = "3.8"
+py-version = "3.9"
 
 load-plugins = [
   "pylint.extensions.docparams",

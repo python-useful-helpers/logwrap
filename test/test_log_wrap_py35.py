@@ -29,11 +29,6 @@ import logwrap
 class TestLogWrapAsync(unittest.TestCase):
     """async def differs from asyncio.coroutine."""
 
-    @classmethod
-    def setUpClass(cls):
-        """Global preparation for tests (run once per class)."""
-        cls.loop = asyncio.get_event_loop()
-
     def setUp(self):
         """Preparation for tests.
 
@@ -58,7 +53,7 @@ class TestLogWrapAsync(unittest.TestCase):
         async def func():
             pass
 
-        self.loop.run_until_complete(func())
+        asyncio.run(func())
         self.assertEqual(
             "DEBUG>Awaiting: \nfunc()\nDEBUG>Done: 'func' with result:\nNone\n",
             self.stream.getvalue(),
@@ -73,7 +68,7 @@ class TestLogWrapAsync(unittest.TestCase):
         async def func():
             pass
 
-        self.loop.run_until_complete(func())
+        asyncio.run(func())
 
         self.assertEqual(
             [
@@ -89,7 +84,7 @@ class TestLogWrapAsync(unittest.TestCase):
             raise Exception("Expected")
 
         with self.assertRaises(Exception):  # noqa: B017
-            self.loop.run_until_complete(func())
+            asyncio.run(func())
 
         self.assertEqual(
             "DEBUG>Awaiting: \nfunc()\nERROR>Failed: \nfunc()\nTraceback (most recent call last):",
@@ -106,7 +101,7 @@ class TestLogWrapAsync(unittest.TestCase):
             raise TypeError("Blacklisted")
 
         with self.assertRaises(TypeError):
-            self.loop.run_until_complete(func())
+            asyncio.run(func())
 
         # While we're not expanding result coroutine object from namespace,
         # do not check execution result

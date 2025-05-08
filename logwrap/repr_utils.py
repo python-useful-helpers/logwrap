@@ -160,11 +160,11 @@ class ReprParameter:
         return self._parameter
 
     @property
-    def name(self) -> None | str:
+    def name(self) -> str | None:
         """Parameter name.
 
         :return: parameter name. For `*args` and `**kwargs` add corresponding prefixes
-        :rtype: None | str
+        :rtype: str | None
         """
         if self.kind == Parameter.VAR_POSITIONAL:
             return "*" + self.parameter.name

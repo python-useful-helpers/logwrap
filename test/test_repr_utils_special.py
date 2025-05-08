@@ -36,7 +36,7 @@ class TestPrettyRepr(unittest.TestCase):
         self.assertEqual("{\n    key: value,\n}", logwrap.pretty_str(val))
 
     def test_002_typing_specific_dict(self):
-        class MyDict(typing.Dict[str, str]):
+        class MyDict(dict[str, str]):
             """Dict subclass."""
 
         val = MyDict(key="value")
@@ -45,7 +45,7 @@ class TestPrettyRepr(unittest.TestCase):
         self.assertEqual("{\n    key: value,\n}", logwrap.pretty_str(val))
 
     def test_003_typing_specific_dict_repr_override(self):
-        class MyDict(typing.Dict[str, str]):
+        class MyDict(dict[str, str]):
             """Dict subclass."""
 
             def __repr__(self) -> str:
