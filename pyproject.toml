@@ -13,7 +13,7 @@ name = "logwrap"
 description = "Decorator for logging function arguments and return value by human-readable way"
 requires-python = ">=3.9.0"
 keywords = ["logging", "debugging", "development"]
-license="Apache-2.0}  # Use SPDX classifier
+license="Apache-2.0"  # Use SPDX classifier
 license-files=["LICENSE"]
 readme = {file = "README.rst", content-type = "text/x-rst"}
 authors=[{name="Aleksei Stepanov", email="penguinolog@gmail.com"}]
@@ -56,10 +56,6 @@ universal = 0
 
 [tool.setuptools_scm]
 write_to = "logwrap/_version.py"
-
-[tool.black]
-line-length = 120
-target-version = ["py39"]
 
 [tool.isort]
 line_length = 120

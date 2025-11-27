@@ -335,7 +335,7 @@ class TestLogWrap(unittest.TestCase):
             f"    arg=0,\n"
             f"    darg=1,\n"
             f"    # VAR_POSITIONAL:\n"
-            f"    args={logwrap.pretty_repr((2, ), indent=4, no_indent_start=True)},\n"
+            f"    args={logwrap.pretty_repr((2,), indent=4, no_indent_start=True)},\n"
             f"    # VAR_KEYWORD:\n"
             f"    kwargs={logwrap.pretty_repr({'arg3': 3}, indent=4, no_indent_start=True)},\n"
             f")\n"

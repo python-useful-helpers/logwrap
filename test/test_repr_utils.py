@@ -341,9 +341,7 @@ class TestContainers(unittest.TestCase):
 
         test_dc = WithUnionAnn(None)
         self.assertEqual(
-            "test_repr_utils.WithUnionAnn(\n"
-            "    a=None,  # type: int | None\n"
-            ")",
+            "test_repr_utils.WithUnionAnn(\n    a=None,  # type: int | None\n)",
             logwrap.pretty_repr(test_dc),
         )
 
