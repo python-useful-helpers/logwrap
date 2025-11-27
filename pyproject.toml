@@ -2,7 +2,7 @@
 # Minimum requirements for the build system to execute.
 # PEP 508 specifications for PEP 518.
 requires = [
-    "setuptools >= 61.0.0",
+    "setuptools >= 80.3.0",
     "setuptools_scm[toml]>=6.2",
     "wheel",
 ]
@@ -13,7 +13,8 @@ name = "logwrap"
 description = "Decorator for logging function arguments and return value by human-readable way"
 requires-python = ">=3.9.0"
 keywords = ["logging", "debugging", "development"]
-license={text="Apache-2.0"}  # Use SPDX classifier
+license="Apache-2.0}  # Use SPDX classifier
+license-files=["LICENSE"]
 readme = {file = "README.rst", content-type = "text/x-rst"}
 authors=[{name="Aleksei Stepanov", email="penguinolog@gmail.com"}]
 maintainers=[

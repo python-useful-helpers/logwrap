@@ -1,4 +1,4 @@
-#    Copyright 2016 - 2022 Alexey Stepanov aka penguinolog
+#    Copyright 2016 - 2025 Alexey Stepanov aka penguinolog
 
 #    Copyright 2016 Mirantis, Inc.
 
@@ -98,10 +98,8 @@ class _RichReprProto(Protocol):
 def _known_callable(item: Any) -> bool:
     """Check for possibility to parse callable.
 
-    :param item:  item to check for repr() way
-    :type item: Any
+    :param item: item to check for repr() way
     :return: item is callable and should be processed not using repr
-    :rtype: bool
     """
     return isinstance(item, (types.FunctionType, types.MethodType))
 
@@ -110,9 +108,7 @@ def _simple(item: Any) -> bool:
     """Check for nested iterations: True, if not.
 
     :param item: item to check for repr() way
-    :type item: Any
-    :return: use repr() iver item by default
-    :rtype: bool
+    :return: use repr() over item by default
     """
     return not any(
         (
@@ -143,9 +139,7 @@ class ReprParameter:
         """Parameter-like object store for repr and str tasks.
 
         :param parameter: parameter from signature
-        :type parameter: Parameter
         :param value: default value override
-        :type value: Any
         """
         self._parameter: Parameter = parameter
         self._value: Any = value if value is not parameter.empty else parameter.default
@@ -154,8 +148,7 @@ class ReprParameter:
     def parameter(self) -> Parameter:
         """Parameter object.
 
-        :return: original Parameter object
-        :rtype: Parameter
+        :returns: original Parameter object
         """
         return self._parameter
 
@@ -163,8 +156,7 @@ class ReprParameter:
     def name(self) -> str | None:
         """Parameter name.
 
-        :return: parameter name. For `*args` and `**kwargs` add corresponding prefixes
-        :rtype: str | None
+        :returns: parameter name. For `*args` and `**kwargs` add corresponding prefixes
         """
         if self.kind == Parameter.VAR_POSITIONAL:
             return "*" + self.parameter.name
@@ -176,8 +168,7 @@ class ReprParameter:
     def value(self) -> Any:
         """Parameter value to log.
 
-        :return: If function is bound to class -> value is class instance else default value.
-        :rtype: Any
+        :returns: If function is bound to class -> value is class instance else default value.
         """
         return self._value
 
@@ -185,8 +176,7 @@ class ReprParameter:
     def annotation(self) -> Parameter.empty | str:  # type: ignore[valid-type]
         """Parameter annotation.
 
-        :return: parameter annotation from signature
-        :rtype: Parameter.empty | str
+        :returns: parameter annotation from signature
         """
         return self.parameter.annotation  # type: ignore[no-any-return]
 
@@ -194,8 +184,7 @@ class ReprParameter:
     def kind(self) -> int:
         """Parameter kind.
 
-        :return: parameter kind from Parameter
-        :rtype: int
+        :returns: parameter kind from Parameter
         """
         # noinspection PyTypeChecker
         return self.parameter.kind
@@ -211,8 +200,7 @@ class ReprParameter:
     def __repr__(self) -> str:
         """Debug purposes.
 
-        :return: parameter repr for debug purposes
-        :rtype: str
+        :returns: parameter repr for debug purposes
         """
         return f'<{self.__class__.__name__} "{self}">'
 
@@ -221,9 +209,7 @@ def _prepare_repr(func: types.FunctionType | types.MethodType) -> list[ReprParam
     """Get arguments lists with defaults.
 
     :param func: Callable object to process
-    :type func: types.FunctionType | types.MethodType
-    :return: repr of callable parameter from signature
-    :rtype: list[ReprParameter]
+    :returns: repr of callable parameter from signature
     """
     ismethod: bool = isinstance(func, types.MethodType)
     self_processed: bool = False
@@ -255,9 +241,7 @@ class PrettyFormat(abc.ABC):
         """Pretty Formatter.
 
         :param max_indent: maximal indent before classic repr() call
-        :type max_indent: int
         :param indent_step: step for the next indentation level
-        :type indent_step: int
         """
         self.__max_indent: int = max_indent
         self.__max_iter: int = max_iter
@@ -267,8 +251,7 @@ class PrettyFormat(abc.ABC):
     def max_indent(self) -> int:
         """Max indent getter.
 
-        :return: maximal indent before switch to normal repr
-        :rtype: int
+        :returns: maximal indent before switch to normal repr
         """
         return self.__max_indent
 
@@ -276,8 +259,7 @@ class PrettyFormat(abc.ABC):
     def max_iter(self) -> int:
         """Max iterable items getter.
 
-        :return: maximal items count for iterable objects
-        :rtype: int
+        :returns: maximal items count for iterable objects
         """
         return self.__max_iter
 
@@ -285,8 +267,7 @@ class PrettyFormat(abc.ABC):
     def indent_step(self) -> int:
         """Indent step getter.
 
-        :return: indent step for nested definitions
-        :rtype: int
+        :returns: indent step for nested definitions
         """
         return self.__indent_step
 
@@ -294,11 +275,8 @@ class PrettyFormat(abc.ABC):
         """Next indentation value.
 
         :param indent: current indentation value
-        :type indent: int
         :param multiplier: step multiplier
-        :type multiplier: int
-        :return: next indentation value
-        :rtype: int
+        :returns: next indentation value
         """
         return indent + multiplier * self.indent_step
 
@@ -310,11 +288,8 @@ class PrettyFormat(abc.ABC):
         """Repr callable object (function or method).
 
         :param src: Callable to process
-        :type src: types.FunctionType | types.MethodType
         :param indent: start indentation
-        :type indent: int
-        :return: Repr of function or method with signature.
-        :rtype: str
+        :returns: Repr of function or method with signature.
         """
         param_repr: list[str] = []
 
@@ -362,13 +337,9 @@ class PrettyFormat(abc.ABC):
         """Repr attribute holder object (like argparse objects).
 
         :param src: attribute holder object to process
-        :type src: _AttributeHolderProto
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
-        :type no_indent_start: bool
-        :return: Repr of attribute holder object.
-        :rtype: str
+        :returns: Repr of attribute holder object.
         """
         param_repr: list[str] = []
         star_args: dict[str, Any] = {}
@@ -406,13 +377,9 @@ class PrettyFormat(abc.ABC):
         """Repr named tuple.
 
         :param src: named tuple object to process
-        :type src: _NamedTupleProto
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
-        :type no_indent_start: bool
-        :return: Repr of named tuple object.
-        :rtype: str
+        :returns: Repr of named tuple object.
         """
         param_repr: list[str] = []
 
@@ -447,13 +414,9 @@ class PrettyFormat(abc.ABC):
         """Repr dataclass.
 
         :param src: dataclass object to process
-        :type src: _DataClassProto
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
-        :type no_indent_start: bool
-        :return: Repr of dataclass.
-        :rtype: str
+        :returns: Repr of dataclass.
         """
         param_repr: list[str] = []
 
@@ -502,13 +465,9 @@ class PrettyFormat(abc.ABC):
         """Repr object without iteration.
 
         :param src: Source object
-        :type src: Any
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: ignore indent
-        :type no_indent_start: bool
-        :return: simple repr() over object
-        :rtype: str
+        :returns: simple repr() over object
         """
 
     @abc.abstractmethod
@@ -520,11 +479,8 @@ class PrettyFormat(abc.ABC):
         """Repr dict items.
 
         :param src: object to process
-        :type src: dict[Any, Any]
         :param indent: start indentation
-        :type indent: int
-        :return: repr of key/value pairs from dict
-        :rtype: str
+        :returns: repr of key/value pairs from dict
         """
 
     @staticmethod
@@ -540,19 +496,12 @@ class PrettyFormat(abc.ABC):
         """Repr iterable item.
 
         :param obj_type: Object type
-        :type obj_type: str
         :param prefix: prefix
-        :type prefix: str
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
-        :type no_indent_start: bool
         :param result: result of pre-formatting
-        :type result: str
         :param suffix: suffix
-        :type suffix: str
-        :return: formatted repr of "result" with prefix and suffix to explain type.
-        :rtype: str
+        :returns: formatted repr of "result" with prefix and suffix to explain type.
         """
 
     def _repr_iterable_items(
@@ -563,11 +512,8 @@ class PrettyFormat(abc.ABC):
         """Repr iterable items (not designed for dicts).
 
         :param src: object to process
-        :type src: Iterable[Any]
         :param indent: start indentation
-        :type indent: int
-        :return: repr of elements in iterable item
-        :rtype: str
+        :returns: repr of elements in iterable item
         """
         next_indent: int = self.next_indent(indent)
         buf: list[str] = []
@@ -591,13 +537,9 @@ class PrettyFormat(abc.ABC):
         """Repr of objects with rich defined repr.
 
         :param src: object to process
-        :type src: Any
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
-        :type no_indent_start: bool
-        :return: formatted string
-        :rtype: str
+        :returns: formatted string
         """
         param_repr: list[str] = []
 
@@ -639,8 +581,7 @@ class PrettyFormat(abc.ABC):
     def _magic_method_name(self) -> str:
         """Magic method name.
 
-        :return: magic method name to lookup in processing objects
-        :rtype: str
+        :returns: magic method name to lookup in processing objects
         """
 
     def process_element(
@@ -652,13 +593,21 @@ class PrettyFormat(abc.ABC):
         """Make human readable representation of object.
 
         :param src: object to process
-        :type src: Any
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
-        :type no_indent_start: bool
-        :return: formatted string
-        :rtype: str
+        :returns: formatted string
+
+        Example::
+
+            >>> formatter = PrettyRepr()
+            >>> print(formatter.process_element({'key': [1, 2, 3]}))
+            {
+                'key': [
+                    1,
+                    2,
+                    3,
+                ],
+            }
         """
         if hasattr(src, self._magic_method_name):
             return getattr(  # type: ignore[no-any-return]
@@ -737,13 +686,17 @@ class PrettyFormat(abc.ABC):
         """Make human-readable representation of object. The main entry point.
 
         :param src: object to process
-        :type src: Any
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
-        :type no_indent_start: bool
-        :return: formatted string
-        :rtype: str
+        :returns: formatted string
+
+        Example::
+
+            >>> formatter = PrettyRepr()
+            >>> print(formatter({'key': 'value'}))
+            {
+                'key': 'value',
+            }
         """
         return self.process_element(src, indent=indent, no_indent_start=no_indent_start)
 
@@ -760,8 +713,7 @@ class PrettyRepr(PrettyFormat):
     def _magic_method_name(self) -> str:
         """Magic method name.
 
-        :return: magic method name to lookup in processing objects
-        :rtype: str
+        :returns: magic method name to lookup in processing objects
         """
         return "__pretty_repr__"
 
@@ -774,13 +726,9 @@ class PrettyRepr(PrettyFormat):
         """Repr object without iteration.
 
         :param src: Source object
-        :type src: Any
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: ignore indent
-        :type no_indent_start: bool
-        :return: simple repr() over object, except strings (add prefix) and set (uniform py2/py3)
-        :rtype: str
+        :returns: simple repr() over object, except strings (add prefix) and set (uniform py2/py3)
         """
         return f"{'':<{0 if no_indent_start else indent}}{src!r}"
 
@@ -792,11 +740,8 @@ class PrettyRepr(PrettyFormat):
         """Repr dict items.
 
         :param src: object to process
-        :type src: dict[Any, Any]
         :param indent: start indentation
-        :type indent: int
-        :return: repr of key/value pairs from dict
-        :rtype: str
+        :returns: repr of key/value pairs from dict
         """
         max_len: int = max(len(repr(key)) for key in src) if src else 0
         next_indent: int = self.next_indent(indent)
@@ -825,19 +770,12 @@ class PrettyRepr(PrettyFormat):
         """Repr iterable item.
 
         :param obj_type: Object type
-        :type obj_type: str
         :param prefix: prefix
-        :type prefix: str
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
-        :type no_indent_start: bool
         :param result: result of pre-formatting
-        :type result: str
         :param suffix: suffix
-        :type suffix: str
-        :return: formatted repr of "result" with prefix and suffix to explain type.
-        :rtype: str
+        :returns: formatted repr of "result" with prefix and suffix to explain type.
         """
         return f"{'':<{indent if not no_indent_start else 0}}{obj_type}({prefix}{result}\n{'':<{indent}}{suffix})"
 
@@ -854,7 +792,7 @@ class PrettyStr(PrettyFormat):
     def _magic_method_name(self) -> str:
         """Magic method name.
 
-        :rtype: str
+        :returns: magic method name to lookup in processing objects
         """
         return "__pretty_str__"
 
@@ -866,11 +804,8 @@ class PrettyStr(PrettyFormat):
         """Custom str for strings and binary strings.
 
         :param indent: result indent
-        :type indent: int
         :param val: value for repr
-        :type val: bytes | str
-        :return: indented string as `str`
-        :rtype: str
+        :returns: indented string as `str`
         """
         if isinstance(val, bytes):
             string: str = val.decode(encoding="utf-8", errors="backslashreplace")
@@ -887,13 +822,9 @@ class PrettyStr(PrettyFormat):
         """Repr object without iteration.
 
         :param src: Source object
-        :type src: Any
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: ignore indent
-        :type no_indent_start: bool
-        :return: simple repr() over object, except strings (decode) and set (uniform py2/py3)
-        :rtype: str
+        :returns: simple repr() over object, except strings (decode) and set (uniform py2/py3)
         """
         indent = 0 if no_indent_start else indent
         if isinstance(src, (bytes, str)):
@@ -908,11 +839,8 @@ class PrettyStr(PrettyFormat):
         """Repr dict items.
 
         :param src: object to process
-        :type src: dict[Any, Any]
         :param indent: start indentation
-        :type indent: int
-        :return: repr of key/value pairs from dict
-        :rtype: str
+        :returns: repr of key/value pairs from dict
         """
         max_len = max(len(str(key)) for key in src) if src else 0
         next_indent: int = self.next_indent(indent)
@@ -941,19 +869,12 @@ class PrettyStr(PrettyFormat):
         """Repr iterable item.
 
         :param obj_type: Object type
-        :type obj_type: str
         :param prefix: prefix
-        :type prefix: str
         :param indent: start indentation
-        :type indent: int
         :param no_indent_start: do not indent open bracket and simple parameters
-        :type no_indent_start: bool
         :param result: result of pre-formatting
-        :type result: str
         :param suffix: suffix
-        :type suffix: str
-        :return: formatted repr of "result" with prefix and suffix to explain type.
-        :rtype: str
+        :returns: formatted repr of "result" with prefix and suffix to explain type.
         """
         return f"{'':<{indent if not no_indent_start else 0}}{prefix}{result}\n{'':<{indent}}{suffix}"
 
@@ -969,19 +890,27 @@ def pretty_repr(
     """Make human readable repr of object.
 
     :param src: object to process
-    :type src: Any
     :param indent: start indentation, all next levels is +indent_step
-    :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
-    :type no_indent_start: bool
     :param max_indent: maximal indent before classic repr() call
-    :type max_indent: int
     :param max_iter: maximal number of items to iterate
-    :type max_iter: int
     :param indent_step: step for the next indentation level
-    :type indent_step: int
-    :return: formatted string
-    :rtype: str
+    :returns: formatted string
+
+    Example::
+
+        >>> data = {'key': [1, 2, 3], 'nested': {'inner': 'value'}}
+        >>> print(pretty_repr(data))
+        {
+            'key'   : [
+                1,
+                2,
+                3,
+            ],
+            'nested': {
+                'inner': 'value',
+            },
+        }
     """
     return PrettyRepr(max_indent=max_indent, max_iter=max_iter, indent_step=indent_step)(
         src=src,
@@ -1001,18 +930,27 @@ def pretty_str(
     """Make human readable str of object.
 
     :param src: object to process
-    :type src: Any
     :param indent: start indentation, all next levels is +indent_step
-    :type indent: int
     :param no_indent_start: do not indent open bracket and simple parameters
-    :type no_indent_start: bool
     :param max_indent: maximal indent before classic repr() call
-    :type max_indent: int
     :param max_iter: maximal number of items to log in iterables
-    :type max_iter: int
     :param indent_step: step for the next indentation level
-    :type indent_step: int
-    :return: formatted string
+    :returns: formatted string
+
+    Example::
+
+        >>> data = {'key': [1, 2, 3], 'nested': {'inner': 'value'}}
+        >>> print(pretty_str(data))
+        {
+            key   : [
+                1,
+                2,
+                3,
+            ],
+            nested: {
+                inner: value,
+            },
+        }
     """
     return PrettyStr(max_indent=max_indent, max_iter=max_iter, indent_step=indent_step)(
         src=src,
