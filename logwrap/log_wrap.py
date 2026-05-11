@@ -205,7 +205,8 @@ class LogWrap:
     ) -> None:
         """Log function calls and return values.
 
-        :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
+        :param log: logger object for decorator,
+                    by default, trying to use logger from the target module. Fallback: 'logwrap'
         :type log: typing.Optional[Logger]
         :param log_level: log level for successful calls
         :type log_level: int
@@ -215,14 +216,14 @@ class LogWrap:
         :type max_indent: int
         :param max_iter: maximum number of elements in iterable before ellipsis.
         :type max_iter: int
-        :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
+        :param blacklisted_names: Blacklisted argument names. Arguments with this name will be skipped in log.
         :type blacklisted_names: Iterable[str] | None
         :param blacklisted_exceptions: list of exception, which should be re-raised
                without producing traceback and text log record.
         :type blacklisted_exceptions: Iterable[type[Exception]]
-        :param log_call_args: log call arguments before executing wrapped function.
+        :param log_call_args: log call arguments before executing a wrapped function.
         :type log_call_args: bool
-        :param log_call_args_on_exc: log call arguments if exception raised.
+        :param log_call_args_on_exc: log call arguments if an exception is raised.
         :type log_call_args_on_exc: bool
         :param log_traceback: log traceback on exception in addition to failure info
         :type log_traceback: bool
@@ -262,7 +263,7 @@ class LogWrap:
         # We are not interested to pass any arguments to object
 
     def _get_logger_for_func(self, func: Callable[Spec, RetVal]) -> Logger:
-        """Get logger for function from function module if possible.
+        """Get logger for the function from the function module if possible.
 
         :param func: decorated function
         :type func: FuncResultType
@@ -304,7 +305,7 @@ class LogWrap:
     def exc_level(self) -> int:
         """Log level for exceptions.
 
-        :return: log level for exceptions cases
+        :return: log level for exception cases
         :rtype: int
         """
         return self.__exc_level
@@ -365,7 +366,7 @@ class LogWrap:
 
     @property
     def blacklisted_names(self) -> list[str]:
-        """List of arguments names to ignore in log.
+        """List of argument names to ignore in log.
 
         :return: list of arguments to ignore in log
         :rtype: typing.List[str]
@@ -506,7 +507,7 @@ class LogWrap:
         :return: value, value override for logging or None if argument should not be logged.
         :rtype: typing.Union[BoundParameter, typing.Tuple[BoundParameter, Any], None]
 
-        Override this method if some modifications required for parameter value before logging
+        Override this method if some modifications are required for a parameter value before logging
 
         .. versionadded:: 3.3.0
         """
@@ -564,7 +565,7 @@ class LogWrap:
         args: tuple[Any, ...],
         kwargs: dict[str, Any],
     ) -> str:
-        """Internal helper for reducing complexity of decorator code.
+        """Internal helper for reducing the complexity of decorator code.
 
         :param sig: function signature
         :type sig: inspect.Signature
@@ -627,7 +628,7 @@ class LogWrap:
         func_name: str,
         result: Any,
     ) -> None:
-        """Construct success record.
+        """Construct a success record.
 
         :param logger: logger instance to use
         :type logger: Logger
@@ -651,7 +652,7 @@ class LogWrap:
         arguments: str,
         method: str = "Calling",
     ) -> None:
-        """Make log record before execution.
+        """Make a log record before execution.
 
         :param logger: logger instance to use
         :type logger: Logger
@@ -753,7 +754,11 @@ class LogWrap:
                 raise
             return result
 
-        return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper  # type: ignore[return-value]
+        if sys.version_info < (3, 10):
+            # Python 3.9 and below do not work well with inspect.iscoroutinefunction
+            return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper  # type: ignore[return-value]
+
+        return async_wrapper if inspect.iscoroutinefunction(func) else wrapper  # type: ignore[return-value]
 
     def __call__(
         self,

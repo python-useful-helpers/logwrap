@@ -1,4 +1,4 @@
-#    Copyright 2018 - 2025 Alexey Stepanov aka penguinolog
+#    Copyright 2018 - 2025 Aleksei Stepanov aka penguinolog
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -30,6 +30,8 @@ from logwrap.constants import VALID_LOGGER_NAMES
 
 if typing.TYPE_CHECKING:
     from collections.abc import Callable
+
+    from typing_extensions import Self
 
 __all__ = ("LogOnAccess",)
 
@@ -275,10 +277,10 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         """Get object repr block.
 
         :param instance: object instance
-        :type instance: typing.Any
+        :type instance: _OwnerT
         :param owner: object class (available for getter usage only)
         :type owner: type[_OwnerT] | None
-        :return: repr of object if it not disabled else repr placeholder
+        :return: repr of an object if it is not disabled else repr placeholder
         :rtype: str
         """
         if self.log_object_repr:
@@ -292,8 +294,8 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
     def _get_logger_for_instance(self, instance: _OwnerT) -> Logger:
         """Get logger for log calls.
 
-        :param instance: Owner class instance. Filled only if instance created, else None.
-        :type instance: _OwnerT | None
+        :param instance: Owner class instance. Filled only if an instance is created, else None.
+        :type instance: _OwnerT
         :return: logger instance
         :rtype: logging.Logger
         """
@@ -310,17 +312,38 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
                 return logger_candidate
         return _LOGGER
 
+    @typing.overload  # type: ignore[override]
+    def __get__(
+        self,
+        instance: None,
+        owner: None,
+        /,
+    ) -> typing.NoReturn:
+        """Get descriptor.
+
+        :param instance: Owner class instance. Filled only if an instance is created, else None.
+        :type instance: None
+        :param owner: Owner class for property.
+        :type owner: type[_OwnerT] | None
+        :return: getter call result if getter presents
+        :rtype: typing.Any
+        :raises AttributeError: Getter is not available
+        :raises Exception: Something goes wrong
+        """
+
     @typing.overload
     def __get__(
         self,
         instance: None,
-        owner: type[_OwnerT] | None = None,
-    ) -> typing.NoReturn:
+        owner: type[_OwnerT],
+        /,
+    ) -> Self:
         """Get descriptor.
 
-        :param instance: Owner class instance. Filled only if instance created, else None.
-        :type instance: _OwnerT | None
+        :param instance: Owner class instance. Filled only if an instance is created, else None.
+        :type instance: None
         :param owner: Owner class for property.
+        :type owner: type[_OwnerT] | None
         :return: getter call result if getter presents
         :rtype: typing.Any
         :raises AttributeError: Getter is not available
@@ -332,12 +355,14 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self,
         instance: _OwnerT,
         owner: type[_OwnerT] | None = None,
+        /,
     ) -> _ReturnT:
         """Get descriptor.
 
-        :param instance: Owner class instance. Filled only if instance created, else None.
+        :param instance: Owner class instance. Filled only if an instance is created, else None.
         :type instance: _OwnerT | None
         :param owner: Owner class for property.
+        :type owner: type[_OwnerT] | None
         :return: getter call result if getter presents
         :rtype: typing.Any
         :raises AttributeError: Getter is not available
@@ -348,19 +373,27 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self,
         instance: _OwnerT | None,
         owner: type[_OwnerT] | None = None,
-    ) -> _ReturnT:
+        /,
+    ) -> _ReturnT | Self:
         """Get descriptor.
 
-        :param instance: Owner class instance. Filled only if instance created, else None.
+        :param instance: Owner class instance. Filled only if an instance is created, else None.
         :type instance: _OwnerT | None
         :param owner: Owner class for property.
+        :type owner: type[_OwnerT] | None
         :return: getter call result if getter presents
         :rtype: typing.Any
         :raises AttributeError: Getter is not available
         :raises Exception: Something goes wrong
         """
-        if instance is None or self.fget is None:
-            raise AttributeError()
+        if instance is None:
+            if owner is not None:
+                return self
+
+            raise AttributeError("Owner class is required for descriptor usage.")
+
+        if self.fget is None:
+            raise AttributeError("Getter is not available.")
 
         source: str = self.__get_obj_source(instance, owner)
         logger: Logger = self._get_logger_for_instance(instance)
@@ -386,7 +419,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
             raise
         return result
 
-    def __set__(self, instance: _OwnerT, value: _ReturnT) -> None:
+    def __set__(self, instance: _OwnerT, value: _ReturnT, /) -> None:
         """Set descriptor.
 
         :param instance: Owner class instance. Filled only if instance created, else None.
@@ -422,7 +455,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
                 )
             raise
 
-    def __delete__(self, instance: _OwnerT) -> None:
+    def __delete__(self, instance: _OwnerT, /) -> None:
         """Delete descriptor.
 
         :param instance: Owner class instance. Filled only if instance created, else None.
@@ -475,7 +508,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
 
     @property
     def log_object_repr(self) -> bool:
-        """Use `repr` over object to describe owner if True else owner class name and id.
+        """Use `repr` over the object to describe an owner if True else owner class name and id.
 
         :return: switch state
         :rtype: bool
@@ -484,7 +517,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
 
     @log_object_repr.setter
     def log_object_repr(self, value: bool) -> None:
-        """Use `repr` over object to describe owner if True else owner class name and id.
+        """Use `repr` over the object to describe an owner if True else owner class name and id.
 
         :param value: switch state
         :type value: bool
@@ -654,10 +687,10 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         self.__max_iter = value
 
     @property
-    def __name__(self) -> str:  # type: ignore[override]  # noqa: A003,PLW3201,RUF100
+    def __name__(self) -> str:  # noqa: A003,PLW3201,RUF100
         """Name getter.
 
-        :return: attribute name (may be overridden)
+        :return: attribute name (maybe overridden)
         :rtype: str
         """
         if self.override_name:
@@ -671,6 +704,12 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         if self.fdel is not None:
             return self.fdel.__name__
         return ""
+
+    @__name__.setter  # noqa: A003
+    def __name__(self, name: str | None) -> None:
+        """Name setter."""
+        if name:
+            self.__name = name
 
 
 if __name__ == "__main__":
