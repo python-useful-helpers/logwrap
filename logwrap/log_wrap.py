@@ -754,7 +754,7 @@ class LogWrap:
                 raise
             return result
 
-        if sys.version_info < (3, 10):
+        if sys.version_info < (3, 12):
             # Python 3.9 and below do not work well with inspect.iscoroutinefunction
             return async_wrapper if asyncio.iscoroutinefunction(func) else wrapper  # type: ignore[return-value]
 
