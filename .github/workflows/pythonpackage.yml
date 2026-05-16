@@ -82,7 +82,7 @@ jobs:
           mypy --strict logwrap
 
   Test:
-    needs: [PEP8, Formatting, PyLint, MyPy]  # isort is broken
+    needs: [PEP8, Formatting, PyLint, MyPy]
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 6

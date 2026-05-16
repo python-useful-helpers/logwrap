@@ -7,21 +7,9 @@ repos:
     - id: trailing-whitespace
     - id: mixed-line-ending
 
-  - repo: https://github.com/pycqa/isort
-    rev: 9.0.0a3
-    hooks:
-    - id: isort
-      name: isort (python)
-    - id: isort
-      name: isort (cython)
-      types: [cython]
-    - id: isort
-      name: isort (pyi)
-      types: [pyi]
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.15.12
+    rev: v0.15.13
     hooks:
       # Run the linter.
       - id: ruff-check
