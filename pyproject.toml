@@ -39,8 +39,7 @@ pytest = [
   "coverage[toml]>=5.0",
 ]
 mypy = [
-  "mypy[faster-cache]>=2.0",
-  "lxml",
+  "mypy[faster-cache,reports]>=2.0",
   "rich",
 ]
 tox-test = [
