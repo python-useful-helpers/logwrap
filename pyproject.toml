@@ -29,6 +29,207 @@ dynamic = ["classifiers", "version"]  # "dependencies",
 "Repository" = "https://github.com/python-useful-helpers/logwrap"
 "Bug Tracker" = "https://github.com/python-useful-helpers/logwrap/issues"
 
+[dependency-groups]
+pytest = [
+  "asynctest",
+  "pytest > 7.0",
+  "pytest-cov",
+  "pytest-mock",
+  "pytest-asyncio",
+  "coverage[toml]>=5.0",
+]
+mypy = [
+  "mypy[faster-cache]>=2.0",
+  "lxml",
+  "rich",
+]
+tox-test = [
+  {include-group = "pytest"},
+]
+tox-ruff = [
+  "ruff>=0.14.6",
+]
+tox-pep257 = [
+  "pydocstyle[toml]",
+]
+tox-doc8 = [
+  "doc8",
+  "Pygments",
+]
+tox-pylint = [
+  "pylint>=3.0.0",
+]
+tox-docs = [
+  "sphinx",
+]
+tox-readme = [
+  "twine",
+  "build",
+]
+tox-bandit = [
+  "bandit",
+]
+tox-mypy = [
+  {include-group = "mypy"},
+]
+
+[tool.tox]
+requires = ["tox>=4.53"]
+env_list = [
+  "ruff",
+  "pylint",
+  "mypy",
+  "pep257",
+  "py39",
+  "py310",
+  "py311",
+  "py312",
+  "py313",
+  "py314",
+  "py315",
+  "pypy39",
+  "pypy310",
+  "pypy311",
+  "pypy312",
+  "pypy313",
+  "pypy314",
+  "pypy315",
+  "py313t",
+  "py314t",
+  "py315t",
+  "readme",
+  "doc8",
+  "docs",
+]
+skip_missing_interpreters = true
+
+[tool.tox.env_run_base]
+recreate = true
+package = "editable"
+pass_env = [
+  "http_proxy",
+  "HTTP_PROXY",
+  "https_proxy",
+  "HTTPS_PROXY",
+  "no_proxy",
+  "NO_PROXY",
+]
+set_env = {PYTHONDONTWRITEBYTECODE = "1"}
+dependency_groups = ["tox-test"]
+commands = [
+  ["pip", "freeze"],
+  ["py.test"],
+]
+
+[tool.tox.env.py39]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.py310]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.py311]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.py312]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.py313]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.py314]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.py315]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.pypy39]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.pypy310]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.pypy311]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.pypy312]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.pypy313]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.pypy314]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.pypy315]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.py313t]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.py314t]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.py315t]
+depends = ["pylint", "mypy", "ruff", "ruff-format", "pep257", "bandit"]
+
+[tool.tox.env.venv]
+commands = [["{posargs}"]]
+
+[tool.tox.env.ruff]
+package = "skip"
+depends = ["ruff-format"]
+dependency_groups = ["tox-ruff"]
+commands = [["ruff", "check", "."]]
+
+[tool.tox.env.ruff-format]
+package = "skip"
+dependency_groups = ["tox-ruff"]
+commands = [["ruff", "format", "--check", "."]]
+
+[tool.tox.env.pep257]
+package = "skip"
+depends = ["ruff-format"]
+dependency_groups = ["tox-pep257"]
+commands = [["pydocstyle", "-v", "logwrap"]]
+
+[tool.tox.env.doc8]
+package = "skip"
+dependency_groups = ["tox-doc8"]
+commands = [["doc8", "README.rst", "doc/source"]]
+
+[tool.tox.env.install]
+dependency_groups = []
+commands = [["pip", "install", "./", "-vvv", "-U"]]
+
+[tool.tox.env.pylint]
+depends = ["ruff", "ruff-format", "pep257", "bandit"]
+dependency_groups = ["tox-pylint"]
+commands = [["pylint", "logwrap"]]
+
+[tool.tox.env.docs]
+depends = ["doc8", "readme"]
+dependency_groups = ["tox-docs"]
+commands = [["sphinx-build", "doc/source/", "doc/build"]]
+
+[tool.tox.env.readme]
+package = "skip"
+dependency_groups = ["tox-readme"]
+commands = [
+  ["python", "-m", "build", "-s"],
+  ["twine", "check", "{tox_root}{/}dist{/}*"],
+]
+
+[tool.tox.env.bandit]
+dependency_groups = ["tox-bandit"]
+commands = [["bandit", "-r", "logwrap"]]
+
+[tool.tox.env.mypy]
+depends = ["ruff", "ruff-format", "pep257", "bandit"]
+dependency_groups = ["tox-mypy"]
+commands = [
+  ["mypy", "--strict", "--show-error-codes", "-p", "logwrap"],
+]
+
 [tool.setuptools.package-data]
 logwrap=[
   "py.typed",
