@@ -3,6 +3,7 @@ repos:
     rev: v6.0.0
     hooks:
     - id: check-yaml
+    - id: check-toml
     - id: end-of-file-fixer
     - id: trailing-whitespace
     - id: mixed-line-ending
@@ -24,3 +25,10 @@ repos:
     - id: python-check-blanket-type-ignore
     - id: rst-directive-colons
     - id: rst-inline-touching-normal
+
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    # Use the sha / tag you want to point at
+    # or use `pre-commit autoupdate` to get the latest version
+    rev: "v2.21.2"
+    hooks:
+      - id: pyproject-fmt

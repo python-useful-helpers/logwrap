@@ -30,8 +30,7 @@ from logwrap.constants import VALID_LOGGER_NAMES
 
 if typing.TYPE_CHECKING:
     from collections.abc import Callable
-
-    from typing_extensions import Self
+    from typing import Self
 
 __all__ = ("LogOnAccess",)
 
