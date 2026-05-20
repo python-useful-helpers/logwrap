@@ -169,10 +169,13 @@ extend-ignore = [
   "SIM108",  # Use ternary operator,
   "TRY003",  # long messages prepare outside, ...
 ]
-isort.force-single-line = true
-isort.known-third-party = []
-pydocstyle.convention = "pep257"
-pylint.allow-dunder-method-names = [ "__pretty_repr__", "__pretty_str__", "__rich_repr__" ]
+[tool.ruff.lint.isort]
+force-single-line = true
+known-third-party = []
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+[tool.ruff.lint.pylint]
+allow-dunder-method-names = [ "__pretty_repr__", "__pretty_str__", "__rich_repr__" ]
 
 [tool.isort]
 line_length = 120
