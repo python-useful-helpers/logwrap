@@ -28,6 +28,11 @@ import unittest
 
 import logwrap
 
+try:
+    import attrs
+except ImportError:
+    attrs = None  # type: ignore[assignment]
+
 if typing.TYPE_CHECKING:
     from collections.abc import Iterable
 
@@ -343,6 +348,50 @@ class TestContainers(unittest.TestCase):
         self.assertEqual(
             "test_repr_utils.WithUnionAnn(\n    a=None,  # type: int | None\n)",
             logwrap.pretty_repr(test_dc),
+        )
+
+    @unittest.skipUnless(attrs is not None, "attrs is not installed")
+    def test_007_attrs_define(self):
+        @attrs.define
+        class TestAttrsClass:
+            b: int = 0
+            c: int = attrs.field(default=0, repr=False)
+            d: tuple[str] = attrs.field(default=("d",))
+
+        test_val = TestAttrsClass()
+
+        self.assertEqual(
+            "test_repr_utils.TestAttrsClass(\n"
+            "    b=0,  # type: int\n"
+            "    d=(\n"
+            "        'd',\n"
+            "    ),  # type: tuple[str]\n"
+            ")",
+            logwrap.pretty_repr(test_val),
+        )
+
+    @unittest.skipUnless(attrs is not None, "attrs is not installed")
+    def test_008_attrs_frozen_union_ann(self):
+        @attrs.frozen
+        class WithUnionAnn:
+            a: int | None = None
+
+        test_val = WithUnionAnn()
+        self.assertEqual(
+            "test_repr_utils.WithUnionAnn(\n    a=None,  # type: int | None\n)",
+            logwrap.pretty_repr(test_val),
+        )
+
+    @unittest.skipUnless(attrs is not None, "attrs is not installed")
+    def test_009_attrs_kw_only(self):
+        @attrs.define(kw_only=True)
+        class KwOnlyAttrs:
+            x: int = 1
+
+        test_val = KwOnlyAttrs()
+        self.assertEqual(
+            "test_repr_utils.KwOnlyAttrs(\n    x=1,  # type: int  # kw_only\n)",
+            logwrap.pretty_repr(test_val),
         )
 
 

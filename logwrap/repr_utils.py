@@ -88,6 +88,13 @@ class _DataClassProto(Protocol):
 
 
 @runtime_checkable
+class _AttrsProto(Protocol):
+    __slots__ = ()
+
+    __attrs_attrs__: tuple[Any, ...] = ()
+
+
+@runtime_checkable
 class _RichReprProto(Protocol):
     """Protocol for type checking."""
 
@@ -455,6 +462,58 @@ class PrettyFormat(abc.ABC):
         param_str = "".join(param_repr)
         return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
 
+    def _repr_attrs(
+        self,
+        src: _AttrsProto,
+        indent: int = 0,
+        no_indent_start: bool = False,
+    ) -> str:
+        """Repr attrs class instance (``attrs.define`` / ``attrs.frozen`` / ``attr.s``).
+
+        :param src: attrs class instance to process
+        :param indent: start indentation
+        :param no_indent_start: do not indent open bracket and simple parameters
+        :returns: Repr of attrs class instance.
+        """
+        param_repr: list[str] = []
+
+        next_indent = self.next_indent(indent)
+        prefix: str = "\n" + " " * next_indent
+
+        for field in src.__attrs_attrs__:
+            if field.repr is False:
+                continue
+            arg_name = field.name
+            repr_val = self.process_element(getattr(src, arg_name), indent=next_indent, no_indent_start=True)
+
+            comment: list[str] = []
+
+            field_type = getattr(field, "type", None)
+            if field_type:
+                if isinstance(field_type, str):
+                    comment.append(f"type: {field_type}")
+                elif isinstance(field_type, ForwardRef):
+                    comment.append(f"type: {field_type!r}")
+                elif isclass(field_type):
+                    comment.append(f"type: {field_type.__name__}")
+                else:
+                    comment.append(f"type: {field_type!r}")
+            if getattr(field, "kw_only", False):
+                comment.append("kw_only")
+
+            if comment:
+                comment_str = "  # " + "  # ".join(comment)
+            else:
+                comment_str = ""
+
+            param_repr.append(f"{prefix}{arg_name}={repr_val},{comment_str}")
+
+        if param_repr:
+            param_repr.extend(("\n", " " * indent))
+
+        param_str = "".join(param_repr)
+        return f"{'':<{indent if not no_indent_start else 0}}{src.__module__}.{src.__class__.__name__}({param_str})"
+
     @abc.abstractmethod
     def _repr_simple(
         self,
@@ -633,6 +692,9 @@ class PrettyFormat(abc.ABC):
 
         if isinstance(src, _DataClassProto) and not isinstance(src, type) and src.__dataclass_params__.repr:
             return self._repr_dataclass(src=src, indent=indent, no_indent_start=no_indent_start)
+
+        if isinstance(src, _AttrsProto) and not isinstance(src, type):
+            return self._repr_attrs(src=src, indent=indent, no_indent_start=no_indent_start)
 
         if _simple(src) or indent >= self.max_indent or not src:
             return self._repr_simple(src=src, indent=indent, no_indent_start=no_indent_start)
