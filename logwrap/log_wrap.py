@@ -550,7 +550,7 @@ class LogWrap:
                 max_indent=self.max_indent,
                 max_iter=self.max_iter,
             )
-        except Exception as exc:
+        except Exception as exc:  # NOQA:BLE001  # It's a goal
             base_name: str = getattr(value, "name", getattr(value, "__name__", value.__class__.__name__))
             base_details: str = f"at 0x{id(value):X} (repr failed with reason: {exc})"
             if isinstance(value, types.FunctionType):  # pragma: no cover

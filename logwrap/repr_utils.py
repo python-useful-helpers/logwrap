@@ -393,7 +393,7 @@ class PrettyFormat(abc.ABC):
         # noinspection PyBroadException
         try:
             args_annotations: dict[str, Any] = get_type_hints(type(src))
-        except BaseException:  # NOSONAR
+        except BaseException:  # NOQA:BLE001  # It's a goal
             args_annotations = {}
 
         next_indent = self.next_indent(indent)
