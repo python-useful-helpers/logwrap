@@ -23,7 +23,6 @@ import functools
 import inspect
 import os
 import sys
-import traceback
 import types
 from logging import DEBUG
 from logging import ERROR
@@ -35,6 +34,7 @@ from typing import TypeVar
 from typing import overload
 
 from logwrap import repr_utils
+from logwrap._tracebacks import format_traceback
 from logwrap.constants import VALID_LOGGER_NAMES
 
 if TYPE_CHECKING:
@@ -71,9 +71,7 @@ class BoundParameter(inspect.Parameter):
         """Parameter-like object store BOUND with value parameter.
 
         :param parameter: parameter from signature
-        :type parameter: inspect.Parameter
         :param value: parameter real value
-        :type value: Any
         :raises ValueError: No default value and no value
         """
         super().__init__(
@@ -95,7 +93,6 @@ class BoundParameter(inspect.Parameter):
         """Parameter value.
 
         :return: actual parameter value
-        :rtype: Any
         """
         return self._value
 
@@ -103,7 +100,6 @@ class BoundParameter(inspect.Parameter):
         """Debug purposes.
 
         :return: string representation for parameter. */** flags is attached if positional (*args) or keyword (**kwargs)
-        :rtype: str
         """
         # POSITIONAL_ONLY is only in precompiled functions or Python 3.8+
         if self.kind == self.POSITIONAL_ONLY:  # pragma: no cover
@@ -138,7 +134,6 @@ class BoundParameter(inspect.Parameter):
         """Debug purposes.
 
         :return: representation for logging/debug purposes
-        :rtype: str
         """
         return f'<{self.__class__.__name__} "{self}">'
 
@@ -151,13 +146,9 @@ def bind_args_kwargs(
     """Bind *args and **kwargs to signature and get Bound Parameters.
 
     :param sig: source signature
-    :type sig: inspect.Signature
     :param args: positional arguments
-    :type args: Any
     :param kwargs: keyword arguments
-    :type kwargs: Any
     :return: Iterator for bound parameters with all information about it
-    :rtype: typing.List[BoundParameter]
 
     .. versionadded:: 3.3.0
     .. versionchanged:: 5.3.1 return list
@@ -207,28 +198,17 @@ class LogWrap:
 
         :param log: logger object for decorator,
                     by default, trying to use logger from the target module. Fallback: 'logwrap'
-        :type log: typing.Optional[Logger]
         :param log_level: log level for successful calls
-        :type log_level: int
         :param exc_level: log level for exception cases
-        :type exc_level: int
         :param max_indent: maximum indent before classic `repr()` call.
-        :type max_indent: int
         :param max_iter: maximum number of elements in iterable before ellipsis.
-        :type max_iter: int
         :param blacklisted_names: Blacklisted argument names. Arguments with this name will be skipped in log.
-        :type blacklisted_names: Iterable[str] | None
         :param blacklisted_exceptions: list of exception, which should be re-raised
                without producing traceback and text log record.
-        :type blacklisted_exceptions: Iterable[type[Exception]]
         :param log_call_args: log call arguments before executing a wrapped function.
-        :type log_call_args: bool
         :param log_call_args_on_exc: log call arguments if an exception is raised.
-        :type log_call_args_on_exc: bool
         :param log_traceback: log traceback on exception in addition to failure info
-        :type log_traceback: bool
         :param log_result_obj: log result of function call.
-        :type log_result_obj: bool
 
         .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
         .. versionchanged:: 5.1.0 log_traceback parameter
@@ -266,9 +246,7 @@ class LogWrap:
         """Get logger for the function from the function module if possible.
 
         :param func: decorated function
-        :type func: FuncResultType
         :return: logger instance
-        :rtype: Logger
         """
         if self.__logger is not None:
             return self.__logger
@@ -285,7 +263,6 @@ class LogWrap:
         """Log level for normal behavior.
 
         :return: log level for normal behavior
-        :rtype: int
         """
         return self.__log_level
 
@@ -294,7 +271,6 @@ class LogWrap:
         """Log level for normal behavior.
 
         :param val: log level to use for calls and returns
-        :type val: int
         :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
@@ -306,7 +282,6 @@ class LogWrap:
         """Log level for exceptions.
 
         :return: log level for exception cases
-        :rtype: int
         """
         return self.__exc_level
 
@@ -315,7 +290,6 @@ class LogWrap:
         """Log level for exceptions.
 
         :param val: log level to use for captured exceptions
-        :type val: int
         :raises TypeError: log level is not integer
         """
         if not isinstance(val, int):
@@ -327,7 +301,6 @@ class LogWrap:
         """Maximum indentation.
 
         :return: maximum allowed indentation before switch to normal repr
-        :rtype: int
         """
         return self.__max_indent
 
@@ -336,7 +309,6 @@ class LogWrap:
         """Maximum indentation.
 
         :param val: Maximal indentation before use of simple repr()
-        :type val: int
         :raises TypeError: indent is not integer
         """
         if not isinstance(val, int):
@@ -348,7 +320,6 @@ class LogWrap:
         """Maximum number of elements in iterable before ellipsis.
 
         :return: maximum number of elements in iterable before ellipsis
-        :rtype: int
         """
         return self.__max_iter
 
@@ -357,7 +328,6 @@ class LogWrap:
         """Maximum number of elements in iterable before ellipsis.
 
         :param val: maximum number of elements in iterable before ellipsis
-        :type val: int
         :raises TypeError: max_iter is not integer
         """
         if not isinstance(val, int):
@@ -369,7 +339,6 @@ class LogWrap:
         """List of argument names to ignore in log.
 
         :return: list of arguments to ignore in log
-        :rtype: typing.List[str]
         """
         return self.__blacklisted_names
 
@@ -378,7 +347,6 @@ class LogWrap:
         """List of exceptions to re-raise without log traceback and text.
 
         :return: list of exceptions to re-raise silent
-        :rtype: typing.List[typing.Type[Exception]]
         """
         return self.__blacklisted_exceptions
 
@@ -387,7 +355,6 @@ class LogWrap:
         """Flag: log call arguments before call.
 
         :return: log cal arguments before call
-        :rtype: bool
         """
         return self.__log_call_args
 
@@ -396,7 +363,6 @@ class LogWrap:
         """Flag: log call arguments before call.
 
         :param val: Enable flag
-        :type val: bool
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
@@ -408,7 +374,6 @@ class LogWrap:
         """Flag: log call arguments on exception.
 
         :return: log call arguments in case of exception logging
-        :rtype: bool
         """
         return self.__log_call_args_on_exc
 
@@ -417,7 +382,6 @@ class LogWrap:
         """Flag: log call arguments on exception.
 
         :param val: Enable flag
-        :type val: bool
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
@@ -429,7 +393,6 @@ class LogWrap:
         """Flag: log traceback on exception.
 
         :return: log traceback in case of exception logging
-        :rtype: bool
         """
         return self.__log_traceback
 
@@ -438,7 +401,6 @@ class LogWrap:
         """Flag: log traceback on exception.
 
         :param val: Enable flag
-        :type val: bool
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
@@ -450,7 +412,6 @@ class LogWrap:
         """Flag: log result object.
 
         :return: log execution result object
-        :rtype: bool
         """
         return self.__log_result_obj
 
@@ -459,7 +420,6 @@ class LogWrap:
         """Flag: log result object.
 
         :param val: Enable flag
-        :type val: bool
         :raises TypeError: Value is not bool
         """
         if not isinstance(val, bool):
@@ -471,7 +431,6 @@ class LogWrap:
         """Logger instance.
 
         :return: logger instance if configured
-        :rtype: typing.Optional[Logger]
         """
         return self.__logger
 
@@ -479,7 +438,6 @@ class LogWrap:
         """Repr for debug purposes.
 
         :return: representation for logging/debug purposes
-        :rtype: str
         """
         return (
             f"{self.__class__.__name__}("
@@ -503,9 +461,7 @@ class LogWrap:
         """Process parameter for the future logging.
 
         :param arg: bound parameter
-        :type arg: BoundParameter
         :return: value, value override for logging or None if argument should not be logged.
-        :rtype: typing.Union[BoundParameter, typing.Tuple[BoundParameter, Any], None]
 
         Override this method if some modifications are required for a parameter value before logging
 
@@ -522,11 +478,8 @@ class LogWrap:
         """Process parameter for the future logging.
 
         :param arg: bound parameter
-        :type arg: BoundParameter
         :param arg_repr: repr for value
-        :type arg_repr: str
         :return: processed repr for value
-        :rtype: str
 
         Override this method if some modifications required for result of repr() over parameter
 
@@ -538,9 +491,7 @@ class LogWrap:
         """Try to get repr for value and provide fallback text in case of impossibility.
 
         :param value: value to try make repr
-        :type value: Any
         :return: repr string or fallback description
-        :rtype: str
         """
         try:
             return repr_utils.pretty_repr(
@@ -568,13 +519,9 @@ class LogWrap:
         """Internal helper for reducing the complexity of decorator code.
 
         :param sig: function signature
-        :type sig: inspect.Signature
         :param args: positional arguments
-        :type args: typing.Tuple
         :param kwargs: keyword arguments
-        :type kwargs: typing.Dict[str, Any]
         :return: repr over function arguments
-        :rtype: str
 
         .. versionchanged:: 3.3.0 Use pre- and post- processing of params during execution
         """
@@ -631,11 +578,8 @@ class LogWrap:
         """Construct a success record.
 
         :param logger: logger instance to use
-        :type logger: Logger
         :param func_name: function name
-        :type func_name: str
         :param result: function execution result
-        :type result: Any
         """
         msg: str = f"Done: {func_name!r}"
 
@@ -655,13 +599,9 @@ class LogWrap:
         """Make a log record before execution.
 
         :param logger: logger instance to use
-        :type logger: Logger
         :param name: function name
-        :type name: str
         :param arguments: function arguments repr
-        :type arguments: str
         :param method: "calling" or "awaiting"
-        :type method: str
         """
         logger.log(level=self.log_level, msg=f"{method}: \n{name}({arguments if self.log_call_args else ''})")
 
@@ -675,21 +615,14 @@ class LogWrap:
         """Make log record if exception raised.
 
         :param logger: logger instance to use
-        :type logger: Logger
         :param name: function name
-        :type name: str
         :param arguments: function arguments repr
-        :type arguments: str
         :param exception: exception captured
-        :type exception: Exception
+
+        .. versionchanged:: 11.2.0 traceback covers the failed code itself, decorator internals are excluded
         """
-        exc_info = sys.exc_info()
-        stack: traceback.StackSummary = traceback.extract_stack()
-        full_tb: list[traceback.FrameSummary] = [elem for elem in stack if elem.filename != _CURRENT_FILE]
-        exc_line: list[str] = traceback.format_exception_only(*exc_info[:2])
-        # Make standard traceback string
         tb_text: str = (
-            f"Traceback (most recent call last):\n{''.join(traceback.format_list(full_tb))}{''.join(exc_line)}"
+            format_traceback(exception, exclude_files=(_CURRENT_FILE,))
             if self.log_traceback and not isinstance(exception, tuple(self.blacklisted_exceptions))
             else exception.__class__.__name__
         )
@@ -707,9 +640,7 @@ class LogWrap:
         """Here should be constructed and returned real decorator.
 
         :param func: Wrapped function
-        :type func: typing.Callable
         :return: wrapped coroutine or function
-        :rtype: typing.Callable
         """
 
         logger: Logger = self._get_logger_for_func(func)
@@ -719,7 +650,6 @@ class LogWrap:
             """Decorator for async callable objects.
 
             :return: function result
-            :rtype: Any
             :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
             """
             sig: inspect.Signature = inspect.signature(func)
@@ -739,7 +669,6 @@ class LogWrap:
             """Decorator for normal callable objects.
 
             :return: function result
-            :rtype: Any
             :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
             """
             sig: inspect.Signature = inspect.signature(func)
@@ -767,7 +696,6 @@ class LogWrap:
         """Callable instance.
 
         :return: decorated function
-        :rtype: typing.Callable[..., FuncResultType]
         """
         return self._get_function_wrapper(func)
 
@@ -849,32 +777,19 @@ def logwrap(
     """Log function calls and return values.
 
     :param func: function to wrap
-    :type func: typing.Optional[typing.Callable]
     :param log: logger object for decorator, by default trying to use logger from target module. Fallback: 'logwrap'
-    :type log: typing.Optional[Logger]
     :param log_level: log level for successful calls
-    :type log_level: int
     :param exc_level: log level for exception cases
-    :type exc_level: int
     :param max_indent: maximum indent before classic `repr()` call.
-    :type max_indent: int
     :param max_iter: maximum number of elements to log from iterables.
-    :type max_iter: int
     :param blacklisted_names: Blacklisted argument names. Arguments with this names will be skipped in log.
-    :type blacklisted_names: Iterable[str] | None
     :param blacklisted_exceptions: list of exceptions, which should be re-raised
                                    without producing traceback and text log record.
-    :type blacklisted_exceptions: Iterable[type[Exception]] | None
     :param log_call_args: log call arguments before executing wrapped function.
-    :type log_call_args: bool
     :param log_call_args_on_exc: log call arguments if exception raised.
-    :type log_call_args_on_exc: bool
     :param log_traceback: log traceback on exception in addition to failure info
-    :type log_traceback: bool
     :param log_result_obj: log result of function call.
-    :type log_result_obj: bool
     :return: built real decorator.
-    :rtype: typing.Union[LogWrap, typing.Callable[..., FuncResultType]]
 
     .. versionchanged:: 3.3.0 Extract func from log and do not use Union.
     .. versionchanged:: 3.3.0 Deprecation of *args

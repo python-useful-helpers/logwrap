@@ -24,6 +24,7 @@ import dataclasses
 import functools
 import io
 import logging
+import os
 import unittest
 from unittest import mock
 
@@ -641,6 +642,27 @@ class TestLogWrap(unittest.TestCase):
             self.stream.getvalue(),
         )
         # fmt: on
+
+    def test_026_traceback_content(self):
+        def failing():
+            raise ValueError("because I can")
+
+        @logwrap.logwrap
+        def func():
+            failing()
+
+        with self.assertRaises(ValueError):
+            func()
+
+        tb_text = self.stream.getvalue().split("Traceback (most recent call last):\n")[1]
+        # Decorator internals are hidden
+        self.assertNotIn(os.path.abspath(logwrap.log_wrap.__file__), tb_text)
+        # Caller, decorated function and the real failure point are all present
+        self.assertIn("test_026_traceback_content", tb_text)
+        self.assertIn("in func\n", tb_text)
+        self.assertIn("in failing\n", tb_text)
+        self.assertIn('raise ValueError("because I can")', tb_text)
+        self.assertIn("ValueError: because I can", tb_text)
 
 
 # noinspection PyMissingOrEmptyDocstring
