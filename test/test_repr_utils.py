@@ -326,6 +326,17 @@ class TestContainers(unittest.TestCase):
         default_deque.extendleft(("second", "first"))
 
         self.assertEqual(
+            "deque((\n    'first',\n    'second',\n    'middle',\n    'next',\n    'last',\n))",
+            logwrap.pretty_repr(default_deque),
+        )
+
+    def test_006_deque_max_len(self):
+        default_deque = collections.deque(maxlen=5)
+        default_deque.append("middle")
+        default_deque.extend(("next", "last"))
+        default_deque.extendleft(("second", "first"))
+
+        self.assertEqual(
             "deque(\n"
             "    (\n"
             "        'first',\n"
@@ -334,12 +345,12 @@ class TestContainers(unittest.TestCase):
             "        'next',\n"
             "        'last',\n"
             "    ),\n"
-            "    maxlen=None,\n"
+            "    maxlen=5,\n"
             ")",
             logwrap.pretty_repr(default_deque),
         )
 
-    def tests_006_union_ann(self):
+    def tests_007_union_ann(self):
         @dataclasses.dataclass
         class WithUnionAnn:
             a: int | None
@@ -351,7 +362,7 @@ class TestContainers(unittest.TestCase):
         )
 
     @unittest.skipUnless(attrs is not None, "attrs is not installed")
-    def test_007_attrs_define(self):
+    def test_008_attrs_define(self):
         @attrs.define
         class TestAttrsClass:
             b: int = 0
@@ -371,7 +382,7 @@ class TestContainers(unittest.TestCase):
         )
 
     @unittest.skipUnless(attrs is not None, "attrs is not installed")
-    def test_008_attrs_frozen_union_ann(self):
+    def test_009_attrs_frozen_union_ann(self):
         @attrs.frozen
         class WithUnionAnn:
             a: int | None = None
@@ -383,7 +394,7 @@ class TestContainers(unittest.TestCase):
         )
 
     @unittest.skipUnless(attrs is not None, "attrs is not installed")
-    def test_009_attrs_kw_only(self):
+    def test_0010_attrs_kw_only(self):
         @attrs.define(kw_only=True)
         class KwOnlyAttrs:
             x: int = 1
@@ -391,6 +402,22 @@ class TestContainers(unittest.TestCase):
         test_val = KwOnlyAttrs()
         self.assertEqual(
             "test_repr_utils.KwOnlyAttrs(\n    x=1,  # type: int  # kw_only\n)",
+            logwrap.pretty_repr(test_val),
+        )
+
+    def test_0011_counter(self):
+        test_val = collections.Counter("test string")
+        self.assertEqual(
+            "Counter({\n"
+            "    't': 3,\n"
+            "    's': 2,\n"
+            "    'e': 1,\n"
+            "    ' ': 1,\n"
+            "    'r': 1,\n"
+            "    'i': 1,\n"
+            "    'n': 1,\n"
+            "    'g': 1,\n"
+            "})",
             logwrap.pretty_repr(test_val),
         )
 
