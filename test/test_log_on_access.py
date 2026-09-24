@@ -4,6 +4,7 @@
 
 import io
 import logging
+import os
 import unittest
 
 import logwrap
@@ -254,6 +255,46 @@ class TestLogOnAccess(unittest.TestCase):
             self.assertIsNone(target.ok)
 
         self.assertEqual(self.stream.getvalue(), "")
+
+    def test_06_1_negative_traceback_content(self):
+        def failing():
+            raise RuntimeError("because I can")
+
+        # noinspection PyMissingOrEmptyDocstring
+        class Target:
+            def __repr__(tself):
+                return f"{tself.__class__.__name__}()"
+
+            @logwrap.LogOnAccess
+            def ok(tself):
+                failing()
+
+            @ok.setter
+            def ok(tself, val):
+                failing()
+
+            @ok.deleter
+            def ok(tself):
+                failing()
+
+        target = Target()
+
+        for action in (lambda: target.ok, lambda: setattr(target, "ok", VALUE), lambda: delattr(target, "ok")):
+            with self.subTest(action=action):
+                self.stream.seek(0)
+                self.stream.truncate()
+
+                with self.assertRaises(RuntimeError):
+                    action()
+
+                tb_text = self.stream.getvalue().split("Traceback (most recent call last):\n")[1]
+                # Descriptor internals are hidden
+                self.assertNotIn(os.path.abspath(logwrap.log_on_access.__file__), tb_text)
+                # Accessor and the real failure point are both present
+                self.assertIn("in ok\n", tb_text)
+                self.assertIn("in failing\n", tb_text)
+                self.assertIn('raise RuntimeError("because I can")', tb_text)
+                self.assertIn("RuntimeError: because I can", tb_text)
 
     def test_07_property_mimic(self):
         # noinspection PyMissingOrEmptyDocstring
