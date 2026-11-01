@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestLogWrapLoggerInTargetModule(unittest.TestCase):
     def setUp(self):
-        """Preparation for tests.
+        """Prepare for tests.
 
         Due to no possibility of proper mock patch of function defaults, modify directly.
         """

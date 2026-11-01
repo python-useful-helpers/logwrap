@@ -16,7 +16,7 @@
 from __future__ import annotations
 
 import inspect
-import os
+import pathlib
 import time
 import typing
 from logging import DEBUG
@@ -34,7 +34,7 @@ if typing.TYPE_CHECKING:
 __all__ = ("LogOnAccess",)
 
 _LOGGER: Logger = getLogger(__name__)
-_CURRENT_FILE = os.path.abspath(__file__)
+_CURRENT_FILE = str(pathlib.Path(__file__).absolute())
 _OwnerT = typing.TypeVar("_OwnerT")
 _ReturnT = typing.TypeVar("_ReturnT")
 
@@ -289,15 +289,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         instance: None,
         owner: None,
         /,
-    ) -> typing.NoReturn:
-        """Get descriptor.
-
-        :param instance: Owner class instance. Filled only if an instance is created, else None.
-        :param owner: Owner class for property.
-        :return: getter call result if getter presents
-        :raises AttributeError: Getter is not available
-        :raises Exception: Something goes wrong
-        """
+    ) -> typing.NoReturn: ...
 
     @typing.overload
     def __get__(
@@ -305,15 +297,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         instance: None,
         owner: type[_OwnerT],
         /,
-    ) -> Self:
-        """Get descriptor.
-
-        :param instance: Owner class instance. Filled only if an instance is created, else None.
-        :param owner: Owner class for property.
-        :return: getter call result if getter presents
-        :raises AttributeError: Getter is not available
-        :raises Exception: Something goes wrong
-        """
+    ) -> Self: ...
 
     @typing.overload
     def __get__(
@@ -321,15 +305,7 @@ class LogOnAccess(property, typing.Generic[_OwnerT, _ReturnT]):
         instance: _OwnerT,
         owner: type[_OwnerT] | None = None,
         /,
-    ) -> _ReturnT:
-        """Get descriptor.
-
-        :param instance: Owner class instance. Filled only if an instance is created, else None.
-        :param owner: Owner class for property.
-        :return: getter call result if getter presents
-        :raises AttributeError: Getter is not available
-        :raises Exception: Something goes wrong
-        """
+    ) -> _ReturnT: ...
 
     def __get__(
         self,

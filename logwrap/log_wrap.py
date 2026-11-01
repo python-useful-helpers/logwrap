@@ -21,7 +21,7 @@ from __future__ import annotations
 import asyncio
 import functools
 import inspect
-import os
+import pathlib
 import sys
 import types
 from logging import DEBUG
@@ -51,7 +51,7 @@ __all__ = ("BoundParameter", "LogWrap", "bind_args_kwargs", "logwrap")
 
 LOGGER: Logger = getLogger("logwrap")
 INDENT = 4
-_CURRENT_FILE = os.path.abspath(__file__)
+_CURRENT_FILE = str(pathlib.Path(__file__).absolute())
 
 
 class BoundParameter(inspect.Parameter):
@@ -501,7 +501,7 @@ class LogWrap:
                 max_indent=self.max_indent,
                 max_iter=self.max_iter,
             )
-        except Exception as exc:  # NOQA:BLE001  # It's a goal
+        except Exception as exc:  # noqa: BLE001  # a failed repr is reported in the log, not raised
             base_name: str = getattr(value, "name", getattr(value, "__name__", value.__class__.__name__))
             base_details: str = f"at 0x{id(value):X} (repr failed with reason: {exc})"
             if isinstance(value, types.FunctionType):  # pragma: no cover
@@ -516,7 +516,7 @@ class LogWrap:
         args: tuple[Any, ...],
         kwargs: dict[str, Any],
     ) -> str:
-        """Internal helper for reducing the complexity of decorator code.
+        """Build the arguments repr for the call log records.
 
         :param sig: function signature
         :param args: positional arguments
@@ -637,17 +637,16 @@ class LogWrap:
         self,
         func: Callable[Spec, RetVal],
     ) -> Callable[Spec, RetVal]:
-        """Here should be constructed and returned real decorator.
+        """Construct and return the real decorator.
 
         :param func: Wrapped function
         :return: wrapped coroutine or function
         """
-
         logger: Logger = self._get_logger_for_func(func)
 
         @functools.wraps(func)
         async def async_wrapper(*args: Spec.args, **kwargs: Spec.kwargs) -> Any:
-            """Decorator for async callable objects.
+            """Log the async callable call.
 
             :return: function result
             :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
@@ -666,7 +665,7 @@ class LogWrap:
 
         @functools.wraps(func)
         def wrapper(*args: Spec.args, **kwargs: Spec.kwargs) -> RetVal:
-            """Decorator for normal callable objects.
+            """Log the callable call.
 
             :return: function result
             :raises Exception: something went wrong. Exception has been logged if not blacklisted/disabled log.
@@ -714,8 +713,7 @@ def logwrap(
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
     log_result_obj: bool = True,
-) -> LogWrap:
-    """Overload: with no func."""
+) -> LogWrap: ...
 
 
 @overload
@@ -734,8 +732,7 @@ def logwrap(
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
     log_result_obj: bool = True,
-) -> LogWrap:
-    """Overload: with no func."""
+) -> LogWrap: ...
 
 
 @overload
@@ -754,8 +751,7 @@ def logwrap(
     log_call_args_on_exc: bool = True,
     log_traceback: bool = True,
     log_result_obj: bool = True,
-) -> Callable[Spec, RetVal]:
-    """Overload: func provided."""
+) -> Callable[Spec, RetVal]: ...
 
 
 def logwrap(

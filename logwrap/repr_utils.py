@@ -42,7 +42,7 @@ from typing import runtime_checkable
 
 if sys.version_info < (3, 12):  # `__protocol_attrs__` have been available since python 3.12 only
     # noinspection protected-member
-    from typing import _get_protocol_attrs
+    from typing import _get_protocol_attrs  # pyrefly: ignore[missing-module-attribute]  # private, not in typeshed
 else:
     _get_protocol_attrs = None
 
@@ -314,7 +314,7 @@ class PrettyFormat(abc.ABC):
     __slots__ = ("_indent_step", "_max_indent", "_max_iter")
 
     # magic method name to lookup in processing objects. Defined by the concrete subclasses.
-    _magic_method_name: ClassVar[str]  # pylint: disable=declare-non-slot
+    _magic_method_name: ClassVar[str]
 
     def __init__(
         self,
@@ -487,7 +487,7 @@ class PrettyFormat(abc.ABC):
         # noinspection PyBroadException
         try:
             args_annotations: dict[str, Any] = get_type_hints(type(src))
-        except BaseException:  # NOQA:BLE001  # It's a goal
+        except Exception:  # noqa: BLE001  # unresolvable annotations: repr without them
             args_annotations = {}
 
         next_indent: int = indent + self._indent_step
@@ -695,6 +695,7 @@ class PrettyFormat(abc.ABC):
         :param indent: start indentation
         :param no_indent_start: do not indent open bracket and simple parameters
         :returns: formatted string
+        :raises ValueError: an empty tuple yielded by __rich_repr__
         """
         param_repr: list[str] = []
 
@@ -702,19 +703,18 @@ class PrettyFormat(abc.ABC):
         prefix: str = "\n" + " " * next_indent
         arg: typing.Any | tuple[typing.Any] | tuple[str, typing.Any] | tuple[str, typing.Any, typing.Any]
         arg_name: str | None
+        default: list[typing.Any]
 
         for arg in src.__rich_repr__():
             if isinstance(arg, tuple):
-                match len(arg):
-                    case 1:
+                match arg:
+                    case (value,):
                         arg_name = None
-                        default = ()
-                        value = arg[0]
-                    case 2:
-                        arg_name, value = arg
-                        default = ()
+                        default = []
+                    case (arg_name, value, *default):
+                        pass
                     case _:
-                        arg_name, value, *default = arg  # type: ignore[assignment]
+                        raise ValueError(f"{src.__class__.__name__}.__rich_repr__ yielded an empty tuple")
 
                 if arg_name is not None and default and default[0] == value:
                     # standard behaviour for rich
@@ -980,7 +980,7 @@ class PrettyStr(PrettyFormat):
         indent: int,
         val: bytes | str,
     ) -> str:
-        """Custom str for strings and binary strings.
+        """Make str for strings and binary strings.
 
         :param indent: Result indent
         :param val: value for repr

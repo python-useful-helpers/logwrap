@@ -23,7 +23,7 @@ from logwrap import log_wrap
 
 
 def example_function(arg1, arg2: int = 2, *args, arg3, arg4: int = 4, **kwargs) -> None:
-    """Function to use as signature source."""
+    """Serve as the signature source."""
 
 
 sig = signature(example_function)

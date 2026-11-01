@@ -14,7 +14,7 @@
 
 # pylint: disable=missing-docstring, unused-argument
 
-"""Python 3 specific tests"""
+"""Python 3 specific tests."""
 
 import asyncio
 import io
@@ -30,7 +30,7 @@ class TestLogWrapAsync(unittest.TestCase):
     """async def differs from asyncio.coroutine."""
 
     def setUp(self):
-        """Preparation for tests.
+        """Prepare for tests.
 
         Due to no possibility of proper mock patch of function defaults, modify directly.
         """

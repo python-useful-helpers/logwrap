@@ -26,12 +26,9 @@ import dataclasses
 import typing
 import unittest
 
-import logwrap
+import attrs
 
-try:
-    import attrs
-except ImportError:
-    attrs = None  # type: ignore[assignment]
+import logwrap
 
 if typing.TYPE_CHECKING:
     from collections.abc import Iterable
@@ -361,7 +358,6 @@ class TestContainers(unittest.TestCase):
             logwrap.pretty_repr(test_dc),
         )
 
-    @unittest.skipUnless(attrs is not None, "attrs is not installed")
     def test_008_attrs_define(self):
         @attrs.define
         class TestAttrsClass:
@@ -381,7 +377,6 @@ class TestContainers(unittest.TestCase):
             logwrap.pretty_repr(test_val),
         )
 
-    @unittest.skipUnless(attrs is not None, "attrs is not installed")
     def test_009_attrs_frozen_union_ann(self):
         @attrs.frozen
         class WithUnionAnn:
@@ -393,7 +388,6 @@ class TestContainers(unittest.TestCase):
             logwrap.pretty_repr(test_val),
         )
 
-    @unittest.skipUnless(attrs is not None, "attrs is not installed")
     def test_0010_attrs_kw_only(self):
         @attrs.define(kw_only=True)
         class KwOnlyAttrs:
@@ -463,3 +457,12 @@ class TestRich(unittest.TestCase):
             f")",
             logwrap.pretty_repr(val),
         )
+
+    def test_003_empty_tuple(self):
+        class Broken:
+            def __rich_repr__(self) -> RichReprResult:
+                yield "name", "value"
+                yield ()
+
+        with self.assertRaisesRegex(ValueError, "Broken.__rich_repr__ yielded an empty tuple"):
+            logwrap.pretty_repr(Broken())

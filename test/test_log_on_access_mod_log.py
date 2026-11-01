@@ -14,7 +14,7 @@ LOG = logging.getLogger("Target_mod")
 
 class TestLogOnAccess(unittest.TestCase):
     def setUp(self):
-        """Preparation for tests."""
+        """Prepare for tests."""
         self.stream = io.StringIO()
         logging.getLogger().handlers.clear()
         logging.basicConfig(level=logging.DEBUG, stream=self.stream)

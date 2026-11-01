@@ -4,7 +4,7 @@
 
 import io
 import logging
-import os
+import pathlib
 import unittest
 
 import logwrap
@@ -14,7 +14,7 @@ VALUE = "ok"
 
 class TestLogOnAccess(unittest.TestCase):
     def setUp(self):
-        """Preparation for tests."""
+        """Prepare for tests."""
         self.stream = io.StringIO()
         logging.getLogger().handlers.clear()
         logging.basicConfig(level=logging.DEBUG, stream=self.stream)
@@ -289,7 +289,7 @@ class TestLogOnAccess(unittest.TestCase):
 
                 tb_text = self.stream.getvalue().split("Traceback (most recent call last):\n")[1]
                 # Descriptor internals are hidden
-                self.assertNotIn(os.path.abspath(logwrap.log_on_access.__file__), tb_text)
+                self.assertNotIn(str(pathlib.Path(logwrap.log_on_access.__file__).absolute()), tb_text)
                 # Accessor and the real failure point are both present
                 self.assertIn("in ok\n", tb_text)
                 self.assertIn("in failing\n", tb_text)

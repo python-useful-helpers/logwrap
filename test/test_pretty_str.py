@@ -16,7 +16,7 @@
 
 # pylint: disable=missing-docstring
 
-"""pretty_str specific tests"""
+"""pretty_str specific tests."""
 
 import unittest
 

@@ -15,7 +15,7 @@
 
 from __future__ import annotations
 
-import os
+import pathlib
 import traceback
 import typing
 
@@ -25,7 +25,7 @@ if typing.TYPE_CHECKING:
 
 __all__ = ("format_traceback",)
 
-_CURRENT_FILE = os.path.abspath(__file__)
+_CURRENT_FILE = str(pathlib.Path(__file__).absolute())
 
 
 def drop_frames_for_files(

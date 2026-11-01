@@ -24,7 +24,7 @@ import dataclasses
 import functools
 import io
 import logging
-import os
+import pathlib
 import unittest
 from unittest import mock
 
@@ -44,7 +44,7 @@ class AnyStringWith(str):  # noqa: PLW1641,RUF100
 # noinspection PyUnusedLocal,PyMissingOrEmptyDocstring
 class TestLogWrap(unittest.TestCase):
     def setUp(self):
-        """Preparation for tests.
+        """Prepare for tests.
 
         Due to no possibility of proper mock patch of function defaults, modify directly.
         """
@@ -656,7 +656,7 @@ class TestLogWrap(unittest.TestCase):
 
         tb_text = self.stream.getvalue().split("Traceback (most recent call last):\n")[1]
         # Decorator internals are hidden
-        self.assertNotIn(os.path.abspath(logwrap.log_wrap.__file__), tb_text)
+        self.assertNotIn(str(pathlib.Path(logwrap.log_wrap.__file__).absolute()), tb_text)
         # Caller, decorated function and the real failure point are all present
         self.assertIn("test_026_traceback_content", tb_text)
         self.assertIn("in func\n", tb_text)
@@ -701,7 +701,7 @@ class TestObject(unittest.TestCase):
         self.assertFalse(log_call.log_result_obj)
 
         with self.assertRaises(TypeError):
-            log_call.log_level = "WARNING"
+            log_call.log_level = "WARNING"  # pyrefly: ignore[bad-argument-type]  # the runtime check is tested
 
         self.assertEqual(
             f"{log_call.__class__.__name__}("
